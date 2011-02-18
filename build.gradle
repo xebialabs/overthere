@@ -1,0 +1,8 @@
+apply plugin: java
+apply plugin: eclipse
+apply plugin: idea
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
