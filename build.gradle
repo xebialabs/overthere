@@ -2,6 +2,15 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+dependencies {
+  compile 'commons-lang:commons-lang:2.5'
+  compile 'commons-io:commons-io:1.4'
+  compile 'com.google.collections:google-collections:1.0'
+  compile 'org.slf4j:slf4j-api:1.6.1'
+  compile 'com.jcraft:jsch:0.1.42'
+  testCompile 'junit:junit:4.8.1'
+}
+
 repositories {
   mavenLocal()
   mavenCentral()
