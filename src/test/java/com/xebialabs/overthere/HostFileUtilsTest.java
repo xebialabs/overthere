@@ -27,19 +27,11 @@
 
 package com.xebialabs.overthere;
 
-import com.google.common.collect.Maps;
-import com.xebialabs.deployit.ci.Host;
-import com.xebialabs.deployit.ci.HostAccessMethod;
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.deployit.ci.artifact.EjbJar;
-import com.xebialabs.deployit.ci.artifact.Libraries;
-import com.xebialabs.deployit.ci.artifact.War;
-import com.xebialabs.deployit.ci.artifact.mapping.PlaceholderFormat;
-import com.xebialabs.deployit.exception.RuntimeIOException;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -47,53 +39,45 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createNiceMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class HostFileUtilsTest {
 
-	private ConnectionOptions host1;
-	private String type1;
-
-	private ConnectionOptions host2;
-	private String type2;
-
-	@Before
-	public void setUpHost1() {
-		host1 = new Host();
-		host1.setAddress("apache-22");
-		host1.setUsername("root");
-		host1.setPassword("centos");
-		host1.setAccessMethod(HostAccessMethod.SSH_SCP);
-		host1.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-	}
-
-	@Before
-	public void setUpHost2() {
-		host2 = new Host();
-		host2.setAddress("was-51");
-		host2.setUsername("root");
-		host2.setPassword("centos");
-		host2.setAccessMethod(HostAccessMethod.SSH_SFTP);
-		host2.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-	}
+	// private String type1;
+	// private ConnectionOptions host1;
+	//
+	// private String type2;
+	// private ConnectionOptions host2;
+	//
+	// @Before
+	// public void setUpHosts() {
+	// type1 = "ssh_scp";
+	// host1 = new ConnectionOptions();
+	// host1.set("address", "overthere");
+	// host1.set("username", "root");
+	// host1.set("password", "centos");
+	// host1.set("os", OperatingSystemFamily.UNIX);
+	//
+	// type2 = "ssh_sftp";
+	// host2 = new ConnectionOptions();
+	// host2.set("address", "overthere");
+	// host2.set("username", "trusted");
+	// host2.set("password", "trustme");
+	// host2.set("os", OperatingSystemFamily.UNIX);
+	// }
 
 	@Test
 	public void copyOfFileToDirectoryFails() {
 
-		HostFile regularFile = createNiceMock(HostFile.class);
-		expect(regularFile.exists()).andReturn(true);
-		expect(regularFile.isDirectory()).andReturn(false);
+		HostFile regularFile = Mockito.mock(HostFile.class);
+		Mockito.when(regularFile.exists()).thenReturn(true);
+		Mockito.when(regularFile.isDirectory()).thenReturn(false);
 
-		HostFile directory = createNiceMock(HostFile.class);
-		expect(directory.exists()).andReturn(true);
-		expect(directory.isDirectory()).andReturn(true);
-
-		replay(regularFile, directory);
+		HostFile directory = Mockito.mock(HostFile.class);
+		Mockito.when(directory.exists()).thenReturn(true);
+		Mockito.when(directory.isDirectory()).thenReturn(true);
 
 		try {
 			HostFileUtils.copy(regularFile, directory);
@@ -111,7 +95,9 @@ public class HostFileUtilsTest {
 
 	@Test
 	public void testCopyDirIsRecursive() {
-		HostConnection s = Host.getLocalHost().getHostSession();
+		ConnectionOptions localOptions = new ConnectionOptions();
+		localOptions.set("os", UNIX);
+		HostConnection s = Overthere.getConnection("local", localOptions);
 		try {
 			File srcDirFile = File.createTempFile("srcdir", null);
 			HostFile srcDir = s.getFile(srcDirFile.getPath());
@@ -188,7 +174,7 @@ public class HostFileUtilsTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			s.close();
+			s.disconnect();
 		}
 	}
 
@@ -216,60 +202,58 @@ public class HostFileUtilsTest {
 		return dirs;
 	}
 
-	@Test
-	@Ignore
-	public void testCopyToSameMachine() {
-		HostConnection s = HostSessionFactory.getHostSession(host1);
-		// HostConnection s2 = HostSessionFactory.getHostSession(host2);
-		try {
-			HostFile h1 = s.getFile("/tmp/input.txt");
-			// HostFile h2 = s.getFile("/tmp/output.txt");
-			HostFile h2 = s.getFile("/root/loopback/mnt/output.txt");
-			HostFileUtils.copy(h1, h2);
-		} finally {
-			s.close();
-			// s2.close();
-		}
-	}
-
-	@Test
-	@Ignore
-	public void testCopyToFullDisk() {
-		Host h = new Host();
-		// h.setAddress("was-51");
-		h.setAddress("apache-22");
-		h.setUsername("root");
-		h.setPassword("centos");
-		// h.setTemporaryDirectoryLocation("/root/loopback/mnt");
-		h.setAccessMethod(HostAccessMethod.SSH_SCP);
-		h.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-
-		HostConnection s = HostSessionFactory.getHostSession(h);
-		try {
-			try {
-				s.copyToTemporaryFile(new ClassPathResource("web/help/settingUpAnEnvironment.mp4"));
-				fail("No exception thrown when writing to full disk");
-			} catch (Exception exc) {
-				exc.printStackTrace();
-			}
-		} finally {
-			s.close();
-		}
-	}
-
-	@Test
-	@Ignore
-	public void testTemporaryDirectory() {
-		HostConnection s = HostSessionFactory.getHostSession(host1);
-		try {
-			HostFile tmp1 = s.getTempFile("bla.txt");
-			HostFileUtils.putStringToHostFile("blargh1", tmp1);
-			HostFile tmp2 = s.getTempFile("bla", ".tmp");
-			HostFileUtils.putStringToHostFile("blargh2", tmp2);
-			HostFile tmp3 = s.getTempFile("bla", ".tmp");
-			HostFileUtils.putStringToHostFile("blargh2", tmp3);
-		} finally {
-			s.close();
-		}
-	}
+	// FIXME: Find a better way to write these test
+	// @Test
+	// @Ignore
+	// public void testCopyToSameMachine() {
+	// HostConnection s = Overthere.getConnection(type1, host1);
+	// try {
+	// HostFile h1 = s.getFile("/tmp/input.txt");
+	// HostFile h2 = s.getFile("/root/loopback/mnt/output.txt");
+	// HostFileUtils.copy(h1, h2);
+	// } finally {
+	// s.disconnect();
+	// }
+	// }
+	//
+	// @Test
+	// @Ignore
+	// public void testCopyToFullDisk() {
+	// Host h = new Host();
+	// // h.setAddress("was-51");
+	// h.setAddress("apache-22");
+	// h.setUsername("root");
+	// h.setPassword("centos");
+	// // h.setTemporaryDirectoryLocation("/root/loopback/mnt");
+	// h.setAccessMethod(HostAccessMethod.SSH_SCP);
+	// h.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
+	//
+	// HostConnection s = HostSessionFactory.getHostSession(h);
+	// try {
+	// try {
+	// s.copyToTemporaryFile(new ClassPathResource("web/help/settingUpAnEnvironment.mp4"));
+	// fail("No exception thrown when writing to full disk");
+	// } catch (Exception exc) {
+	// exc.printStackTrace();
+	// }
+	// } finally {
+	// s.disconnect();
+	// }
+	// }
+	//
+	// @Test
+	// @Ignore
+	// public void testTemporaryDirectory() {
+	// HostConnection s = HostSessionFactory.getHostSession(host1);
+	// try {
+	// HostFile tmp1 = s.getTempFile("bla.txt");
+	// HostFileUtils.putStringToHostFile("blargh1", tmp1);
+	// HostFile tmp2 = s.getTempFile("bla", ".tmp");
+	// HostFileUtils.putStringToHostFile("blargh2", tmp2);
+	// HostFile tmp3 = s.getTempFile("bla", ".tmp");
+	// HostFileUtils.putStringToHostFile("blargh2", tmp3);
+	// } finally {
+	// s.disconnect();
+	// }
+	// }
 }

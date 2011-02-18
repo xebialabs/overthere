@@ -35,31 +35,28 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import com.xebialabs.overthere.*;
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Needs Windows 2003 image")
-public class CifsTelnetHostSessionItest extends HostSessionItestBase {
+import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.HostSessionItestBase;
+import com.xebialabs.overthere.OperatingSystemFamily;
 
-	@Before
-	public void setupCifsTelnetEnvironment() {
+@Ignore("Needs Windows 2003 image")
+public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
+
+	@Override
+    protected void setTypeAndOptions() {
+		type = "cifs_telnet";
 		options = new ConnectionOptions();
 		options.set("address", "wls-11g-win");
 		options.set("username", "itestuser");
 		// ensure the test user contains some reserved characters such as ';', ':' or '@' 
 		options.set("password", "hello@:;<>myfriend");
 		options.set("os", OperatingSystemFamily.WINDOWS);
-
-		connection = Overthere.getConnection("cifs_telnet", options);
-	}
-
-	@After
-	public void tearDownCifsTelnetItestEnvironment() {
-		connection.close();
 	}
 
 	@Test

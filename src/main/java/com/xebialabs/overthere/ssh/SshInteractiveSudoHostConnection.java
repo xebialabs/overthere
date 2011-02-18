@@ -12,9 +12,9 @@ import java.util.Map;
 /**
  * A connection to a remote host using SSH w/ interactive SUDO.
  */
-class SshInteractiveSudoHostConnection extends SshSudoHostConnection {
+public class SshInteractiveSudoHostConnection extends SshSudoHostConnection {
 
-	SshInteractiveSudoHostConnection(String type, ConnectionOptions options) {
+	public SshInteractiveSudoHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
 	}
 

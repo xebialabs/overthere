@@ -37,13 +37,13 @@ import static org.junit.Assert.assertThat;
 public class SshSftpHostConnectionItest extends SshHostConnectionItestBase {
 
 	@Override
-	public void setupConnection() {
-		options = new ConnectionOptions();
-		options.set("address", "apache-22");
-		options.set("username", "root");
-		options.set("password", "centos");
-		options.set("os", UNIX);
+    protected void setTypeAndOptions() {
 		type = "ssh_sftp";
+		options = new ConnectionOptions();
+		options.set("address", "overthere");
+		options.set("username", "overthere");
+		options.set("password", "overhere");
+		options.set("os", UNIX);
 	}
 
 	@Test

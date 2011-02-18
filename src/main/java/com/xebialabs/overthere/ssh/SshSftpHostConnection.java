@@ -27,8 +27,8 @@ public class SshSftpHostConnection extends SshHostConnection {
 	}
 
 	@Override
-	public void close() {
-		super.close();
+	public void disconnect() {
+		super.disconnect();
 
 		if (sharedSftpChannel != null) {
 			closeSftpChannel(sharedSftpChannel);

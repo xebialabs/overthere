@@ -27,14 +27,19 @@
 
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.*;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Ignore;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostSessionItestBase;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.Overthere;
+
+@Ignore("Needs image with user that is identified by key")
 public class SshIdentifiedByPubKeyItest extends HostSessionItestBase {
 
-	@Before
-	public void setupSshSftpItestEnvironment() {
+	@Override
+    protected void setTypeAndOptions() {
 		options = new ConnectionOptions();
 		options.set("address", "jboss-51");
 		options.set("username", "autodpl");
@@ -49,8 +54,6 @@ public class SshIdentifiedByPubKeyItest extends HostSessionItestBase {
 	@After
 	public void clean() {
 		System.clearProperty("ssh.privatekey.filename");
-		if (connection != null) {
-			connection.close();
-		}
 	}
+
 }

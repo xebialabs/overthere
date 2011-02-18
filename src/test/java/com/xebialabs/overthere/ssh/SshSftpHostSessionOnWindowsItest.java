@@ -7,10 +7,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
+@Ignore("Needs Windows image that is not on dexter")
 public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItestBase {
 
 	@Override
-	protected void setupConnection() {
+    protected void setTypeAndOptions() {
 		type = "ssh_sftp";
 		options.set("address", "win-xp");
 		options.set("username", "Administrator");
@@ -20,7 +21,6 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 	}
 
 	@Test
-	@Ignore("Needs Windows image that is not on dexter")
 	public void writeTemporaryFileAndTypeIt() {
 		final String expectedOutput = "Mary had a little lamb";
 
@@ -37,7 +37,7 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 
 			assertTrue(capturedOutput.getOutput().contains(expectedOutput));
 		} finally {
-			hs.close();
+			hs.disconnect();
 		}
 	}
 
@@ -55,7 +55,7 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 			HostFileUtils.putStringToHostFile("hello....\r\n", file);
 
 		} finally {
-			hs.close();
+			hs.disconnect();
 		}
 	}
 

@@ -1,5 +1,7 @@
 package com.xebialabs.overthere.local;
 
+import static java.io.File.createTempFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -17,7 +19,7 @@ import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
 /**
  * A connection to the local host.
  */
-public class LocalHostConnection extends AbstractHostConnection implements HostConnection {
+public class LocalHostConnection extends AbstractHostConnection implements HostConnectionBuilder, HostConnection {
 
 	/**
 	 * Constructs a connection to the local host.
@@ -26,9 +28,17 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 		super(type, options);
 	}
 
+	public HostConnection connect() {
+		return this;
+	}
+
 	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		try {
-			return new LocalHostFile(this, File.createTempFile(prefix, suffix, new File(getTemporaryDirectory().getPath())));
+			File tempFile = createTempFile(prefix, suffix, new File(getTemporaryDirectory().getPath()));
+			// FIXME: Need to delete this file to make test work, but isn't it better to NOT do that so that a tempfile with the same name is not accidentally
+			// created simultaneously?
+			tempFile.delete();
+			return new LocalHostFile(this, tempFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}

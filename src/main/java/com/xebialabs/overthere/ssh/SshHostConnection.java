@@ -29,7 +29,7 @@ import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
 /**
  * A host connection over SSH.
  */
-abstract class SshHostConnection extends AbstractHostConnection implements HostConnection, HostConnectionBuilder {
+abstract class SshHostConnection extends AbstractHostConnection implements HostConnectionBuilder, HostConnection {
 
 	protected String host;
 
@@ -45,13 +45,13 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 
 	public SshHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.host = options.get("host");
-		this.port = (Integer) options.get("port");
+		this.host = options.get("address");
+		this.port = options.get("port", 22);
 		this.username = options.get("username");
 		this.password = options.get("password");
 	}
 
-	public SshHostConnection open() throws RuntimeIOException {
+	public SshHostConnection connect() throws RuntimeIOException {
 		if (sharedSession == null) {
 			try {
 				sharedSession = openSession(CHANNEL_PURPOSE);
@@ -63,8 +63,8 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 	}
 
 	@Override
-	public void close() {
-		super.close();
+	public void disconnect() {
+		super.disconnect();
 		disconnectSharedSession();
 	}
 

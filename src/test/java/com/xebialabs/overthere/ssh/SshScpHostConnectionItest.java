@@ -10,12 +10,12 @@ import static org.junit.Assert.assertThat;
 public class SshScpHostConnectionItest extends SshHostConnectionItestBase {
 
 	@Override
-	protected void setupConnection() {
+    protected void setTypeAndOptions() {
 		type = "ssh_scp";
 		options = new ConnectionOptions();
-		options.set("address", "apache-22");
-		options.set("username", "root");
-		options.set("password", "centos");
+		options.set("address", "overthere");
+		options.set("username", "overthere");
+		options.set("password", "overhere");
 		options.set("os", OperatingSystemFamily.UNIX);
 	}
 

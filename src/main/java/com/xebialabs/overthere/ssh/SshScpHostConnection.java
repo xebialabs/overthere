@@ -11,7 +11,7 @@ public class SshScpHostConnection extends SshHostConnection {
 
 	public SshScpHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		open();
+		connect();
 	}
 
 	@Override

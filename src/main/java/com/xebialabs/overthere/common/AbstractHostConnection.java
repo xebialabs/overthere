@@ -1,16 +1,23 @@
 package com.xebialabs.overthere.common;
 
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-import com.xebialabs.overthere.*;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Abstract base class with common methods used by actual implementations of {@link com.xebialabs.overthere.HostConnection}.
@@ -27,7 +34,7 @@ public abstract class AbstractHostConnection implements HostConnection {
 
 	protected AbstractHostConnection(String type, ConnectionOptions options) {
 		this.os = options.get("os");
-		this.temporaryDirectoryPath = options.get("temporaryDirectoryPath");
+		this.temporaryDirectoryPath = options.get("temporaryDirectoryPath", os.getDefaultTemporaryDirectoryPath());
 	}
 
 	public OperatingSystemFamily getHostOperatingSystem() {
@@ -42,7 +49,7 @@ public abstract class AbstractHostConnection implements HostConnection {
 		return os.encodeCommandLineForLogging(cmdarray);
 	}
 
-	public void close() {
+	public void disconnect() {
 		String doNotCleanUpTemporaryFiles = System.getProperty("com.xebia.ad.donotcleanuptemporaryfiles");
 		boolean doNotCleanUp = (doNotCleanUpTemporaryFiles != null && doNotCleanUpTemporaryFiles.equalsIgnoreCase("true"));
 		if (!doNotCleanUp) {
@@ -106,12 +113,12 @@ public abstract class AbstractHostConnection implements HostConnection {
 			}
 		}
 
-		if (StringUtils.isBlank(nameTemplate)) {
+		if (isBlank(nameTemplate)) {
 			prefix = "hostsession";
 			suffix = ".tmp";
 		} else {
-			prefix = FilenameUtils.getBaseName(nameTemplate);
-			suffix = "." + FilenameUtils.getExtension(nameTemplate);
+			prefix = getBaseName(nameTemplate);
+			suffix = "." + getExtension(nameTemplate);
 		}
 
 		return getTempFile(prefix, suffix);

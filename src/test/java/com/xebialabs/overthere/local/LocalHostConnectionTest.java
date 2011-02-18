@@ -27,32 +27,34 @@
 
 package com.xebialabs.overthere.local;
 
-import com.xebialabs.overthere.*;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
-import java.io.IOException;
-
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.internal.matchers.StringContains.containsString;
 
-public class LocalHostFileTest extends HostSessionItestBase {
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
+import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.HostSessionItestBase;
+import com.xebialabs.overthere.OperatingSystemFamily;
+
+public class LocalHostConnectionTest extends HostSessionItestBase {
 
 	@Rule
 	public TemporaryFolder temp = new TemporaryFolder();
 
-	private HostConnection connection;
-
-	@Before
-	public void openSession() throws IOException {
+	@Override
+    protected void setTypeAndOptions() {
+		type = "local";
+		options = new ConnectionOptions();
+		// FIXME: LocalHostConnection should be able to find out its OS family by itself.
 		options.set("os", OperatingSystemFamily.UNIX);
 		options.set("temporaryDirectoryPath", temp.getRoot().getPath());
-		connection = Overthere.getConnection("local", options);
 	}
 
 	@Test
@@ -64,6 +66,8 @@ public class LocalHostFileTest extends HostSessionItestBase {
 	}
 
 	@Test
+	@Ignore
+	// FIXME: needs different test command
 	public void passwordNotSeen() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler();
 		connection.execute(handler, "foo.sh -username", "benoit", "-password", "benoit");
@@ -71,17 +75,14 @@ public class LocalHostFileTest extends HostSessionItestBase {
 	}
 
 	@Test
+	@Ignore
+	// FIXME: needs different test command
 	public void passwordNotSeen2() {
 		try {
 			connection.execute(new DebugCommandExecutionCallbackHandler(), "foo.sh -username benoit -password benoit");
 		} catch (Throwable t) {
 
 		}
-	}
-
-	@After
-	public void closeSession() {
-		connection.close();
 	}
 
 }

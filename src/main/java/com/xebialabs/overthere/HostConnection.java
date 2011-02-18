@@ -47,7 +47,7 @@ public interface HostConnection {
 	 * 
 	 * Never throws an exception, not even a {@link RuntimeException}
 	 */
-	void close();
+	void disconnect();
 
 	/**
 	 * Creates a reference to a file on the host.

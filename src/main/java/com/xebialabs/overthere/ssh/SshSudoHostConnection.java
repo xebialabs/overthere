@@ -13,14 +13,13 @@ import org.slf4j.LoggerFactory;
 /**
  * A connection to a remote host using SSH w/ SUDO.
  */
-class SshSudoHostConnection extends SshHostConnection {
+public class SshSudoHostConnection extends SshHostConnection {
 
 	protected String sudoUsername;
 
-	SshSudoHostConnection(String type, ConnectionOptions options) {
+	public SshSudoHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.sudoUsername = options.get("sudoUsername");
-		open();
 	}
 
 	@Override

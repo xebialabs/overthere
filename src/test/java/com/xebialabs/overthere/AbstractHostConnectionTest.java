@@ -27,29 +27,36 @@
 
 package com.xebialabs.overthere;
 
-import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import com.xebialabs.deployit.ci.Host;
-import com.xebialabs.deployit.ci.HostAccessMethod;
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
+import com.xebialabs.overthere.common.AbstractHostConnection;
 
-public class HostSessionFactoryTest {
+public class AbstractHostConnectionTest {
 
 	@Test
-	public void cannotConnectToHostThatHasNonAccessMethod() {
+	public void getTempFileWithSingleArgumentInvokesTemplateMethod() throws SecurityException, NoSuchMethodException {
+		String prefix1 = "prefix";
+		String suffix1 = ".suffix";
+		String prefix2 = "thereisnosuffix";
+		String suffix2 = "";
 
-		Host h = new Host();
-		h.setAddress("localhost");
-		h.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-		h.setAccessMethod(HostAccessMethod.NONE);
+		AbstractHostConnection session = mock(AbstractHostConnection.class);
+		when(session.getTempFile(anyString())).thenCallRealMethod();
 
-		try {
-			HostSessionFactory.getHostSession(h);
-			fail();
-		} catch (IllegalStateException expected) {
-		}
+		session.getTempFile(prefix1 + suffix1);
+		session.getTempFile(prefix2 + suffix2);
+		session.getTempFile(null);
+		session.getTempFile("");
+		session.getTempFile(" ");
+		verify(session, times(5)).getTempFile(isA(String.class), isA(String.class));
+		// FIXME: verify that the method was invoked with the right parameters
 	}
 
 }

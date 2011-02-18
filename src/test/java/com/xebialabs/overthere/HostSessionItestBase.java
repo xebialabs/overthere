@@ -40,14 +40,30 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 public abstract class HostSessionItestBase {
 
 	protected ConnectionOptions options;
+
 	protected String type;
 
 	protected HostConnection connection;
+
+	@Before
+	public void connect() {
+		setTypeAndOptions();
+		connection = Overthere.getConnection(type, options);
+	}
+
+	protected abstract void setTypeAndOptions();
+
+	@After
+	public void disconnect() {
+		connection.disconnect();
+	}
 
 	@Test
 	public void createWriteReadAndRemoveTemporaryFile() throws IOException {
@@ -73,7 +89,7 @@ public abstract class HostSessionItestBase {
 		assertEquals("Expected temporary file to have the size of the contents written to it", contents.length, tempFile.length());
 		assertTrue("Expected temporary file to be readable", tempFile.canRead());
 		assertTrue("Expected temporary file to be writeable", tempFile.canWrite());
-		
+
 		// Windows systems don't support the concept of checking for executability
 		if (connection.getHostOperatingSystem() == OperatingSystemFamily.UNIX) {
 			assertFalse("Expected temporary file to not be executable", tempFile.canExecute());
@@ -109,8 +125,8 @@ public abstract class HostSessionItestBase {
 		assertTrue("Expected temporary directory to be a directory", tempDir.isDirectory());
 
 		HostFile anotherTempDir = connection.getTempFile(prefix, suffix);
-		assertFalse("Expected temporary directories created with identical prefix and suffix to still be different", tempDir.getPath().equals(
-				anotherTempDir.getPath()));
+		assertFalse("Expected temporary directories created with identical prefix and suffix to still be different",
+		        tempDir.getPath().equals(anotherTempDir.getPath()));
 
 		HostFile nested1 = tempDir.getFile("nested1");
 		HostFile nested2 = nested1.getFile("nested2");

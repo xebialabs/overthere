@@ -1,30 +1,29 @@
 package com.xebialabs.overthere.ssh;
-import com.xebialabs.overthere.ConnectionOptions;
+
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Test;
 
-import static com.xebialabs.overthere.OperatingSystemFamily.*;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import com.xebialabs.overthere.ConnectionOptions;
 
 public class SshInteractiveSudoHostConnectionItest extends SshSudoHostConnectionItestBase {
 
 	@Override
-	protected void setupConnection() {
+    protected void setTypeAndOptions() {
 		type = "ssh_interactive_sudo";
 		options = new ConnectionOptions();
-		options.set("address", "was-61");
-		options.set("username", "autodpl");
-		options.set("password", "autodpl");
-		options.set("sudoUsername", "root");
+		options.set("address", "overthere");
+		options.set("username", "untrusted");
+		options.set("password", "donttrustme");
+		options.set("sudoUsername", "overthere");
 		options.set("os", UNIX);
 	}
 
 	@Test
 	public void hostSessionIsAnSshSudoHostSession() {
 		assertThat(connection, instanceOf(SshInteractiveSudoHostConnection.class));
-
 	}
-
 
 }
