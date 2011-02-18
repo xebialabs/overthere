@@ -1,34 +1,7 @@
-/*
- * Copyright (c) 2008-2010 XebiaLabs B.V. All rights reserved.
- *
- * Your use of XebiaLabs Software and Documentation is subject to the Personal
- * License Agreement.
- *
- * http://www.xebialabs.com/deployit-personal-edition-license-agreement
- *
- * You are granted a personal license (i) to use the Software for your own
- * personal purposes which may be used in a production environment and/or (ii)
- * to use the Documentation to develop your own plugins to the Software.
- * "Documentation" means the how to's and instructions (instruction videos)
- * provided with the Software and/or available on the XebiaLabs website or other
- * websites as well as the provided API documentation, tutorial and access to
- * the source code of the XebiaLabs plugins. You agree not to (i) lease, rent
- * or sublicense the Software or Documentation to any third party, or otherwise
- * use it except as permitted in this agreement; (ii) reverse engineer,
- * decompile, disassemble, or otherwise attempt to determine source code or
- * protocols from the Software, and/or to (iii) copy the Software or
- * Documentation (which includes the source code of the XebiaLabs plugins). You
- * shall not create or attempt to create any derivative works from the Software
- * except and only to the extent permitted by law. You will preserve XebiaLabs'
- * copyright and legal notices on the Software and Documentation. XebiaLabs
- * retains all rights not expressly granted to You in the Personal License
- * Agreement.
- */
-
 package com.xebialabs.overthere.cifs;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.xebialabs.overthere.BrokenHostSessionFactory.DEFAULT_CONNECTION_TIMEOUT_MS;
+import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +12,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.common.AbstractHostConnection;
 import jcifs.smb.SmbFile;
 
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
@@ -46,13 +21,7 @@ import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.deployit.exception.RuntimeIOException;
-import com.xebialabs.overthere.CommandExecution;
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSession;
-import com.xebialabs.overthere.common.AbstractHostSession;
+import org.slf4j.LoggerFactory;
 
 /**
  * <ul>
@@ -62,7 +31,7 @@ import com.xebialabs.overthere.common.AbstractHostSession;
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */
-public class CifsTelnetHostSession extends AbstractHostSession implements HostSession {
+public class CifsTelnetHostConnection extends AbstractHostConnection implements HostConnection {
 
 	private String address;
 
@@ -81,11 +50,11 @@ public class CifsTelnetHostSession extends AbstractHostSession implements HostSe
 	 */
 	public static final int EXITCODE_CANNOT_DETERMINE_ERRORLEVEL = -999999;
 
-	public CifsTelnetHostSession(OperatingSystemFamily osFamily, String temporaryDirectoryPath, String address, int port, String username, String password) {
-		super(osFamily, temporaryDirectoryPath);
-		this.address = address;
-		this.username = username;
-		this.password = password;
+	public CifsTelnetHostConnection(String type, ConnectionOptions options) {
+		super(type, options);
+		this.address = options.get("address");
+		this.username = options.get("username");
+		this.password = options.get("password");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -245,7 +214,7 @@ public class CifsTelnetHostSession extends AbstractHostSession implements HostSe
 
 		Random r = new Random();
 		String infix = "";
-		for (int i = 0; i < AbstractHostSession.MAX_TEMP_RETRIES; i++) {
+		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
 			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
@@ -301,6 +270,6 @@ public class CifsTelnetHostSession extends AbstractHostSession implements HostSe
 		return username + "@" + address;
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(CifsTelnetHostSession.class);
+	private static Logger logger = LoggerFactory.getLogger(CifsTelnetHostConnection.class);
 
 }

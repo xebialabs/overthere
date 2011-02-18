@@ -30,12 +30,15 @@ package com.xebialabs.overthere.ssh;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.ClassUtils;
+import org.junit.rules.TemporaryFolder;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.CommandExecution;
@@ -43,12 +46,15 @@ import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.HostFile;
 
-public abstract class SshSudoHostSessionItestBase extends SshHostSessionItestBase {
+public abstract class SshSudoHostConnectionItestBase extends SshHostConnectionItestBase {
+
+	@Rule
+	public TemporaryFolder temp = new TemporaryFolder();
 
 	@Test
 	public void executeCommandWithSudoThatAsksForPassword() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler();
-		int res = session.execute(handler, "ls", "-ld", "/tmp");
+		int res = connection.execute(handler, "ls", "-ld", "/tmp");
 		assertEquals(0, res);
 		assertEquals(1, handler.getOutputLines().size());
 		assertTrue(handler.getOutput().contains("drwxrwxrwt"));
@@ -56,7 +62,7 @@ public abstract class SshSudoHostSessionItestBase extends SshHostSessionItestBas
 
 	@Test
 	public void startExecuteCommandWithSudoThatAsksForPassword() throws IOException {
-		CommandExecution execution = session.startExecute("ls", "-ld", "/tmp");
+		CommandExecution execution = connection.startExecute("ls", "-ld", "/tmp");
 		String commandOutput = IOUtils.toString(execution.getStdout());
 		assertEquals(0, execution.waitFor());
 		assertTrue(commandOutput.contains("drwxrwxrwt"));
@@ -64,24 +70,26 @@ public abstract class SshSudoHostSessionItestBase extends SshHostSessionItestBas
 
 	@Test
 	public void tempDirectoryIsWritableForScpUser() throws Exception {
-		final String classAsResource = ClassUtils.convertClassNameToResourcePath(getClass().getName()) + ClassUtils.CLASS_FILE_SUFFIX;
-		HostFile file = session.copyToTemporaryFile(new ClassPathResource(classAsResource));
+		final File tempFile = temp.newFile("fooBar");
+		FileUtils.writeStringToFile(tempFile, "Foo Bar Baz");
+		HostFile file = connection.copyToTemporaryFile(tempFile);
 		assertTrue("Expected temp file to have been written", file.exists());
 	}
 
 	@Test
-	public void writtenFileIsReadableForSudoUser() {
-		final String classAsResource = ClassUtils.convertClassNameToResourcePath(getClass().getName()) + ClassUtils.CLASS_FILE_SUFFIX;
-		HostFile file = session.copyToTemporaryFile(new ClassPathResource(classAsResource));
+	public void writtenFileIsReadableForSudoUser() throws IOException {
+		final File tempFile = temp.newFile("fooBar");
+		FileUtils.writeStringToFile(tempFile, "Foo Bar Baz");
+		HostFile file = connection.copyToTemporaryFile(tempFile);
 
 		CommandExecutionCallbackHandler handler = new DebugCommandExecutionCallbackHandler();
-		int res = session.execute(handler, "cp", file.getPath(), "/tmp/" + System.currentTimeMillis() + ".class");
+		int res = connection.execute(handler, "cp", file.getPath(), "/tmp/" + System.currentTimeMillis() + ".class");
 		assertEquals(0, res);
 	}
 
 	@Test
 	public void commandWithPipeShouldHaveTwoSudoSections() {
-		String[] prepended = ((SshSudoHostSession) session).prependSudoCommand("a", "|", "b");
+		String[] prepended = ((SshSudoHostConnection) connection).prependSudoCommand("a", "|", "b");
 		assertEquals(9, prepended.length);
 		assertEquals("sudo", prepended[0]);
 		assertEquals("sudo", prepended[5]);
@@ -89,7 +97,7 @@ public abstract class SshSudoHostSessionItestBase extends SshHostSessionItestBas
 
 	@Test
 	public void commandWithSemiColonShouldHaveTwoSudoSections() {
-		String[] prepended = ((SshSudoHostSession) session).prependSudoCommand("a", ";", "b");
+		String[] prepended = ((SshSudoHostConnection) connection).prependSudoCommand("a", ";", "b");
 		assertEquals(9, prepended.length);
 		assertEquals("sudo", prepended[0]);
 		assertEquals("sudo", prepended[5]);

@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2008-2010 XebiaLabs B.V. All rights reserved.
- *
- * Your use of XebiaLabs Software and Documentation is subject to the Personal
- * License Agreement.
- *
- * http://www.xebialabs.com/deployit-personal-edition-license-agreement
- *
- * You are granted a personal license (i) to use the Software for your own
- * personal purposes which may be used in a production environment and/or (ii)
- * to use the Documentation to develop your own plugins to the Software.
- * "Documentation" means the how to's and instructions (instruction videos)
- * provided with the Software and/or available on the XebiaLabs website or other
- * websites as well as the provided API documentation, tutorial and access to
- * the source code of the XebiaLabs plugins. You agree not to (i) lease, rent
- * or sublicense the Software or Documentation to any third party, or otherwise
- * use it except as permitted in this agreement; (ii) reverse engineer,
- * decompile, disassemble, or otherwise attempt to determine source code or
- * protocols from the Software, and/or to (iii) copy the Software or
- * Documentation (which includes the source code of the XebiaLabs plugins). You
- * shall not create or attempt to create any derivative works from the Software
- * except and only to the extent permitted by law. You will preserve XebiaLabs'
- * copyright and legal notices on the Software and Documentation. XebiaLabs
- * retains all rights not expressly granted to You in the Personal License
- * Agreement.
- */
-
 package com.xebialabs.overthere.ssh;
 
 import java.io.InputStream;
@@ -33,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -40,18 +15,17 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.deployit.exception.RuntimeIOException;
 import com.xebialabs.overthere.HostFile;
+import org.slf4j.LoggerFactory;
 
 /**
  * A file on a host connected through SSH that is accessed using SFTP.
  */
 class SshSftpHostFile extends SshHostFile {
 
-	private SshSftpHostSession sshSftpHostSession;
+	private SshSftpHostConnection sshSftpHostSession;
 
-	public SshSftpHostFile(SshSftpHostSession session, String remotePath) {
+	public SshSftpHostFile(SshSftpHostConnection session, String remotePath) {
 		super(session, remotePath);
 		sshSftpHostSession = session;
 	}
@@ -162,7 +136,7 @@ class SshSftpHostFile extends SshHostFile {
 	public void moveTo(HostFile destFile) {
 		if (destFile instanceof SshSftpHostFile) {
 			SshSftpHostFile sshSftpDestFile = (SshSftpHostFile) destFile;
-			if (sshSftpDestFile.getSession() == getSession()) {
+			if (sshSftpDestFile.getConnection() == getConnection()) {
 				try {
 					sshSftpHostSession.getSharedSftpChannel().rename(remotePath, sshSftpDestFile.getPath());
 				} catch (SftpException exc) {
@@ -172,7 +146,7 @@ class SshSftpHostFile extends SshHostFile {
 				}
 			} else {
 				throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to SSH/SCP file/directory " + destFile
-						+ " because it is in a different session");
+						+ " because it is in a different connection");
 			}
 		} else {
 			throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to non-SSH/SCP file/directory " + destFile);
@@ -258,7 +232,7 @@ class SshSftpHostFile extends SshHostFile {
 	}
 
 	private String convertWindowsPathToWinSshdPath(String path) {
-		if (getSession().getHostOperatingSystem() == OperatingSystemFamily.WINDOWS) {
+		if (getConnection().getHostOperatingSystem() == OperatingSystemFamily.WINDOWS) {
 			String winSshdPath;
 			if (path.length() == 2 && path.charAt(1) == ':') {
 				winSshdPath = "/" + path.charAt(0);

@@ -27,12 +27,7 @@
 
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.deployit.ci.Host;
-import com.xebialabs.deployit.ci.HostAccessMethod;
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.overthere.HostSessionFactory;
-import com.xebialabs.overthere.HostSessionItestBase;
-
+import com.xebialabs.overthere.*;
 import org.junit.After;
 import org.junit.Before;
 
@@ -40,23 +35,22 @@ public class SshIdentifiedByPubKeyItest extends HostSessionItestBase {
 
 	@Before
 	public void setupSshSftpItestEnvironment() {
-		targetHost = new Host();
-		targetHost.setLabel("Itest Host for Identified by public keys");
-		targetHost.setAddress("jboss-51");
-		targetHost.setUsername("autodpl");
+		options = new ConnectionOptions();
+		options.set("address", "jboss-51");
+		options.set("username", "autodpl");
 
 		System.setProperty("ssh.privatekey.filename", System.getProperty("user.home") + "/.ssh/deployit-itest-id_rsa");
-		targetHost.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-		targetHost.setTemporaryDirectoryLocation("/tmp");
-		targetHost.setAccessMethod(HostAccessMethod.SSH_SCP);
-		session = HostSessionFactory.getHostSession(targetHost);
+		options.set("os", OperatingSystemFamily.UNIX);
+		options.set("temporaryDirectoryPath", "/tmp");
+		type = "ssh_scp";
+		connection = Overthere.getConnection(type, options);
 	}
 
 	@After
 	public void clean() {
 		System.clearProperty("ssh.privatekey.filename");
-		if (session != null) {
-			session.close();
+		if (connection != null) {
+			connection.close();
 		}
 	}
 }

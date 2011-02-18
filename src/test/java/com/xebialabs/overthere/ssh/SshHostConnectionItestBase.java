@@ -29,33 +29,32 @@ package com.xebialabs.overthere.ssh;
 
 import static org.junit.Assert.fail;
 
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.RuntimeIOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.xebialabs.deployit.exception.RuntimeIOException;
-import com.xebialabs.overthere.HostSessionFactory;
 import com.xebialabs.overthere.HostSessionItestBase;
 
-public abstract class SshHostSessionItestBase extends HostSessionItestBase {
+public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 
 	@Before
 	public void setupSshItestEnvironment() {
-		setupTargetHost();
+		setupConnection();
 
-		session = HostSessionFactory.getHostSession(targetHost);
+		connection = Overthere.getConnection(type, options);
 	}
 
 	@After
 	public void tearDownSshItestEnvironment() {
-		session.close();
+		connection.close();
 	}
 
 	@Test
 	public void cannotConnectWithIncorrectUsername() {
-		targetHost.setUsername("an-incorrect-username");
+		options.set("Username", "an-incorrect-username");
 		try {
-			HostSessionFactory.getHostSession(targetHost);
+			Overthere.getConnection(type, options);
 			fail("Expected not to be able to connect with an incorrect username");
 		} catch (RuntimeIOException expected) {
 		}
@@ -63,14 +62,14 @@ public abstract class SshHostSessionItestBase extends HostSessionItestBase {
 
 	@Test
 	public void cannotConnectWithIncorrectPassword() {
-		targetHost.setPassword("an-incorrect-password");
+		options.set("Password", "an-incorrect-password");
 		try {
-			HostSessionFactory.getHostSession(targetHost);
+			Overthere.getConnection(type, options);
 			fail("Expected not to be able to connect with an incorrect password");
 		} catch (RuntimeIOException expected) {
 		}
 	}
 
-	protected abstract void setupTargetHost();
+	protected abstract void setupConnection();
 
 }

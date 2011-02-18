@@ -26,7 +26,7 @@
  */
 
 /**
- * The host session framework. This framework allows plugin authors to work with local or remote systems ("hosts") conveniently. Some of the features:
+ * The host connection framework. This framework allows plugin authors to work with local or remote systems ("hosts") conveniently. Some of the features:
  * <ul>
  * <li>Files can be manipulated, read and written.<li>
  * <li>Commands can be executed.</li>

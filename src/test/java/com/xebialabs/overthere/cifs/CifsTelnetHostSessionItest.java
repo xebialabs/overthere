@@ -35,52 +35,43 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import com.xebialabs.overthere.*;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.xebialabs.deployit.ci.Host;
-import com.xebialabs.deployit.ci.HostAccessMethod;
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSessionFactory;
-import com.xebialabs.overthere.HostSessionItestBase;
-
 @Ignore("Needs Windows 2003 image")
 public class CifsTelnetHostSessionItest extends HostSessionItestBase {
 
 	@Before
 	public void setupCifsTelnetEnvironment() {
-		targetHost = new Host();
-		targetHost.setLabel("Windows 2003 host");
-		targetHost.setAddress("wls-11g-win");
-		targetHost.setUsername("itestuser");
+		options = new ConnectionOptions();
+		options.set("address", "wls-11g-win");
+		options.set("username", "itestuser");
 		// ensure the test user contains some reserved characters such as ';', ':' or '@' 
-		targetHost.setPassword("hello@:;<>myfriend");
-		targetHost.setAccessMethod(HostAccessMethod.CIFS_TELNET);
-		targetHost.setOperatingSystemFamily(OperatingSystemFamily.WINDOWS);
+		options.set("password", "hello@:;<>myfriend");
+		options.set("os", OperatingSystemFamily.WINDOWS);
 
-		session = HostSessionFactory.getHostSession(targetHost);
+		connection = Overthere.getConnection("cifs_telnet", options);
 	}
 
 	@After
 	public void tearDownCifsTelnetItestEnvironment() {
-		session.close();
+		connection.close();
 	}
 
 	@Test
 	public void listC() throws IOException {
-		HostFile file = session.getFile("C:");
+		HostFile file = connection.getFile("C:");
 		List<String> filesInC = file.list();
 		assertTrue(filesInC.contains("AUTOEXEC.BAT"));
 	}
 
 	@Test
 	public void readFile() throws IOException {
-		HostFile file = session.getFile("C:\\itest\\itestfile.txt");
+		HostFile file = connection.getFile("C:\\itest\\itestfile.txt");
 		assertEquals("itestfile.txt", file.getName());
 		assertEquals(27, file.length());
 		InputStream inputStream = file.get();
@@ -96,7 +87,7 @@ public class CifsTelnetHostSessionItest extends HostSessionItestBase {
 	@Test
 	public void executeDirCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
-		int res = session.execute(handler, "dir", "C:\\itest");
+		int res = connection.execute(handler, "dir", "C:\\itest");
 		assertEquals(0, res);
 		assertTrue(handler.getOutput().contains("27 itestfile.txt"));
 	}
@@ -104,7 +95,7 @@ public class CifsTelnetHostSessionItest extends HostSessionItestBase {
 	@Test
 	public void executeCmdCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
-		int res = session.execute(handler, "C:\\itest\\itestecho.cmd");
+		int res = connection.execute(handler, "C:\\itest\\itestecho.cmd");
 		assertEquals(0, res);
 		assertTrue(handler.getOutput().contains("All mimsy were the borogroves"));
 	}
@@ -112,7 +103,7 @@ public class CifsTelnetHostSessionItest extends HostSessionItestBase {
 	@Test
 	public void executeIncorrectCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
-		int res = session.execute(handler, "C:\\NONEXISTANT.cmd");
+		int res = connection.execute(handler, "C:\\NONEXISTANT.cmd");
 		assertEquals(9009, res);
 	}
 

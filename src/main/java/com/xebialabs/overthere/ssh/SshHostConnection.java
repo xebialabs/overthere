@@ -1,34 +1,7 @@
-/*
- * Copyright (c) 2008-2010 XebiaLabs B.V. All rights reserved.
- *
- * Your use of XebiaLabs Software and Documentation is subject to the Personal
- * License Agreement.
- *
- * http://www.xebialabs.com/deployit-personal-edition-license-agreement
- *
- * You are granted a personal license (i) to use the Software for your own
- * personal purposes which may be used in a production environment and/or (ii)
- * to use the Documentation to develop your own plugins to the Software.
- * "Documentation" means the how to's and instructions (instruction videos)
- * provided with the Software and/or available on the XebiaLabs website or other
- * websites as well as the provided API documentation, tutorial and access to
- * the source code of the XebiaLabs plugins. You agree not to (i) lease, rent
- * or sublicense the Software or Documentation to any third party, or otherwise
- * use it except as permitted in this agreement; (ii) reverse engineer,
- * decompile, disassemble, or otherwise attempt to determine source code or
- * protocols from the Software, and/or to (iii) copy the Software or
- * Documentation (which includes the source code of the XebiaLabs plugins). You
- * shall not create or attempt to create any derivative works from the Software
- * except and only to the extent permitted by law. You will preserve XebiaLabs'
- * copyright and legal notices on the Software and Documentation. XebiaLabs
- * retains all rights not expressly granted to You in the Personal License
- * Agreement.
- */
-
 package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.xebialabs.overthere.BrokenHostSessionFactory.DEFAULT_CONNECTION_TIMEOUT_MS;
+import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -38,6 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
+import com.xebialabs.overthere.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,22 +20,16 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
-import com.xebialabs.overthere.AbortedException;
-import com.xebialabs.overthere.CommandExecution;
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSession;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.common.AbstractHostSession;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.common.AbstractHostConnection;
 import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
 import com.xebialabs.overthere.common.InputResponseHandler;
 import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
 
 /**
- * A host session over SSH.
+ * A host connection over SSH.
  */
-abstract class SshHostSession extends AbstractHostSession implements HostSession {
+abstract class SshHostConnection extends AbstractHostConnection implements HostConnection, HostConnectionBuilder {
 
 	protected String host;
 
@@ -75,31 +43,15 @@ abstract class SshHostSession extends AbstractHostSession implements HostSession
 
 	private static final String CHANNEL_PURPOSE = "";
 
-	/**
-	 * Constructs an SshHostSession
-	 * 
-	 * @param os
-	 *            the operating system of the host
-	 * @param temporaryDirectoryPath
-	 *            the path of the directory in which to store temporary files
-	 * @param host
-	 *            the hostname or IP adress of the host
-	 * @param port
-	 *            the port to connect to
-	 * @param username
-	 *            the username to connect with
-	 * @param password
-	 *            the password to connect with
-	 */
-	public SshHostSession(OperatingSystemFamily os, String temporaryDirectoryPath, String host, int port, String username, String password) {
-		super(os, temporaryDirectoryPath);
-		this.host = host;
-		this.port = port;
-		this.username = username;
-		this.password = password;
+	public SshHostConnection(String type, ConnectionOptions options) {
+		super(type, options);
+		this.host = options.get("host");
+		this.port = (Integer) options.get("port");
+		this.username = options.get("username");
+		this.password = options.get("password");
 	}
 
-	void open() throws RuntimeIOException {
+	public SshHostConnection open() throws RuntimeIOException {
 		if (sharedSession == null) {
 			try {
 				sharedSession = openSession(CHANNEL_PURPOSE);
@@ -107,6 +59,7 @@ abstract class SshHostSession extends AbstractHostSession implements HostSession
 				throw new RuntimeIOException("Cannot connect to " + this, exc);
 			}
 		}
+		return this;
 	}
 
 	@Override
@@ -165,8 +118,8 @@ abstract class SshHostSession extends AbstractHostSession implements HostSession
 		if (!(parent instanceof SshHostFile)) {
 			throw new IllegalStateException("parent is not a file on an SSH host");
 		}
-		if (parent.getSession() != this) {
-			throw new IllegalStateException("parent is not a file in this session");
+		if (parent.getConnection() != this) {
+			throw new IllegalStateException("parent is not a file in this connection");
 		}
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
 	}
@@ -179,7 +132,7 @@ abstract class SshHostSession extends AbstractHostSession implements HostSession
 
 		Random r = new Random();
 		String infix = "";
-		for (int i = 0; i < AbstractHostSession.MAX_TEMP_RETRIES; i++) {
+		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
 			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
@@ -407,6 +360,6 @@ abstract class SshHostSession extends AbstractHostSession implements HostSession
 		return username + "@" + host + ":" + port;
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(SshHostSession.class);
+	private static Logger logger = LoggerFactory.getLogger(SshHostConnection.class);
 
 }

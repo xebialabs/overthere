@@ -33,16 +33,16 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * A reference to a file on a host. This object is always associated with a {@link HostSession}.
+ * A reference to a file on a host. This object is always associated with a {@link HostConnection}.
  */
 public interface HostFile {
 
 	/**
-	 * Returns the session this file is associated with.
+	 * Returns the connection this file is associated with.
 	 * 
-	 * @return the session
+	 * @return the connection
 	 */
-	HostSession getSession();
+	HostConnection getConnection();
 
 	/**
 	 * Returns a new HostFile with this file as its parent. Identical to invoking

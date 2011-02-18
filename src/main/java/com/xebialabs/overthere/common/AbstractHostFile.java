@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2008-2010 XebiaLabs B.V. All rights reserved.
- *
- * Your use of XebiaLabs Software and Documentation is subject to the Personal
- * License Agreement.
- *
- * http://www.xebialabs.com/deployit-personal-edition-license-agreement
- *
- * You are granted a personal license (i) to use the Software for your own
- * personal purposes which may be used in a production environment and/or (ii)
- * to use the Documentation to develop your own plugins to the Software.
- * "Documentation" means the how to's and instructions (instruction videos)
- * provided with the Software and/or available on the XebiaLabs website or other
- * websites as well as the provided API documentation, tutorial and access to
- * the source code of the XebiaLabs plugins. You agree not to (i) lease, rent
- * or sublicense the Software or Documentation to any third party, or otherwise
- * use it except as permitted in this agreement; (ii) reverse engineer,
- * decompile, disassemble, or otherwise attempt to determine source code or
- * protocols from the Software, and/or to (iii) copy the Software or
- * Documentation (which includes the source code of the XebiaLabs plugins). You
- * shall not create or attempt to create any derivative works from the Software
- * except and only to the extent permitted by law. You will preserve XebiaLabs'
- * copyright and legal notices on the Software and Documentation. XebiaLabs
- * retains all rights not expressly granted to You in the Personal License
- * Agreement.
- */
-
 package com.xebialabs.overthere.common;
 
 import java.io.File;
@@ -37,33 +10,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.xebialabs.overthere.*;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSession;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.HostConnection;
 
 /**
  * Abstract base class with common methods used by actual implementations of {@link HostFile}.
  */
 public abstract class AbstractHostFile implements HostFile {
 
-	protected HostSession session;
+	protected HostConnection connection;
 
-	public AbstractHostFile(HostSession session) {
-		this.session = session;
+	public AbstractHostFile(HostConnection connection) {
+		this.connection = connection;
 	}
 
-	public HostSession getSession() {
-		return session;
+	public HostConnection getConnection() {
+		return connection;
 	}
 
 	public HostFile getFile(String name) {
-		return getSession().getFile(this, name);
+		return getConnection().getFile(this, name);
 	}
 
 	public HostFile getParentFile() {
@@ -71,7 +41,7 @@ public abstract class AbstractHostFile implements HostFile {
 		if (parent == null || parent.length() == 0) {
 			return null;
 		} else {
-			return getSession().getFile(parent);
+			return getConnection().getFile(parent);
 		}
 	}
 
@@ -82,7 +52,7 @@ public abstract class AbstractHostFile implements HostFile {
 		} else {
 			List<HostFile> listFiles = new ArrayList<HostFile>(filenames.size());
 			for (String filename : filenames) {
-				listFiles.add(getSession().getFile(this, filename));
+				listFiles.add(getConnection().getFile(this, filename));
 			}
 			return listFiles;
 		}

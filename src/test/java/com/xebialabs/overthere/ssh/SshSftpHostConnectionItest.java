@@ -27,43 +27,28 @@
 
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.deployit.ci.OperatingSystemFamily;
-import com.xebialabs.deployit.exception.RuntimeIOException;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.ConnectionOptions;
+import org.junit.Test;
 
-/**
- * A session to a remote host using SSH w/ SCP.
- */
-public class SshScpHostSession extends SshHostSession {
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
-	/**
-	 * Constructs an SshScpHostSession
-	 * 
-	 * @param os
-	 *            the operating system of the host
-	 * @param temporaryDirectoryPath
-	 *            the path of the directory in which to store temporary files
-	 * @param host
-	 *            the hostname or IP adress of the host
-	 * @param port
-	 *            the port to connect to
-	 * @param username
-	 *            the username to connect with
-	 * @param password
-	 *            the password to connect with
-	 */
-	public SshScpHostSession(OperatingSystemFamily os, String temporaryDirectoryPath, String host, int port, String username, String password) {
-		super(os, temporaryDirectoryPath, host, port, username, password);
-		open();
-	}
+public class SshSftpHostConnectionItest extends SshHostConnectionItestBase {
 
 	@Override
-	protected HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshScpHostFile(this, hostPath);
+	public void setupConnection() {
+		options = new ConnectionOptions();
+		options.set("address", "apache-22");
+		options.set("username", "root");
+		options.set("password", "centos");
+		options.set("os", UNIX);
+		type = "ssh_sftp";
 	}
 
-	public String toString() {
-		return username + "@" + host + ":" + port + " (scp)";
+	@Test
+	public void hostSessionIsAnSshSftpHostSession() {
+		assertThat(connection, instanceOf(SshSftpHostConnection.class));
 	}
 
 }

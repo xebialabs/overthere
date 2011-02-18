@@ -36,6 +36,7 @@ import com.xebialabs.deployit.ci.OperatingSystemFamily;
 import com.xebialabs.deployit.ci.UnreachableHost;
 import com.xebialabs.deployit.exception.RuntimeIOException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -45,19 +46,19 @@ import java.net.ServerSocket;
 import java.util.Map;
 
 /**
- * Builds a session to an unreachable host through a tunnel on the jumping station.
+ * Builds a connection to an unreachable host through a tunnel on the jumping station.
  */
-public class TunnelledHostSession implements HostSession {
+public class TunnelledHostConnection implements HostConnection {
     private static final int DEFAULT_LOCAL_PORT = 9000;
-    private static Logger logger = LoggerFactory.getLogger(TunnelledHostSession.class);
+    private static Logger logger = LoggerFactory.getLogger(TunnelledHostConnection.class);
 
     private final int tunnelPort;
     private Session tunnel;
-    private final HostSession tunnelledHostSession;
+    private final HostConnection tunnelledHostConnection;
 
-    public TunnelledHostSession(UnreachableHost host) {
+    public TunnelledHostConnection(UnreachableHost host) {
         tunnelPort = startTunnel(host);
-        tunnelledHostSession = BrokenHostSessionFactory.getHostSession(host.getOperatingSystemFamily(), host.getAccessMethod(), 
+        tunnelledHostConnection = BrokenHostSessionFactory.getHostSession(host.getOperatingSystemFamily(), host.getAccessMethod(),
         		Host.getLocalHost().getAddress(), tunnelPort, host.getUsername(), host.getPassword(), host.getSudoUsername(), 
         		host.getTemporaryDirectoryLocation());
     }
@@ -154,8 +155,8 @@ public class TunnelledHostSession implements HostSession {
 
 
     public void close() {
-    	if (tunnelledHostSession != null) {
-    		tunnelledHostSession.close();
+    	if (tunnelledHostConnection != null) {
+    		tunnelledHostConnection.close();
     	}
     	if (tunnel != null) {
     		tunnel.disconnect();
@@ -164,42 +165,42 @@ public class TunnelledHostSession implements HostSession {
     }
 
     public OperatingSystemFamily getHostOperatingSystem() {
-        return tunnelledHostSession.getHostOperatingSystem();
+        return tunnelledHostConnection.getHostOperatingSystem();
     }
 
     public HostFile getFile(String hostPath) throws RuntimeIOException {
-        return tunnelledHostSession.getFile(hostPath);
+        return tunnelledHostConnection.getFile(hostPath);
     }
 
     public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
-        return tunnelledHostSession.getFile(parent, child);
+        return tunnelledHostConnection.getFile(parent, child);
     }
 
     public HostFile getTempFile(String nameTemplate) throws RuntimeIOException {
-        return tunnelledHostSession.getTempFile(nameTemplate);
+        return tunnelledHostConnection.getTempFile(nameTemplate);
     }
 
     public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-        return tunnelledHostSession.getTempFile(prefix, suffix);
+        return tunnelledHostConnection.getTempFile(prefix, suffix);
     }
 
     public int execute(CommandExecutionCallbackHandler handler, String... commandLine) throws RuntimeIOException {
-        return tunnelledHostSession.execute(handler, commandLine);
+        return tunnelledHostConnection.execute(handler, commandLine);
     }
 
     public int execute(CommandExecutionCallbackHandler handler, Map<String, String> inputResponse, String... commandLine) {
-        return tunnelledHostSession.execute(handler, inputResponse, commandLine);
+        return tunnelledHostConnection.execute(handler, inputResponse, commandLine);
     }
 
     public CommandExecution startExecute(String... commandLine) {
-        return tunnelledHostSession.startExecute(commandLine);
+        return tunnelledHostConnection.startExecute(commandLine);
     }
 
     public HostFile copyToTemporaryFile(File localFile) throws RuntimeIOException {
-        return tunnelledHostSession.copyToTemporaryFile(localFile);
+        return tunnelledHostConnection.copyToTemporaryFile(localFile);
     }
 
     public HostFile copyToTemporaryFile(Resource resource) throws RuntimeIOException {
-        return tunnelledHostSession.copyToTemporaryFile(resource);
+        return tunnelledHostConnection.copyToTemporaryFile(resource);
     }
 }

@@ -37,18 +37,18 @@ import com.xebialabs.deployit.ci.OperatingSystemFamily;
 import com.xebialabs.deployit.ci.UnreachableHost;
 import com.xebialabs.overthere.TunnelledHostSession;
 
-public class TunnelledSshSftpHostSessionItest extends SshHostSessionItestBase {
+public class TunnelledSshSftpHostConnectionItest extends SshHostConnectionItestBase {
 
 	@Override
-	public void setupTargetHost() {
+	public void setupConnection() {
 		targetHost = new UnreachableHost();
-		targetHost.setLabel("Itest Host for Tunnelled SSH/SFTP access");
-		targetHost.setAddress("apache-22");
-		targetHost.setUsername("root");
-		targetHost.setPassword("centos");
-		targetHost.setOperatingSystemFamily(OperatingSystemFamily.UNIX);
-		targetHost.setTemporaryDirectoryLocation("/tmp");
-		targetHost.setAccessMethod(HostAccessMethod.SSH_SFTP);
+		options.set("Label", "Itest Host for Tunnelled SSH/SFTP access");
+		options.set("Address", "apache-22");
+		options.set("Username", "root");
+		options.set("Password", "centos");
+		options.set("OperatingSystemFamily", OperatingSystemFamily.UNIX);
+		options.set("TemporaryDirectoryLocation", "/tmp");
+		options.set("AccessMethod", HostAccessMethod.SSH_SFTP);
 
 		Host jumpingHost = new Host();
 		jumpingHost.setLabel("Jumping station for Tunnelled Itest");

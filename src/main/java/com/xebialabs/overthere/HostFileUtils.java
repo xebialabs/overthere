@@ -299,7 +299,7 @@ public class HostFileUtils {
 
 	private static void extractZipEntry(ZipInputStream zipIn, ZipEntry entry, HostFile dir) {
 		String[] pathElements = StringUtils.split(entry.getName(), ZIP_PATH_SEPARATOR);
-		String dstFileSeparator = dir.getSession().getHostOperatingSystem().getFileSeparator();
+		String dstFileSeparator = dir.getConnection().getHostOperatingSystem().getFileSeparator();
 		String dstPath = StringUtils.join(pathElements, dstFileSeparator);
 		HostFile dstFile = dir.getFile(dstPath);
 

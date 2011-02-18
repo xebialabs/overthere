@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2008-2010 XebiaLabs B.V. All rights reserved.
- *
- * Your use of XebiaLabs Software and Documentation is subject to the Personal
- * License Agreement.
- *
- * http://www.xebialabs.com/deployit-personal-edition-license-agreement
- *
- * You are granted a personal license (i) to use the Software for your own
- * personal purposes which may be used in a production environment and/or (ii)
- * to use the Documentation to develop your own plugins to the Software.
- * "Documentation" means the how to's and instructions (instruction videos)
- * provided with the Software and/or available on the XebiaLabs website or other
- * websites as well as the provided API documentation, tutorial and access to
- * the source code of the XebiaLabs plugins. You agree not to (i) lease, rent
- * or sublicense the Software or Documentation to any third party, or otherwise
- * use it except as permitted in this agreement; (ii) reverse engineer,
- * decompile, disassemble, or otherwise attempt to determine source code or
- * protocols from the Software, and/or to (iii) copy the Software or
- * Documentation (which includes the source code of the XebiaLabs plugins). You
- * shall not create or attempt to create any derivative works from the Software
- * except and only to the extent permitted by law. You will preserve XebiaLabs'
- * copyright and legal notices on the Software and Documentation. XebiaLabs
- * retains all rights not expressly granted to You in the Personal License
- * Agreement.
- */
-
 package com.xebialabs.overthere.local;
 
 import java.io.File;
@@ -32,31 +5,25 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.common.AbstractHostConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.AbortedException;
-import com.xebialabs.overthere.CommandExecution;
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSession;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.common.AbstractHostSession;
 import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
 import com.xebialabs.overthere.common.InputResponseHandler;
 import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
 
 /**
- * A session to the local host.
+ * A connection to the local host.
  */
-public class LocalHostSession extends AbstractHostSession implements HostSession {
+public class LocalHostConnection extends AbstractHostConnection implements HostConnection {
 
 	/**
-	 * Constructs a session to the local host.
+	 * Constructs a connection to the local host.
 	 */
-	public LocalHostSession(LocalHostSessionSpecification spec) {
-		super(spec);
+	public LocalHostConnection(String type, ConnectionOptions options) {
+		super(type, options);
 	}
 
 	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
@@ -126,6 +93,6 @@ public class LocalHostSession extends AbstractHostSession implements HostSession
 		return "localhost";
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(LocalHostSession.class);
+	private static Logger logger = LoggerFactory.getLogger(LocalHostConnection.class);
 
 }

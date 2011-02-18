@@ -27,16 +27,12 @@
 
 package com.xebialabs.overthere;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
-
-import java.lang.reflect.Method;
-
+import com.xebialabs.overthere.common.AbstractHostConnection;
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import com.xebialabs.overthere.common.AbstractHostSession;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 public class AbstractHostSessionTest {
 
@@ -47,19 +43,19 @@ public class AbstractHostSessionTest {
 		String prefix2 = "thereisnosuffix";
 		String suffix2 = "";
 
-		AbstractHostSession session = createMock(AbstractHostSession.class, new Method[] { AbstractHostSession.class.getMethod("getTempFile", String.class,
-				String.class) });
-		expect(session.getTempFile(prefix1, suffix1)).andReturn(null);
-		expect(session.getTempFile(prefix2, "." + suffix2)).andReturn(null);
-		expect(session.getTempFile("hostsession", ".tmp")).andReturn(null).times(3);
-		replay(session);
+		AbstractHostConnection session = mock(AbstractHostConnection.class);
+		when(session.getTempFile(isA(String.class))).thenCallRealMethod();
+//		expect(session.getTempFile(prefix1, suffix1)).andReturn(null);
+//		expect(session.getTempFile(prefix2, "." + suffix2)).andReturn(null);
+//		expect(session.getTempFile("hostsession", ".tmp")).andReturn(null).times(3);
+//		replay(session);
 
 		session.getTempFile(prefix1 + suffix1);
 		session.getTempFile(prefix2 + suffix2);
 		session.getTempFile(null);
 		session.getTempFile("");
 		session.getTempFile(" ");
-		verify(session);
+		Mockito.verify(session, times(5)).getTempFile(isA(String.class), isA(String.class));
 	}
 
 }

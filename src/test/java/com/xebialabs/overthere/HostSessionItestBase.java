@@ -44,9 +44,10 @@ import org.junit.Test;
 
 public abstract class HostSessionItestBase {
 
-	protected HostSessionSpecification spec;
+	protected ConnectionOptions options;
+	protected String type;
 
-	protected HostSession session;
+	protected HostConnection connection;
 
 	@Test
 	public void createWriteReadAndRemoveTemporaryFile() throws IOException {
@@ -54,8 +55,8 @@ public abstract class HostSessionItestBase {
 		final String suffix = "suffix";
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
 
-		HostFile tempFile = session.getTempFile(prefix, suffix);
-		assertNotNull("Expected a non-null return value from HostSession.getTempFile()", tempFile);
+		HostFile tempFile = connection.getTempFile(prefix, suffix);
+		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempFile);
 		assertTrue("Expected name of temporary file to start with the prefix", tempFile.getName().startsWith(prefix));
 		assertTrue("Expected name of temporary file to end with the suffix", tempFile.getName().endsWith(suffix));
 		assertFalse("Expected temporary file to not exist yet", tempFile.exists());
@@ -74,7 +75,7 @@ public abstract class HostSessionItestBase {
 		assertTrue("Expected temporary file to be writeable", tempFile.canWrite());
 		
 		// Windows systems don't support the concept of checking for executability
-		if (session.getHostOperatingSystem() == OperatingSystemFamily.UNIX) {
+		if (connection.getHostOperatingSystem() == OperatingSystemFamily.UNIX) {
 			assertFalse("Expected temporary file to not be executable", tempFile.canExecute());
 		}
 
@@ -97,8 +98,8 @@ public abstract class HostSessionItestBase {
 		final String prefix = "prefix";
 		final String suffix = "suffix";
 
-		HostFile tempDir = session.getTempFile(prefix, suffix);
-		assertNotNull("Expected a non-null return value from HostSession.getTempFile()", tempDir);
+		HostFile tempDir = connection.getTempFile(prefix, suffix);
+		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempDir);
 		assertTrue("Expected name of temporary file to start with the prefix", tempDir.getName().startsWith(prefix));
 		assertTrue("Expected name of temporary file to end with the suffix", tempDir.getName().endsWith(suffix));
 		assertFalse("Expected temporary file to not exist yet", tempDir.exists());
@@ -107,7 +108,7 @@ public abstract class HostSessionItestBase {
 		assertTrue("Expected temporary directory to exist after creating it", tempDir.exists());
 		assertTrue("Expected temporary directory to be a directory", tempDir.isDirectory());
 
-		HostFile anotherTempDir = session.getTempFile(prefix, suffix);
+		HostFile anotherTempDir = connection.getTempFile(prefix, suffix);
 		assertFalse("Expected temporary directories created with identical prefix and suffix to still be different", tempDir.getPath().equals(
 				anotherTempDir.getPath()));
 

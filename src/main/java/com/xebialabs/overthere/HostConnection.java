@@ -28,13 +28,12 @@
 package com.xebialabs.overthere;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.Map;
 
 /**
- * A session on a host (local or remote) on which to manipulate files and execute commands.
+ * A connection on a host (local or remote) on which to manipulate files and execute commands.
  */
-public interface HostSession {
+public interface HostConnection {
 
 	/**
 	 * Return the OS family of the host.
@@ -44,7 +43,7 @@ public interface HostSession {
 	OperatingSystemFamily getHostOperatingSystem();
 
 	/**
-	 * Closes the host session. Destroys any temporary files that may have been created on the host.
+	 * Closes the host connection. Destroys any temporary files that may have been created on the host.
 	 * 
 	 * Never throws an exception, not even a {@link RuntimeException}
 	 */
@@ -76,7 +75,7 @@ public interface HostSession {
 
 	/**
 	 * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
-	 * removed when this session is closed. <b>N.B.:</b> The file is not actually created until a put method is invoked.
+	 * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is invoked.
 	 * 
 	 * @param nameTemplate
 	 *            the template on which to base the name of the temporary file. May be <code>null</code>.
@@ -88,7 +87,7 @@ public interface HostSession {
 
 	/**
 	 * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
-	 * removed when this session is closed. <b>N.B.:</b> The file is not actually created until a put method is invoked.
+	 * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is invoked.
 	 * 
 	 * @param prefix
 	 *            the prefix string to be used in generating the file's name; must be at least three characters long
@@ -135,7 +134,7 @@ public interface HostSession {
 	 * @param cmdarray
 	 *            the command line to execute. The first element is the command, the other elements are its arguments.
 	 * @return an object representing the executing command or <tt>null</tt> if this is not supported by the host
-	 *         session.
+	 *         connection.
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurs
 	 */

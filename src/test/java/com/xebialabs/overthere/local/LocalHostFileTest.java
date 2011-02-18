@@ -27,32 +27,37 @@
 
 package com.xebialabs.overthere.local;
 
-import com.xebialabs.deployit.ci.Host;
-import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.HostSession;
-import com.xebialabs.overthere.HostSessionItestBase;
+import com.xebialabs.overthere.*;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.internal.matchers.StringContains.containsString;
 
 public class LocalHostFileTest extends HostSessionItestBase {
 
-	private HostSession session;
+	@Rule
+	public TemporaryFolder temp = new TemporaryFolder();
+
+	private HostConnection connection;
 
 	@Before
-	public void openSession() {
-		session = Host.getLocalHost().getHostSession();
+	public void openSession() throws IOException {
+		options.set("os", OperatingSystemFamily.UNIX);
+		options.set("temporaryDirectoryPath", temp.getRoot().getPath());
+		connection = Overthere.getConnection("local", options);
 	}
 
 	@Test
 	public void isDirectoryWorks() {
-		HostFile tempFile = session.getTempFile("tmpDir");
+		HostFile tempFile = connection.getTempFile("tmpDir");
 		tempFile.delete();
 		tempFile.mkdir();
 		assertTrue("expected temp is a dir", tempFile.isDirectory());
@@ -60,15 +65,15 @@ public class LocalHostFileTest extends HostSessionItestBase {
 
 	@Test
 	public void passwordNotSeen() {
-			CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(); 
-			session.execute(handler, "foo.sh -username","benoit","-password","benoit");
-			assertThat(handler.getOutput(), )
+		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler();
+		connection.execute(handler, "foo.sh -username", "benoit", "-password", "benoit");
+		assertThat(handler.getOutput(), containsString("********"));
 	}
 
 	@Test
 	public void passwordNotSeen2() {
 		try {
-			session.execute(new DebugCommandExecutionCallbackHandler(), "foo.sh -username benoit -password benoit");
+			connection.execute(new DebugCommandExecutionCallbackHandler(), "foo.sh -username benoit -password benoit");
 		} catch (Throwable t) {
 
 		}
@@ -76,7 +81,7 @@ public class LocalHostFileTest extends HostSessionItestBase {
 
 	@After
 	public void closeSession() {
-		session.close();
+		connection.close();
 	}
 
 }

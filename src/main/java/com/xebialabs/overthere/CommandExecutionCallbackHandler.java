@@ -28,7 +28,7 @@
 package com.xebialabs.overthere;
 
 /**
- * Handler for callbacks from the host session.
+ * Handler for callbacks from the host connection.
  */
 public interface CommandExecutionCallbackHandler {
 

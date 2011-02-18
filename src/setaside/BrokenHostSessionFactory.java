@@ -27,17 +27,16 @@
 
 package com.xebialabs.overthere;
 
+import com.xebialabs.overthere.cifs.CifsTelnetHostConnection;
+import com.xebialabs.overthere.local.LocalHostConnection;
+import com.xebialabs.overthere.ssh.*;
 import org.apache.commons.lang.StringUtils;
 
-import com.xebialabs.overthere.cifs.CifsTelnetHostSession;
-import com.xebialabs.overthere.local.LocalHostSession;
-import com.xebialabs.overthere.ssh.SshInteractiveSudoHostSession;
-import com.xebialabs.overthere.ssh.SshScpHostSession;
-import com.xebialabs.overthere.ssh.SshSftpHostSession;
-import com.xebialabs.overthere.ssh.SshSudoHostSession;
+import com.xebialabs.overthere.ssh.SshInteractiveSudoHostConnection;
+import com.xebialabs.overthere.ssh.SshSftpHostConnection;
 
 /**
- * Factory for {@linkplain HostSession host sessions}.
+ * Factory for {@linkplain HostConnection host sessions}.
  */
 public class BrokenHostSessionFactory {
 
@@ -52,7 +51,7 @@ public class BrokenHostSessionFactory {
 	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 120000;
 
 	/**
-	 * Creates a host session for the host.
+	 * Creates a host connection for the host.
 	 * 
 	 * @param osFamily
 	 *            the OS family of the host
@@ -70,33 +69,33 @@ public class BrokenHostSessionFactory {
 	 *            the username to sudo to
 	 * @param temporaryDirectoryPath
 	 *            the path of the directory in which to store temporary files
-	 * @return the session created
+	 * @return the connection created
 	 * @throws IllegalStateException
-	 *             if no suitable session can be created.
+	 *             if no suitable connection can be created.
 	 */
-	public static HostSession getHostSession(OperatingSystemFamily osFamily, HostAccessMethod accessMethod, String address, int port, String username,
+	public static HostConnection getHostSession(OperatingSystemFamily osFamily, HostAccessMethod accessMethod, String address, int port, String username,
 	        String password, String sudoUsername, String temporaryDirectoryPath) {
-		HostSession s;
+		HostConnection s;
 		switch (accessMethod) {
 		case NONE:
 			throw new IllegalStateException("Cannot connect to a host that has a NONE access method");
 		case LOCAL:
-			s = new LocalHostSession(osFamily, temporaryDirectoryPath);
+			s = new LocalHostConnection(osFamily, temporaryDirectoryPath);
 			break;
 		case SSH_SFTP:
-			s = new SshSftpHostSession(osFamily, temporaryDirectoryPath, address, port, username, password);
+			s = new SshSftpHostConnection(osFamily, temporaryDirectoryPath, address, port, username, password);
 			break;
 		case SSH_SCP:
-			s = new SshScpHostSession(osFamily, temporaryDirectoryPath, address, port, username, password);
+			s = new SshScpHostConnection(osFamily, temporaryDirectoryPath, address, port, username, password);
 			break;
 		case SSH_SUDO:
-			s = new SshSudoHostSession(osFamily, temporaryDirectoryPath, address, port, username, password, sudoUsername);
+			s = new SshSudoHostConnection(osFamily, temporaryDirectoryPath, address, port, username, password, sudoUsername);
 			break;
 		case SSH_INTERACTIVE_SUDO:
-			s = new SshInteractiveSudoHostSession(osFamily, temporaryDirectoryPath, address, port, username, password, sudoUsername);
+			s = new SshInteractiveSudoHostConnection(osFamily, temporaryDirectoryPath, address, port, username, password, sudoUsername);
 			break;
 		case CIFS_TELNET:
-			s = new CifsTelnetHostSession(osFamily, temporaryDirectoryPath, address, port, username, password);
+			s = new CifsTelnetHostConnection(osFamily, temporaryDirectoryPath, address, port, username, password);
 			break;
 		default:
 			throw new IllegalStateException("Unknown host access method " + accessMethod);
@@ -105,7 +104,7 @@ public class BrokenHostSessionFactory {
 	}
 
 	/**
-	 * Creates a host session for the host.
+	 * Creates a host connection for the host.
 	 * 
 	 * @param osFamily
 	 *            the OS family of the host
@@ -121,13 +120,13 @@ public class BrokenHostSessionFactory {
 	 *            the username to sudo to
 	 * @param temporaryDirectoryPath
 	 *            the path of the directory in which to store temporary files
-	 * @return the session created
+	 * @return the connection created
 	 * @throws IllegalArgumentException
 	 *             if the host specification contains an error
 	 * @throws IllegalStateException
-	 *             if no suitable session can be created.
+	 *             if no suitable connection can be created.
 	 */
-	public static HostSession getHostSession(OperatingSystemFamily osFamily, HostAccessMethod accessMethod, String hostSpecification, String username,
+	public static HostConnection getHostSession(OperatingSystemFamily osFamily, HostAccessMethod accessMethod, String hostSpecification, String username,
 	        String password, String sudoUsername, String temporaryDirectoryPath) {
 		String address;
 		int port;
@@ -158,19 +157,19 @@ public class BrokenHostSessionFactory {
 	}
 
 	/**
-	 * Returns an HostSession based on the information in a Host CI.
+	 * Returns an HostConnection based on the information in a Host CI.
 	 * 
 	 * @param host
 	 *            the host from which to take the details.
-	 * @return the session created
+	 * @return the connection created
 	 * @throws IllegalArgumentException
 	 *             if the host specification contains an error
 	 * @throws IllegalStateException
-	 *             if no suitable session can be created.
+	 *             if no suitable connection can be created.
 	 */
-	public static HostSession getHostSession(Host host) {
+	public static HostConnection getHostSession(Host host) {
 		if (host instanceof UnreachableHost) {
-			return new TunnelledHostSession((UnreachableHost) host);
+			return new TunnelledHostConnection((UnreachableHost) host);
 		} else {
 			return getHostSession(host.getOperatingSystemFamily(), host.getAccessMethod(), host.getAddress(), host.getUsername(), host.getPassword(),
 			        host.getSudoUsername(), host.getTemporaryDirectoryLocation());
