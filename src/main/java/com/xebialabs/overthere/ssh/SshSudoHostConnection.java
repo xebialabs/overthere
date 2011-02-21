@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A connection to a remote host using SSH w/ SUDO.
  */
+@Protocol(name = "ssh_sudo")
 public class SshSudoHostConnection extends SshHostConnection {
 
 	protected String sudoUsername;

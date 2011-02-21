@@ -4,6 +4,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Protocol;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * A connection to a remote host using SSH w/ interactive SUDO.
  */
+@Protocol(name = "ssh_interactive_sudo")
 public class SshInteractiveSudoHostConnection extends SshSudoHostConnection {
 
 	public SshInteractiveSudoHostConnection(String type, ConnectionOptions options) {

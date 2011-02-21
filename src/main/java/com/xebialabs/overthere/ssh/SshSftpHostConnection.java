@@ -1,6 +1,7 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Protocol;
 import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A connection to a remote host using SSH w/ SFTP.
  */
+@Protocol(name = "ssh_sftp")
 public class SshSftpHostConnection extends SshHostConnection {
 
 	private ChannelSftp sharedSftpChannel;

@@ -19,6 +19,7 @@ import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
 /**
  * A connection to the local host.
  */
+@Protocol(name = "local")
 public class LocalHostConnection extends AbstractHostConnection implements HostConnectionBuilder, HostConnection {
 
 	/**
