@@ -50,6 +50,7 @@ public abstract class AbstractHostConnection implements HostConnection {
 	}
 
 	public void disconnect() {
+		// FIXME Reference to an old key
 		String doNotCleanUpTemporaryFiles = System.getProperty("com.xebia.ad.donotcleanuptemporaryfiles");
 		boolean doNotCleanUp = (doNotCleanUpTemporaryFiles != null && doNotCleanUpTemporaryFiles.equalsIgnoreCase("true"));
 		if (!doNotCleanUp) {

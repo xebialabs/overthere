@@ -1,4 +1,5 @@
 build/
+out/
 .gradle/
 .settings/
 .classpath
@@ -6,4 +7,4 @@ build/
 *.iml
 *.ipr
 *.iws
-
+s101plugin.state
