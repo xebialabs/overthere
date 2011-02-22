@@ -1,3 +1,18 @@
+buildscript {
+  repositories {
+    add(new org.apache.ivy.plugins.resolver.URLResolver()) {
+      name = "GitHub"
+      addArtifactPattern 'http://cloud.github.com/downloads/hierynomus/gradle-plugins/[organization]-[module]-[revision].[ext]'
+    }
+  }
+
+  dependencies {
+    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.1-SNAPSHOT@jar'
+  }
+}
+
+apply plugin: 'license'
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
