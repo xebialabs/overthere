@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.common.AbstractHostConnection;
+import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,11 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 	 * Constructs a connection to the local host.
 	 */
 	public LocalHostConnection(String type, ConnectionOptions options) {
-		super(type, options);
+		super(type, determineOs(), options);
+	}
+
+	private static OperatingSystemFamily determineOs() {
+		return SystemUtils.IS_OS_WINDOWS ? OperatingSystemFamily.WINDOWS : OperatingSystemFamily.UNIX;
 	}
 
 	public HostConnection connect() {

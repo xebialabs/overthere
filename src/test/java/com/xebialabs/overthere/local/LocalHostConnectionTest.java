@@ -52,8 +52,6 @@ public class LocalHostConnectionTest extends HostSessionItestBase {
     protected void setTypeAndOptions() {
 		type = "local";
 		options = new ConnectionOptions();
-		// FIXME: LocalHostConnection should be able to find out its OS family by itself.
-		options.set("os", OperatingSystemFamily.UNIX);
 		options.set("temporaryDirectoryPath", temp.getRoot().getPath());
 	}
 

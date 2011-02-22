@@ -24,7 +24,7 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 public abstract class AbstractHostConnection implements HostConnection {
 
-	private OperatingSystemFamily os;
+	protected OperatingSystemFamily os;
 
 	private String temporaryDirectoryPath;
 
@@ -32,9 +32,13 @@ public abstract class AbstractHostConnection implements HostConnection {
 
 	public static final long MAX_TEMP_RETRIES = 100;
 
-	protected AbstractHostConnection(String type, ConnectionOptions options) {
-		this.os = options.get("os");
+	protected AbstractHostConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {
+		this.os = os;
 		this.temporaryDirectoryPath = options.get("temporaryDirectoryPath", os.getDefaultTemporaryDirectoryPath());
+	}
+	
+	protected AbstractHostConnection(String type, ConnectionOptions options) {
+		this(type, options.<OperatingSystemFamily>get("os"), options);
 	}
 
 	public OperatingSystemFamily getHostOperatingSystem() {
@@ -50,9 +54,8 @@ public abstract class AbstractHostConnection implements HostConnection {
 	}
 
 	public void disconnect() {
-		// FIXME Reference to an old key
-		String doNotCleanUpTemporaryFiles = System.getProperty("com.xebia.ad.donotcleanuptemporaryfiles");
-		boolean doNotCleanUp = (doNotCleanUpTemporaryFiles != null && doNotCleanUpTemporaryFiles.equalsIgnoreCase("true"));
+		String doNotCleanUpTemporaryFiles = System.getProperty("overthere.donotcleanuptemporaryfiles");
+		boolean doNotCleanUp = Boolean.valueOf(doNotCleanUpTemporaryFiles);
 		if (!doNotCleanUp) {
 			cleanupTemporaryFiles();
 		}

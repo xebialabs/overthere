@@ -55,8 +55,10 @@ public class AbstractHostConnectionTest {
 		session.getTempFile(null);
 		session.getTempFile("");
 		session.getTempFile(" ");
-		verify(session, times(5)).getTempFile(isA(String.class), isA(String.class));
-		// FIXME: verify that the method was invoked with the right parameters
+		verify(session).getTempFile(prefix1, suffix1);
+		verify(session).getTempFile(prefix2, ".");
+		verify(session, times(3)).getTempFile("hostsession", ".tmp");
 	}
 
 }
+
