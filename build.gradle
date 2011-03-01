@@ -15,6 +15,7 @@ apply plugin: 'license'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'maven'
 
 dependencies {
 	compile 'commons-lang:commons-lang:2.5'
@@ -38,3 +39,14 @@ repositories {
 
 version = "1.0-SNAPSHOT"
 group = "com.xebialabs.overthere"
+
+uploadArchives {
+  repositories.mavenDeployer {
+    snapshotRepository(url: "http://dexter.xebialabs.com/nexus/content/repositories/snapshots") {
+      authentication(userName: "deployment", password: '_#$(%RJf-W}')
+    }
+    repository(url: "http://dexter.xebialabs.com/nexus/content/repositories/releases") {
+      authentication(userName: "deployment", password: '_#$(%RJf-W}')
+    }
+  }
+}
