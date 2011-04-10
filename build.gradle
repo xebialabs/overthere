@@ -26,6 +26,7 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.6.1'
 	compile 'org.reflections:reflections:0.9.5-RC2'
 	testCompile 'junit:junit:4.8.1'
+	testCompile 'org.hamcrest:hamcrest-all:1.1'
 	testCompile 'org.mockito:mockito-all:1.8.5'
 	testCompile 'org.slf4j:slf4j-simple:1.6.1'
 }
