@@ -135,13 +135,13 @@ public class HostFileUtilsTest {
 			assertTrue(destDir.exists());
 			assertTrue(destDir.isDirectory());
 
-			List<OverthereFile> filesInDestDir = destDir.listFiles();
+			OverthereFile[] filesInDestDir = destDir.listFiles();
 			int nFiles = countFiles(filesInDestDir);
 			assertEquals(1, nFiles);
 			int nDirs = countDirs(filesInDestDir);
 			assertEquals(2, nDirs);
 
-			List<OverthereFile> subDirsInDestDir = getDirs(filesInDestDir);
+			OverthereFile[] subDirsInDestDir = getDirs(filesInDestDir);
 
 			for (OverthereFile subDir : subDirsInDestDir) {
 				assertTrue(subDir.exists());
@@ -167,11 +167,11 @@ public class HostFileUtilsTest {
 		}
 	}
 
-	private int countFiles(List<OverthereFile> files) {
-		return files.size() - countDirs(files);
+	private int countFiles(OverthereFile[] files) {
+		return files.length - countDirs(files);
 	}
 
-	private int countDirs(List<OverthereFile> files) {
+	private int countDirs(OverthereFile[] files) {
 		int cnt = 0;
 		for (OverthereFile f : files) {
 			if (f.isDirectory()) {
@@ -181,14 +181,14 @@ public class HostFileUtilsTest {
 		return cnt;
 	}
 
-	private List<OverthereFile> getDirs(List<OverthereFile> files) {
+	private OverthereFile[] getDirs(OverthereFile[] files) {
 		List<OverthereFile> dirs = new ArrayList<OverthereFile>();
 		for (OverthereFile f : files) {
 			if (f.isDirectory()) {
 				dirs.add(f);
 			}
 		}
-		return dirs;
+		return dirs.toArray(new OverthereFile[dirs.size()]);
 	}
 
 	// FIXME: Find a better way to write these test
@@ -246,4 +246,3 @@ public class HostFileUtilsTest {
 	// }
 	// }
 }
-

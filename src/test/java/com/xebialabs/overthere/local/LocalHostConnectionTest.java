@@ -28,9 +28,8 @@ import org.junit.rules.TemporaryFolder;
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.HostSessionItestBase;
-import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 
 public class LocalHostConnectionTest extends HostSessionItestBase {
 

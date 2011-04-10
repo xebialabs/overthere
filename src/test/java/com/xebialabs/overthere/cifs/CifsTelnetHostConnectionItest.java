@@ -16,13 +16,14 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
@@ -30,20 +31,20 @@ import org.junit.Test;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 
 @Ignore("Needs Windows 2003 image")
 public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 
 	@Override
-    protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() {
 		type = "cifs_telnet";
 		options = new ConnectionOptions();
 		options.set("address", "wls-11g-win");
 		options.set("username", "itestuser");
-		// ensure the test user contains some reserved characters such as ';', ':' or '@' 
+		// ensure the test user contains some reserved characters such as ';', ':' or '@'
 		options.set("password", "hello@:;<>myfriend");
 		options.set("os", OperatingSystemFamily.WINDOWS);
 	}
@@ -51,8 +52,8 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 	@Test
 	public void listC() throws IOException {
 		OverthereFile file = connection.getFile("C:");
-		List<String> filesInC = file.list();
-		assertTrue(filesInC.contains("AUTOEXEC.BAT"));
+		String[] filesInC = file.list();
+		assertThat(filesInC, hasItemInArray("AUTOEXEC.BAT"));
 	}
 
 	@Test
@@ -94,4 +95,3 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 	}
 
 }
-

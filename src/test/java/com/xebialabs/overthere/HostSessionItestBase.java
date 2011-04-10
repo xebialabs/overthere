@@ -16,9 +16,12 @@
  */
 package com.xebialabs.overthere;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -27,7 +30,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -134,10 +136,10 @@ public abstract class HostSessionItestBase {
 		OverthereFile regularFile = tempDir.getFile("somefile.txt");
 		regularFile.put(new ByteArrayInputStream(contents), contents.length);
 
-		List<String> dirContents = tempDir.list();
-		assertEquals("Expected directory to contain two entries", 2, dirContents.size());
-		assertTrue("Expected directory to contain parent of deeply nested directory", dirContents.contains(nested1.getName()));
-		assertTrue("Expected directory to contain regular file that was just created", dirContents.contains(regularFile.getName()));
+		String[] dirContents = tempDir.list();
+		assertThat("Expected directory to contain two entries", dirContents.length, equalTo(2));
+		assertThat("Expected directory to contain parent of deeply nested directory", dirContents, hasItemInArray(nested1.getName()));
+		assertThat("Expected directory to contain regular file that was just created", dirContents, hasItemInArray(regularFile.getName()));
 
 		try {
 			nested1.delete();
@@ -153,4 +155,3 @@ public abstract class HostSessionItestBase {
 	}
 
 }
-
