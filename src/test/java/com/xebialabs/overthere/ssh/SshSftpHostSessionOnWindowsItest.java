@@ -42,7 +42,7 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 
 		HostConnection hs = Overthere.getConnection(type, options);
 		try {
-			HostFile tempFile = hs.getTempFile("testoutput", ".txt");
+			OverthereFile tempFile = hs.getTempFile("testoutput", ".txt");
 
 			HostFileUtils.putStringToHostFile(expectedOutput + "\r\nwhose fleece was white as snow\r\n", tempFile);
 
@@ -63,10 +63,10 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 
 		HostConnection hs = Overthere.getConnection(type, options);
 		try {
-			HostFile tempFile3 = hs.getFile("c:\\temp\\level1\\level2\\level3");
+			OverthereFile tempFile3 = hs.getFile("c:\\temp\\level1\\level2\\level3");
 			tempFile3.mkdirs();
 
-			final HostFile file = tempFile3.getFile("foo.txt");
+			final OverthereFile file = tempFile3.getFile("foo.txt");
 
 			HostFileUtils.putStringToHostFile("hello....\r\n", file);
 

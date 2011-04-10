@@ -54,28 +54,30 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 		return this;
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		try {
 			File tempFile = createTempFile(prefix, suffix, new File(getTemporaryDirectory().getPath()));
 			// FIXME: Need to delete this file to make test work, but isn't it better to NOT do that so that a tempfile with the same name is not accidentally
 			// created simultaneously?
+			// FIXME: Answer from VP: we have to decide on the semantics. How do you create a temporary directory?
 			tempFile.delete();
-			return new LocalHostFile(this, tempFile);
+			return new LocalOverthereFile(this, tempFile.getPath());
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
-		return new LocalHostFile(this, new File(hostPath));
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+		return new LocalOverthereFile(this, hostPath);
 	}
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
-		if (!(parent instanceof LocalHostFile)) {
-			throw new IllegalStateException("parent is not a file on the local host");
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+		if (!(parent instanceof LocalOverthereFile)) {
+			throw new IllegalStateException("parent is not a LocalOverthereFile");
 		}
-		File parentFile = ((LocalHostFile) parent).getFile();
-		return new LocalHostFile(this, new File(parentFile, child));
+
+		File childFile = new File(parent.getParentFile(), child);
+		return new LocalOverthereFile(this, childFile.getPath());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -128,4 +130,3 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 	private static Logger logger = LoggerFactory.getLogger(LocalHostConnection.class);
 
 }
-

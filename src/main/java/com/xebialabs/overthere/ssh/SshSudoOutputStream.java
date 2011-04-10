@@ -23,7 +23,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -31,15 +31,15 @@ import org.slf4j.LoggerFactory;
  */
 class SshSudoOutputStream extends OutputStream {
 
-	private HostFile tempFile;
+	private OverthereFile tempFile;
 
-	private SshSudoHostFile hostFile;
+	private SshSudoOverthereFile hostFile;
 
 	private long length;
 
 	private OutputStream tempFileOutputStream;
 
-	public SshSudoOutputStream(SshSudoHostFile hostFile, long length, HostFile tempFile) {
+	public SshSudoOutputStream(SshSudoOverthereFile hostFile, long length, OverthereFile tempFile) {
 		this.hostFile = hostFile;
 		this.length = length;
 		this.tempFile = tempFile;

@@ -60,7 +60,7 @@ public abstract class HostSessionItestBase {
 		final String suffix = "suffix";
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
 
-		HostFile tempFile = connection.getTempFile(prefix, suffix);
+		OverthereFile tempFile = connection.getTempFile(prefix, suffix);
 		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempFile);
 		assertTrue("Expected name of temporary file to start with the prefix", tempFile.getName().startsWith(prefix));
 		assertTrue("Expected name of temporary file to end with the suffix", tempFile.getName().endsWith(suffix));
@@ -103,7 +103,7 @@ public abstract class HostSessionItestBase {
 		final String prefix = "prefix";
 		final String suffix = "suffix";
 
-		HostFile tempDir = connection.getTempFile(prefix, suffix);
+		OverthereFile tempDir = connection.getTempFile(prefix, suffix);
 		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempDir);
 		assertTrue("Expected name of temporary file to start with the prefix", tempDir.getName().startsWith(prefix));
 		assertTrue("Expected name of temporary file to end with the suffix", tempDir.getName().endsWith(suffix));
@@ -113,13 +113,13 @@ public abstract class HostSessionItestBase {
 		assertTrue("Expected temporary directory to exist after creating it", tempDir.exists());
 		assertTrue("Expected temporary directory to be a directory", tempDir.isDirectory());
 
-		HostFile anotherTempDir = connection.getTempFile(prefix, suffix);
+		OverthereFile anotherTempDir = connection.getTempFile(prefix, suffix);
 		assertFalse("Expected temporary directories created with identical prefix and suffix to still be different",
 		        tempDir.getPath().equals(anotherTempDir.getPath()));
 
-		HostFile nested1 = tempDir.getFile("nested1");
-		HostFile nested2 = nested1.getFile("nested2");
-		HostFile nested3 = nested2.getFile("nested3");
+		OverthereFile nested1 = tempDir.getFile("nested1");
+		OverthereFile nested2 = nested1.getFile("nested2");
+		OverthereFile nested3 = nested2.getFile("nested3");
 		assertFalse("Expected deeply nested directory to not exist", nested3.exists());
 		try {
 			nested3.mkdir();
@@ -131,7 +131,7 @@ public abstract class HostSessionItestBase {
 		assertTrue("Expected deeply nested directory to exist after invoking mkdirs on it", nested3.exists());
 
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
-		HostFile regularFile = tempDir.getFile("somefile.txt");
+		OverthereFile regularFile = tempDir.getFile("somefile.txt");
 		regularFile.put(new ByteArrayInputStream(contents), contents.length);
 
 		List<String> dirContents = tempDir.list();

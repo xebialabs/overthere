@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.OperatingSystemFamily;
 
@@ -50,14 +50,14 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 
 	@Test
 	public void listC() throws IOException {
-		HostFile file = connection.getFile("C:");
+		OverthereFile file = connection.getFile("C:");
 		List<String> filesInC = file.list();
 		assertTrue(filesInC.contains("AUTOEXEC.BAT"));
 	}
 
 	@Test
 	public void readFile() throws IOException {
-		HostFile file = connection.getFile("C:\\itest\\itestfile.txt");
+		OverthereFile file = connection.getFile("C:\\itest\\itestfile.txt");
 		assertEquals("itestfile.txt", file.getName());
 		assertEquals(27, file.length());
 		InputStream inputStream = file.get();

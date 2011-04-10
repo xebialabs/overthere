@@ -60,11 +60,11 @@ public class HostFileUtilsTest {
 	@Test
 	public void copyOfFileToDirectoryFails() {
 
-		HostFile regularFile = Mockito.mock(HostFile.class);
+		OverthereFile regularFile = Mockito.mock(OverthereFile.class);
 		Mockito.when(regularFile.exists()).thenReturn(true);
 		Mockito.when(regularFile.isDirectory()).thenReturn(false);
 
-		HostFile directory = Mockito.mock(HostFile.class);
+		OverthereFile directory = Mockito.mock(OverthereFile.class);
 		Mockito.when(directory.exists()).thenReturn(true);
 		Mockito.when(directory.isDirectory()).thenReturn(true);
 
@@ -89,7 +89,7 @@ public class HostFileUtilsTest {
 		HostConnection s = Overthere.getConnection("local", localOptions);
 		try {
 			File srcDirFile = File.createTempFile("srcdir", null);
-			HostFile srcDir = s.getFile(srcDirFile.getPath());
+			OverthereFile srcDir = s.getFile(srcDirFile.getPath());
 			String javaTempDirName = srcDir.getParent();
 
 			String mySrcTempDirName = javaTempDirName + File.separator + "srcTempDir";
@@ -105,7 +105,7 @@ public class HostFileUtilsTest {
 
 			String mySrcSubTempDirName = mySrcTempDirName + File.separator + "srcSubTempDir";
 			File srcSubDirFile = new File(mySrcSubTempDirName);
-			HostFile srcSubDir = s.getFile(srcSubDirFile.getPath());
+			OverthereFile srcSubDir = s.getFile(srcSubDirFile.getPath());
 			srcSubDir.mkdirs();
 
 			String fileAtFirstSubLevel = mySrcSubTempDirName + File.separator + "fileAtFirstSubLevel.txt";
@@ -116,7 +116,7 @@ public class HostFileUtilsTest {
 
 			String mySecondSrcSubTempDirName = mySrcTempDirName + File.separator + "srcSecondSubTempDir";
 			File srcSecondSubDirFile = new File(mySecondSrcSubTempDirName);
-			HostFile srcSecondSubDir = s.getFile(srcSecondSubDirFile.getPath());
+			OverthereFile srcSecondSubDir = s.getFile(srcSecondSubDirFile.getPath());
 			srcSecondSubDir.mkdirs();
 
 			String fileAtSecondSubLevel = mySecondSrcSubTempDirName + File.separator + "fileAtSecondSubLevel.txt";
@@ -125,7 +125,7 @@ public class HostFileUtilsTest {
 			pw.println("I am the content of the second sub level file");
 			pw.close();
 
-			HostFile destDir = s.getFile(new File(javaTempDirName + File.separator + "destdir").getPath());
+			OverthereFile destDir = s.getFile(new File(javaTempDirName + File.separator + "destdir").getPath());
 
 			assertFalse(destDir.exists());
 
@@ -135,15 +135,15 @@ public class HostFileUtilsTest {
 			assertTrue(destDir.exists());
 			assertTrue(destDir.isDirectory());
 
-			List<HostFile> filesInDestDir = destDir.listFiles();
+			List<OverthereFile> filesInDestDir = destDir.listFiles();
 			int nFiles = countFiles(filesInDestDir);
 			assertEquals(1, nFiles);
 			int nDirs = countDirs(filesInDestDir);
 			assertEquals(2, nDirs);
 
-			List<HostFile> subDirsInDestDir = getDirs(filesInDestDir);
+			List<OverthereFile> subDirsInDestDir = getDirs(filesInDestDir);
 
-			for (HostFile subDir : subDirsInDestDir) {
+			for (OverthereFile subDir : subDirsInDestDir) {
 				assertTrue(subDir.exists());
 				assertTrue(subDir.isDirectory());
 				filesInDestDir = subDir.listFiles();
@@ -167,13 +167,13 @@ public class HostFileUtilsTest {
 		}
 	}
 
-	private int countFiles(List<HostFile> files) {
+	private int countFiles(List<OverthereFile> files) {
 		return files.size() - countDirs(files);
 	}
 
-	private int countDirs(List<HostFile> files) {
+	private int countDirs(List<OverthereFile> files) {
 		int cnt = 0;
-		for (HostFile f : files) {
+		for (OverthereFile f : files) {
 			if (f.isDirectory()) {
 				cnt++;
 			}
@@ -181,9 +181,9 @@ public class HostFileUtilsTest {
 		return cnt;
 	}
 
-	private List<HostFile> getDirs(List<HostFile> files) {
-		List<HostFile> dirs = new ArrayList<HostFile>();
-		for (HostFile f : files) {
+	private List<OverthereFile> getDirs(List<OverthereFile> files) {
+		List<OverthereFile> dirs = new ArrayList<OverthereFile>();
+		for (OverthereFile f : files) {
 			if (f.isDirectory()) {
 				dirs.add(f);
 			}

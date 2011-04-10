@@ -120,18 +120,18 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		}
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		return getFile(hostPath, false);
 	}
 
-	protected abstract HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
+	protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
 		return getFile(parent, child, false);
 	}
 
-	protected HostFile getFile(HostFile parent, String child, boolean isTempFile) throws RuntimeIOException {
-		if (!(parent instanceof SshHostFile)) {
+	protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+		if (!(parent instanceof SshOverthereFile)) {
 			throw new IllegalStateException("parent is not a file on an SSH host");
 		}
 		if (parent.getConnection() != this) {
@@ -140,7 +140,7 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		checkNotNull(prefix);
 		if (suffix == null) {
 			suffix = ".tmp";
@@ -149,7 +149,7 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		Random r = new Random();
 		String infix = "";
 		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
-			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
+			OverthereFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
 					logger.debug("Created temporary file " + f);

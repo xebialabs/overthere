@@ -33,7 +33,7 @@ import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.CommandExecution;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -85,7 +85,7 @@ public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 		final File tempFile = temp.newFile("fooBar");
 		writeStringToFile(tempFile, "Foo Bar Baz");
 
-		HostFile file = connection.copyToTemporaryFile(tempFile);
+		OverthereFile file = connection.copyToTemporaryFile(tempFile);
 
 		assertTrue("Expected temp file to have been written", file.exists());
 	}
@@ -95,7 +95,7 @@ public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 		final File tempFile = temp.newFile("fooBar");
 		writeStringToFile(tempFile, "Foo Bar Baz");
 
-		HostFile file = connection.copyToTemporaryFile(tempFile);
+		OverthereFile file = connection.copyToTemporaryFile(tempFile);
 
 		CommandExecutionCallbackHandler handler = new DebugCommandExecutionCallbackHandler();
 		int res = connection.execute(handler, "cp", file.getPath(), "/tmp/" + System.currentTimeMillis() + ".class");

@@ -209,20 +209,20 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 		return null;
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		try {
 			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath));
-			return new CifsHostFile(this, smbFile);
+			return new CifsOverthereFile(this, smbFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
 	}
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child.replace('\\', '/'));
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		checkNotNull(prefix);
 		if (suffix == null) {
 			suffix = ".tmp";
@@ -231,7 +231,7 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 		Random r = new Random();
 		String infix = "";
 		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
-			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
+			OverthereFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
 					logger.debug("Created temporary file " + f);

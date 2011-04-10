@@ -16,26 +16,17 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.collect.Maps;
-import com.xebialabs.overthere.local.LocalHostConnection;
-import com.xebialabs.overthere.ssh.SshInteractiveSudoHostConnection;
-import com.xebialabs.overthere.ssh.SshScpHostConnection;
-import com.xebialabs.overthere.ssh.SshSftpHostConnection;
-import com.xebialabs.overthere.ssh.SshSudoHostConnection;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
 
 /**
  * FIXME: Removed functionality:
@@ -48,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * 
  * - unreachable host support/tunneled host session -> needs to be reimplemented in a nice way.
  */
+@SuppressWarnings("unchecked")
 public class Overthere {
 	/**
 	 * The default timeout for opening a connection in milliseconds.
@@ -61,10 +53,10 @@ public class Overthere {
 	static {
 		final Reflections reflections = new Reflections("com.xebialabs", new TypeAnnotationsScanner());
 		final Set<Class<?>> protocols = reflections.getTypesAnnotatedWith(Protocol.class);
-		for (Class protocol : protocols) {
+		for (Class<?> protocol : protocols) {
 			if (HostConnectionBuilder.class.isAssignableFrom(protocol)) {
 				final String name = ((Protocol) protocol.getAnnotation(Protocol.class)).name();
-				Overthere.protocols.get().put(name, protocol);
+				Overthere.protocols.get().put(name, (Class<? extends HostConnectionBuilder>) protocol);
 			} else {
 				logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
 			}

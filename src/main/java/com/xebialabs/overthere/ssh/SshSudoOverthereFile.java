@@ -25,13 +25,14 @@ import org.slf4j.Logger;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
 import org.slf4j.LoggerFactory;
 
 /**
  * A file on a host connected through SSH w/ SUDO.
  */
-class SshSudoHostFile extends SshScpHostFile implements HostFile {
+@SuppressWarnings("serial")
+class SshSudoOverthereFile extends SshScpOverthereFile {
 
 	private SshSudoHostConnection sshSudoHostSession;
 
@@ -47,7 +48,7 @@ class SshSudoHostFile extends SshScpHostFile implements HostFile {
 	 * @param isTempFile
 	 *            is <code>true</code> if this is a temporary file; <code>false</code> otherwise
 	 */
-	public SshSudoHostFile(SshSudoHostConnection session, String remotePath, boolean isTempFile) {
+	public SshSudoOverthereFile(SshSudoHostConnection session, String remotePath, boolean isTempFile) {
 		super(session, remotePath);
 		this.sshSudoHostSession = session;
 		this.isTempFile = isTempFile;
@@ -63,15 +64,15 @@ class SshSudoHostFile extends SshScpHostFile implements HostFile {
 	}
 
 	@Override
-	public HostFile getFile(String name) {
-		SshSudoHostFile f = (SshSudoHostFile) super.getFile(name);
+	public OverthereFile getFile(String name) {
+		SshSudoOverthereFile f = (SshSudoOverthereFile) super.getFile(name);
 		f.isTempFile = this.isTempFile;
 		return f;
 	}
 
 	@Override
-	public HostFile getParentFile() {
-		SshSudoHostFile f = (SshSudoHostFile) super.getParentFile();
+	public OverthereFile getParentFile() {
+		SshSudoOverthereFile f = (SshSudoOverthereFile) super.getParentFile();
 		f.isTempFile = this.isTempFile;
 		return f;
 	}
@@ -81,13 +82,13 @@ class SshSudoHostFile extends SshScpHostFile implements HostFile {
 		if (isTempFile) {
 			return super.get();
 		} else {
-			HostFile tempFile = getTempFile(true);
+			OverthereFile tempFile = getTempFile(true);
 			copyHostFileToTempFile(tempFile);
 			return tempFile.get();
 		}
 	}
 
-	private void copyHostFileToTempFile(HostFile tempFile) {
+	private void copyHostFileToTempFile(OverthereFile tempFile) {
 		if (logger.isDebugEnabled())
 			logger.debug("Copying " + this + " to " + tempFile + " for reading");
 		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
@@ -115,27 +116,27 @@ class SshSudoHostFile extends SshScpHostFile implements HostFile {
 		}
 	}
 
-	protected HostFile getTempFile(boolean useSudoForDeletion) {
+	protected OverthereFile getTempFile(boolean useSudoForDeletion) {
 		String prefix = FilenameUtils.getBaseName(getPath());
 		String suffix = FilenameUtils.getExtension(getPath());
 		return sshSudoHostSession.getTempFile(prefix, suffix);
 	}
 
 	@Override
-	public void mkdir() throws RuntimeIOException {
+	public boolean mkdir() throws RuntimeIOException {
 		if (!isTempFile) {
-			super.mkdir();
+			return super.mkdir();
 		} else {
 			/*
 			 * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is world writable with the
 			 * sticky bit set.
 			 */
 			logger.debug("Making directory world-writable (with sticky bit)");
-			mkdir(new String[] { "-m", "1777" });
+			return mkdir(new String[] { "-m", "1777" });
 		}
 	}
 
-	private Logger logger = LoggerFactory.getLogger(SshSudoHostFile.class);
+	private Logger logger = LoggerFactory.getLogger(SshSudoOverthereFile.class);
 
 }
 

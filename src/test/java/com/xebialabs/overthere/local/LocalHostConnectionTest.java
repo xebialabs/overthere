@@ -28,7 +28,7 @@ import org.junit.rules.TemporaryFolder;
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.OperatingSystemFamily;
 
@@ -46,7 +46,7 @@ public class LocalHostConnectionTest extends HostSessionItestBase {
 
 	@Test
 	public void isDirectoryWorks() {
-		HostFile tempFile = connection.getTempFile("tmpDir");
+		OverthereFile tempFile = connection.getTempFile("tmpDir");
 		tempFile.delete();
 		tempFile.mkdir();
 		assertTrue("expected temp is a dir", tempFile.isDirectory());
