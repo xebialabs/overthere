@@ -123,9 +123,11 @@ public abstract class HostSessionItestBase {
 		OverthereFile nested2 = nested1.getFile("nested2");
 		OverthereFile nested3 = nested2.getFile("nested3");
 		assertFalse("Expected deeply nested directory to not exist", nested3.exists());
+		// FIXME: Remove either the if or the catch when the error handling strategy for mkdir is decided
 		try {
-			nested3.mkdir();
-			fail("Expected not to be able to create a deeply nested directory in one go");
+			if (nested3.mkdir()) {
+				fail("Expected not to be able to create a deeply nested directory in one go");
+			}
 		} catch (RuntimeIOException expected1) {
 		}
 		assertFalse("Expected deeply nested directory to still not exist", nested3.exists());
@@ -141,9 +143,11 @@ public abstract class HostSessionItestBase {
 		assertThat("Expected directory to contain parent of deeply nested directory", dirContents, hasItemInArray(nested1.getName()));
 		assertThat("Expected directory to contain regular file that was just created", dirContents, hasItemInArray(regularFile.getName()));
 
+		// FIXME: Remove either the if or the catch when the error handling strategy for mkdir is decided
 		try {
-			nested1.delete();
-			fail("Expected to not be able to remove a non-empty directory");
+			if(!nested1.delete()) {
+				fail("Expected to not be able to remove a non-empty directory");
+			}
 		} catch (RuntimeIOException expected2) {
 		}
 		nested1.deleteRecursively();

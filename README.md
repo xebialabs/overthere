@@ -9,4 +9,5 @@ Runs something on a remote machine, ie. over there.
 * figure out what to do with the HostFileInputStreamTransformer filter.
 * figure out what to do with HostFileUtils.
 * separate out an spi package.
-
+* decide whether to support winsshd and/or copssh and/or other Windows SSH implementations. Leave that up to subclasses?
+* implement SSH pub/private key implementation in a nicer manner.

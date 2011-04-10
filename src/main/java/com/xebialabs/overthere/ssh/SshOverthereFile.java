@@ -38,6 +38,7 @@ abstract class SshOverthereFile extends RemoteOverthereFile {
 	 */
 	SshOverthereFile(SshHostConnection connection, String path) {
 		super(connection, path);
+		sshHostConnection = connection;
 	}
 
 	public boolean delete() throws RuntimeIOException {
@@ -60,6 +61,4 @@ abstract class SshOverthereFile extends RemoteOverthereFile {
 		return sshHostConnection.execute(handler, command);
 	}
 
-
 }
-

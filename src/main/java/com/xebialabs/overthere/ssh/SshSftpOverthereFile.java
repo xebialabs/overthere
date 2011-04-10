@@ -41,16 +41,16 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 class SshSftpOverthereFile extends SshOverthereFile {
 
-	private SshSftpHostConnection sshSftpHostSession;
+	private SshSftpHostConnection sshSftpHostConnection;
 
-	public SshSftpOverthereFile(SshSftpHostConnection session, String path) {
-		super(session, path);
-		sshSftpHostSession = session;
+	public SshSftpOverthereFile(SshSftpHostConnection connection, String path) {
+		super(connection, path);
+		sshSftpHostConnection = connection;
 	}
 
 	protected SftpATTRS stat() throws RuntimeIOException {
 		try {
-			SftpATTRS attrs = sshSftpHostSession.getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
+			SftpATTRS attrs = sshSftpHostConnection.getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
 			if (logger.isDebugEnabled())
 				logger.debug("Statted file " + this);
 			return attrs;
@@ -63,7 +63,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	public boolean exists() throws RuntimeIOException {
 		try {
-			sshSftpHostSession.getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
+			sshSftpHostConnection.getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
 			if (logger.isDebugEnabled())
 				logger.debug("Checked file " + getPath() + " for existence and found it");
 			return true;
@@ -105,7 +105,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 		try {
 			// read files from host
 			@SuppressWarnings("unchecked")
-			Vector<LsEntry> ls = (Vector<LsEntry>) sshSftpHostSession.getSharedSftpChannel().ls(convertWindowsPathToWinSshdPath(getPath()));
+			Vector<LsEntry> ls = (Vector<LsEntry>) sshSftpHostConnection.getSharedSftpChannel().ls(convertWindowsPathToWinSshdPath(getPath()));
 
 			// copy files to list, skipping . and ..
 			List<String> filenames = new ArrayList<String>(ls.size());
@@ -128,7 +128,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 	public boolean mkdir() throws RuntimeIOException {
 		try {
 			String compatibleRemotePath = convertWindowsPathToWinSshdPath(getPath());
-			sshSftpHostSession.getSharedSftpChannel().mkdir(compatibleRemotePath);
+			sshSftpHostConnection.getSharedSftpChannel().mkdir(compatibleRemotePath);
 			if (logger.isDebugEnabled())
 				logger.debug("Created directory " + getPath());
 			return true;
@@ -163,7 +163,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 			SshSftpOverthereFile sftpDest = (SshSftpOverthereFile) dest;
 			if (sftpDest.getConnection() == getConnection()) {
 				try {
-					sshSftpHostSession.getSharedSftpChannel().rename(getPath(), sftpDest.getPath());
+					sshSftpHostConnection.getSharedSftpChannel().rename(getPath(), sftpDest.getPath());
 					return true;
 				} catch (SftpException exc) {
 					throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest + ": " + exc.toString(), exc);
@@ -182,7 +182,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 	@Override
 	protected void deleteFile() {
 		try {
-			sshSftpHostSession.getSharedSftpChannel().rm(convertWindowsPathToWinSshdPath(getPath()));
+			sshSftpHostConnection.getSharedSftpChannel().rm(convertWindowsPathToWinSshdPath(getPath()));
 			if (logger.isDebugEnabled())
 				logger.debug("Removed file " + this);
 		} catch (SftpException exc) {
@@ -195,7 +195,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 	@Override
 	protected void deleteDirectory() {
 		try {
-			sshSftpHostSession.getSharedSftpChannel().rmdir(convertWindowsPathToWinSshdPath(getPath()));
+			sshSftpHostConnection.getSharedSftpChannel().rmdir(convertWindowsPathToWinSshdPath(getPath()));
 			if (logger.isDebugEnabled())
 				logger.debug("Removed directory " + this);
 		} catch (SftpException exc) {
@@ -207,8 +207,8 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	public InputStream get() throws RuntimeIOException {
 		try {
-			ChannelSftp sftpChannel = sshSftpHostSession.openSftpChannel();
-			InputStream in = new SshSftpInputStream(sshSftpHostSession, sftpChannel, sftpChannel.get(convertWindowsPathToWinSshdPath(getPath())));
+			ChannelSftp sftpChannel = sshSftpHostConnection.openSftpChannel();
+			InputStream in = new SshSftpInputStream(sshSftpHostConnection, sftpChannel, sftpChannel.get(convertWindowsPathToWinSshdPath(getPath())));
 			if (logger.isDebugEnabled())
 				logger.debug("Opened SFTP input stream to read from file " + this);
 			return in;
@@ -221,7 +221,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	public void get(OutputStream out) throws RuntimeIOException {
 		try {
-			sshSftpHostSession.getSharedSftpChannel().get(convertWindowsPathToWinSshdPath(getPath()), out);
+			sshSftpHostConnection.getSharedSftpChannel().get(convertWindowsPathToWinSshdPath(getPath()), out);
 			if (logger.isDebugEnabled())
 				logger.debug("Wrote output stream from file " + this);
 		} catch (SftpException exc) {
@@ -233,8 +233,8 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	public OutputStream put(long length) throws RuntimeIOException {
 		try {
-			ChannelSftp sftpChannel = sshSftpHostSession.openSftpChannel();
-			OutputStream out = new SshSftpOutputStream(sshSftpHostSession, sftpChannel, sftpChannel.put(convertWindowsPathToWinSshdPath(getPath())));
+			ChannelSftp sftpChannel = sshSftpHostConnection.openSftpChannel();
+			OutputStream out = new SshSftpOutputStream(sshSftpHostConnection, sftpChannel, sftpChannel.put(convertWindowsPathToWinSshdPath(getPath())));
 			if (logger.isDebugEnabled())
 				logger.debug("Opened SFTP ouput stream to write to file " + this);
 			return out;
@@ -247,7 +247,7 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	public void put(InputStream in, long length) throws RuntimeIOException {
 		try {
-			sshSftpHostSession.getSharedSftpChannel().put(in, convertWindowsPathToWinSshdPath(getPath()));
+			sshSftpHostConnection.getSharedSftpChannel().put(in, convertWindowsPathToWinSshdPath(getPath()));
 			if (logger.isDebugEnabled())
 				logger.debug("Wrote input stream to file " + this);
 		} catch (SftpException exc) {
