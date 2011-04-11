@@ -17,19 +17,19 @@
 package com.xebialabs.overthere;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItemInArray;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,10 +63,10 @@ public abstract class HostSessionItestBase {
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
 
 		OverthereFile tempFile = connection.getTempFile(prefix, suffix);
-		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempFile);
-		assertTrue("Expected name of temporary file to start with the prefix", tempFile.getName().startsWith(prefix));
-		assertTrue("Expected name of temporary file to end with the suffix", tempFile.getName().endsWith(suffix));
-		assertFalse("Expected temporary file to not exist yet", tempFile.exists());
+		assertThat("Expected a non-null return value from HostConnection.getTempFile()", tempFile, notNullValue());
+		assertThat("Expected name of temporary file to start with the prefix", tempFile.getName(), startsWith(prefix));
+		assertThat("Expected name of temporary file to end with the suffix", tempFile.getName(), endsWith(suffix));
+		assertThat("Expected temporary file to not exist yet", tempFile.exists(), equalTo(false));
 
 		OutputStream outputStream = tempFile.put(contents.length);
 		try {
@@ -75,11 +75,11 @@ public abstract class HostSessionItestBase {
 			outputStream.close();
 		}
 
-		assertTrue("Expected temporary file to exist after writing to it", tempFile.exists());
-		assertFalse("Expected temporary file to not be a directory", tempFile.isDirectory());
-		assertEquals("Expected temporary file to have the size of the contents written to it", contents.length, tempFile.length());
-		assertTrue("Expected temporary file to be readable", tempFile.canRead());
-		assertTrue("Expected temporary file to be writeable", tempFile.canWrite());
+		assertThat("Expected temporary file to exist after writing to it", tempFile.exists(), equalTo(true));
+		assertThat("Expected temporary file to not be a directory", tempFile.isDirectory(), equalTo(false));
+		assertThat("Expected temporary file to have the size of the contents written to it", tempFile.length(), equalTo((long) contents.length));
+		assertThat("Expected temporary file to be readable", tempFile.canRead(), equalTo(true));
+		assertThat("Expected temporary file to be writeable", tempFile.canWrite(), equalTo(true));
 
 		// Windows systems don't support the concept of checking for executability
 		if (connection.getHostOperatingSystem() == OperatingSystemFamily.UNIX) {
@@ -90,14 +90,14 @@ public abstract class HostSessionItestBase {
 		try {
 			final byte[] contentsRead = new byte[contents.length];
 			inputStream.readFully(contentsRead);
-			assertEquals("Expected input stream to be exhausted after reading the full contents", 0, inputStream.available());
-			assertTrue("Expected contents in temporary file to be identical to data written into it", Arrays.equals(contents, contentsRead));
+			assertThat("Expected input stream to be exhausted after reading the full contents", inputStream.available(), equalTo(0));
+			assertThat("Expected contents in temporary file to be identical to data written into it", contentsRead, equalTo(contents));
 		} finally {
 			inputStream.close();
 		}
 
 		tempFile.delete();
-		assertFalse("Expected temporary file to no longer exist", tempFile.exists());
+		assertThat("Expected temporary file to no longer exist", tempFile.exists(), equalTo(false));
 	}
 
 	@Test
@@ -106,23 +106,23 @@ public abstract class HostSessionItestBase {
 		final String suffix = "suffix";
 
 		OverthereFile tempDir = connection.getTempFile(prefix, suffix);
-		assertNotNull("Expected a non-null return value from HostConnection.getTempFile()", tempDir);
-		assertTrue("Expected name of temporary file to start with the prefix", tempDir.getName().startsWith(prefix));
-		assertTrue("Expected name of temporary file to end with the suffix", tempDir.getName().endsWith(suffix));
-		assertFalse("Expected temporary file to not exist yet", tempDir.exists());
+		assertThat("Expected a non-null return value from HostConnection.getTempFile()", tempDir, notNullValue());
+		assertThat("Expected name of temporary file to start with the prefix", tempDir.getName(), startsWith(prefix));
+		assertThat("Expected name of temporary file to end with the suffix", tempDir.getName(), endsWith(suffix));
+		assertThat("Expected temporary file to not exist yet", tempDir.exists(), equalTo(false));
 
 		tempDir.mkdir();
-		assertTrue("Expected temporary directory to exist after creating it", tempDir.exists());
-		assertTrue("Expected temporary directory to be a directory", tempDir.isDirectory());
+		assertThat("Expected temporary directory to exist after creating it", tempDir.exists(), equalTo(true));
+		assertThat("Expected temporary directory to be a directory", tempDir.isDirectory(), equalTo(true));
 
 		OverthereFile anotherTempDir = connection.getTempFile(prefix, suffix);
-		assertFalse("Expected temporary directories created with identical prefix and suffix to still be different",
-		        tempDir.getPath().equals(anotherTempDir.getPath()));
+		assertThat("Expected temporary directories created with identical prefix and suffix to still be different", tempDir.getPath(),
+		        not(equalTo(anotherTempDir.getPath())));
 
 		OverthereFile nested1 = tempDir.getFile("nested1");
 		OverthereFile nested2 = nested1.getFile("nested2");
 		OverthereFile nested3 = nested2.getFile("nested3");
-		assertFalse("Expected deeply nested directory to not exist", nested3.exists());
+		assertThat("Expected deeply nested directory to not exist", nested3.exists(), equalTo(false));
 		// FIXME: Remove either the if or the catch when the error handling strategy for mkdir is decided
 		try {
 			if (nested3.mkdir()) {
@@ -130,9 +130,9 @@ public abstract class HostSessionItestBase {
 			}
 		} catch (RuntimeIOException expected1) {
 		}
-		assertFalse("Expected deeply nested directory to still not exist", nested3.exists());
+		assertThat("Expected deeply nested directory to still not exist", nested3.exists(), equalTo(false));
 		nested3.mkdirs();
-		assertTrue("Expected deeply nested directory to exist after invoking mkdirs on it", nested3.exists());
+		assertThat("Expected deeply nested directory to exist after invoking mkdirs on it", nested3.exists(), equalTo(true));
 
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
 		OverthereFile regularFile = tempDir.getFile("somefile.txt");
@@ -145,17 +145,17 @@ public abstract class HostSessionItestBase {
 
 		// FIXME: Remove either the if or the catch when the error handling strategy for mkdir is decided
 		try {
-			if(!nested1.delete()) {
+			if (nested1.delete()) {
 				fail("Expected to not be able to remove a non-empty directory");
 			}
 		} catch (RuntimeIOException expected2) {
 		}
 		nested1.deleteRecursively();
-		assertFalse("Expected parent of deeply nested directory to have been removed recursively", nested1.exists());
+		assertThat("Expected parent of deeply nested directory to have been removed recursively", nested1.exists(), equalTo(false));
 
 		regularFile.delete();
 		tempDir.delete();
-		assertFalse("Expected temporary directory to not exist after removing it when it was empty", tempDir.exists());
+		assertThat("Expected temporary directory to not exist after removing it when it was empty", tempDir.exists(), equalTo(false));
 	}
 
 }

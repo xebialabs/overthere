@@ -16,8 +16,8 @@
  */
 package com.xebialabs.overthere.local;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.internal.matchers.StringContains.containsString;
 
 import org.junit.Ignore;
@@ -48,7 +48,7 @@ public class LocalHostConnectionTest extends HostSessionItestBase {
 		OverthereFile tempFile = connection.getTempFile("tmpDir");
 		tempFile.delete();
 		tempFile.mkdir();
-		assertTrue("expected temp is a dir", tempFile.isDirectory());
+		assertThat("expected temp is a dir", tempFile.isDirectory(), equalTo(true));
 	}
 
 	@Test

@@ -16,10 +16,11 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,8 +60,8 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 	@Test
 	public void readFile() throws IOException {
 		OverthereFile file = connection.getFile("C:\\itest\\itestfile.txt");
-		assertEquals("itestfile.txt", file.getName());
-		assertEquals(27, file.length());
+		assertThat(file.getName(), equalTo("itestfile.txt"));
+		assertThat(file.length(), equalTo(27L));
 		InputStream inputStream = file.get();
 		ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
 		try {
@@ -75,23 +76,23 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 	public void executeDirCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "dir", "C:\\itest");
-		assertEquals(0, res);
-		assertTrue(handler.getOutput().contains("27 itestfile.txt"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("27 itestfile.txt"));
 	}
 
 	@Test
 	public void executeCmdCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "C:\\itest\\itestecho.cmd");
-		assertEquals(0, res);
-		assertTrue(handler.getOutput().contains("All mimsy were the borogroves"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("All mimsy were the borogroves"));
 	}
 
 	@Test
 	public void executeIncorrectCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "C:\\NONEXISTANT.cmd");
-		assertEquals(9009, res);
+		assertThat(res, equalTo(9009));
 	}
 
 }

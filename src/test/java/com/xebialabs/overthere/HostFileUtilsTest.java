@@ -17,10 +17,10 @@
 package com.xebialabs.overthere;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -61,12 +61,12 @@ public class HostFileUtilsTest {
 	public void copyOfFileToDirectoryFails() {
 
 		OverthereFile regularFile = Mockito.mock(OverthereFile.class);
-		Mockito.when(regularFile.exists()).thenReturn(true);
-		Mockito.when(regularFile.isDirectory()).thenReturn(false);
+		when(regularFile.exists()).thenReturn(true);
+		when(regularFile.isDirectory()).thenReturn(false);
 
 		OverthereFile directory = Mockito.mock(OverthereFile.class);
-		Mockito.when(directory.exists()).thenReturn(true);
-		Mockito.when(directory.isDirectory()).thenReturn(true);
+		when(directory.exists()).thenReturn(true);
+		when(directory.isDirectory()).thenReturn(true);
 
 		try {
 			HostFileUtils.copy(regularFile, directory);
@@ -127,30 +127,30 @@ public class HostFileUtilsTest {
 
 			OverthereFile destDir = s.getFile(new File(javaTempDirName + File.separator + "destdir").getPath());
 
-			assertFalse(destDir.exists());
+			assertThat(destDir.exists(), equalTo(true));
 
 			HostFileUtils.copyDirectory(srcDir, destDir);
 
 			// now inspect destDir
-			assertTrue(destDir.exists());
-			assertTrue(destDir.isDirectory());
+			assertThat(destDir.exists(), equalTo(true));
+			assertThat(destDir.isDirectory(), equalTo(true));
 
 			OverthereFile[] filesInDestDir = destDir.listFiles();
 			int nFiles = countFiles(filesInDestDir);
-			assertEquals(1, nFiles);
+			assertThat(nFiles, equalTo(1));
 			int nDirs = countDirs(filesInDestDir);
-			assertEquals(2, nDirs);
+			assertThat(nDirs, equalTo(2));
 
 			OverthereFile[] subDirsInDestDir = getDirs(filesInDestDir);
 
 			for (OverthereFile subDir : subDirsInDestDir) {
-				assertTrue(subDir.exists());
-				assertTrue(subDir.isDirectory());
+				assertThat(subDir.exists(), equalTo(true));
+				assertThat(subDir.isDirectory(), equalTo(true));
 				filesInDestDir = subDir.listFiles();
 				nFiles = countFiles(filesInDestDir);
-				assertEquals(1, nFiles);
+				assertThat(nFiles, equalTo(1));
 				nDirs = countDirs(filesInDestDir);
-				assertEquals(0, nDirs);
+				assertThat(nDirs, equalTo(0));
 			}
 
 			// cleanup
@@ -158,8 +158,7 @@ public class HostFileUtilsTest {
 				destDir.deleteRecursively();
 			}
 
-			assertFalse(destDir.exists());
-
+			assertThat(destDir.exists(), equalTo(false));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
