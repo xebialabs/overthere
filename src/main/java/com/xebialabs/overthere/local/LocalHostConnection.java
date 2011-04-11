@@ -78,7 +78,7 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 			throw new IllegalStateException("parent is not a LocalOverthereFile");
 		}
 
-		File childFile = new File(parent.getParentFile(), child);
+		File childFile = new File(parent, child);
 		return new LocalOverthereFile(this, childFile.getPath());
 	}
 
