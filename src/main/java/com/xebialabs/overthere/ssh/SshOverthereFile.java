@@ -17,8 +17,8 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.RemoteOverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.RemoteOverthereFile;
 
 /**
  * A file on a host connected through SSH.

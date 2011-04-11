@@ -1,6 +1,9 @@
-package com.xebialabs.overthere;
+package com.xebialabs.overthere.spi;
 
 import java.io.File;
+
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OverthereFile;
 
 @SuppressWarnings("serial")
 public abstract class RemoteOverthereFile extends OverthereFile {

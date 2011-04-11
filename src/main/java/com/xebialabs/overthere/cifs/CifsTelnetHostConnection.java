@@ -29,7 +29,8 @@ import java.util.Map;
 import java.util.Random;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.common.AbstractHostConnection;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
+
 import jcifs.smb.SmbFile;
 
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;

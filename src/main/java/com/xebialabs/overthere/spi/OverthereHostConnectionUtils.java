@@ -1,4 +1,4 @@
-package com.xebialabs.overthere.common;
+package com.xebialabs.overthere.spi;
 
 import java.util.StringTokenizer;
 

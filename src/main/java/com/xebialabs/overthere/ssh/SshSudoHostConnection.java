@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.Protocol;
+
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;

@@ -24,14 +24,16 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.common.AbstractHostConnection;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
-import com.xebialabs.overthere.common.InputResponseHandler;
-import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
+import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.InputResponseHandler;
+import com.xebialabs.overthere.spi.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to the local host.

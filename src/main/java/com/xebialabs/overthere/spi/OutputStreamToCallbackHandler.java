@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.common;
+package com.xebialabs.overthere.spi;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
+import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * FIXME: Removed functionality:

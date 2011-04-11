@@ -18,8 +18,8 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.Protocol;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ SCP.

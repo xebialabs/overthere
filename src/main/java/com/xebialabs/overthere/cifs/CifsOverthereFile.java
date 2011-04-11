@@ -26,8 +26,8 @@ import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.RemoteOverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.RemoteOverthereFile;
 
 @SuppressWarnings("serial")
 public class CifsOverthereFile extends RemoteOverthereFile {

@@ -16,7 +16,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.common.OverthereHostConnectionUtils.getFileInfo;
+import static com.xebialabs.overthere.spi.OverthereHostConnectionUtils.getFileInfo;
 
 import java.io.File;
 import java.io.InputStream;

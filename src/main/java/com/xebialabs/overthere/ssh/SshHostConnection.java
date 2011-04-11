@@ -37,10 +37,11 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.common.AbstractHostConnection;
-import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
-import com.xebialabs.overthere.common.InputResponseHandler;
-import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
+import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.InputResponseHandler;
+import com.xebialabs.overthere.spi.OutputStreamToCallbackHandler;
 
 /**
  * A host connection over SSH.

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import com.xebialabs.overthere.common.AbstractHostConnection;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
 
 public class AbstractHostConnectionTest {
 
