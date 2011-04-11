@@ -211,25 +211,6 @@ public class HostFileUtils {
 	}
 
 	/**
-	 * Reads the contents of a {@link OverthereFile} as a string.
-	 *
-	 * @param sourceHostFile the host file to read.
-	 * @return the contents of the host file.
-	 */
-	public static String getHostFileAsString(OverthereFile sourceHostFile) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		try {
-			sourceHostFile.get(bos);
-			byte[] contentBytes = bos.toByteArray();
-			return new String(contentBytes, guessCharset(contentBytes));
-		} catch (UnsupportedEncodingException exc) {
-			throw new RuntimeIOException(exc);
-		} finally {
-			IOUtils.closeQuietly(bos);
-		}
-	}
-
-	/**
 	 * Guess the character encoding of a byte array by looking at its bytes. If the first two bytes are a Unicode byte order mark, the bytes are assumed to be
 	 * in UTF-16 encoding (depending on the values of the bytes). Otherwise the encoding is assumed to be UTF-8.
 	 *
