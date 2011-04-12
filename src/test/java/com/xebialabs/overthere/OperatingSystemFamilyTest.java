@@ -134,25 +134,5 @@ public class OperatingSystemFamilyTest {
 		assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
 	}
 
-	// @Test
-	// public void testMySqlCommandWithSpaces() {
-	// final String expression = "--socket=/tmp/truck -u scott -p tiger COUNTRY";
-	// assertEquals(expression, Encoder.encodeCommandLine(false, expression));
-	// assertEquals(expression, Encoder.encodeCommandLine(true, expression));
-	// }
-	//
-	// @Test
-	// public void testSplittedMySqlCommandWithPassword() {
-	// final String expression = "-username benoit -password deployit";
-	// assertEquals(expression, Encoder.encodeCommandLine(false, "-username", "benoit", "-password", "deployit"));
-	// assertEquals("-username benoit -password ********", Encoder.encodeCommandLine(true, "-username", "benoit", "-password", "deployit"));
-	// }
-	//
-	// @Test
-	// public void testMySqlCommandWithPassword() {
-	// final String expression = "-username benoit -password deployit";
-	// assertEquals(expression, Encoder.encodeCommandLine(false, expression));
-	// assertEquals("-username benoit -password ********", Encoder.encodeCommandLine(true, expression));
-	// }
 }
 

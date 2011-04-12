@@ -16,111 +16,119 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.spi.OverthereHostConnectionUtils.getFileInfo;
+
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
-import org.slf4j.LoggerFactory;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * A file on a host connected through SSH w/ SCP.
  */
-class SshScpHostFile extends SshHostFile implements HostFile {
+@SuppressWarnings("serial")
+class SshScpOverthereFile extends SshOverthereFile {
 
 	/**
-	 * Constructs a SshScpHostFile
+	 * Constructs an SshScpOverthereFile
 	 * 
-	 * @param session
-	 *            the connection connected to the host
+	 * @param connection
+	 *            the connection to the host
 	 * @param remotePath
 	 *            the path of the file on the host
 	 */
-	public SshScpHostFile(SshHostConnection session, String remotePath) {
-		super(session, remotePath);
+	public SshScpOverthereFile(SshHostConnection connection, String remotePath) {
+		super(connection, remotePath);
 	}
 
-	public boolean exists() throws RuntimeIOException {
-		return executeStat().exists;
+	public boolean exists() {
+		return getFileInfo(this).exists;
 	}
 
-	public boolean isDirectory() throws RuntimeIOException {
-		return executeStat().isDirectory;
+	public boolean isDirectory() {
+		return getFileInfo(this).isDirectory;
 	}
 
-	public long length() throws RuntimeIOException {
-		return executeStat().length;
+	public long length() {
+		return getFileInfo(this).length;
 	}
 
-	public boolean canRead() throws RuntimeIOException {
-		return executeStat().canRead;
+	public boolean canRead() {
+		return getFileInfo(this).canRead;
 	}
 
-	public boolean canWrite() throws RuntimeIOException {
-		return executeStat().canWrite;
+	public boolean canWrite() {
+		return getFileInfo(this).canWrite;
 	}
 
-	public boolean canExecute() throws RuntimeIOException {
-		return executeStat().canExecute;
+	public boolean canExecute() {
+		return getFileInfo(this).canExecute;
 	}
 
-	public List<String> list() throws RuntimeIOException {
+	public String[] list() throws RuntimeIOException {
 		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
 		// yes, this *is* meant to be 'el es min one'!
-		int errno = executeCommand(capturedOutput, "ls", "-1", remotePath);
+		int errno = executeCommand(capturedOutput, "ls", "-1", getPath());
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
 
 		if (logger.isDebugEnabled())
 			logger.debug("Listed directory " + this);
-		return capturedOutput.getOutputLines();
+
+		List<String> lsLines = capturedOutput.getOutputLines();
+		return lsLines.toArray(new String[lsLines.size()]);
 	}
 
-	public void mkdir() throws RuntimeIOException {
-		mkdir(new String[0]);
+	public boolean mkdir() {
+		return mkdir(new String[0]);
 	}
 
-	public void mkdirs() throws RuntimeIOException {
-		mkdir(new String[] { "-p" });
+	public boolean mkdirs() {
+		return mkdir(new String[] { "-p" });
 	}
 
-	protected void mkdir(String[] args) throws RuntimeIOException {
-		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-		int errno = executeCommand(capturedOutput, makeMkdirCommand(args));
-		if (errno != 0) {
-			throw new RuntimeIOException("Cannot create directory or -ies " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+	protected boolean mkdir(String[] mkdirOptions) throws RuntimeIOException {
+		String[] command = new String[mkdirOptions.length + 2];
+		command[0] = "mkdir";
+		for (int i = 0; i < mkdirOptions.length; i++) {
+			command[i + 1] = mkdirOptions[i];
 		}
+		command[command.length - 1] = getPath();
+
+		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
+		int errno = executeCommand(capturedOutput, command);
+		if (errno != 0) {
+			logger.error("Cannot create directory or -ies " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+			return false;
+		}
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Created directory " + this);
 		}
+		return true;
 	}
 
-	private String[] makeMkdirCommand(String[] args) {
-		int numArgs = args.length;
-		String[] command = new String[numArgs + 2];
-		command[0] = "mkdir";
-		System.arraycopy(args, 0, command, 1, numArgs);
-		command[numArgs + 1] = remotePath;
-		return command;
-	}
-
-	public void moveTo(HostFile destFile) {
-		if (destFile instanceof SshScpHostFile) {
-			SshScpHostFile sshScpDestFile = (SshScpHostFile) destFile;
+	@Override
+	public boolean renameTo(File destFile) {
+		if (destFile instanceof SshScpOverthereFile) {
+			SshScpOverthereFile sshScpDestFile = (SshScpOverthereFile) destFile;
 			if (sshScpDestFile.getConnection() == getConnection()) {
 				CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-				int errno = executeCommand(capturedOutput, "mv", remotePath, sshScpDestFile.getPath());
+				int errno = executeCommand(capturedOutput, "mv", getPath(), sshScpDestFile.getPath());
 				if (errno != 0) {
 					throw new RuntimeIOException("Cannot move/rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 				}
+				return true;
 			} else {
 				throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to SSH/SCP file/directory " + destFile
-						+ " because it is in a different connection");
+				        + " because it is in a different connection");
 			}
 		} else {
 			throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to non-SSH/SCP file/directory " + destFile);
@@ -130,7 +138,7 @@ class SshScpHostFile extends SshHostFile implements HostFile {
 	@Override
 	protected void deleteDirectory() {
 		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-		int errno = executeCommand(capturedOutput, "rmdir", remotePath);
+		int errno = executeCommand(capturedOutput, "rmdir", getPath());
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
@@ -141,7 +149,7 @@ class SshScpHostFile extends SshHostFile implements HostFile {
 	@Override
 	protected void deleteFile() {
 		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-		int errno = executeCommand(capturedOutput, "rm", "-f", remotePath);
+		int errno = executeCommand(capturedOutput, "rm", "-f", getPath());
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete file " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
@@ -151,18 +159,14 @@ class SshScpHostFile extends SshHostFile implements HostFile {
 
 	@Override
 	public boolean deleteRecursively() throws RuntimeIOException {
-		if (!exists()) {
-			return false;
-		} else {
-			CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-			int errno = executeCommand(capturedOutput, "rm", "-rf", remotePath);
-			if (errno != 0) {
-				throw new RuntimeIOException("Cannot recursively delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-			}
-			if (logger.isDebugEnabled())
-				logger.debug("Recursively deleted file/directory " + this);
-			return true;
+		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
+		int errno = executeCommand(capturedOutput, "rm", "-rf", getPath());
+		if (errno != 0) {
+			throw new RuntimeIOException("Cannot recursively delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
+		if (logger.isDebugEnabled())
+			logger.debug("Recursively deleted file/directory " + this);
+		return true;
 	}
 
 	public InputStream get() throws RuntimeIOException {
@@ -181,7 +185,6 @@ class SshScpHostFile extends SshHostFile implements HostFile {
 		return out;
 	}
 
-	private Logger logger = LoggerFactory.getLogger(SshScpHostFile.class);
+	private Logger logger = LoggerFactory.getLogger(SshScpOverthereFile.class);
 
 }
-

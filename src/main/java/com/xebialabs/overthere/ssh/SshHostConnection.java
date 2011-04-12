@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Random;
 
 import com.xebialabs.overthere.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,11 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.common.AbstractHostConnection;
-import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
-import com.xebialabs.overthere.common.InputResponseHandler;
-import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
+import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.InputResponseHandler;
+import com.xebialabs.overthere.spi.OutputStreamToCallbackHandler;
 
 /**
  * A host connection over SSH.
@@ -61,10 +63,10 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 
 	public SshHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.host = options.get("address");
-		this.port = options.get("port", 22);
-		this.username = options.get("username");
-		this.password = options.get("password");
+		this.host = options.get(ConnectionOptions.ADDRESS);
+		this.port = options.get(ConnectionOptions.PORT, 22);
+		this.username = options.get(ConnectionOptions.USERNAME);
+		this.password = options.get(ConnectionOptions.PASSWORD);
 	}
 
 	public SshHostConnection connect() throws RuntimeIOException {
@@ -120,18 +122,18 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		}
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		return getFile(hostPath, false);
 	}
 
-	protected abstract HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
+	protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
 		return getFile(parent, child, false);
 	}
 
-	protected HostFile getFile(HostFile parent, String child, boolean isTempFile) throws RuntimeIOException {
-		if (!(parent instanceof SshHostFile)) {
+	protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+		if (!(parent instanceof SshOverthereFile)) {
 			throw new IllegalStateException("parent is not a file on an SSH host");
 		}
 		if (parent.getConnection() != this) {
@@ -140,7 +142,7 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		checkNotNull(prefix);
 		if (suffix == null) {
 			suffix = ".tmp";
@@ -149,7 +151,7 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		Random r = new Random();
 		String infix = "";
 		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
-			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
+			OverthereFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
 					logger.debug("Created temporary file " + f);

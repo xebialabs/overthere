@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.Protocol;
+
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -32,11 +34,13 @@ import org.slf4j.LoggerFactory;
 @Protocol(name = "ssh_sudo")
 public class SshSudoHostConnection extends SshHostConnection {
 
+	public static final String SUDO_USERNAME = "sudoUsername";
+
 	protected String sudoUsername;
 
 	public SshSudoHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.sudoUsername = options.get("sudoUsername");
+		this.sudoUsername = options.get(SUDO_USERNAME);
 	}
 
 	@Override
@@ -80,13 +84,13 @@ public class SshSudoHostConnection extends SshHostConnection {
 		return super.execute(handler, Collections.EMPTY_MAP, commandLine);
 	}
 
-	protected HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSudoHostFile(this, hostPath, isTempFile);
+	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+		return new SshSudoOverthereFile(this, hostPath, isTempFile);
 	}
 
 	@Override
-	protected HostFile createSessionTempDirectory(HostFile systemTempDirectory, String name) {
-		HostFile f = getFile(systemTempDirectory, name, true);
+	protected OverthereFile createSessionTempDirectory(OverthereFile systemTempDirectory, String name) {
+		OverthereFile f = getFile(systemTempDirectory, name, true);
 		if (!f.exists()) {
 			f.mkdir();
 			return f;

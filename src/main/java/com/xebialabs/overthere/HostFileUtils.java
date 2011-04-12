@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -49,7 +48,7 @@ public class HostFileUtils {
 	 * @param dst the destination file or directory. If it exists it must be of the same type as the source. Its parent directory must exist.
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copy(HostFile src, HostFile dst) {
+	public static void copy(OverthereFile src, OverthereFile dst) {
 		copy(src, dst, null);
 	}
 
@@ -61,7 +60,7 @@ public class HostFileUtils {
 	 * @param transformer Transforms the inputstream of the sourcefile, can supply null
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copy(HostFile src, HostFile dst, HostFileInputStreamTransformer transformer) {
+	public static void copy(OverthereFile src, OverthereFile dst, HostFileInputStreamTransformer transformer) {
 		if (src.isDirectory()) {
 			copyDirectory(src, dst, transformer);
 		} else {
@@ -76,9 +75,8 @@ public class HostFileUtils {
 	 * @param dstFile the destination file. May exists but must not be a directory. Its parent directory must exist.
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copyFile(HostFile srcFile, HostFile dstFile) throws RuntimeIOException {
+	public static void copyFile(OverthereFile srcFile, OverthereFile dstFile) throws RuntimeIOException {
 		copyFile(srcFile, dstFile, null);
-
 	}
 
 	/**
@@ -89,7 +87,7 @@ public class HostFileUtils {
 	 * @param transformer Transforms the inputstream of the sourcefile, can be null
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copyFile(HostFile srcFile, HostFile dstFile, HostFileInputStreamTransformer transformer) throws RuntimeIOException {
+	public static void copyFile(OverthereFile srcFile, OverthereFile dstFile, HostFileInputStreamTransformer transformer) throws RuntimeIOException {
 		// check source file
 		if (!srcFile.exists()) {
 			throw new RuntimeIOException("Source file " + srcFile + " does not exist");
@@ -146,7 +144,7 @@ public class HostFileUtils {
 	 * @param dstDir the destination directory. May exists but must a directory. Its parent directory must exist.
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copyDirectory(HostFile srcDir, HostFile dstDir) throws RuntimeIOException {
+	public static void copyDirectory(OverthereFile srcDir, OverthereFile dstDir) throws RuntimeIOException {
 		copyDirectory(srcDir, dstDir, null);
 
 	}
@@ -159,7 +157,7 @@ public class HostFileUtils {
 	 * @param transformer Transforms the inputstream of the sourcefile, can be null
 	 * @throws RuntimeIOException if an I/O error occurred
 	 */
-	public static void copyDirectory(HostFile srcDir, HostFile dstDir, HostFileInputStreamTransformer transformer) throws RuntimeIOException {
+	public static void copyDirectory(OverthereFile srcDir, OverthereFile dstDir, HostFileInputStreamTransformer transformer) throws RuntimeIOException {
 		// check source directory
 		if (!srcDir.exists()) {
 			throw new RuntimeIOException("Source directory " + srcDir + " does not exist");
@@ -183,20 +181,20 @@ public class HostFileUtils {
 
 		if (logger.isDebugEnabled())
 			logger.debug("Copying contents of directory " + srcDir + " to " + dstDir);
-		List<HostFile> srcFiles = srcDir.listFiles();
-		for (HostFile srcFile : srcFiles) {
-			HostFile dstFile = dstDir.getFile(srcFile.getName());
+		OverthereFile[] srcFiles = srcDir.listFiles();
+		for (OverthereFile srcFile : srcFiles) {
+			OverthereFile dstFile = dstDir.getFile(srcFile.getName());
 			copy(srcFile, dstFile, transformer);
 		}
 	}
 
 	/**
-	 * Copies the contents of a string to a {@link HostFile}.
+	 * Copies the contents of a string to a {@link OverthereFile}.
 	 *
 	 * @param sourceString the string to copy.
 	 * @param targetFile   the host file to copy to.
 	 */
-	public static void putStringToHostFile(String sourceString, HostFile targetFile) {
+	public static void putStringToHostFile(String sourceString, OverthereFile targetFile) {
 		byte[] bytes;
 		try {
 			bytes = sourceString.getBytes("UTF-8");
@@ -209,25 +207,6 @@ public class HostFileUtils {
 			targetFile.put(in, bytes.length);
 		} finally {
 			IOUtils.closeQuietly(in);
-		}
-	}
-
-	/**
-	 * Reads the contents of a {@link HostFile} as a string.
-	 *
-	 * @param sourceHostFile the host file to read.
-	 * @return the contents of the host file.
-	 */
-	public static String getHostFileAsString(HostFile sourceHostFile) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		try {
-			sourceHostFile.get(bos);
-			byte[] contentBytes = bos.toByteArray();
-			return new String(contentBytes, guessCharset(contentBytes));
-		} catch (UnsupportedEncodingException exc) {
-			throw new RuntimeIOException(exc);
-		} finally {
-			IOUtils.closeQuietly(bos);
 		}
 	}
 
@@ -252,11 +231,11 @@ public class HostFileUtils {
 	 * @param zip the file to unzip.
 	 * @param dir the directory to unzip to.
 	 */
-	public static void unzip(HostFile zip, HostFile dir) {
+	public static void unzip(OverthereFile zip, OverthereFile dir) {
 		unzip(zip, dir, null);
 	}
 
-	public static void unzip(HostFile zip, HostFile dir, HostFileInputStreamTransformer transformer) {
+	public static void unzip(OverthereFile zip, OverthereFile dir, HostFileInputStreamTransformer transformer) {
 		if (!dir.isDirectory()) {
 			throw new IllegalArgumentException(dir + " is not a directory");
 		}
@@ -267,7 +246,7 @@ public class HostFileUtils {
 		}
 	}
 
-	private static void unzip(String zipPath, InputStream zipStream, HostFile dstDir) {
+	private static void unzip(String zipPath, InputStream zipStream, OverthereFile dstDir) {
 		if (logger.isDebugEnabled())
 			logger.debug("Unzipping " + zipPath + " to " + dstDir);
 
@@ -286,11 +265,11 @@ public class HostFileUtils {
 		}
 	}
 
-	private static void extractZipEntry(ZipInputStream zipIn, ZipEntry entry, HostFile dir) {
+	private static void extractZipEntry(ZipInputStream zipIn, ZipEntry entry, OverthereFile dir) {
 		String[] pathElements = StringUtils.split(entry.getName(), ZIP_PATH_SEPARATOR);
 		String dstFileSeparator = dir.getConnection().getHostOperatingSystem().getFileSeparator();
 		String dstPath = StringUtils.join(pathElements, dstFileSeparator);
-		HostFile dstFile = dir.getFile(dstPath);
+		OverthereFile dstFile = dir.getFile(dstPath);
 
 		if (logger.isDebugEnabled())
 			logger.debug("Unzipping " + entry.getName() + " to " + dstFile.getPath());
@@ -303,7 +282,7 @@ public class HostFileUtils {
 		}
 	}
 
-	private static ByteArrayOutputStream readIntoByteArrayOutputStream(HostFile srcFile, InputStream inputStream) {
+	private static ByteArrayOutputStream readIntoByteArrayOutputStream(OverthereFile srcFile, InputStream inputStream) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		int value;
 		try {

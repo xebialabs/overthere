@@ -16,12 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 
 public class SshScpHostConnectionItest extends SshHostConnectionItestBase {
 
@@ -37,7 +38,7 @@ public class SshScpHostConnectionItest extends SshHostConnectionItestBase {
 
 	@Test
 	public void hostSessionIsAnSshScpHostSession() {
-		assertThat(connection, is(SshScpHostConnection.class));
+		assertThat(connection, instanceOf(SshScpHostConnection.class));
 	}
 
 }

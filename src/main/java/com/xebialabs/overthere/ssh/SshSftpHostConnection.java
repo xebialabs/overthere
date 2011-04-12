@@ -17,14 +17,15 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Protocol;
 import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
-import com.xebialabs.overthere.HostFile;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.spi.Protocol;
+
 import org.slf4j.LoggerFactory;
 
 /**
@@ -40,8 +41,8 @@ public class SshSftpHostConnection extends SshHostConnection {
 	}
 
 	@Override
-	public HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSftpHostFile(this, hostPath);
+	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+		return new SshSftpOverthereFile(this, hostPath);
 	}
 
 	@Override

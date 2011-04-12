@@ -17,9 +17,9 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.HostFile;
-import com.xebialabs.overthere.Protocol;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ SCP.
@@ -33,8 +33,8 @@ public class SshScpHostConnection extends SshHostConnection {
 	}
 
 	@Override
-	protected HostFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshScpHostFile(this, hostPath);
+	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+		return new SshScpOverthereFile(this, hostPath);
 	}
 
 	public String toString() {

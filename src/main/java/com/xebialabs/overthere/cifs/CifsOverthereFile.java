@@ -16,28 +16,26 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.util.Arrays;
-import java.util.List;
 
-import com.xebialabs.overthere.RuntimeIOException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.common.AbstractHostFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.RemoteOverthereFile;
 
-public class CifsHostFile extends AbstractHostFile implements HostFile {
+@SuppressWarnings("serial")
+public class CifsOverthereFile extends RemoteOverthereFile {
 
 	private SmbFile smbFile;
 
-	CifsHostFile(HostConnection connection, SmbFile smbFile) {
-		super(connection);
+	CifsOverthereFile(HostConnection connection, SmbFile smbFile) {
+		super(connection, smbFile.getPath());
 		this.smbFile = smbFile;
 	}
 
@@ -45,14 +43,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		return smbFile;
 	}
 
-	public String getName() {
-		return smbFile.getName();
-	}
-
-	public String getParent() {
-		return smbFile.getParent();
-	}
-
+	@Override
 	public String getPath() {
 		String uncPath = smbFile.getUncPath();
 		int slashPos = uncPath.indexOf('\\', 2);
@@ -61,6 +52,17 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		return drive + ":" + path;
 	}
 
+	@Override
+	public String getName() {
+		return smbFile.getName();
+	}
+
+	@Override
+	public String getParent() {
+		return smbFile.getParent();
+	}
+
+	@Override
 	public boolean exists() throws RuntimeIOException {
 		try {
 			return smbFile.exists();
@@ -69,6 +71,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public boolean isDirectory() throws RuntimeIOException {
 		try {
 			return smbFile.isDirectory();
@@ -77,6 +80,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public boolean canExecute() throws RuntimeIOException {
 		try {
 			return smbFile.canRead();
@@ -85,6 +89,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public boolean canRead() throws RuntimeIOException {
 		try {
 			return smbFile.canRead();
@@ -93,6 +98,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public boolean canWrite() throws RuntimeIOException {
 		try {
 			return smbFile.canWrite();
@@ -101,6 +107,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public long length() throws RuntimeIOException {
 		try {
 			return smbFile.length();
@@ -109,10 +116,11 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
-	public List<String> list() throws RuntimeIOException {
+	@Override
+	public String[] list() throws RuntimeIOException {
 		try {
 			upgradeToDirectorySmbFile();
-			return Arrays.asList(smbFile.list());
+			return smbFile.list();
 		} catch (MalformedURLException exc) {
 			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
 		} catch (SmbException exc) {
@@ -120,35 +128,42 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
-	public void mkdir() throws RuntimeIOException {
+	@Override
+	public boolean mkdir() throws RuntimeIOException {
 		try {
 			smbFile.mkdir();
+			return true;
 		} catch (SmbException exc) {
 			throw new RuntimeIOException("Cannot create directory " + this + ": " + exc.toString(), exc);
 		}
 	}
 
-	public void mkdirs() throws RuntimeIOException {
+	@Override
+	public boolean mkdirs() throws RuntimeIOException {
 		try {
 			smbFile.mkdirs();
+			return true;
 		} catch (SmbException exc) {
 			throw new RuntimeIOException("Cannot create directories " + this + ": " + exc.toString(), exc);
 		}
 	}
 
-	public void moveTo(HostFile destFile) throws RuntimeIOException {
-		if (destFile instanceof CifsHostFile) {
-			SmbFile targetSmbFile = ((CifsHostFile) destFile).getSmbFile();
+	@Override
+	public boolean renameTo(File dest) throws RuntimeIOException {
+		if (dest instanceof CifsOverthereFile) {
+			SmbFile targetSmbFile = ((CifsOverthereFile) dest).getSmbFile();
 			try {
 				smbFile.renameTo(targetSmbFile);
+				return true;
 			} catch (SmbException exc) {
-				throw new RuntimeIOException("Cannot move/rename " + this + " to " + destFile + ": " + exc.toString(), exc);
+				throw new RuntimeIOException("Cannot move/rename " + this + " to " + dest + ": " + exc.toString(), exc);
 			}
 		} else {
-			throw new RuntimeIOException("Cannot move/rename SMB file/directory " + this + " to non-SMB file/directory " + destFile);
+			throw new RuntimeIOException("Cannot move/rename SMB file/directory " + this + " to non-SMB file/directory " + dest);
 		}
 	}
 
+	@Override
 	public boolean delete() throws RuntimeIOException {
 		try {
 			if (smbFile.exists()) {
@@ -192,6 +207,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public InputStream get() throws RuntimeIOException {
 		try {
 			return smbFile.getInputStream();
@@ -200,6 +216,7 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 		}
 	}
 
+	@Override
 	public OutputStream put(long length) throws RuntimeIOException {
 		try {
 			return smbFile.getOutputStream();
@@ -221,12 +238,5 @@ public class CifsHostFile extends AbstractHostFile implements HostFile {
 	public String toString() {
 		return getPath() + " on " + connection;
 	}
-	
-	@Override
-	protected int executeCommand(CommandExecutionCallbackHandler handler, String... command) {
-		return connection.execute(handler, command);
-	}
-
 
 }
-

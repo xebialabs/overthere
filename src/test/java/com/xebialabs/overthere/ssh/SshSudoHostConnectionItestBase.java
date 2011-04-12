@@ -16,7 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
@@ -25,17 +26,17 @@ public abstract class SshSudoHostConnectionItestBase extends SshHostConnectionIt
 	@Test
 	public void commandWithPipeShouldHaveTwoSudoSections() {
 		String[] prepended = ((SshSudoHostConnection) connection).prependSudoCommand("a", "|", "b");
-		assertEquals(9, prepended.length);
-		assertEquals("sudo", prepended[0]);
-		assertEquals("sudo", prepended[5]);
+		assertThat(prepended.length, equalTo(9));
+		assertThat(prepended[0], equalTo("sudo"));
+		assertThat(prepended[5], equalTo("sudo"));
 	}
 
 	@Test
 	public void commandWithSemiColonShouldHaveTwoSudoSections() {
 		String[] prepended = ((SshSudoHostConnection) connection).prependSudoCommand("a", ";", "b");
-		assertEquals(9, prepended.length);
-		assertEquals("sudo", prepended[0]);
-		assertEquals("sudo", prepended[5]);
+		assertThat(prepended.length, equalTo(9));
+		assertThat(prepended[0], equalTo("sudo"));
+		assertThat(prepended[5], equalTo("sudo"));
 	}
 
 }

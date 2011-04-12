@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.common;
+package com.xebialabs.overthere.spi;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -31,8 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.HostFile;
 import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
@@ -40,21 +42,22 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 public abstract class AbstractHostConnection implements HostConnection {
 
+
 	protected OperatingSystemFamily os;
 
 	private String temporaryDirectoryPath;
 
-	private HostFile sessionTemporaryDirectory;
+	private OverthereFile sessionTemporaryDirectory;
 
 	public static final long MAX_TEMP_RETRIES = 100;
 
 	protected AbstractHostConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {
 		this.os = os;
-		this.temporaryDirectoryPath = options.get("temporaryDirectoryPath", os.getDefaultTemporaryDirectoryPath());
+		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 	}
 	
 	protected AbstractHostConnection(String type, ConnectionOptions options) {
-		this(type, options.<OperatingSystemFamily>get("os"), options);
+		this(type, options.<OperatingSystemFamily>get(OPERATING_SYSTEM), options);
 	}
 
 	public OperatingSystemFamily getHostOperatingSystem() {
@@ -77,16 +80,16 @@ public abstract class AbstractHostConnection implements HostConnection {
 		}
 	}
 
-	protected synchronized HostFile getTemporaryDirectory() throws RuntimeIOException {
+	protected synchronized OverthereFile getTemporaryDirectory() throws RuntimeIOException {
 		if (sessionTemporaryDirectory == null) {
-			HostFile temporaryDirectory = getFile(temporaryDirectoryPath);
+			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 			Random r = new Random();
 			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
 			String prefix = "deployit-" + dateFormat.format(new Date());
 			String infix = "";
 			String suffix = ".tmp";
 			for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-				HostFile tempDir = createSessionTempDirectory(temporaryDirectory, prefix + infix + suffix);
+				OverthereFile tempDir = createSessionTempDirectory(temporaryDirectory, prefix + infix + suffix);
 				if (tempDir != null) {
 					sessionTemporaryDirectory = tempDir;
 					logger.info("Created connection temporary directory " + sessionTemporaryDirectory);
@@ -99,8 +102,8 @@ public abstract class AbstractHostConnection implements HostConnection {
 		return sessionTemporaryDirectory;
 	}
 
-	protected HostFile createSessionTempDirectory(HostFile systemTempDirectory, String name) {
-		HostFile f = getFile(systemTempDirectory, name);
+	protected OverthereFile createSessionTempDirectory(OverthereFile systemTempDirectory, String name) {
+		OverthereFile f = getFile(systemTempDirectory, name);
 		if (!f.exists()) {
 			f.mkdir();
 			return f;
@@ -119,7 +122,7 @@ public abstract class AbstractHostConnection implements HostConnection {
 		}
 	}
 
-	public HostFile getTempFile(String nameTemplate) throws RuntimeIOException {
+	public OverthereFile getTempFile(String nameTemplate) throws RuntimeIOException {
 		String prefix, suffix;
 
 		if (nameTemplate != null) {
@@ -144,8 +147,8 @@ public abstract class AbstractHostConnection implements HostConnection {
 		return getTempFile(prefix, suffix);
 	}
 
-	public HostFile copyToTemporaryFile(File localFile) throws RuntimeIOException {
-		HostFile t = getTempFile(localFile.getName());
+	public OverthereFile copyToTemporaryFile(File localFile) throws RuntimeIOException {
+		OverthereFile t = getTempFile(localFile.getName());
 		t.put(localFile);
 		return t;
 	}

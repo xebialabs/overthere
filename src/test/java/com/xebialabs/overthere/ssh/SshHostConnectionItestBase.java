@@ -17,9 +17,10 @@
 package com.xebialabs.overthere.ssh;
 
 import static org.apache.commons.io.FileUtils.writeStringToFile;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +34,9 @@ import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.CommandExecution;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
@@ -67,17 +68,17 @@ public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 	public void executeSimpleCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler();
 		int res = connection.execute(handler, "ls", "-ld", "/tmp");
-		assertEquals(0, res);
-		assertEquals(1, handler.getOutputLines().size());
-		assertTrue(handler.getOutput().contains("drwxrwxrwt"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutputLines().size(), equalTo(1));
+		assertThat(handler.getOutput(), containsString("drwxrwxrwt"));
 	}
 
 	@Test
 	public void startExecuteSimpleCommand() throws IOException {
 		CommandExecution execution = connection.startExecute("ls", "-ld", "/tmp");
 		String commandOutput = IOUtils.toString(execution.getStdout());
-		assertEquals(0, execution.waitFor());
-		assertTrue(commandOutput.contains("drwxrwxrwt"));
+		assertThat(execution.waitFor(), equalTo(0));
+		assertThat(commandOutput, containsString("drwxrwxrwt"));
 	}
 
 	@Test
@@ -85,9 +86,9 @@ public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 		final File tempFile = temp.newFile("fooBar");
 		writeStringToFile(tempFile, "Foo Bar Baz");
 
-		HostFile file = connection.copyToTemporaryFile(tempFile);
+		OverthereFile file = connection.copyToTemporaryFile(tempFile);
 
-		assertTrue("Expected temp file to have been written", file.exists());
+		assertThat("Expected temp file to have been written", file.exists(), equalTo(true));
 	}
 
 	@Test
@@ -95,12 +96,11 @@ public abstract class SshHostConnectionItestBase extends HostSessionItestBase {
 		final File tempFile = temp.newFile("fooBar");
 		writeStringToFile(tempFile, "Foo Bar Baz");
 
-		HostFile file = connection.copyToTemporaryFile(tempFile);
+		OverthereFile file = connection.copyToTemporaryFile(tempFile);
 
 		CommandExecutionCallbackHandler handler = new DebugCommandExecutionCallbackHandler();
 		int res = connection.execute(handler, "cp", file.getPath(), "/tmp/" + System.currentTimeMillis() + ".class");
-		assertEquals(0, res);
+		assertThat(res, equalTo(0));
 	}
 
 }
-
