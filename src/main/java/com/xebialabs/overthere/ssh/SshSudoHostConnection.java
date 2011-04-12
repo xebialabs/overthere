@@ -34,11 +34,13 @@ import org.slf4j.LoggerFactory;
 @Protocol(name = "ssh_sudo")
 public class SshSudoHostConnection extends SshHostConnection {
 
+	public static final String SUDO_USERNAME = "sudoUsername";
+
 	protected String sudoUsername;
 
 	public SshSudoHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.sudoUsername = options.get("sudoUsername");
+		this.sudoUsername = options.get(SUDO_USERNAME);
 	}
 
 	@Override
