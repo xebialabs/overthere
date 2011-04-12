@@ -66,15 +66,15 @@ public class Overthere {
 		}
 	}
 
-	public static HostConnection getConnection(String type, ConnectionOptions options) {
-		if (!protocols.get().containsKey(type)) {
-			throw new IllegalArgumentException("Unknown connection type " + type);
+	public static HostConnection getConnection(String protocol, ConnectionOptions options) {
+		if (!protocols.get().containsKey(protocol)) {
+			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
-		final Class<? extends HostConnectionBuilder> connectionBuilder = protocols.get().get(type);
+		final Class<? extends HostConnectionBuilder> connectionBuilder = protocols.get().get(protocol);
 		try {
 			final Constructor<? extends HostConnectionBuilder> constructor = connectionBuilder.getConstructor(String.class, ConnectionOptions.class);
-			return constructor.newInstance(type, options).connect();
+			return constructor.newInstance(protocol, options).connect();
 		} catch (NoSuchMethodException exc) {
 			throw new IllegalStateException(connectionBuilder + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
 		} catch (IllegalArgumentException exc) {
