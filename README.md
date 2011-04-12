@@ -2,7 +2,7 @@
 Runs something on a remote machine, ie. over there.
 
 # TODO
-* determine semantics of mkdir, mkdirs, renameTo with respect to errors.
+* determine semantics of delete, mkdir, mkdirs, renameTo with respect to errors.
 * factor out dependencies that might cause a version clash for users of this library such as google collections and apache commons.
 * port scp -r functionality.
 * figure out what to do with the HostFileInputStreamTransformer filter.
@@ -15,3 +15,7 @@ Runs something on a remote machine, ie. over there.
 * redesign InputResponse map?
 * rename HostConnection to OverthereConnection?
 * reimplement tunneled SSH connections.
+* add OverthereFile.valueOf().
+* add WrappingOverthereFile to tunnel to other java.io.File implementations.
+* need to be able to set default values for synehtic properties (port).
+* need to be able to define abstract synthetic types (SshHost). Then temporaryDirectoryPath could also be defined in an abstract base class below Host.
