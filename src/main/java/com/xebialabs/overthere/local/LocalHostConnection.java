@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static java.io.File.createTempFile;
 
 import java.io.File;
@@ -45,11 +46,7 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 	 * Constructs a connection to the local host.
 	 */
 	public LocalHostConnection(String type, ConnectionOptions options) {
-		super(type, determineOs(), options);
-	}
-
-	private static OperatingSystemFamily determineOs() {
-		return SystemUtils.IS_OS_WINDOWS ? OperatingSystemFamily.WINDOWS : OperatingSystemFamily.UNIX;
+		super(type, getLocalHostOperatingSystemFamily(), options);
 	}
 
 	public HostConnection connect() {
