@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.spi;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang.StringUtils.isBlank;
@@ -31,14 +33,15 @@ import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.HostConnection;
-import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Abstract base class with common methods used by actual implementations of {@link com.xebialabs.overthere.HostConnection}.
  */
 public abstract class AbstractHostConnection implements HostConnection {
+
 
 	protected OperatingSystemFamily os;
 
@@ -50,11 +53,11 @@ public abstract class AbstractHostConnection implements HostConnection {
 
 	protected AbstractHostConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {
 		this.os = os;
-		this.temporaryDirectoryPath = options.get("temporaryDirectoryPath", os.getDefaultTemporaryDirectoryPath());
+		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 	}
 	
 	protected AbstractHostConnection(String type, ConnectionOptions options) {
-		this(type, options.<OperatingSystemFamily>get("os"), options);
+		this(type, options.<OperatingSystemFamily>get(OPERATING_SYSTEM), options);
 	}
 
 	public OperatingSystemFamily getHostOperatingSystem() {

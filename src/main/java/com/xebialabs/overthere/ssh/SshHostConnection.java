@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Random;
 
 import com.xebialabs.overthere.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,10 +63,10 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 
 	public SshHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.host = options.get("address");
-		this.port = options.get("port", 22);
-		this.username = options.get("username");
-		this.password = options.get("password");
+		this.host = options.get(ConnectionOptions.ADDRESS);
+		this.port = options.get(ConnectionOptions.PORT, 22);
+		this.username = options.get(ConnectionOptions.USERNAME);
+		this.password = options.get(ConnectionOptions.PASSWORD);
 	}
 
 	public SshHostConnection connect() throws RuntimeIOException {

@@ -17,6 +17,9 @@
 package com.xebialabs.overthere.cifs;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 
 import java.io.IOException;
@@ -28,17 +31,21 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AbstractHostConnection;
-
 import jcifs.smb.SmbFile;
 
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.CommandExecution;
+import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
 
 /**
  * <ul>
@@ -69,9 +76,9 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 
 	public CifsTelnetHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.address = options.get("address");
-		this.username = options.get("username");
-		this.password = options.get("password");
+		this.address = options.get(ADDRESS);
+		this.username = options.get(USERNAME);
+		this.password = options.get(PASSWORD);
 	}
 
 	@SuppressWarnings("unchecked")
