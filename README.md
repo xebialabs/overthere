@@ -14,8 +14,13 @@ Runs something on a remote machine, ie. over there.
 * remove HostConnection.copyToTemporaryFile?
 * redesign InputResponse map?
 * rename HostConnection to OverthereConnection?
-* reimplement tunneled SSH connections.
 * add OverthereFile.valueOf().
 * add WrappingOverthereFile to tunnel to other java.io.File implementations.
 * need to be able to set default values for synehtic properties (port).
 * need to be able to define abstract synthetic types (SshHost). Then temporaryDirectoryPath could also be defined in an abstract base class below Host.
+* Fix functionality removed from Overthere:
+ - untar -> separate utility method, maybe not in here?
+ - copy resource to temp file -> add helpers to plugin-api
+ - copy resource to file -> actually only needed by "copy resource to temp file" method
+ - unreachable host support/tunneled host session -> needs to be reimplemented in a nice way.
+

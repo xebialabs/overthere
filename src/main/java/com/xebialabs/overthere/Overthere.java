@@ -31,17 +31,6 @@ import com.google.common.collect.Maps;
 import com.xebialabs.overthere.spi.HostConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
-/**
- * FIXME: Removed functionality:
- * 
- * - untar -> separate utility method, maybe not in here?
- * 
- * - copy resource to temp file -> add helpers to plugin-api
- * 
- * - copy resource to file -> actually only needed by "copy resource to temp file" method
- * 
- * - unreachable host support/tunneled host session -> needs to be reimplemented in a nice way.
- */
 @SuppressWarnings("unchecked")
 public class Overthere {
 	/**
