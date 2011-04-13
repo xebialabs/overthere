@@ -16,17 +16,19 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.apache.commons.io.FilenameUtils.getExtension;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xebialabs.overthere.RuntimeIOException;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.OverthereFile;
-import org.slf4j.LoggerFactory;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * A file on a host connected through SSH w/ SUDO.
@@ -117,8 +119,8 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 	}
 
 	protected OverthereFile getTempFile(boolean useSudoForDeletion) {
-		String prefix = FilenameUtils.getBaseName(getPath());
-		String suffix = FilenameUtils.getExtension(getPath());
+		String prefix = getBaseName(getPath());
+		String suffix = getExtension(getPath());
 		return sshSudoHostSession.getTempFile(prefix, suffix);
 	}
 

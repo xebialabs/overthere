@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,7 +27,6 @@ import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -120,7 +121,7 @@ public class HostFileUtils {
 					in = new ByteArrayInputStream(bytes.toByteArray());
 				} finally {
 					//Need to close the input stream
-					IOUtils.closeQuietly(transformedInputStream);
+					closeQuietly(transformedInputStream);
 				}
 			}
 		}
@@ -133,7 +134,7 @@ public class HostFileUtils {
 		try {
 			dstFile.put(in, length);
 		} finally {
-			IOUtils.closeQuietly(in);
+			closeQuietly(in);
 		}
 	}
 
@@ -206,7 +207,7 @@ public class HostFileUtils {
 		try {
 			targetFile.put(in, bytes.length);
 		} finally {
-			IOUtils.closeQuietly(in);
+			closeQuietly(in);
 		}
 	}
 
@@ -261,7 +262,7 @@ public class HostFileUtils {
 				throw new RuntimeIOException("Cannot unzip " + zipPath + " to " + dstDir, exc);
 			}
 		} finally {
-			IOUtils.closeQuietly(zipIn);
+			closeQuietly(zipIn);
 		}
 	}
 

@@ -16,11 +16,11 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import static java.util.Collections.unmodifiableList;
+import static org.apache.commons.lang.StringUtils.join;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An implementation of the {@link CommandExecutionCallbackHandler} that captures the output in variables.
@@ -79,7 +79,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return a list of captured regular output lines.
 	 */
 	public List<String> getOutputLines() {
-		return Collections.unmodifiableList(outputLines);
+		return unmodifiableList(outputLines);
 	}
 
 	/**
@@ -88,7 +88,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return the captured regular output as one string.
 	 */
 	public String getOutput() {
-		return StringUtils.join(outputLines, "\n");
+		return join(outputLines, "\n");
 	}
 
 	/**
@@ -97,7 +97,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return a list of captured error output lines.
 	 */
 	public List<String> getErrorLines() {
-		return Collections.unmodifiableList(errorLines);
+		return unmodifiableList(errorLines);
 	}
 
 	/**
@@ -106,7 +106,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return the captured error output as one string.
 	 */
 	public String getError() {
-		return StringUtils.join(errorLines, "\n");
+		return join(errorLines, "\n");
 	}
 
 	/**
@@ -115,7 +115,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return a list of captured error regular and output lines.
 	 */
 	public List<String> getAllLines() {
-		return Collections.unmodifiableList(allLines);
+		return unmodifiableList(allLines);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public final class CapturingCommandExecutionCallbackHandler implements CommandEx
 	 * @return the captured regular and error output as one string.
 	 */
 	public String getAll() {
-		return StringUtils.join(allLines, "\n");
+		return join(allLines, "\n");
 	}
 
 	public String toString() {

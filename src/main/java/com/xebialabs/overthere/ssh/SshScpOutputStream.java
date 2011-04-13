@@ -16,19 +16,20 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xebialabs.overthere.RuntimeIOException;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import org.slf4j.LoggerFactory;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * An output stream to a file on a host connected through SSH w/ SCP.
@@ -137,12 +138,12 @@ class SshScpOutputStream extends OutputStream {
 		}
 
 		// close output channel to force remote scp to quit
-		IOUtils.closeQuietly(channelOut);
+		closeQuietly(channelOut);
 
 		// get return code from remote scp
 		int res = SshHostConnection.waitForExitStatus(channel, command);
 
-		IOUtils.closeQuietly(channelIn);
+		closeQuietly(channelIn);
 		channel.disconnect();
 		file.sshHostConnection.disconnectSession(session, CHANNEL_PURPOSE);
 		if (res != 0) {

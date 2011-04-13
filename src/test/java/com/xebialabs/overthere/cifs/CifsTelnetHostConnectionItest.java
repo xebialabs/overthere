@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static org.apache.commons.io.IOUtils.copy;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.junit.Assert.assertThat;
@@ -26,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -65,7 +65,7 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 		InputStream inputStream = file.get();
 		ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
 		try {
-			IOUtils.copy(inputStream, fileContents);
+			copy(inputStream, fileContents);
 		} finally {
 			inputStream.close();
 		}

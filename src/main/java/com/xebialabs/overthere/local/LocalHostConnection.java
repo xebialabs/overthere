@@ -24,11 +24,17 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import com.xebialabs.overthere.*;
-import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xebialabs.overthere.AbortedException;
+import com.xebialabs.overthere.CommandExecution;
+import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AbstractHostConnection;
 import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
 import com.xebialabs.overthere.spi.HostConnectionBuilder;

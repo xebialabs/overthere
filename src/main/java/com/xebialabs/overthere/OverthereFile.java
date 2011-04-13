@@ -16,6 +16,9 @@
  */
 package com.xebialabs.overthere;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+import static org.apache.commons.io.IOUtils.copy;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,8 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-
-import org.apache.commons.io.IOUtils;
 
 /**
  * A reference to a file on a host. This object is always associated with a {@link HostConnection}.
@@ -156,9 +157,9 @@ public abstract class OverthereFile extends File {
 		try {
 			InputStream in = get();
 			try {
-				IOUtils.copy(in, out);
+				copy(in, out);
 			} finally {
-				IOUtils.closeQuietly(in);
+				closeQuietly(in);
 			}
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
@@ -217,9 +218,9 @@ public abstract class OverthereFile extends File {
 		try {
 			OutputStream out = put(length);
 			try {
-				IOUtils.copy(in, out);
+				copy(in, out);
 			} finally {
-				IOUtils.closeQuietly(out);
+				closeQuietly(out);
 			}
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
