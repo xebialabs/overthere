@@ -23,11 +23,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +36,6 @@ import org.slf4j.LoggerFactory;
 public class HostFileUtils {
 
 	private static final String ZIP_PATH_SEPARATOR = "/";
-
-	private static final byte[] UTF16LE_PREAMABLE = {(byte) 0xFF, (byte) 0xFE};
-	private static final byte[] UTF16BE_PREAMABLE = {(byte) 0xFE, (byte) 0xFF};
 
 	/**
 	 * Copies a file or directory.
@@ -209,21 +204,6 @@ public class HostFileUtils {
 		} finally {
 			closeQuietly(in);
 		}
-	}
-
-	/**
-	 * Guess the character encoding of a byte array by looking at its bytes. If the first two bytes are a Unicode byte order mark, the bytes are assumed to be
-	 * in UTF-16 encoding (depending on the values of the bytes). Otherwise the encoding is assumed to be UTF-8.
-	 *
-	 * @param rawContent the bytes to inspect
-	 * @return the character encoding we've guessed the bytes are in.
-	 */
-	private static String guessCharset(byte[] rawContent) {
-		byte[] rawContentFirstBytes = ArrayUtils.subarray(rawContent, 0, 2);
-
-		boolean looksLikeUTF16LE = Arrays.equals(rawContentFirstBytes, UTF16LE_PREAMABLE);
-		boolean looksLikeUTF16BE = Arrays.equals(rawContentFirstBytes, UTF16BE_PREAMABLE);
-		return ((looksLikeUTF16LE || looksLikeUTF16BE) ? "UTF-16" : "UTF-8");
 	}
 
 	/**
