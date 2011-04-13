@@ -18,6 +18,7 @@ package com.xebialabs.overthere;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -27,7 +28,6 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Maps;
 import com.xebialabs.overthere.spi.HostConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -40,7 +40,7 @@ public class Overthere {
 	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 120000;
 	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
 	private static final AtomicReference<Map<String, Class<? extends HostConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends HostConnectionBuilder>>>(
-	        Maps.<String, Class<? extends HostConnectionBuilder>> newHashMap());
+	        new HashMap<String, Class<? extends HostConnectionBuilder>>());
 
 	static {
 		final Reflections reflections = new Reflections("com.xebialabs", new TypeAnnotationsScanner());

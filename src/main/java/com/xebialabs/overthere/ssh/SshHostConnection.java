@@ -16,7 +16,6 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 import static java.lang.String.format;
 
@@ -27,8 +26,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
-import com.xebialabs.overthere.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +34,13 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
+import com.xebialabs.overthere.AbortedException;
+import com.xebialabs.overthere.CommandExecution;
+import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AbstractHostConnection;
 import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
 import com.xebialabs.overthere.spi.HostConnectionBuilder;
@@ -142,8 +145,11 @@ abstract class SshHostConnection extends AbstractHostConnection implements HostC
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
 	}
 
+	// FIXME: Move to OverthereConnectionUtils
 	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		checkNotNull(prefix);
+		if(prefix == null)
+			throw new NullPointerException("prefix is null");
+
 		if (suffix == null) {
 			suffix = ".tmp";
 		}

@@ -16,12 +16,11 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Maps.newHashMap;
-
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConnectionOptions {
-	private Map<String, Object> options = newHashMap();
+	private Map<String, Object> options = new HashMap<String, Object>();
 
 	@SuppressWarnings("unchecked")
 	public <T> T get(String key) {

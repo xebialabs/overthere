@@ -16,7 +16,6 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
@@ -230,8 +229,11 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child.replace('\\', '/'));
 	}
 
+	// FIXME: Move to OverthereConnectionUtils
 	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		checkNotNull(prefix);
+		if(prefix == null)
+			throw new NullPointerException("prefix is null");
+
 		if (suffix == null) {
 			suffix = ".tmp";
 		}

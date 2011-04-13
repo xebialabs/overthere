@@ -16,8 +16,6 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang.StringUtils.containsAny;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 
@@ -169,8 +167,10 @@ public enum OperatingSystemFamily {
 	}
 
 	private String encodeCommandLine(boolean hidePassword, String... cmdarray) {
-		checkNotNull(cmdarray, "Cannot encode a null command line");
-		checkArgument(cmdarray.length > 0, "Cannot encode an empty command line");
+		if (cmdarray == null)
+			throw new NullPointerException("Command line is null");
+		if (cmdarray.length == 0)
+			throw new IllegalArgumentException("Command line has length zero");
 
 		StringBuilder sb = new StringBuilder();
 		boolean passwordKeywordSeen = false;
