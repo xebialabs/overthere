@@ -36,5 +36,5 @@ repositories {
 	mavenRepo: 'http://reflections.googlecode.com/svn/repo'
 }
 
-version = "1.0.alpha-1"
+version = "1.0.alpha-SNAPSHOT"
 group = "com.xebialabs.overthere"
