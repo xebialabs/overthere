@@ -53,6 +53,11 @@ abstract class SshOverthereFile extends RemoteOverthereFile {
 		}
 	}
 
+	@Override
+	public boolean isHidden() {
+		return getName().startsWith(".");
+	}
+
 	protected abstract void deleteFile();
 
 	protected abstract void deleteDirectory();

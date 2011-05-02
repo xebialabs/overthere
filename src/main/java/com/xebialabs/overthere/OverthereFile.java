@@ -20,12 +20,16 @@ import static org.apache.commons.io.IOUtils.closeQuietly;
 import static org.apache.commons.io.IOUtils.copy;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A reference to a file on a host. This object is always associated with a {@link HostConnection}.
@@ -111,6 +115,39 @@ public abstract class OverthereFile extends File {
 				files[i] = connection.getFile(this, filenames[i]);
 			}
 			return files;
+		}
+	}
+
+	@Override
+	public OverthereFile[] listFiles(FilenameFilter filter) {
+		String[] filenames = list();
+		if (filenames == null) {
+			return null;
+		} else {
+			List<OverthereFile> filteredFiles = new ArrayList<OverthereFile>();
+			for (int i = 0; i < filenames.length; i++) {
+				if ((filter == null) || filter.accept(this, filenames[i])) {
+					filteredFiles.add(connection.getFile(this, filenames[i]));
+				}
+			}
+			return filteredFiles.toArray(new OverthereFile[filteredFiles.size()]);
+		}
+	}
+
+	@Override
+	public File[] listFiles(FileFilter filter) {
+		String[] filenames = list();
+		if (filenames == null) {
+			return null;
+		} else {
+			List<OverthereFile> filteredFiles = new ArrayList<OverthereFile>();
+			for (int i = 0; i < filenames.length; i++) {
+				OverthereFile f = connection.getFile(this, filenames[i]);
+				if ((filter == null) || filter.accept(f)) {
+					filteredFiles.add(f);
+				}
+			}
+			return filteredFiles.toArray(new OverthereFile[filteredFiles.size()]);
 		}
 	}
 

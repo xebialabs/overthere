@@ -82,6 +82,11 @@ class SshSftpOverthereFile extends SshOverthereFile {
 		return stat().isDir();
 	}
 
+	@Override
+	public long lastModified() {
+		return stat().getMTime();
+	}
+
 	public long length() throws RuntimeIOException {
 		return stat().getSize();
 	}

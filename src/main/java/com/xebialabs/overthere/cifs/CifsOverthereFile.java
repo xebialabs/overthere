@@ -72,11 +72,38 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 	}
 
 	@Override
+	public long length() throws RuntimeIOException {
+		try {
+			return smbFile.length();
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot determine length of file " + this + ": " + exc.toString(), exc);
+		}
+	}
+
+	@Override
+	public long lastModified() {
+		try {
+			return smbFile.lastModified();
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot determine last modification timestamp of " + this + ": " + exc.toString(), exc);
+		}
+	}
+
+	@Override
 	public boolean isDirectory() throws RuntimeIOException {
 		try {
 			return smbFile.isDirectory();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " is a directory" + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " is a directory: " + exc.toString(), exc);
+		}
+	}
+
+	@Override
+	public boolean isHidden() {
+		try {
+			return smbFile.isHidden();
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot determine whether " + this + " is hidden: " + exc.toString(), exc);
 		}
 	}
 
@@ -85,7 +112,7 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 		try {
 			return smbFile.canRead();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be executed" + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be executed: " + exc.toString(), exc);
 		}
 	}
 
@@ -94,7 +121,7 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 		try {
 			return smbFile.canRead();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be read" + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be read: " + exc.toString(), exc);
 		}
 	}
 
@@ -103,16 +130,7 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 		try {
 			return smbFile.canWrite();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be written" + ": " + exc.toString(), exc);
-		}
-	}
-
-	@Override
-	public long length() throws RuntimeIOException {
-		try {
-			return smbFile.length();
-		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine length of file " + this + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be written: " + exc.toString(), exc);
 		}
 	}
 

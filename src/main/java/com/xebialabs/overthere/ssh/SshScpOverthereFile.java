@@ -55,6 +55,11 @@ class SshScpOverthereFile extends SshOverthereFile {
 		return getFileInfo(this).isDirectory;
 	}
 
+	@Override
+	public long lastModified() {
+		throw new UnsupportedOperationException();
+	}
+
 	public long length() {
 		return getFileInfo(this).length;
 	}
