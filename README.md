@@ -24,3 +24,4 @@ Runs something on a remote machine, ie. over there.
 * need to be able to set default values for synehtic properties (port).
 * need to be able to define abstract synthetic types (SshHost). Then temporaryDirectoryPath could also be defined in an abstract base class below Host.
 * port fixes made in HostSession framework since fork.
+* add sources and javadoc to distribution.
