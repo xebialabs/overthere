@@ -52,6 +52,12 @@ public abstract class AbstractHostConnection implements HostConnection {
 	public static final long MAX_TEMP_RETRIES = 100;
 
 	protected AbstractHostConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {
+		if(type == null) {
+			throw new IllegalArgumentException("Null type specified for HostConnnection");
+		}
+		if(os == null) {
+			throw new IllegalArgumentException("Null os specified for HostConnnection");
+		}
 		this.os = os;
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 	}
