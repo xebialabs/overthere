@@ -20,7 +20,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.xebialabs.overthere.CommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Protocol;
+import com.xebialabs.overthere.spi.Protocol;
 
 import java.io.InputStream;
 import java.io.OutputStream;

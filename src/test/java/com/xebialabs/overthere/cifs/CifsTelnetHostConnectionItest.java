@@ -16,54 +16,56 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static org.junit.Assert.assertEquals;
+import static org.apache.commons.io.IOUtils.copy;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.HostFile;
 import com.xebialabs.overthere.HostSessionItestBase;
 import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 
 @Ignore("Needs Windows 2003 image")
 public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 
 	@Override
-    protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() {
 		type = "cifs_telnet";
 		options = new ConnectionOptions();
 		options.set("address", "wls-11g-win");
 		options.set("username", "itestuser");
-		// ensure the test user contains some reserved characters such as ';', ':' or '@' 
+		// ensure the test user contains some reserved characters such as ';', ':' or '@'
 		options.set("password", "hello@:;<>myfriend");
 		options.set("os", OperatingSystemFamily.WINDOWS);
 	}
 
 	@Test
 	public void listC() throws IOException {
-		HostFile file = connection.getFile("C:");
-		List<String> filesInC = file.list();
-		assertTrue(filesInC.contains("AUTOEXEC.BAT"));
+		OverthereFile file = connection.getFile("C:");
+		String[] filesInC = file.list();
+		assertThat(filesInC, hasItemInArray("AUTOEXEC.BAT"));
 	}
 
 	@Test
 	public void readFile() throws IOException {
-		HostFile file = connection.getFile("C:\\itest\\itestfile.txt");
-		assertEquals("itestfile.txt", file.getName());
-		assertEquals(27, file.length());
+		OverthereFile file = connection.getFile("C:\\itest\\itestfile.txt");
+		assertThat(file.getName(), equalTo("itestfile.txt"));
+		assertThat(file.length(), equalTo(27L));
 		InputStream inputStream = file.get();
 		ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
 		try {
-			IOUtils.copy(inputStream, fileContents);
+			copy(inputStream, fileContents);
 		} finally {
 			inputStream.close();
 		}
@@ -74,24 +76,23 @@ public class CifsTelnetHostConnectionItest extends HostSessionItestBase {
 	public void executeDirCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "dir", "C:\\itest");
-		assertEquals(0, res);
-		assertTrue(handler.getOutput().contains("27 itestfile.txt"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("27 itestfile.txt"));
 	}
 
 	@Test
 	public void executeCmdCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "C:\\itest\\itestecho.cmd");
-		assertEquals(0, res);
-		assertTrue(handler.getOutput().contains("All mimsy were the borogroves"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("All mimsy were the borogroves"));
 	}
 
 	@Test
 	public void executeIncorrectCommand() {
 		CapturingCommandExecutionCallbackHandler handler = new CapturingCommandExecutionCallbackHandler(true);
 		int res = connection.execute(handler, "C:\\NONEXISTANT.cmd");
-		assertEquals(9009, res);
+		assertThat(res, equalTo(9009));
 	}
 
 }
-

@@ -16,25 +16,26 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xebialabs.overthere.RuntimeIOException;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.slf4j.LoggerFactory;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * An input stream from a file on a host connected through SSH w/ SCP.
  */
 class SshScpInputStream extends InputStream {
 
-	protected SshScpHostFile file;
+	protected SshScpOverthereFile file;
 
 	protected Session session;
 
@@ -48,22 +49,22 @@ class SshScpInputStream extends InputStream {
 
 	private static final String CHANNEL_PURPOSE = " (for SCP input stream)";
 
-	SshScpInputStream(SshScpHostFile file) {
+	SshScpInputStream(SshScpOverthereFile file) {
 		this.file = file;
 	}
 
 	void open() {
 		try {
 			// connect to SSH and start scp in source mode
-			session = file.sshHostSession.openSession(CHANNEL_PURPOSE);
+			session = file.sshHostConnection.openSession(CHANNEL_PURPOSE);
 			channel = (ChannelExec) session.openChannel("exec");
 			// no password in this command, so use 'false'
-			String command = file.sshHostSession.encodeCommandLineForExecution("scp", "-f", file.remotePath);
+			String command = file.sshHostConnection.encodeCommandLineForExecution("scp", "-f", file.getPath());
 			channel.setCommand(command);
 			channelIn = channel.getInputStream();
 			channelOut = channel.getOutputStream();
 			channel.connect();
-			logger.info("Executing remote command \"" + command + "\" on " + file.sshHostSession + " to open SCP stream for reading");
+			logger.info("Executing remote command \"" + command + "\" on " + file.sshHostConnection + " to open SCP stream for reading");
 
 			// perform SCP read protocol
 			sendAck();
@@ -178,10 +179,10 @@ class SshScpInputStream extends InputStream {
 		} catch (IOException ignore) {
 		} catch(RuntimeIOException ignore2) {
 		}
-		IOUtils.closeQuietly(channelIn);
-		IOUtils.closeQuietly(channelOut);
+		closeQuietly(channelIn);
+		closeQuietly(channelOut);
 		channel.disconnect();
-		file.sshHostSession.disconnectSession(session, CHANNEL_PURPOSE);
+		file.sshHostConnection.disconnectSession(session, CHANNEL_PURPOSE);
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshScpInputStream.class);

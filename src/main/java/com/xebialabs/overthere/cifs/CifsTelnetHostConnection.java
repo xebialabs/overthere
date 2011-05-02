@@ -16,7 +16,9 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 
 import java.io.IOException;
@@ -28,16 +30,21 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.common.AbstractHostConnection;
 import jcifs.smb.SmbFile;
 
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.CommandExecution;
+import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
 
 /**
  * <ul>
@@ -68,9 +75,9 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 
 	public CifsTelnetHostConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.address = options.get("address");
-		this.username = options.get("username");
-		this.password = options.get("password");
+		this.address = options.get(ADDRESS);
+		this.username = options.get(USERNAME);
+		this.password = options.get(PASSWORD);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -209,21 +216,24 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 		return null;
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		try {
 			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath));
-			return new CifsHostFile(this, smbFile);
+			return new CifsOverthereFile(this, smbFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
 	}
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
 		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child.replace('\\', '/'));
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		checkNotNull(prefix);
+	// FIXME: Move to OverthereConnectionUtils
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+		if(prefix == null)
+			throw new NullPointerException("prefix is null");
+
 		if (suffix == null) {
 			suffix = ".tmp";
 		}
@@ -231,7 +241,7 @@ public class CifsTelnetHostConnection extends AbstractHostConnection implements 
 		Random r = new Random();
 		String infix = "";
 		for (int i = 0; i < AbstractHostConnection.MAX_TEMP_RETRIES; i++) {
-			HostFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
+			OverthereFile f = getFile(getTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
 					logger.debug("Created temporary file " + f);

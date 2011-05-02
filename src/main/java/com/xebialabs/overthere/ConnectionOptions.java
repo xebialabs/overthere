@@ -16,20 +16,19 @@
  */
 package com.xebialabs.overthere;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 public class ConnectionOptions {
-	private Map<String, Object> options = newHashMap();
+	private Map<String, Object> options = new HashMap<String, Object>();
 
 	@SuppressWarnings("unchecked")
-    public <T> T get(String key) {
+	public <T> T get(String key) {
 		return (T) options.get(key);
 	}
 
 	@SuppressWarnings("unchecked")
-    public <T> T get(String key, T defaultValue) {
+	public <T> T get(String key, T defaultValue) {
 		if (options.containsKey(key)) {
 			return (T) options.get(key);
 		} else {
@@ -40,5 +39,16 @@ public class ConnectionOptions {
 	public void set(String key, Object value) {
 		options.put(key, value);
 	}
-}
 
+	public static final String TEMPORARY_DIRECTORY_PATH = "temporaryDirectoryPath";
+
+	public static final String OPERATING_SYSTEM = "os";
+
+	public static final String ADDRESS = "address";
+
+	public static final String PORT = "port";
+
+	public static final String USERNAME = "username";
+
+	public static final String PASSWORD = "password";
+}

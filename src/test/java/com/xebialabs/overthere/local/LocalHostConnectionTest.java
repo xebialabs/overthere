@@ -16,8 +16,8 @@
  */
 package com.xebialabs.overthere.local;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.internal.matchers.StringContains.containsString;
 
 import org.junit.Ignore;
@@ -28,9 +28,8 @@ import org.junit.rules.TemporaryFolder;
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.DebugCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.HostFile;
 import com.xebialabs.overthere.HostSessionItestBase;
-import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
 
 public class LocalHostConnectionTest extends HostSessionItestBase {
 
@@ -46,10 +45,10 @@ public class LocalHostConnectionTest extends HostSessionItestBase {
 
 	@Test
 	public void isDirectoryWorks() {
-		HostFile tempFile = connection.getTempFile("tmpDir");
+		OverthereFile tempFile = connection.getTempFile("tmpDir");
 		tempFile.delete();
 		tempFile.mkdir();
-		assertTrue("expected temp is a dir", tempFile.isDirectory());
+		assertThat("expected temp is a dir", tempFile.isDirectory(), equalTo(true));
 	}
 
 	@Test

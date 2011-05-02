@@ -16,12 +16,18 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.HostFileUtils;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereFile;
 
 @Ignore("Needs Windows image that is not on dexter")
 public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItestBase {
@@ -42,7 +48,7 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 
 		HostConnection hs = Overthere.getConnection(type, options);
 		try {
-			HostFile tempFile = hs.getTempFile("testoutput", ".txt");
+			OverthereFile tempFile = hs.getTempFile("testoutput", ".txt");
 
 			HostFileUtils.putStringToHostFile(expectedOutput + "\r\nwhose fleece was white as snow\r\n", tempFile);
 
@@ -51,25 +57,23 @@ public class SshSftpHostSessionOnWindowsItest extends SshSudoHostConnectionItest
 			System.out.println("-->" + capturedOutput);
 			hs.execute(capturedOutput, "type", p);
 
-			assertTrue(capturedOutput.getOutput().contains(expectedOutput));
+			assertThat(capturedOutput.getOutput(), containsString(expectedOutput));
 		} finally {
 			hs.disconnect();
 		}
 	}
 
 	@Test
-	@Ignore("Needs Windows image that is not on dexter")
 	public void mkdirs() {
 
 		HostConnection hs = Overthere.getConnection(type, options);
 		try {
-			HostFile tempFile3 = hs.getFile("c:\\temp\\level1\\level2\\level3");
+			OverthereFile tempFile3 = hs.getFile("c:\\temp\\level1\\level2\\level3");
 			tempFile3.mkdirs();
 
-			final HostFile file = tempFile3.getFile("foo.txt");
+			final OverthereFile file = tempFile3.getFile("foo.txt");
 
 			HostFileUtils.putStringToHostFile("hello....\r\n", file);
-
 		} finally {
 			hs.disconnect();
 		}

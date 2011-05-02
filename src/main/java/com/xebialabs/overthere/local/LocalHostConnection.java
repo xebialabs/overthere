@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static java.io.File.createTempFile;
 
 import java.io.File;
@@ -23,15 +24,23 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.common.AbstractHostConnection;
-import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.common.ErrorStreamToCallbackHandler;
-import com.xebialabs.overthere.common.InputResponseHandler;
-import com.xebialabs.overthere.common.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.AbortedException;
+import com.xebialabs.overthere.CommandExecution;
+import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AbstractHostConnection;
+import com.xebialabs.overthere.spi.ErrorStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.InputResponseHandler;
+import com.xebialabs.overthere.spi.OutputStreamToCallbackHandler;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to the local host.
@@ -43,39 +52,37 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 	 * Constructs a connection to the local host.
 	 */
 	public LocalHostConnection(String type, ConnectionOptions options) {
-		super(type, determineOs(), options);
-	}
-
-	private static OperatingSystemFamily determineOs() {
-		return SystemUtils.IS_OS_WINDOWS ? OperatingSystemFamily.WINDOWS : OperatingSystemFamily.UNIX;
+		super(type, getLocalHostOperatingSystemFamily(), options);
 	}
 
 	public HostConnection connect() {
 		return this;
 	}
 
-	public HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		try {
 			File tempFile = createTempFile(prefix, suffix, new File(getTemporaryDirectory().getPath()));
 			// FIXME: Need to delete this file to make test work, but isn't it better to NOT do that so that a tempfile with the same name is not accidentally
 			// created simultaneously?
+			// FIXME: Answer from VP: we have to decide on the semantics. How do you create a temporary directory?
 			tempFile.delete();
-			return new LocalHostFile(this, tempFile);
+			return new LocalOverthereFile(this, tempFile.getPath());
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
 	}
 
-	public HostFile getFile(String hostPath) throws RuntimeIOException {
-		return new LocalHostFile(this, new File(hostPath));
+	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+		return new LocalOverthereFile(this, hostPath);
 	}
 
-	public HostFile getFile(HostFile parent, String child) throws RuntimeIOException {
-		if (!(parent instanceof LocalHostFile)) {
-			throw new IllegalStateException("parent is not a file on the local host");
+	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+		if (!(parent instanceof LocalOverthereFile)) {
+			throw new IllegalStateException("parent is not a LocalOverthereFile");
 		}
-		File parentFile = ((LocalHostFile) parent).getFile();
-		return new LocalHostFile(this, new File(parentFile, child));
+
+		File childFile = new File(parent, child);
+		return new LocalOverthereFile(this, childFile.getPath());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -128,4 +135,3 @@ public class LocalHostConnection extends AbstractHostConnection implements HostC
 	private static Logger logger = LoggerFactory.getLogger(LocalHostConnection.class);
 
 }
-

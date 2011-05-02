@@ -16,14 +16,14 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang.StringUtils.containsAny;
 import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+
+import org.apache.commons.lang.SystemUtils;
 
 /**
  * The family (flavour) of the operating system running on a host.
@@ -43,6 +43,13 @@ public enum OperatingSystemFamily {
 	 * String containing special characters that require quoting or escaping.
 	 */
 	private static final String SPECIAL_CHARS = " '\"\\;()${}";
+
+	/**
+	 * Returns the {@link OperatingSystemFamily} that corresponds to the local host
+	 */
+	public static OperatingSystemFamily getLocalHostOperatingSystemFamily() {
+		return SystemUtils.IS_OS_WINDOWS ? WINDOWS : UNIX;
+	}
 
 	/**
 	 * Returns the extension for scripts used by the operating system family, e.g. <tt>.bat</tt> or <tt>.sh</tt>
@@ -160,8 +167,10 @@ public enum OperatingSystemFamily {
 	}
 
 	private String encodeCommandLine(boolean hidePassword, String... cmdarray) {
-		checkNotNull(cmdarray, "Cannot encode a null command line");
-		checkArgument(cmdarray.length > 0, "Cannot encode an empty command line");
+		if (cmdarray == null)
+			throw new NullPointerException("Command line is null");
+		if (cmdarray.length == 0)
+			throw new IllegalArgumentException("Command line has length zero");
 
 		StringBuilder sb = new StringBuilder();
 		boolean passwordKeywordSeen = false;
@@ -235,4 +244,3 @@ public enum OperatingSystemFamily {
 	}
 
 }
-

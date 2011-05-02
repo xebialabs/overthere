@@ -47,7 +47,7 @@ public interface HostConnection {
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurs
 	 */
-	HostFile getFile(String hostPath) throws RuntimeIOException;
+	OverthereFile getFile(String hostPath) throws RuntimeIOException;
 
 	/**
 	 * Creates a reference to a file in a directory on the host.
@@ -60,7 +60,7 @@ public interface HostConnection {
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurs
 	 */
-	HostFile getFile(HostFile parent, String child) throws RuntimeIOException;
+	OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException;
 
 	/**
 	 * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
@@ -72,7 +72,7 @@ public interface HostConnection {
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurs
 	 */
-	HostFile getTempFile(String nameTemplate) throws RuntimeIOException;
+	OverthereFile getTempFile(String nameTemplate) throws RuntimeIOException;
 
 	/**
 	 * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
@@ -87,7 +87,7 @@ public interface HostConnection {
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurs
 	 */
-	HostFile getTempFile(String prefix, String suffix) throws RuntimeIOException;
+	OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException;
 
 	/**
 	 * Executes a command with its arguments.
@@ -137,7 +137,7 @@ public interface HostConnection {
 	 * 
 	 * @return the path of the temporary file on the host.
 	 */
-	HostFile copyToTemporaryFile(File file) throws RuntimeIOException;
+	OverthereFile copyToTemporaryFile(File file) throws RuntimeIOException;
 
 }
 

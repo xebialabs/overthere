@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.common;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package com.xebialabs.overthere.spi;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,8 +34,13 @@ public class OutputStreamToCallbackHandler implements Runnable {
 	private CommandExecutionCallbackHandler handler;
 
 	public OutputStreamToCallbackHandler(InputStream in, CommandExecutionCallbackHandler handler) {
-		this.in = checkNotNull(in, "InputStream is null");
-		this.handler = checkNotNull(handler, "CommandExecutionCallbackHandler is null");
+		if (in == null)
+			throw new NullPointerException("InputStream is null");
+		if (handler == null)
+			throw new NullPointerException("CommandExecutionCallbackHandler is null");
+
+		this.in = in;
+		this.handler = handler;
 	}
 
 	public void run() {
@@ -72,4 +75,3 @@ public class OutputStreamToCallbackHandler implements Runnable {
 	private static Logger logger = LoggerFactory.getLogger(OutputStreamToCallbackHandler.class);
 
 }
-

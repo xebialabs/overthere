@@ -16,26 +16,27 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xebialabs.overthere.RuntimeIOException;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import org.slf4j.LoggerFactory;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * An output stream to a file on a host connected through SSH w/ SCP.
  */
 class SshScpOutputStream extends OutputStream {
 
-	protected SshScpHostFile file;
+	protected SshScpOverthereFile file;
 
 	protected long length;
 
@@ -51,7 +52,7 @@ class SshScpOutputStream extends OutputStream {
 
 	private static final String CHANNEL_PURPOSE = " (for SCP input stream)";
 
-	SshScpOutputStream(SshScpHostFile file, long length) {
+	SshScpOutputStream(SshScpOverthereFile file, long length) {
 		this.file = file;
 		this.length = length;
 	}
@@ -59,15 +60,15 @@ class SshScpOutputStream extends OutputStream {
 	void open() {
 		try {
 			// connect to SSH and start scp in sink mode
-			session = file.sshHostSession.openSession(CHANNEL_PURPOSE);
+			session = file.sshHostConnection.openSession(CHANNEL_PURPOSE);
 			channel = (ChannelExec) session.openChannel("exec");
 			// no password in this command, so use 'false'
-			command = file.sshHostSession.encodeCommandLineForExecution("scp", "-t", file.remotePath);
+			command = file.sshHostConnection.encodeCommandLineForExecution("scp", "-t", file.getPath());
 			channel.setCommand(command);
 			channelIn = channel.getInputStream();
 			channelOut = channel.getOutputStream();
 			channel.connect();
-			logger.info("Executing remote command \"" + command + "\" on " + file.sshHostSession + " to open SCP stream for writing");
+			logger.info("Executing remote command \"" + command + "\" on " + file.sshHostConnection + " to open SCP stream for writing");
 
 			// perform SCP write protocol
 			readAck();
@@ -92,10 +93,10 @@ class SshScpOutputStream extends OutputStream {
 
 	private void sendFilePreamble() throws IOException {
 		String preamble = "C0644 " + length + " ";
-		if (file.remotePath.lastIndexOf('/') > 0) {
-			preamble += file.remotePath.substring(file.remotePath.lastIndexOf('/') + 1);
+		if (file.getPath().lastIndexOf('/') > 0) {
+			preamble += file.getPath().substring(file.getPath().lastIndexOf('/') + 1);
 		} else {
-			preamble += file.remotePath;
+			preamble += file.getPath();
 		}
 		if (logger.isDebugEnabled())
 			logger.debug("Sending file preamble \"" + preamble + "\"");
@@ -137,14 +138,14 @@ class SshScpOutputStream extends OutputStream {
 		}
 
 		// close output channel to force remote scp to quit
-		IOUtils.closeQuietly(channelOut);
+		closeQuietly(channelOut);
 
 		// get return code from remote scp
 		int res = SshHostConnection.waitForExitStatus(channel, command);
 
-		IOUtils.closeQuietly(channelIn);
+		closeQuietly(channelIn);
 		channel.disconnect();
-		file.sshHostSession.disconnectSession(session, CHANNEL_PURPOSE);
+		file.sshHostConnection.disconnectSession(session, CHANNEL_PURPOSE);
 		if (res != 0) {
 			throw new RuntimeIOException("Error closing SCP stream to write remote file " + file + " (remote scp command returned error code " + res + ")");
 		}
@@ -153,10 +154,10 @@ class SshScpOutputStream extends OutputStream {
 	}
 
 	private void chmodWrittenFile() {
-		if (file.sshHostSession instanceof SshSudoHostConnection) {
-			SshSudoHostConnection sshSudoHostSession = (SshSudoHostConnection) file.sshHostSession;
+		if (file.sshHostConnection instanceof SshSudoHostConnection) {
+			SshSudoHostConnection sshSudoHostSession = (SshSudoHostConnection) file.sshHostConnection;
 			CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-			int errno = sshSudoHostSession.noSudoExecute(capturedOutput, "chmod", "0666", file.remotePath);
+			int errno = sshSudoHostSession.noSudoExecute(capturedOutput, "chmod", "0666", file.getPath());
 			if (errno != 0) {
 				throw new RuntimeIOException("Cannot chmod file " + file + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 			}

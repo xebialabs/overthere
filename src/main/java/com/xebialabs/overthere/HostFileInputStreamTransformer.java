@@ -21,14 +21,14 @@ import java.io.InputStream;
 public interface HostFileInputStreamTransformer {
 	
 	/**
-	 * Transforms a source {@link HostFile}
+	 * Transforms a source {@link OverthereFile}
 	 * 
 	 * Can transform paths or contents of the file.
 	 * 
 	 * @param input hostfile
 	 * @return the transformed InputStream 
 	 */
-	InputStream transform(HostFile input);
+	InputStream transform(OverthereFile input);
 
 }
 
