@@ -30,11 +30,14 @@ dependencies {
 	testCompile 'org.slf4j:slf4j-simple:1.6.1'
 }
 
-repositories {
-	mavenLocal()
-	mavenCentral()
-	mavenRepo: 'http://reflections.googlecode.com/svn/repo'
-}
+//repositories {
+	//mavenLocal()
+	//mavenCentral()
+	//mavenRepo: 'http://reflections.googlecode.com/svn/repo'
+//}
+apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/repositories.gradle'
+apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
 
 version = "1.0.alpha-SNAPSHOT"
 group = "com.xebialabs.overthere"
+
