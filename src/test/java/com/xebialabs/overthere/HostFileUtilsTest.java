@@ -16,11 +16,8 @@
  */
 package com.xebialabs.overthere;
 
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,8 +26,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
-import org.mockito.Mockito;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
 
 public class HostFileUtilsTest {
 
@@ -127,7 +127,7 @@ public class HostFileUtilsTest {
 
 			OverthereFile destDir = s.getFile(new File(javaTempDirName + File.separator + "destdir").getPath());
 
-			assertThat(destDir.exists(), equalTo(true));
+			assertThat(destDir.exists(), equalTo(false));
 
 			HostFileUtils.copyDirectory(srcDir, destDir);
 
