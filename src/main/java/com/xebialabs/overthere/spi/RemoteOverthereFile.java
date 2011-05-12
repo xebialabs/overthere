@@ -12,8 +12,16 @@ import com.xebialabs.overthere.OverthereFile;
 @SuppressWarnings("serial")
 public abstract class RemoteOverthereFile extends OverthereFile {
 
+	private String path;
+
 	protected RemoteOverthereFile(HostConnection connection, String path) {
 		super(connection, path);
+		this.path = path;
+	}
+
+	@Override
+	public String getPath() {
+		return this.path;
 	}
 
 	@Override
