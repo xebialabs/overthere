@@ -27,14 +27,14 @@ import org.slf4j.LoggerFactory;
 class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 	private final OutputStream remoteStdin;
 	private final byte[] passwordBytes;
-	
+
 	private final StringBuilder receivedOutputBuffer = new StringBuilder();
 	private boolean onFirstLine = true;
-	
+
 	protected SshInteractiveSudoPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password) {
 		super(remoteStdout);
 		this.remoteStdin = remoteStdin;
-		passwordBytes = (password + "\r\n").getBytes();
+		this.passwordBytes = (password + "\r\n").getBytes();
 	}
 
 	@Override
@@ -45,13 +45,24 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 		}
 		return readInt;
 	}
-	
+
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		int numBytesRead = super.read(b, off, len);
+		if (numBytesRead > -1) {
+			for (int i = 0; i < numBytesRead; i++) {
+				handleChar((char) b[off + i]);
+			}
+		}
+		return numBytesRead;
+	}
+
 	private void handleChar(char c) {
 		if (onFirstLine) {
 			switch (c) {
 			case ':':
 				String receivedOutput = receivedOutputBuffer.toString();
-				if (receivedOutput.endsWith("assword")) {
+				if (receivedOutput.contains("assword")) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Found password prompt in first line of output: " + receivedOutput);
 					}
@@ -73,20 +84,9 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 				receivedOutputBuffer.append(c);
 				break;
 			}
-		} 
-	}
-	
-	@Override
-	public int read(byte[] b, int off, int len) throws IOException {
-		int numBytesRead = super.read(b, off, len);
-		if (numBytesRead > -1) {
-			for (int i = 0; i < numBytesRead; i++) {
-				handleChar((char) b[off + i]);
-			}
 		}
-		return numBytesRead;
 	}
-	
-	private static Logger logger = LoggerFactory.getLogger(SshInteractiveSudoPasswordHandlingStream.class);
-}
 
+	private static Logger logger = LoggerFactory.getLogger(SshInteractiveSudoPasswordHandlingStream.class);
+
+}

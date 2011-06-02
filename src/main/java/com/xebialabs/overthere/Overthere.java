@@ -23,60 +23,69 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import nl.javadude.scannit.Configuration;
+import nl.javadude.scannit.Scannit;
+import nl.javadude.scannit.scanner.TypeAnnotationScanner;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.spi.HostConnectionBuilder;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
 @SuppressWarnings("unchecked")
 public class Overthere {
+	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
+
 	/**
 	 * The default timeout for opening a connection in milliseconds.
 	 */
 	// FIXME: should this not be moved somewhere else?
 	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 120000;
-	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
-	private static final AtomicReference<Map<String, Class<? extends HostConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends HostConnectionBuilder>>>(
-	        new HashMap<String, Class<? extends HostConnectionBuilder>>());
+
+	private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
+	        new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
 
 	static {
-		final Reflections reflections = new Reflections("com.xebialabs", new TypeAnnotationsScanner());
-		final Set<Class<?>> protocols = reflections.getTypesAnnotatedWith(Protocol.class);
+		final Scannit scannit = new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner()));
+		final Set<Class<?>> protocols = scannit.getTypesAnnotatedWith(Protocol.class);
 		for (Class<?> protocol : protocols) {
-			if (HostConnectionBuilder.class.isAssignableFrom(protocol)) {
+			if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
 				final String name = ((Protocol) protocol.getAnnotation(Protocol.class)).name();
-				Overthere.protocols.get().put(name, (Class<? extends HostConnectionBuilder>) protocol);
+				Overthere.protocols.get().put(name, (Class<? extends OverthereConnectionBuilder>) protocol);
 			} else {
 				logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
 			}
 		}
 	}
 
-	public static HostConnection getConnection(String protocol, ConnectionOptions options) {
+	public static OverthereConnection getConnection(String protocol, ConnectionOptions options) {
 		if (!protocols.get().containsKey(protocol)) {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
-		final Class<? extends HostConnectionBuilder> connectionBuilder = protocols.get().get(protocol);
+		final Class<? extends OverthereConnectionBuilder> connectionBuilder = protocols.get().get(protocol);
 		try {
-			final Constructor<? extends HostConnectionBuilder> constructor = connectionBuilder.getConstructor(String.class, ConnectionOptions.class);
-			return constructor.newInstance(protocol, options).connect();
+			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilder.getConstructor(String.class, ConnectionOptions.class);
+			if (logger.isDebugEnabled()) {
+				logger.debug("Opening connection with protocol " + protocol);
+			}
+			OverthereConnection connection = constructor.newInstance(protocol, options).connect();
+			logger.info("Connected to " + connection);
+			return connection;
 		} catch (NoSuchMethodException exc) {
 			throw new IllegalStateException(connectionBuilder + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
 		} catch (IllegalArgumentException exc) {
-			throw new IllegalStateException("Could not instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
 		} catch (InstantiationException exc) {
-			throw new IllegalStateException("Could not instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
 		} catch (IllegalAccessException exc) {
-			throw new IllegalStateException("Could not instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
 		} catch (InvocationTargetException exc) {
 			if (exc.getCause() instanceof RuntimeException) {
 				throw (RuntimeException) exc.getCause();
 			} else {
-				throw new IllegalStateException("Could not instantiate " + connectionBuilder, exc);
+				throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
 			}
 		}
 	}

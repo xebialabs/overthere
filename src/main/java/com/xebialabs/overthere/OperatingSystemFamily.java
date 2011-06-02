@@ -16,9 +16,6 @@
  */
 package com.xebialabs.overthere;
 
-import static org.apache.commons.lang.StringUtils.containsAny;
-import static org.apache.commons.lang.StringUtils.endsWithIgnoreCase;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -38,11 +35,6 @@ public enum OperatingSystemFamily {
 	 * An operating system from the Unix family: Linux, AIX, MacOS, etc.
 	 */
 	UNIX;
-
-	/**
-	 * String containing special characters that require quoting or escaping.
-	 */
-	private static final String SPECIAL_CHARS = " '\"\\;()${}";
 
 	/**
 	 * Returns the {@link OperatingSystemFamily} that corresponds to the local host
@@ -140,106 +132,6 @@ public enum OperatingSystemFamily {
 			return converted.toString();
 		} catch (IOException exc) {
 			throw new RuntimeIOException("Unable to read String", exc);
-		}
-	}
-
-	/**
-	 * Encodes a command line array for execution. Any characters that need to be quoted are quoted with a backslash. Empty parameters are encoded as a single
-	 * space on {@link #WINDOWS Windows}.
-	 * 
-	 * @param cmdarray
-	 *            the command line to encode
-	 * @return the encoded command line
-	 */
-	public String encodeCommandLineForExecution(String... cmdarray) {
-		return encodeCommandLine(false, cmdarray);
-	}
-
-	/**
-	 * Encodes a command line array for logging. Any passwords in the command line are encoded as a number of stars.
-	 * 
-	 * @param cmdarray
-	 *            the command line to encode
-	 * @return the encoded command line
-	 */
-	public String encodeCommandLineForLogging(String... cmdarray) {
-		return encodeCommandLine(true, cmdarray);
-	}
-
-	private String encodeCommandLine(boolean hidePassword, String... cmdarray) {
-		if (cmdarray == null)
-			throw new NullPointerException("Command line is null");
-		if (cmdarray.length == 0)
-			throw new IllegalArgumentException("Command line has length zero");
-
-		StringBuilder sb = new StringBuilder();
-		boolean passwordKeywordSeen = false;
-		for (int i = 0; i < cmdarray.length; i++) {
-			if (i != 0) {
-				sb.append(' ');
-			}
-
-			if (cmdarray[i] == null) {
-				throw new NullPointerException("Cannot encode a command line with a null parameter (#" + (i + 1) + ")");
-			}
-
-			String argument = cmdarray[i];
-			if (passwordKeywordSeen && hidePassword) {
-				encodePasswordArgument(argument, sb);
-			} else {
-				encodeArgument(argument, sb);
-			}
-
-			passwordKeywordSeen = endsWithIgnoreCase(cmdarray[i], "password");
-		}
-		return sb.toString();
-	}
-
-	private void encodePasswordArgument(String argument, StringBuilder collector) {
-		collector.append("********");
-	}
-
-	private void encodeArgument(String argument, StringBuilder collector) {
-		if (argument.length() == 0) {
-			encodeEmptyArgument(collector);
-		} else if (!containsAny(argument, SPECIAL_CHARS)) {
-			encodeRegularArgument(argument, collector);
-		} else {
-			if (this == WINDOWS) {
-				encodeArgumentWithSpecialCharactersForWindows(argument, collector);
-			} else {
-				encodeArgumentWithSpecialCharactersForNonWindows(argument, collector);
-			}
-		}
-	}
-
-	private void encodeEmptyArgument(StringBuilder collector) {
-		collector.append("\"\"");
-	}
-
-	private void encodeRegularArgument(String argument, StringBuilder collector) {
-		collector.append(argument);
-	}
-
-	private void encodeArgumentWithSpecialCharactersForWindows(String argument, StringBuilder collector) {
-		collector.append("\"");
-		for (int j = 0; j < argument.length(); j++) {
-			char c = argument.charAt(j);
-			if (c == '\"') {
-				collector.append(c);
-			}
-			collector.append(c);
-		}
-		collector.append("\"");
-	}
-
-	private void encodeArgumentWithSpecialCharactersForNonWindows(String argument, StringBuilder collector) {
-		for (int j = 0; j < argument.length(); j++) {
-			char c = argument.charAt(j);
-			if (SPECIAL_CHARS.indexOf(c) != -1) {
-				collector.append('\\');
-			}
-			collector.append(c);
 		}
 	}
 

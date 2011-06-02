@@ -16,37 +16,42 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
-
-import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.OverthereFile;
 import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 /**
  * An output stream to a file on a host connected through SSH w/ SUDO.
  */
 class SshSudoOutputStream extends OutputStream {
 
-	private OverthereFile tempFile;
-
-	private SshSudoOverthereFile hostFile;
+	private SshSudoOverthereFile destFile;
 
 	private long length;
 
+	private OverthereFile tempFile;
+
 	private OutputStream tempFileOutputStream;
 
-	public SshSudoOutputStream(SshSudoOverthereFile hostFile, long length, OverthereFile tempFile) {
-		this.hostFile = hostFile;
+	public SshSudoOutputStream(SshSudoOverthereFile destFile, long length, OverthereFile tempFile) {
+		this.destFile = destFile;
 		this.length = length;
 		this.tempFile = tempFile;
 	}
 
 	void open() {
-		tempFileOutputStream = tempFile.put(length);
+		tempFileOutputStream = tempFile.getOutputStream(length);
 	}
 
 	@Override
@@ -71,17 +76,20 @@ class SshSudoOutputStream extends OutputStream {
 	}
 
 	private void copyTempFileToHostFile() {
-		if (logger.isDebugEnabled())
-			logger.debug("Copying " + tempFile + " to " + hostFile + " after writing");
-		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-		int result = hostFile.getConnection().execute(capturedOutput, "cp", tempFile.getPath(), hostFile.getPath());
+		if (logger.isDebugEnabled()) {
+			logger.debug("Copying " + tempFile + " to " + destFile + " after writing");
+		}
+
+		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+		int result = destFile.getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("cp", tempFile.getPath(), destFile.getPath()));
 		if (result != 0) {
 			String errorMessage = capturedOutput.getAll();
-			throw new RuntimeIOException("Cannot copy " + tempFile + " to " + hostFile + " after writing: " + errorMessage);
+			throw new RuntimeIOException("Cannot copy " + tempFile + " to " + destFile + " after writing: " + errorMessage);
 		}
+
+		logger.info("Copied " + tempFile + " to " + destFile + " after writing");
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshSudoOutputStream.class);
 
 }
-

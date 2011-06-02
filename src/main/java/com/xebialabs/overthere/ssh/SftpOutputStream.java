@@ -27,11 +27,11 @@ import com.jcraft.jsch.ChannelSftp;
  */
 class SftpOutputStream extends FilterOutputStream {
 
-	private SshSftpHostConnection session;
+	private SshSftpOverthereConnection session;
 
 	private ChannelSftp sftpChannel;
 
-	public SftpOutputStream(SshSftpHostConnection session, ChannelSftp sftpChannel, OutputStream out) {
+	public SftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
 		super(out);
 		this.session = session;
 		this.sftpChannel = sftpChannel;

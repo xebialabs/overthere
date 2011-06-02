@@ -16,33 +16,30 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import org.junit.After;
-import org.junit.Ignore;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.Overthere;
 
-@Ignore("Needs image with user that is identified by key")
-public class SshIdentifiedByPubKeyItest extends OverthereConnectionItestBase {
+public class SshInteractiveSudoOverthereConnectionItest extends SshSudoOverthereConnectionItestBase {
 
 	@Override
     protected void setTypeAndOptions() {
+		type = "ssh_interactive_sudo";
 		options = new ConnectionOptions();
-		options.set("address", "jboss-51");
-		options.set("username", "autodpl");
-
-		System.setProperty("ssh.privatekey.filename", System.getProperty("user.home") + "/.ssh/deployit-itest-id_rsa");
-		options.set("os", OperatingSystemFamily.UNIX);
-		options.set("temporaryDirectoryPath", "/tmp");
-		type = "ssh_scp";
-		connection = Overthere.getConnection(type, options);
+		options.set("address", "overthere");
+		options.set("username", "untrusted");
+		options.set("password", "donttrustme");
+		options.set("sudoUsername", "overthere");
+		options.set("os", UNIX);
 	}
 
-	@After
-	public void clean() {
-		System.clearProperty("ssh.privatekey.filename");
+	@Test
+	public void hostSessionIsAnSshSudoHostSession() {
+		assertThat(connection, instanceOf(SshInteractiveSudoOverthereConnection.class));
 	}
 
 }

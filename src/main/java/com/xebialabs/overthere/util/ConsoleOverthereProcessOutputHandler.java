@@ -14,33 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere.util;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import com.jcraft.jsch.ChannelSftp;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 /**
- * An output stream to a file on a host connected through SSH w/ SFTP.
+ * Implementation of the {@link OverthereProcessOutputHandler} interface that print the output to the console ({@link System#out} and {@link System#err}).
  */
-class SshSftpOutputStream extends FilterOutputStream {
+public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
-	private SshSftpOverthereConnection session;
-
-	private ChannelSftp sftpChannel;
-
-	public SshSftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
-		super(out);
-		this.session = session;
-		this.sftpChannel = sftpChannel;
+	public void handleOutputLine(final String line) {
+		System.out.println(line);
 	}
 
-	public void close() throws IOException {
-		super.close();
-		session.closeSftpChannel(sftpChannel);
+	public void handleErrorLine(final String line) {
+		System.err.println(line);
+	}
+
+	public void handleOutput(final char c) {
+		// no-op
+	}
+
+	public static ConsoleOverthereProcessOutputHandler simpleHandler() {
+		return new ConsoleOverthereProcessOutputHandler();
 	}
 
 }
-

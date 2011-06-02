@@ -16,30 +16,29 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
-import com.jcraft.jsch.ChannelSftp;
+import org.junit.Test;
 
-/**
- * An output stream to a file on a host connected through SSH w/ SFTP.
- */
-class SshSftpOutputStream extends FilterOutputStream {
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 
-	private SshSftpOverthereConnection session;
+public class SshScpOverthereConnectionItest extends SshOverthereConnectionItestBase {
 
-	private ChannelSftp sftpChannel;
-
-	public SshSftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
-		super(out);
-		this.session = session;
-		this.sftpChannel = sftpChannel;
+	@Override
+    protected void setTypeAndOptions() {
+		type = "ssh_scp";
+		options = new ConnectionOptions();
+		options.set("address", "overthere");
+		options.set("username", "overthere");
+		options.set("password", "overhere");
+		options.set("os", OperatingSystemFamily.UNIX);
 	}
 
-	public void close() throws IOException {
-		super.close();
-		session.closeSftpChannel(sftpChannel);
+	@Test
+	public void hostSessionIsAnSshScpHostSession() {
+		assertThat(connection, instanceOf(SshScpOverthereConnection.class));
 	}
 
 }

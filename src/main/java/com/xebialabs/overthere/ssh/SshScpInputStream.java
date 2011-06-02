@@ -16,7 +16,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
+import static com.google.common.io.Closeables.closeQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
@@ -37,17 +38,19 @@ class SshScpInputStream extends InputStream {
 
 	protected SshScpOverthereFile file;
 
+	protected SshScpOverthereConnection connection;
+
 	protected Session session;
 
 	protected ChannelExec channel;
+
+	protected String command;
 
 	protected InputStream channelIn;
 
 	protected OutputStream channelOut;
 
 	protected long bytesRemaining;
-
-	private static final String CHANNEL_PURPOSE = " (for SCP input stream)";
 
 	SshScpInputStream(SshScpOverthereFile file) {
 		this.file = file;
@@ -56,15 +59,18 @@ class SshScpInputStream extends InputStream {
 	void open() {
 		try {
 			// connect to SSH and start scp in source mode
-			session = file.sshHostConnection.openSession(CHANNEL_PURPOSE);
+			connection = (SshScpOverthereConnection) file.getConnection();
+			session = connection.openSession();
+			logger.info("Connected to " + connection);
+
 			channel = (ChannelExec) session.openChannel("exec");
-			// no password in this command, so use 'false'
-			String command = file.sshHostConnection.encodeCommandLineForExecution("scp", "-f", file.getPath());
+			CmdLine scpCommandLine = CmdLine.build("scp", "-f", file.getPath());
+			command = scpCommandLine.toCommandLine(connection.getHostOperatingSystem(), false);
 			channel.setCommand(command);
 			channelIn = channel.getInputStream();
 			channelOut = channel.getOutputStream();
 			channel.connect();
-			logger.info("Executing remote command \"" + command + "\" on " + file.sshHostConnection + " to open SCP stream for reading");
+			logger.info("Executing remote command \"" + scpCommandLine + "\" on " + connection + " to open SCP stream for reading");
 
 			// perform SCP read protocol
 			sendAck();
@@ -177,15 +183,16 @@ class SshScpInputStream extends InputStream {
 			readAck(0);
 			sendAck();
 		} catch (IOException ignore) {
-		} catch(RuntimeIOException ignore2) {
+		} catch (RuntimeIOException ignore2) {
 		}
 		closeQuietly(channelIn);
 		closeQuietly(channelOut);
 		channel.disconnect();
-		file.sshHostConnection.disconnectSession(session, CHANNEL_PURPOSE);
+
+		connection.disconnectSession(session);
+		logger.info("Disconnected from " + connection);
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshScpInputStream.class);
 
 }
-

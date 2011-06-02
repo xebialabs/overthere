@@ -16,30 +16,25 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-
-import com.jcraft.jsch.ChannelSftp;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
- * An output stream to a file on a host connected through SSH w/ SFTP.
+ * A connection to a remote host using SSH w/ SCP.
  */
-class SshSftpOutputStream extends FilterOutputStream {
+@Protocol(name = "ssh_scp")
+public class SshScpOverthereConnection extends SshOverthereConnection {
 
-	private SshSftpOverthereConnection session;
-
-	private ChannelSftp sftpChannel;
-
-	public SshSftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
-		super(out);
-		this.session = session;
-		this.sftpChannel = sftpChannel;
+	public SshScpOverthereConnection(String type, ConnectionOptions options) {
+		super(type, options);
+		connect();
 	}
 
-	public void close() throws IOException {
-		super.close();
-		session.closeSftpChannel(sftpChannel);
+	@Override
+	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+		return new SshScpOverthereFile(this, hostPath);
 	}
 
 }

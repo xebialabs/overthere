@@ -16,8 +16,9 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.io.FilenameUtils.getExtension;
+import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,43 +26,40 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CapturingCommandExecutionCallbackHandler;
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 /**
  * A file on a host connected through SSH w/ SUDO.
  */
-@SuppressWarnings("serial")
 class SshSudoOverthereFile extends SshScpOverthereFile {
-
-	private SshSudoHostConnection sshSudoHostSession;
 
 	private boolean isTempFile;
 
 	/**
 	 * Constructs a SshSudoHostFile
 	 * 
-	 * @param session
+	 * @param connection
 	 *            the connection connected to the host
 	 * @param remotePath
 	 *            the path of the file on the host
 	 * @param isTempFile
 	 *            is <code>true</code> if this is a temporary file; <code>false</code> otherwise
 	 */
-	public SshSudoOverthereFile(SshSudoHostConnection session, String remotePath, boolean isTempFile) {
-		super(session, remotePath);
-		this.sshSudoHostSession = session;
+	public SshSudoOverthereFile(SshSudoOverthereConnection connection, String remotePath, boolean isTempFile) {
+		super(connection, remotePath);
 		this.isTempFile = isTempFile;
 	}
 
 	@Override
-	protected int executeCommand(CommandExecutionCallbackHandler handler, String... command) {
+	protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
 		if (isTempFile) {
-			return sshSudoHostSession.noSudoExecute(handler, command);
+			return ((SshSudoOverthereConnection) connection).noSudoExecute(handler, commandLine);
 		} else {
-			return super.executeCommand(handler, command);
+			return super.executeCommand(handler, commandLine);
 		}
 	}
 
@@ -80,37 +78,37 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 	}
 
 	@Override
-	public InputStream get() throws RuntimeIOException {
+	public InputStream getInputStream() throws RuntimeIOException {
 		if (isTempFile) {
-			return super.get();
+			return super.getInputStream();
 		} else {
-			OverthereFile tempFile = getTempFile(true);
+			OverthereFile tempFile = connection.getTempFile(getName());
 			copyHostFileToTempFile(tempFile);
-			return tempFile.get();
+			return tempFile.getInputStream();
 		}
 	}
 
 	private void copyHostFileToTempFile(OverthereFile tempFile) {
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger.debug("Copying " + this + " to " + tempFile + " for reading");
-		CapturingCommandExecutionCallbackHandler capturedOutput = new CapturingCommandExecutionCallbackHandler();
-		int result = connection.execute(capturedOutput, "cp", this.getPath(), tempFile.getPath());
+		}
+
+		CapturingOverthereProcessOutputHandler capturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
+		int result = connection.execute(multiHandler(loggingHandler(logger), capturedOutput), build("cp", this.getPath(), tempFile.getPath()));
 		if (result != 0) {
 			String errorMessage = capturedOutput.getAll();
 			throw new RuntimeIOException("Cannot copy " + this + " to " + tempFile + " for reading: " + errorMessage);
 		}
+
+		logger.info("Copied " + this + " to " + tempFile + " for reading");
 	}
 
 	@Override
-	public OutputStream put(long length) throws RuntimeIOException {
+	public OutputStream getOutputStream(long length) throws RuntimeIOException {
 		if (isTempFile) {
-			// XXX: this should really be returning a "ChmoddingSudoOutputStream"
-			return super.put(length);
+			return super.getOutputStream(length);
 		} else {
-			/*
-			 * XXX: this should really be returning a "ChmoddingSudoOutputStream" wrapped in a "CopyOnCompletionOutputStream"
-			 */
-			SshSudoOutputStream out = new SshSudoOutputStream(this, length, getTempFile(false));
+			SshSudoOutputStream out = new SshSudoOutputStream(this, length, connection.getTempFile(getName()));
 			out.open();
 			if (logger.isDebugEnabled())
 				logger.debug("Opened SUDO output stream to remote file " + this);
@@ -118,27 +116,38 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 		}
 	}
 
-	protected OverthereFile getTempFile(boolean useSudoForDeletion) {
-		String prefix = getBaseName(getPath());
-		String suffix = getExtension(getPath());
-		return sshSudoHostSession.getTempFile(prefix, suffix);
-	}
-
 	@Override
-	public boolean mkdir() throws RuntimeIOException {
+	public void mkdir() throws RuntimeIOException {
 		if (!isTempFile) {
-			return super.mkdir();
+			super.mkdir();
 		} else {
 			/*
 			 * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is world writable with the
 			 * sticky bit set.
 			 */
-			logger.debug("Making directory world-writable (with sticky bit)");
-			return mkdir(new String[] { "-m", "1777" });
+			if (logger.isDebugEnabled()) {
+				logger.debug("Creating world-writable directory (with sticky bit, mode 01777)");
+			}
+			mkdir("-m", "1777");
+		}
+	}
+
+	@Override
+	public void mkdirs() throws RuntimeIOException {
+		if (!isTempFile) {
+			super.mkdirs();
+		} else {
+			/*
+			 * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is world writable with the
+			 * sticky bit set.
+			 */
+			if (logger.isDebugEnabled()) {
+				logger.debug("Creating world-writable directories (with sticky bit, mode 01777)");
+			}
+			mkdir("-p", "-m", "1777");
 		}
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshSudoOverthereFile.class);
 
 }
-

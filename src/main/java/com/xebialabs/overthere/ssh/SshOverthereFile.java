@@ -16,17 +16,17 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.CommandExecutionCallbackHandler;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.RemoteOverthereFile;
 
 /**
  * A file on a host connected through SSH.
  */
-@SuppressWarnings("serial")
-abstract class SshOverthereFile extends RemoteOverthereFile {
+abstract class SshOverthereFile extends OverthereFile {
 
-	protected SshHostConnection sshHostConnection;
+	protected String path;
 
 	/**
 	 * Constructs an SshOverthereFile
@@ -36,20 +36,51 @@ abstract class SshOverthereFile extends RemoteOverthereFile {
 	 * @param path
 	 *            the path of the file on the host
 	 */
-	SshOverthereFile(SshHostConnection connection, String path) {
-		super(connection, path);
-		sshHostConnection = connection;
+	SshOverthereFile(SshOverthereConnection connection, String path) {
+		super(connection);
+		this.path = path;
 	}
 
-	public boolean delete() throws RuntimeIOException {
-		if (!exists()) {
-			return false;
-		} else if (isDirectory()) {
-			deleteDirectory();
-			return true;
+	@Override
+	public String getPath() {
+		return path;
+	}
+
+	@Override
+	public String getName() {
+		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
+		int lastFileSepPos = path.lastIndexOf(fileSep);
+		if (lastFileSepPos < 0) {
+			return path;
 		} else {
-			deleteFile();
-			return true;
+			return path.substring(lastFileSepPos + 1);
+		}
+	}
+
+	@Override
+	public OverthereFile getParentFile() {
+		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
+		int lastFileSepPos = path.lastIndexOf(fileSep);
+		if (lastFileSepPos < 0 || path.equals(fileSep)) {
+			return null;
+		} else if (lastFileSepPos == 0) {
+			// the parent of something in the root directory is the root
+			// directory itself.
+			return connection.getFile(fileSep);
+		} else {
+			return connection.getFile(path.substring(0, lastFileSepPos));
+		}
+
+	}
+
+	@Override
+	public void delete() throws RuntimeIOException {
+		if (exists()) {
+			if (isDirectory()) {
+				deleteDirectory();
+			} else {
+				deleteFile();
+			}
 		}
 	}
 
@@ -62,8 +93,27 @@ abstract class SshOverthereFile extends RemoteOverthereFile {
 
 	protected abstract void deleteDirectory();
 
-	protected int executeCommand(CommandExecutionCallbackHandler handler, String... command) {
-		return sshHostConnection.execute(handler, command);
+	protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
+		return ((SshOverthereConnection) connection).execute(handler, commandLine);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof SshOverthereFile)) {
+			return false;
+		}
+
+		return path.equals(((SshOverthereFile) obj).getPath());
+	}
+
+	@Override
+	public int hashCode() {
+		return path.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return connection + path;
 	}
 
 }

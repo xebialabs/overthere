@@ -16,30 +16,31 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import java.io.File;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
-import com.xebialabs.overthere.HostConnection;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.RemoteOverthereFile;
 
-@SuppressWarnings("serial")
-public class CifsOverthereFile extends RemoteOverthereFile {
+public class CifsOverthereFile extends OverthereFile {
 
 	private SmbFile smbFile;
 
-	CifsOverthereFile(HostConnection connection, SmbFile smbFile) {
-		super(connection, smbFile.getPath());
+	protected CifsOverthereFile(OverthereConnection connection, SmbFile smbFile) {
+		super(connection);
 		this.smbFile = smbFile;
 	}
 
-	SmbFile getSmbFile() {
+	protected SmbFile getSmbFile() {
 		return smbFile;
 	}
 
@@ -58,8 +59,12 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 	}
 
 	@Override
-	public String getParent() {
-		return smbFile.getParent();
+	public OverthereFile getParentFile() {
+		try {
+			return new CifsOverthereFile(getConnection(), new SmbFile(smbFile.getParent()));
+		} catch (MalformedURLException exc) {
+			return null;
+		}
 	}
 
 	@Override
@@ -135,10 +140,14 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 	}
 
 	@Override
-	public String[] list() throws RuntimeIOException {
+	public List<OverthereFile> listFiles() throws RuntimeIOException {
 		try {
 			upgradeToDirectorySmbFile();
-			return smbFile.list();
+			List<OverthereFile> files = newArrayList();
+			for (String name : smbFile.list()) {
+				files.add(getFile(name));
+			}
+			return files;
 		} catch (MalformedURLException exc) {
 			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
 		} catch (SmbException exc) {
@@ -147,57 +156,63 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 	}
 
 	@Override
-	public boolean mkdir() throws RuntimeIOException {
+	public void mkdir() throws RuntimeIOException {
 		try {
 			smbFile.mkdir();
-			return true;
 		} catch (SmbException exc) {
 			throw new RuntimeIOException("Cannot create directory " + this + ": " + exc.toString(), exc);
 		}
 	}
 
 	@Override
-	public boolean mkdirs() throws RuntimeIOException {
+	public void mkdirs() throws RuntimeIOException {
 		try {
 			smbFile.mkdirs();
-			return true;
 		} catch (SmbException exc) {
 			throw new RuntimeIOException("Cannot create directories " + this + ": " + exc.toString(), exc);
 		}
 	}
 
 	@Override
-	public boolean renameTo(File dest) throws RuntimeIOException {
+	public void renameTo(OverthereFile dest) throws RuntimeIOException {
 		if (dest instanceof CifsOverthereFile) {
 			SmbFile targetSmbFile = ((CifsOverthereFile) dest).getSmbFile();
 			try {
 				smbFile.renameTo(targetSmbFile);
-				return true;
 			} catch (SmbException exc) {
 				throw new RuntimeIOException("Cannot move/rename " + this + " to " + dest + ": " + exc.toString(), exc);
 			}
 		} else {
-			throw new RuntimeIOException("Cannot move/rename SMB file/directory " + this + " to non-SMB file/directory " + dest);
+			throw new RuntimeIOException("Cannot move/rename cifs_telnet file/directory " + this + " to non-cifs_telnet file/directory " + dest);
 		}
 	}
 
 	@Override
-	public boolean delete() throws RuntimeIOException {
+	public void delete() throws RuntimeIOException {
 		try {
-			if (smbFile.exists()) {
-				if (smbFile.isDirectory()) {
-					upgradeToDirectorySmbFile();
-					String[] files = smbFile.list();
-					if (files.length != 0) {
-						throw new RuntimeIOException("Cannot delete non-empty directory " + this);
-					}
+			if (smbFile.isDirectory()) {
+				upgradeToDirectorySmbFile();
+				if (smbFile.list().length > 0) {
+					throw new RuntimeIOException("Cannot delete non-empty directory " + this);
 				}
-				smbFile.delete();
-				refreshSmbFile();
-				return true;
-			} else {
-				return false;
 			}
+			smbFile.delete();
+			refreshSmbFile();
+		} catch (MalformedURLException exc) {
+			throw new RuntimeIOException("Cannot delete " + this + ": " + exc.toString(), exc);
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot delete " + this + ": " + exc.toString(), exc);
+		}
+	}
+
+	@Override
+	public void deleteRecursively() throws RuntimeIOException {
+		try {
+			if (smbFile.isDirectory()) {
+				upgradeToDirectorySmbFile();
+			}
+			smbFile.delete();
+			refreshSmbFile();
 		} catch (MalformedURLException exc) {
 			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
 		} catch (SmbException exc) {
@@ -206,40 +221,20 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 	}
 
 	@Override
-	public boolean deleteRecursively() throws RuntimeIOException {
-		try {
-			if (smbFile.exists()) {
-				if (smbFile.isDirectory()) {
-					upgradeToDirectorySmbFile();
-				}
-				smbFile.delete();
-				refreshSmbFile();
-				return true;
-			} else {
-				return true;
-			}
-		} catch (MalformedURLException exc) {
-			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
-		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot delete " + this + ": " + exc.toString(), exc);
-		}
-	}
-
-	@Override
-	public InputStream get() throws RuntimeIOException {
+	public InputStream getInputStream() throws RuntimeIOException {
 		try {
 			return smbFile.getInputStream();
 		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot read from file " + this + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot open " + this + " for reading: " + exc.toString(), exc);
 		}
 	}
 
 	@Override
-	public OutputStream put(long length) throws RuntimeIOException {
+	public OutputStream getOutputStream(long length) {
 		try {
 			return smbFile.getOutputStream();
 		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot write to file " + this + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot open " + this + " for writing: " + exc.toString(), exc);
 		}
 	}
 
@@ -253,8 +248,22 @@ public class CifsOverthereFile extends RemoteOverthereFile {
 		smbFile = new SmbFile(smbFile.getPath());
 	}
 
+	@Override
+	public boolean equals(Object that) {
+		if (!(that instanceof CifsOverthereFile)) {
+			return false;
+		}
+
+		return getPath().equals(((CifsOverthereFile) that).getPath());
+	}
+
+	@Override
+	public int hashCode() {
+		return smbFile.getPath().hashCode();
+	}
+
 	public String toString() {
-		return getPath() + " on " + connection;
+		return connection + "://" + getPath();
 	}
 
 }

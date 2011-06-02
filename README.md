@@ -1,30 +1,29 @@
 # Project "overthere"
-Runs something on a remote machine, ie. over there.
+Runs something on a remote machine, i.e. over there.
 
 # TODO
-* make sure all java.io.File methods are properly overridden. (1)
-* publish Maven artifacts to public repostory instead of XebiaLabs' Nexus repository.
-* determine semantics of delete, mkdir, mkdirs, renameTo with respect to errors. (1)
-* rename HostConnection to OverthereConnection? (4)
-* add OverthereFile.valueOf(). (4)
-* port fixes made in HostSession framework since fork, including but not limited to: (3)
-  * port CmdLine approach to encoding passwords in command lines.
-  * port scp -r functionality.
-  * port fix for sudo-copying from remote to local (file and directory).
-* figure out what to do with the HostFileInputStreamTransformer filter. (2)
-* figure out what to do with HostFileUtils. (2)
-  * move copy to OverthereFile?
-* decide whether to support winsshd and/or copssh and/or other Windows SSH implementations. Leave that up to subclasses? (2)
-* implement SSH pub/private key implementation in a nicer manner. (2)
-* implement not-removing temporary directories in a nicer manner, or at least with a more up-to-date key name. (2)
-* remove HostConnection.copyToTemporaryFile? (2)
-* redesign InputResponse map? (2)
-* fix functionality removed from Overthere: (2)
- - untar -> separate utility method, maybe not in here?
- - copy resource to temp file -> add helpers to plugin-api
- - copy resource to file -> actually only needed by "copy resource to temp file" method
- - unreachable host support/tunneled host session -> needs to be reimplemented in a nice way.
-* need to be able to define abstract synthetic types (SshHost). Then temporaryDirectoryPath could also be defined in an abstract base class below Host. (4)
-* add sources and javadoc to distribution. (4)
-* add method to build paths to OperatingSystemFamily. (4)
+* Write Javadoc (incl. package-info.java) for API (com.xebialabs.overthere package)
+* Replace dependency on apache commons with dependency on guava.
+* Add more itests, also checking whether the correct exceptions are thrown when files cannot be found, cannot be deleted, etc.
+* Run Gradle license plugin.
+* Write Javadoc (incl. package-info.java) for SPI (com.xebialabs.overthere.spi package)
+* Write Javadoc (incl. package-info.jav for protocol packages.
+* Port fixes made in HostSession framework since fork. Including, but not limited to:
+  - Port scp -r functionality (OverthereFileCopier and OverthereFileDirectoryWalker have already been copied over).
+  - Port fix for sudo-copying from remote to local (file and directory).
+* Figure out what to do with the HostFileInputStreamTransformer filter.
+* Allow constants to be overridden through ConnectionOptions:
+  - Disable automatic removal of temporary files.
+  - Connection timeout.
+  - Number of attempts to create a temporary file.
+  - Enable/disable pesudo-tty on SSH connections.
+* Decide whether to support winsshd and/or copssh and/or other Windows SSH implementations. Leave that up to subclasses?
+* Document or fix functionality removed from Overthere:
+ - SSH pub/private support -> through ConnectionOptions?
+ - Untar -> separate utility method, maybe not in here?
+ - Unreachable host support/tunneled host session -> needs to be reimplemented in a nice way.
+ - inputResponse map: can be re-implemented using OverthereProcess if needed.
+ - Copy resource to temp file -> add helpers to plugin-api
+ - Copy resource to file -> actually only needed by "copy resource to temp file" method
+* Publish Maven artifacts to public repostory instead of XebiaLabs' Nexus repository.
 

@@ -14,33 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere.spi;
 
-import java.io.FilterOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import com.xebialabs.overthere.OverthereConnection;
 
-import com.jcraft.jsch.ChannelSftp;
+public interface OverthereConnectionBuilder {
 
-/**
- * An output stream to a file on a host connected through SSH w/ SFTP.
- */
-class SshSftpOutputStream extends FilterOutputStream {
-
-	private SshSftpOverthereConnection session;
-
-	private ChannelSftp sftpChannel;
-
-	public SshSftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
-		super(out);
-		this.session = session;
-		this.sftpChannel = sftpChannel;
-	}
-
-	public void close() throws IOException {
-		super.close();
-		session.closeSftpChannel(sftpChannel);
-	}
-
+	OverthereConnection connect();
 }
 

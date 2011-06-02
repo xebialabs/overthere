@@ -24,7 +24,7 @@
  * <li>The host can be a Windows or a Unix machine.</li>
  * </ul>
  *
- * @version 1.2
+ * @version 1.0
  */
 package com.xebialabs.overthere;
 

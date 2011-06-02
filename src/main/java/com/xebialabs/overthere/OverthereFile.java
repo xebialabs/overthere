@@ -16,280 +16,118 @@
  */
 package com.xebialabs.overthere;
 
-import static org.apache.commons.io.IOUtils.closeQuietly;
-import static org.apache.commons.io.IOUtils.copy;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+import com.xebialabs.overthere.util.OverthereFileCopier;
+
 /**
- * A reference to a file on a host. This object is always associated with a {@link HostConnection}.
- * 
- * <b>N.B.:</b> Even though {@link File} is {@link Serializable}, instances of this class may not, depending upon whether or not their implementations of the
- * {@link HostConnection} interface are serializable.
+ * A file system object (file, directory, etc.) on a remote system that is accessible through an {@link OverthereConnection}.
  */
-@SuppressWarnings("serial")
-public abstract class OverthereFile extends File {
+public abstract class OverthereFile {
 
-	protected HostConnection connection;
+	protected OverthereConnection connection;
 
-	protected OverthereFile(HostConnection connection, String path) {
-		super(path);
+	protected OverthereFile(OverthereConnection connection) {
 		this.connection = connection;
 	}
 
 	/**
-	 * Returns the connection this file is associated with.
-	 * 
-	 * @return the connection
+	 * The connection through which this file is accessible. If the connection is closed, this file may no longer be accessible.
 	 */
-	public HostConnection getConnection() {
+	public final OverthereConnection getConnection() {
 		return connection;
 	}
 
 	/**
-	 * Returns a new HostFile with this file as its parent. Identical to invoking <code>this.getConnection().getFile(this, name)</code>
+	 * The full path of the file on the remote system.
 	 * 
-	 * @param name
-	 *            the name of the file in this directory
-	 * @return a reference to the file in this directory
+	 * @return the path of the file.
 	 */
-	public OverthereFile getFile(String name) {
-		return connection.getFile(this, name);
-	}
-
-	@Override
-	public String getName() {
-		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
-		int lastFileSepPos = getPath().lastIndexOf(fileSep);
-		if (lastFileSepPos < 0) {
-			return getPath();
-		} else {
-			return getPath().substring(lastFileSepPos + 1);
-		}
-	}
-
-	@Override
-	public String getParent() {
-		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
-		int lastFileSepPos = getPath().lastIndexOf(fileSep);
-		if (lastFileSepPos < 0 || getPath().equals(fileSep)) {
-			return null;
-		} else if (lastFileSepPos == 0) {
-			// the parent of something in the root directory is the root
-			// directory itself.
-			return fileSep;
-		} else {
-			return getPath().substring(0, lastFileSepPos);
-		}
-
-	}
-
-	@Override
-	public OverthereFile getParentFile() {
-		String parent = getParent();
-		if (parent == null || parent.length() == 0) {
-			return null;
-		} else {
-			return getConnection().getFile(parent);
-		}
-	}
-
-	@Override
-	public OverthereFile[] listFiles() {
-		String[] filenames = list();
-		if (filenames == null) {
-			return null;
-		} else {
-			OverthereFile[] files = new OverthereFile[filenames.length];
-			for (int i = 0; i < filenames.length; i++) {
-				files[i] = connection.getFile(this, filenames[i]);
-			}
-			return files;
-		}
-	}
-
-	@Override
-	public OverthereFile[] listFiles(FilenameFilter filter) {
-		String[] filenames = list();
-		if (filenames == null) {
-			return null;
-		} else {
-			List<OverthereFile> filteredFiles = new ArrayList<OverthereFile>();
-			for (int i = 0; i < filenames.length; i++) {
-				if ((filter == null) || filter.accept(this, filenames[i])) {
-					filteredFiles.add(connection.getFile(this, filenames[i]));
-				}
-			}
-			return filteredFiles.toArray(new OverthereFile[filteredFiles.size()]);
-		}
-	}
-
-	@Override
-	public File[] listFiles(FileFilter filter) {
-		String[] filenames = list();
-		if (filenames == null) {
-			return null;
-		} else {
-			List<OverthereFile> filteredFiles = new ArrayList<OverthereFile>();
-			for (int i = 0; i < filenames.length; i++) {
-				OverthereFile f = connection.getFile(this, filenames[i]);
-				if ((filter == null) || filter.accept(f)) {
-					filteredFiles.add(f);
-				}
-			}
-			return filteredFiles.toArray(new OverthereFile[filteredFiles.size()]);
-		}
-	}
+	public abstract String getPath();
 
 	/**
-	 * Deletes this file or directory recursively. If this is a directory, first its contents are deleted and then the directory itself. If this is a file, this
-	 * method behaves identically to {@link #delete()}.
+	 * The name of the file on the remote system.
 	 * 
-	 * @return <code>true</code> if and only if the file or directory is successfully deleted; <code>false</code> otherwise
+	 * @return the name of the file.
 	 */
-	public boolean deleteRecursively() {
-		if (!exists()) {
-			return false;
-		}
+	public abstract String getName();
 
+	/**
+	 * The parent file of 
+	 * @return
+	 */
+	public abstract OverthereFile getParentFile();
+
+	public OverthereFile getFile(String child) {
+		return getConnection().getFile(this, child);
+	}
+
+	public abstract long length();
+
+	public abstract long lastModified();
+
+	public abstract boolean exists();
+
+	public abstract boolean isDirectory();
+
+	public abstract boolean isHidden();
+
+	public abstract boolean canRead();
+
+	public abstract boolean canWrite();
+
+	public abstract boolean canExecute();
+
+	public abstract InputStream getInputStream();
+
+	public abstract OutputStream getOutputStream(long length);
+
+	public abstract void delete();
+
+	public void deleteRecursively() throws RuntimeIOException {
 		if (isDirectory()) {
-			for (OverthereFile f : listFiles()) {
-				if (!f.getPath().startsWith(getPath())) {
-					continue;
-				}
-
-				if (!f.deleteRecursively()) {
-					return false;
-				}
+			for (OverthereFile each : listFiles()) {
+				each.deleteRecursively();
 			}
 		}
 
-		return delete();
+		delete();
+	}
+
+	public abstract List<OverthereFile> listFiles();
+
+	public abstract void mkdir();
+
+	public abstract void mkdirs();
+
+	public abstract void renameTo(OverthereFile dest);
+
+	public final void copyTo(final OverthereFile dest) {
+		dest.copyFrom(this);
+	}
+
+	protected void copyFrom(OverthereFile source) {
+		OverthereFileCopier.copy(source, this, null);
 	}
 
 	/**
-	 * Opens this file for reading.
-	 * 
-	 * @return the InputStream connected to the file.
+	 * Subclasses MUST implement equals properly.
 	 */
-	public abstract InputStream get();
+	@Override
+	public abstract boolean equals(Object obj);
 
 	/**
-	 * Copies the content of this file to a stream.
-	 * 
-	 * @param out
-	 *            the stream to copy to
+	 * Subclasses MUST implement hashCode properly.
 	 */
-	public void get(OutputStream out) {
-		try {
-			InputStream in = get();
-			try {
-				copy(in, out);
-			} finally {
-				closeQuietly(in);
-			}
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-	}
+	@Override
+	public abstract int hashCode();
 
 	/**
-	 * Copies the content of this file to another file.
-	 * 
-	 * @param dest
-	 *            the file to copy to
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
+	 * Subclasses MUST implement toString properly.
 	 */
-	public void get(File dest) {
-		try {
-			OutputStream out;
-			if (dest instanceof OverthereFile) {
-				out = ((OverthereFile) dest).put(length());
-			} else {
-				out = new FileOutputStream(dest);
-			}
-
-			try {
-				get(out);
-			} finally {
-				out.close();
-			}
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-	}
-
-	/**
-	 * Opens this file for writing.
-	 * 
-	 * @param length
-	 *            the number of bytes that will be written to the stream
-	 * @return the OutputStream connected to the file.
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
-	 */
-	public abstract OutputStream put(long length);
-
-	/**
-	 * Copies the contents of a stream to this file.
-	 * 
-	 * @param in
-	 *            the stream to copy from
-	 * @param length
-	 *            the number of bytes that will be written to the stream
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
-	 */
-	public void put(InputStream in, long length) {
-		try {
-			OutputStream out = put(length);
-			try {
-				copy(in, out);
-			} finally {
-				closeQuietly(out);
-			}
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-
-	}
-
-	/**
-	 * Copies the contact of another file to this file.
-	 * 
-	 * @param src
-	 *            the file to copy from
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
-	 */
-	public void put(File src) {
-		try {
-			InputStream in;
-			if (src instanceof OverthereFile) {
-				in = ((OverthereFile) src).get();
-			} else {
-				in = new FileInputStream(src);
-			}
-			try {
-				put(in, src.length());
-			} finally {
-				in.close();
-			}
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-
-	}
+	@Override
+	public abstract String toString();
 
 }
