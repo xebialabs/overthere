@@ -16,7 +16,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-version = "1.0.alpha-SNAPSHOT"
+version = "1.0-alpha-1"
 group = "com.xebialabs.overthere"
 
 sourceCompatibility = 1.6
