@@ -40,7 +40,9 @@ public class ConnectionOptions {
 		options.put(key, value);
 	}
 
-	public static final String TEMPORARY_DIRECTORY_PATH = "temporaryDirectoryPath";
+	public static final String TEMPORARY_DIRECTORY_PATH = "tmp";
+
+	public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmp.deleteOnDisconnect";
 
 	public static final String OPERATING_SYSTEM = "os";
 

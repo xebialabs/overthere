@@ -47,6 +47,8 @@ public abstract class OverthereConnection {
 
 	protected OverthereFile sessionTemporaryDirectory;
 
+	protected boolean deleteTemporaryDirectoryOnDisconnect = true;
+	
 	// FIXME: Move to connection options
 	public static final long MAX_TEMP_RETRIES = 100;
 
@@ -54,6 +56,11 @@ public abstract class OverthereConnection {
 		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
 		this.os = checkNotNull(os, "Cannot create HostConnection with null os");
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
+
+		Object deleteTemporaryDirectoryOnDisconnectObject = options.get(ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
+		if(deleteTemporaryDirectoryOnDisconnectObject instanceof String && "false".equalsIgnoreCase((String) deleteTemporaryDirectoryOnDisconnectObject)) {
+			deleteTemporaryDirectoryOnDisconnect = false;
+		}
 	}
 
 	protected OverthereConnection(String type, ConnectionOptions options) {
@@ -75,11 +82,8 @@ public abstract class OverthereConnection {
 	 * Never throws an exception, not even a {@link RuntimeException}
 	 */
 	public void disconnect() {
-		// FIXME: Make this configurable through ConnectionOptions
-		String doNotCleanUpTemporaryFiles = System.getProperty("overthere.donotcleanuptemporaryfiles");
-		boolean doNotCleanUp = Boolean.valueOf(doNotCleanUpTemporaryFiles);
-		if (!doNotCleanUp) {
-			cleanupTemporaryFiles();
+		if (deleteTemporaryDirectoryOnDisconnect) {
+			deleteTemporaryDirectory();
 		}
 
 		logger.info("Disconnected from " + this);
@@ -116,7 +120,7 @@ public abstract class OverthereConnection {
 		return null;
 	}
 
-	public void cleanupTemporaryFiles() {
+	public void deleteTemporaryDirectory() {
 		if (sessionTemporaryDirectory != null) {
 			try {
 				sessionTemporaryDirectory.deleteRecursively();
