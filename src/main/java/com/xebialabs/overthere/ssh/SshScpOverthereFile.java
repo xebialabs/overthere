@@ -91,9 +91,8 @@ class SshScpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public List<OverthereFile> listFiles() {
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled())
 			logger.debug("Listing directory " + this);
-		}
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		// Yes, this *is* meant to be 'el es minus one'! Each file should go one a separate line, even if we create a pseudo-tty. Long format is NOT what we
@@ -108,26 +107,24 @@ class SshScpOverthereFile extends SshOverthereFile {
 			files.add(connection.getFile(this, lsLine));
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Listed directory " + this);
-		}
-
 		return files;
 	}
 
 	public void mkdir() {
+		if (logger.isDebugEnabled())
+			logger.debug("Creating directory " + this);
+
 		mkdir(new String[0]);
 	}
 
 	public void mkdirs() {
+		if (logger.isDebugEnabled())
+			logger.debug("Creating directories " + this);
+
 		mkdir("-p");
 	}
 
 	protected void mkdir(String... mkdirOptions) throws RuntimeIOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Creating directory " + this + " (with options:" + Joiner.on(' ').join(mkdirOptions));
-		}
-
 		CmdLine commandLine = CmdLine.build("mkdir");
 		for (String opt : mkdirOptions) {
 			commandLine.addArgument(opt);
@@ -146,100 +143,76 @@ class SshScpOverthereFile extends SshOverthereFile {
 	}
 
 	@Override
-	public void renameTo(OverthereFile destFile) {
-		if (destFile instanceof SshScpOverthereFile) {
-			SshScpOverthereFile sshScpDestFile = (SshScpOverthereFile) destFile;
-			if (sshScpDestFile.getConnection() == getConnection()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Renaming " + this + " to " + destFile);
-				}
+	public void renameTo(OverthereFile dest) {
+		if (logger.isDebugEnabled())
+			logger.debug("Renaming " + this + " to " + dest);
 
+		if (dest instanceof SshScpOverthereFile) {
+			SshScpOverthereFile sshScpDestFile = (SshScpOverthereFile) dest;
+			if (sshScpDestFile.getConnection() == getConnection()) {
 				CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 				int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("mv", getPath(), sshScpDestFile.getPath()));
 				if (errno != 0) {
 					throw new RuntimeIOException("Cannot rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 				}
-
-				if (logger.isDebugEnabled()) {
-					logger.debug("Renamed " + this + " to " + destFile);
-				}
 			} else {
-				throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to ssh_scp file/directory " + destFile + " because it is in a different connection");
+				throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to ssh_scp file/directory " + dest + " because it is in a different connection");
 			}
 		} else {
-			throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to non-ssh_scp file/directory " + destFile);
+			throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to non-ssh_scp file/directory " + dest);
 		}
 	}
 
 	@Override
 	protected void deleteDirectory() {
+		if (logger.isDebugEnabled())
+			logger.debug("Deleting directory " + this);
+
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rmdir", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Deleted directory " + this);
-		}
 	}
 
 	@Override
 	protected void deleteFile() {
+		if (logger.isDebugEnabled())
+			logger.debug("Deleting file " + this);
+
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-f", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete file " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Deleted file " + this);
-		}
 	}
 
 	@Override
 	public void deleteRecursively() throws RuntimeIOException {
-		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+		if (logger.isDebugEnabled())
+			logger.debug("Recursively deleting file/directory " + this);
+
+			CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-rf", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot recursively delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-		}
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Recursively deleted file/directory " + this);
 		}
 	}
 
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled())
 			logger.debug("Opening SCP input stream to read from file " + this);
-		}
 
-		SshScpInputStream in = new SshScpInputStream(this);
-		in.open();
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Opened SCP input stream to read from file " + this);
-		}
-
-		return in;
+		return new SshScpInputStream(this);
 	}
 
 	@Override
 	public OutputStream getOutputStream(long length) throws RuntimeIOException {
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled())
 			logger.debug("Opening SCP output stream to write to file " + this);
-		}
 
-		SshScpOutputStream out = new SshScpOutputStream(this, length);
-		out.open();
-
-		if (logger.isDebugEnabled()) {
-			logger.debug("Opened SCP output stream to write to file " + this);
-		}
-
-		return out;
+		return new SshScpOutputStream(this, length);
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshScpOverthereFile.class);

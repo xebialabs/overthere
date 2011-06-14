@@ -46,10 +46,10 @@ class SshSftpOverthereFile extends SshOverthereFile {
 	}
 
 	protected SftpATTRS stat() throws RuntimeIOException {
+		logger.info("Statting file " + this);
+
 		try {
 			SftpATTRS attrs = ((SshSftpOverthereConnection) connection).getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
-			if (logger.isDebugEnabled())
-				logger.debug("Statted file " + this);
 			return attrs;
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot stat file " + this, exc);
@@ -59,16 +59,14 @@ class SshSftpOverthereFile extends SshOverthereFile {
 	}
 
 	public boolean exists() throws RuntimeIOException {
+		logger.info("Checking file " + getPath() + " for existence");
+
 		try {
 			((SshSftpOverthereConnection) connection).getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
-			if (logger.isDebugEnabled())
-				logger.debug("Checked file " + getPath() + " for existence and found it");
 			return true;
 		} catch (SftpException exc) {
 			// if we get an SftpException while trying to stat the file, we
 			// assume it does not exist
-			if (logger.isDebugEnabled())
-				logger.debug("Checked file " + getPath() + " for existence and did not find it");
 			return false;
 		} catch (JSchException exc) {
 			throw new RuntimeIOException("Cannot check existence of file " + getPath(), exc);
@@ -110,6 +108,8 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public List<OverthereFile> listFiles() {
+		logger.info("Listing files in " + this);
+
 		try {
 			// read files from host
 			@SuppressWarnings("unchecked")
@@ -134,11 +134,10 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public void mkdir() throws RuntimeIOException {
+		logger.info("Creating directory " + this);
+
 		try {
-			String compatibleRemotePath = convertWindowsPathToWinSshdPath(getPath());
-			((SshSftpOverthereConnection) connection).getSharedSftpChannel().mkdir(compatibleRemotePath);
-			if (logger.isDebugEnabled())
-				logger.debug("Created directory " + getPath());
+			((SshSftpOverthereConnection) connection).getSharedSftpChannel().mkdir(convertWindowsPathToWinSshdPath(getPath()));
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot create directory " + getPath() + ": " + exc.toString(), exc);
 		} catch (JSchException exc) {
@@ -148,6 +147,8 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public void mkdirs() throws RuntimeIOException {
+		logger.info("Creating directories " + this);
+
 		List<OverthereFile> allDirs = new ArrayList<OverthereFile>();
 		OverthereFile dir = this;
 		do {
@@ -163,6 +164,8 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public void renameTo(OverthereFile dest) {
+		logger.info("Renaming " + this + " to " + dest);
+
 		if (dest instanceof SshSftpOverthereFile) {
 			SshSftpOverthereFile sftpDest = (SshSftpOverthereFile) dest;
 			if (sftpDest.getConnection() == getConnection()) {
@@ -184,10 +187,10 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	protected void deleteFile() {
+		logger.info("Removing file " + this);
+
 		try {
 			((SshSftpOverthereConnection) connection).getSharedSftpChannel().rm(convertWindowsPathToWinSshdPath(getPath()));
-			if (logger.isDebugEnabled())
-				logger.debug("Removed file " + this);
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot delete file " + this + ": " + exc.toString(), exc);
 		} catch (JSchException exc) {
@@ -197,10 +200,10 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	protected void deleteDirectory() {
+		logger.info("Removing directory " + this);
+
 		try {
 			((SshSftpOverthereConnection) connection).getSharedSftpChannel().rmdir(convertWindowsPathToWinSshdPath(getPath()));
-			if (logger.isDebugEnabled())
-				logger.debug("Removed directory " + this);
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot delete directory " + this + ": " + exc.toString(), exc);
 		} catch (JSchException exc) {
@@ -210,11 +213,11 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public InputStream getInputStream() {
+		logger.info("Opening SFTP input stream to read from file " + this);
+
 		try {
-			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel();
-			InputStream in = new SshSftpInputStream(((SshSftpOverthereConnection) connection), sftpChannel, sftpChannel.get(convertWindowsPathToWinSshdPath(getPath())));
-			if (logger.isDebugEnabled())
-				logger.debug("Opened SFTP input stream to read from file " + this);
+			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel(false);
+			InputStream in = new SshSftpInputStream(this, sftpChannel, sftpChannel.get(convertWindowsPathToWinSshdPath(getPath())));
 			return in;
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot read from file " + getPath() + ": " + exc.toString(), exc);
@@ -225,11 +228,11 @@ class SshSftpOverthereFile extends SshOverthereFile {
 
 	@Override
 	public OutputStream getOutputStream(long length) throws RuntimeIOException {
+		logger.info("Opening SFTP ouput stream to write to file " + this);
+
 		try {
-			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel();
-			OutputStream out = new SshSftpOutputStream(((SshSftpOverthereConnection) connection), sftpChannel, sftpChannel.put(convertWindowsPathToWinSshdPath(getPath())));
-			if (logger.isDebugEnabled())
-				logger.debug("Opened SFTP ouput stream to write to file " + this);
+			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel(false);
+			OutputStream out = new SshSftpOutputStream(this, sftpChannel, sftpChannel.put(convertWindowsPathToWinSshdPath(getPath())));
 			return out;
 		} catch (SftpException exc) {
 			throw new RuntimeIOException("Cannot write to file " + getPath() + ": " + exc.toString(), exc);

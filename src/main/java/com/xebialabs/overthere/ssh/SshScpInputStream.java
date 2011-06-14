@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.io.Closeables.closeQuietly;
 
 import java.io.IOException;
@@ -54,14 +55,13 @@ class SshScpInputStream extends InputStream {
 
 	SshScpInputStream(SshScpOverthereFile file) {
 		this.file = file;
-	}
 
-	void open() {
 		try {
 			// connect to SSH and start scp in source mode
+			if(logger.isDebugEnabled())
+				logger.debug("Connecting to " + connection + " (to run scp command to read from file " + file + ")");
 			connection = (SshScpOverthereConnection) file.getConnection();
 			session = connection.openSession();
-			logger.info("Connected to " + connection);
 
 			channel = (ChannelExec) session.openChannel("exec");
 			CmdLine scpCommandLine = CmdLine.build("scp", "-f", file.getPath());
@@ -79,7 +79,6 @@ class SshScpInputStream extends InputStream {
 			bytesRemaining = readFileLength();
 			readFilename();
 			sendAck();
-			logger.info("Opened SCP stream to read from remote file " + file);
 		} catch (IOException exc) {
 			throw new RuntimeIOException("Cannot open SCP stream to read remote file " + file, exc);
 		} catch (JSchException exc) {
@@ -179,6 +178,8 @@ class SshScpInputStream extends InputStream {
 
 	@Override
 	public void close() {
+		checkState(channel != null && session != null, "Cannot close SCP input stream that has already been closed");
+
 		try {
 			readAck(0);
 			sendAck();
@@ -188,9 +189,14 @@ class SshScpInputStream extends InputStream {
 		closeQuietly(channelIn);
 		closeQuietly(channelOut);
 		channel.disconnect();
+		channel = null;
 
 		connection.disconnectSession(session);
-		logger.info("Disconnected from " + connection);
+		session = null;
+
+		if(logger.isDebugEnabled())
+			logger.debug("Disconnected from " + connection + " (to run scp command to read from file " + file + ")");
+		logger.info("Closed SCP input stream to read from file " + file);
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshScpInputStream.class);

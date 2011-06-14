@@ -75,10 +75,9 @@ public class OverthereConnectionUtils {
 			results.exists = false;
 		}
 
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled())
 			logger.debug("Listed file " + file + ": exists=" + results.exists + ", isDirectory=" + results.isDirectory + ", length=" + results.length
 			        + ", canRead=" + results.canRead + ", canWrite=" + results.canWrite + ", canExecute=" + results.canExecute);
-		}
 		return results;
 	}
 

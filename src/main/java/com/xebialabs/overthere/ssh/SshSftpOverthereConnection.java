@@ -49,34 +49,33 @@ public class SshSftpOverthereConnection extends SshOverthereConnection {
 		super.disconnect();
 
 		if (sharedSftpChannel != null) {
-			closeSftpChannel(sharedSftpChannel);
+			closeSftpChannel(sharedSftpChannel, true);
 		}
 	}
 
 	protected ChannelSftp getSharedSftpChannel() throws JSchException {
 		if (sharedSftpChannel == null) {
-			sharedSftpChannel = openSftpChannel();
+			sharedSftpChannel = openSftpChannel(true);
 		}
 		return sharedSftpChannel;
 	}
 
-	protected ChannelSftp openSftpChannel() throws JSchException {
+	protected ChannelSftp openSftpChannel(boolean shared) throws JSchException {
 		Channel channel = getSharedSession().openChannel("sftp");
 		if (logger.isDebugEnabled())
-			logger.debug("Opened SFTP channel to " + this);
+			logger.debug((shared ? "Opening shared SFTP channel to " : "Opening SFTP channel to ") + this);
 		channel.connect();
 		return (ChannelSftp) channel;
 	}
 
-	protected void closeSftpChannel(ChannelSftp sftpChannel) {
+	protected void closeSftpChannel(ChannelSftp sftpChannel, boolean shared) {
 		if (sftpChannel != null) {
-			sftpChannel.disconnect();
 			if (logger.isDebugEnabled())
-				logger.debug("Closed SFTP channel to " + this);
+				logger.debug((shared ? "Closing shared SFTP channel to " : "Closing SFTP channel to ") + this);
+			sftpChannel.disconnect();
 		}
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshSftpOverthereConnection.class);
 
 }
-

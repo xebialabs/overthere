@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
@@ -59,14 +60,13 @@ class SshScpOutputStream extends OutputStream {
 	SshScpOutputStream(SshScpOverthereFile file, long length) {
 		this.file = file;
 		this.length = length;
-	}
 
-	void open() {
 		try {
 			// connect to SSH and start scp in sink mode
+			if(logger.isDebugEnabled())
+				logger.debug("Connecting to " + connection + " (to run scp command to write to file " + this + ")");
 			connection = (SshScpOverthereConnection) file.getConnection();
 			session = connection.openSession();
-			logger.info("Connected to " + connection);
 
 			channel = (ChannelExec) session.openChannel("exec");
 			CmdLine scpCommandLine = CmdLine.build("scp", "-t", file.getPath());
@@ -80,7 +80,6 @@ class SshScpOutputStream extends OutputStream {
 			// perform SCP write protocol
 			readAck();
 			sendFilePreamble();
-			logger.info("Opened SCP stream to write to remote file " + file);
 		} catch (IOException exc) {
 			throw new RuntimeIOException("Cannot open SCP stream to write remote file " + file, exc);
 		} catch (JSchException exc) {
@@ -138,6 +137,8 @@ class SshScpOutputStream extends OutputStream {
 
 	@Override
 	public void close() {
+		checkState(channel != null && session != null, "Cannot close SCP output stream that has already been closed");
+
 		try {
 			sendAck();
 			readAck();
@@ -152,28 +153,32 @@ class SshScpOutputStream extends OutputStream {
 
 		closeQuietly(channelIn);
 		channel.disconnect();
+		channel = null;
+
 		connection.disconnectSession(session);
-		logger.info("Disconnected from " + connection);
+		session = null;
+
+		if(logger.isDebugEnabled())
+			logger.debug("Disconnected from " + connection + " (to run scp command to write to file " + this + ")");
 
 		if (res != 0) {
 			throw new RuntimeIOException("Error closing SCP stream to write remote file " + file + " (remote scp command returned error code " + res + ")");
 		}
 
 		chmodWrittenFile();
+
+		logger.info("Closed SCP output stream to write to file " + file);
 	}
 
 	private void chmodWrittenFile() {
 		if (connection instanceof SshSudoOverthereConnection) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Chmodding 0666 " + file);
-			}
+			logger.info("Chmodding 0666 " + file);
 
 			CapturingOverthereProcessOutputHandler capturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
 			int errno = ((SshSudoOverthereConnection) connection).noSudoExecute(multiHandler(loggingHandler(logger), capturedOutput), build("chmod", "0666", file.getPath()));
 			if (errno != 0) {
 				throw new RuntimeIOException("Cannot chmod file " + file + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 			}
-			logger.info("Chmodded 0666 " + file);
 		}
 	}
 

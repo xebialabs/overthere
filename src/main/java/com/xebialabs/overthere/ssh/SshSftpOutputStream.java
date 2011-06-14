@@ -16,9 +16,14 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.ChannelSftp;
 
@@ -27,20 +32,29 @@ import com.jcraft.jsch.ChannelSftp;
  */
 class SshSftpOutputStream extends FilterOutputStream {
 
-	private SshSftpOverthereConnection session;
+	private SshSftpOverthereFile file;
 
 	private ChannelSftp sftpChannel;
 
-	public SshSftpOutputStream(SshSftpOverthereConnection session, ChannelSftp sftpChannel, OutputStream out) {
+	public SshSftpOutputStream(SshSftpOverthereFile file, ChannelSftp sftpChannel, OutputStream out) {
 		super(out);
-		this.session = session;
+		this.file = file;
 		this.sftpChannel = sftpChannel;
 	}
 
 	public void close() throws IOException {
+		checkState(sftpChannel != null, "Cannot close SFTP output stream that has already been closed");
+
 		super.close();
-		session.closeSftpChannel(sftpChannel);
+
+		((SshSftpOverthereConnection) file.getConnection()).closeSftpChannel(sftpChannel, false);
+		sftpChannel = null;
+
+		if(logger.isDebugEnabled())
+			logger.debug("Closed SFTP output stream to write to file " + file);
 	}
+
+	private static Logger logger = LoggerFactory.getLogger(SshSftpOutputStream.class);
 
 }
 
