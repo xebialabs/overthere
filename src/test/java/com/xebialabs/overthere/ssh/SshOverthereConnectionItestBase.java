@@ -30,8 +30,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
