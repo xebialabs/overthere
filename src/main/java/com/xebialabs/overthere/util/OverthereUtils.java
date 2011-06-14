@@ -30,17 +30,12 @@ public class OverthereUtils {
 
 	public static void write(final byte[] from, final OverthereFile to) {
 		try {
-			final OutputStream out = to.getOutputStream(from.length);
-			try {
-				ByteStreams.write(from, new OutputSupplier<OutputStream>() {
-					@Override
-					public OutputStream getOutput() throws IOException {
-						return out;
-					}
-				});
-			} finally {
-				close(out, false);
-			}
+			ByteStreams.write(from, new OutputSupplier<OutputStream>() {
+				@Override
+				public OutputStream getOutput() throws IOException {
+					return to.getOutputStream(from.length);
+				}
+			});
 		} catch (IOException exc) {
 			throw new RuntimeIOException("Cannot copy inputstream to " + to, exc);
 		}
