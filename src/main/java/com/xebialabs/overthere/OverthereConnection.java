@@ -17,20 +17,19 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static org.apache.commons.io.FilenameUtils.getBaseName;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 import static org.apache.commons.lang.StringUtils.isBlank;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,16 +215,13 @@ public abstract class OverthereConnection {
 	 *             if an I/O error occurs
 	 */
 	public final int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
-		OverthereProcess process = startProcess(commandLine);
-		Thread stdoutReadingThread = null;
-		Thread stderrReadingThread = null;
+		final OverthereProcess process = startProcess(commandLine);
+		Thread stdoutReaderThread = null;
+		Thread stderrReaderThread = null;
 		try {
-			final InputStream stdout = process.getStdout();
-			final InputStream stderr = process.getStderr();
-
-			stdoutReadingThread = new Thread("Stdout reader thread for " + this) {
+			stdoutReaderThread = new Thread("Stdout reader thread for " + this) {
 				public void run() {
-					InputStreamReader stdoutReader = new InputStreamReader(stdout);
+					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
 					try {
 						int readInt = stdoutReader.read();
 						StringBuffer lineBuffer = new StringBuffer();
@@ -244,15 +240,15 @@ public abstract class OverthereConnection {
 					} catch (Exception exc) {
 						logger.error("An exception occured while reading from stdout", exc);
 					} finally {
-						IOUtils.closeQuietly(stdoutReader);
+						closeQuietly(stdoutReader);
 					}
 				}
 			};
-			stdoutReadingThread.start();
+			stdoutReaderThread.start();
 
-			stderrReadingThread = new Thread("Stderr reader thread for " + this) {
+			stderrReaderThread = new Thread("Stderr reader thread for " + this) {
 				public void run() {
-					InputStreamReader stderrReader = new InputStreamReader(stderr);
+					InputStreamReader stderrReader = new InputStreamReader(process.getStderr());
 					try {
 						int readInt = stderrReader.read();
 						StringBuffer lineBuffer = new StringBuffer();
@@ -270,11 +266,11 @@ public abstract class OverthereConnection {
 					} catch (Exception exc) {
 						logger.error("An exception occured while reading from stderr", exc);
 					} finally {
-						IOUtils.closeQuietly(stderrReader);
+						closeQuietly(stderrReader);
 					}
 				}
 			};
-			stderrReadingThread.start();
+			stderrReaderThread.start();
 
 			// FIXME: Add configurable wait-for timeout
 			try {
@@ -285,16 +281,20 @@ public abstract class OverthereConnection {
 				throw new RuntimeIOException("Execution interrupted", exc);
 			}
 		} finally {
-			if (stdoutReadingThread != null) {
+			if (stdoutReaderThread != null) {
 				try {
-					stdoutReadingThread.join();
+					// interrupt the stdout reader thread in case it is stuck waiting for output that will never come
+					stdoutReaderThread.interrupt();
+					stdoutReaderThread.join();
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 				}
 			}
-			if (stderrReadingThread != null) {
+			if (stderrReaderThread != null) {
 				try {
-					stderrReadingThread.join();
+					// interrupt the stdout reader thread in case it is stuck waiting for output that will never come
+					stderrReaderThread.interrupt();
+					stderrReaderThread.join();
 				} catch (InterruptedException ignored) {
 					Thread.currentThread().interrupt();
 				}
