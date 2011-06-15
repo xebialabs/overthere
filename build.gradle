@@ -40,3 +40,17 @@ dependencies {
 apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/repositories.gradle'
 apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
 apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/artifacts.gradle'
+
+task itest(type: Test) {
+    includes = ['**/*Itest.*']
+    testResultsDir = file("${buildDir}/itest-results")
+    systemProperties['itests'] = project.hasProperty('itests') ? project.getProperty('itests') : ''
+    systemProperties['testconfig'] = project.hasProperty('testconfig') ? project.getProperty('testconfig') : ''
+    systemProperties['testimage'] = project.hasProperty('testimage') ? project.getProperty('testimage') : ''
+}
+
+
+test {
+    excludes = ['**/*Itest.*', '**/acceptance/*']
+}
+
