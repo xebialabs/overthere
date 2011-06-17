@@ -16,16 +16,18 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.io.IOException;
+
+import net.schmizz.sshj.sftp.SFTPClient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.Protocol;
-import net.schmizz.sshj.sftp.SFTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * A connection to a remote host using SSH w/ SFTP.

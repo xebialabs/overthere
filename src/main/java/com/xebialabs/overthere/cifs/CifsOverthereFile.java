@@ -27,15 +27,15 @@ import java.util.List;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
-import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
-public class CifsOverthereFile extends OverthereFile {
+public class CifsOverthereFile extends BaseOverthereFile<CifsTelnetOverthereConnection> {
 
 	private SmbFile smbFile;
 
-	protected CifsOverthereFile(OverthereConnection connection, SmbFile smbFile) {
+	protected CifsOverthereFile(CifsTelnetOverthereConnection connection, SmbFile smbFile) {
 		super(connection);
 		this.smbFile = smbFile;
 	}

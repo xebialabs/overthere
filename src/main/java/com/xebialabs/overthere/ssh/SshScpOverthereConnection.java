@@ -31,13 +31,10 @@ public class SshScpOverthereConnection extends SshOverthereConnection {
 		super(type, options);
 	}
 
-
-
 	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		return new SshScpOverthereFile(this, hostPath);
 	}
-
 
 }
 

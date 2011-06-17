@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
@@ -24,7 +25,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 /**
  * A file on a host connected through SSH.
  */
-abstract class SshOverthereFile<C extends SshOverthereConnection> extends OverthereFile<C> {
+abstract class SshOverthereFile<C extends SshOverthereConnection> extends BaseOverthereFile<C> {
 
 	protected String path;
 
@@ -103,7 +104,7 @@ abstract class SshOverthereFile<C extends SshOverthereConnection> extends Overth
 			return false;
 		}
 
-		return path.equals(((SshOverthereFile) obj).getPath());
+		return path.equals(((SshOverthereFile<?>) obj).getPath());
 	}
 
 	@Override

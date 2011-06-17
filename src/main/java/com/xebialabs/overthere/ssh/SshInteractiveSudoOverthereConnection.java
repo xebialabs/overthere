@@ -16,15 +16,15 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.spi.Protocol;
+import java.io.InputStream;
+
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
-import java.io.InputStream;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ interactive SUDO.

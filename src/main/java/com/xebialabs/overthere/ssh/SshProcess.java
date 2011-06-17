@@ -1,18 +1,16 @@
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.connection.channel.direct.Signal;
 import net.schmizz.sshj.transport.TransportException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
 
 class SshProcess implements OverthereProcess {
     private SshOverthereConnection connection;
@@ -67,5 +65,4 @@ class SshProcess implements OverthereProcess {
         }
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(SshProcess.class);
 }

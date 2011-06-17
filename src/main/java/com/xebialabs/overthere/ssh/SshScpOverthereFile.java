@@ -23,7 +23,12 @@ import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandle
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import org.slf4j.Logger;

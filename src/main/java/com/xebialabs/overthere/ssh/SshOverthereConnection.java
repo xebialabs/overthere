@@ -17,7 +17,6 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.lang.String.format;
 
 import java.io.IOException;
 import java.util.Random;
@@ -28,6 +27,7 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.UserAuthException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

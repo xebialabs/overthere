@@ -26,18 +26,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * A local file.
  */
-public class LocalOverthereFile extends OverthereFile {
+public class LocalOverthereFile extends BaseOverthereFile<LocalOverthereConnection> {
 
 	protected File file;
 
-	public LocalOverthereFile(OverthereConnection connection, File file) {
+	public LocalOverthereFile(LocalOverthereConnection connection, File file) {
 		super(connection);
 		this.file = file;
 	}

@@ -33,7 +33,6 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 		this.transformer = transformer;
 	}
 
-	@Override
 	protected void handleDirectoryStart(OverthereFile scrDir, int depth) throws IOException {
 		OverthereFile dstDir = getCurrentDestinationDir();
 		if (depth != ROOT) {
@@ -65,13 +64,11 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 		return dstDirStack.peek();
 	}
 
-	@Override
 	protected void handleFile(OverthereFile srcFile, int depth) throws IOException {
 		OverthereFile dstFile = getCurrentDestinationDir().getFile(srcFile.getName());
 		OverthereFileCopier.copyFile(srcFile, dstFile, transformer);
 	}
 
-	@Override
 	protected void handleDirectoryEnd(OverthereFile directory, int depth) throws IOException {
 		if (depth != ROOT) {
 			dstDirStack.pop();
