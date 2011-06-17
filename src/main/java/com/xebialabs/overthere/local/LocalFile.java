@@ -33,11 +33,11 @@ import com.xebialabs.overthere.RuntimeIOException;
 /**
  * A local file.
  */
-public class LocalOverthereFile extends BaseOverthereFile<LocalOverthereConnection> {
+public class LocalFile extends BaseOverthereFile<LocalConnection> {
 
 	protected File file;
 
-	public LocalOverthereFile(LocalOverthereConnection connection, File file) {
+	public LocalFile(LocalConnection connection, File file) {
 		super(connection);
 		this.file = file;
 	}
@@ -126,18 +126,18 @@ public class LocalOverthereFile extends BaseOverthereFile<LocalOverthereConnecti
 	public List<OverthereFile> listFiles() {
 		List<OverthereFile> list = newArrayList();
 		for (File each : file.listFiles()) {
-			list.add(new LocalOverthereFile(connection, each));
+			list.add(new LocalFile(connection, each));
 		}
 		return list;
 	}
 
 	@Override
 	public void renameTo(OverthereFile dest) {
-		if (!(dest instanceof LocalOverthereFile)) {
-			throw new RuntimeIOException("Destination is not a " + LocalOverthereFile.class.getName());
+		if (!(dest instanceof LocalFile)) {
+			throw new RuntimeIOException("Destination is not a " + LocalFile.class.getName());
 		}
 
-		if (!file.renameTo(((LocalOverthereFile) dest).file)) {
+		if (!file.renameTo(((LocalFile) dest).file)) {
 			throw new RuntimeIOException("Cannot rename " + this + " to " + dest);
 		}
 
@@ -163,10 +163,10 @@ public class LocalOverthereFile extends BaseOverthereFile<LocalOverthereConnecti
 
 	@Override
 	public boolean equals(Object that) {
-		if (!(that instanceof LocalOverthereFile))
+		if (!(that instanceof LocalFile))
 			return false;
 
-		return this.file.equals(((LocalOverthereFile) that).file);
+		return this.file.equals(((LocalFile) that).file);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 /**
  * A file on a host connected through SSH.
  */
-abstract class SshOverthereFile<C extends SshOverthereConnection> extends BaseOverthereFile<C> {
+abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
 	protected String path;
 
@@ -37,7 +37,7 @@ abstract class SshOverthereFile<C extends SshOverthereConnection> extends BaseOv
 	 * @param path
 	 *            the path of the file on the host
 	 */
-	SshOverthereFile(C connection, String path) {
+	SshFile(C connection, String path) {
 		super(connection);
 		this.path = path;
 	}
@@ -100,11 +100,11 @@ abstract class SshOverthereFile<C extends SshOverthereConnection> extends BaseOv
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof SshOverthereFile)) {
+		if (!(obj instanceof SshFile)) {
 			return false;
 		}
 
-		return path.equals(((SshOverthereFile<?>) obj).getPath());
+		return path.equals(((SshFile<?>) obj).getPath());
 	}
 
 	@Override

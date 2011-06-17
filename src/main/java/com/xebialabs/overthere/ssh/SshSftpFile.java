@@ -39,9 +39,9 @@ import com.xebialabs.overthere.RuntimeIOException;
 /**
  * A file on a host connected through SSH that is accessed using SFTP.
  */
-class SshSftpOverthereFile extends SshOverthereFile<SshSftpOverthereConnection> {
+class SshSftpFile extends SshFile<SshSftpConnection> {
 
-	public SshSftpOverthereFile(SshSftpOverthereConnection connection, String path) {
+	public SshSftpFile(SshSftpConnection connection, String path) {
 		super(connection, path);
 	}
 
@@ -148,8 +148,8 @@ class SshSftpOverthereFile extends SshOverthereFile<SshSftpOverthereConnection> 
 	public void renameTo(OverthereFile dest) {
 		logger.debug("Renaming {} to {}", this, dest);
 
-		if (dest instanceof SshSftpOverthereFile) {
-			SshSftpOverthereFile sftpDest = (SshSftpOverthereFile) dest;
+		if (dest instanceof SshSftpFile) {
+			SshSftpFile sftpDest = (SshSftpFile) dest;
 			if (sftpDest.getConnection() == getConnection()) {
 				try {
 					connection.getSharedSftpClient().rename(getPath(), sftpDest.getPath());
@@ -210,6 +210,6 @@ class SshSftpOverthereFile extends SshOverthereFile<SshSftpOverthereConnection> 
         }
 	}
 
-    private static Logger logger = LoggerFactory.getLogger(SshSftpOverthereFile.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpFile.class);
 
 }

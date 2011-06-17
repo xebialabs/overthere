@@ -24,23 +24,21 @@ import org.junit.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
 
-public class SshSudoOverthereConnectionItest extends SshSudoOverthereConnectionItestBase {
+public class SshSftpConnectionItest extends SshConnectionItestBase {
 
 	@Override
-    protected void setTypeAndOptions() {
-		type = "ssh_sudo";
+	protected void setTypeAndOptions() {
+		type = "ssh_sftp";
 		options = new ConnectionOptions();
 		options.set("address", "overthere");
-		options.set("username", "trusted");
-		options.set("password", "trustme");
-		options.set("sudoUsername", "overthere");
+		options.set("username", "overthere");
+		options.set("password", "overhere");
 		options.set("os", UNIX);
 	}
 
 	@Test
-	public void hostSessionIsAnSshSudoHostSession() {
-		assertThat(connection, instanceOf(SshSudoOverthereConnection.class));
+	public void hostSessionIsAnSshSftpHostSession() {
+		assertThat(connection, instanceOf(SshSftpConnection.class));
 	}
 
 }
-

@@ -42,7 +42,7 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 /**
  * Base class for host connections using SSH.
  */
-abstract class SshOverthereConnection extends OverthereConnection implements OverthereConnectionBuilder {
+abstract class SshConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
     protected String host;
 
@@ -54,7 +54,7 @@ abstract class SshOverthereConnection extends OverthereConnection implements Ove
 
     protected SSHClient sshClient;
 
-    public SshOverthereConnection(String type, ConnectionOptions options) {
+    public SshConnection(String type, ConnectionOptions options) {
         super(type, options);
         this.host = options.get(ConnectionOptions.ADDRESS);
         this.port = options.get(ConnectionOptions.PORT, 22);
@@ -63,7 +63,7 @@ abstract class SshOverthereConnection extends OverthereConnection implements Ove
     }
 
     @Override
-    public SshOverthereConnection connect() throws RuntimeIOException {
+    public SshConnection connect() throws RuntimeIOException {
         try {
             sshClient = openSession();
         } catch (SSHException e) {
@@ -127,7 +127,7 @@ abstract class SshOverthereConnection extends OverthereConnection implements Ove
     }
 
     protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
-        if (!(parent instanceof SshOverthereFile)) {
+        if (!(parent instanceof SshFile)) {
             throw new IllegalStateException("parent is not a file on an SSH host");
         }
         if (parent.getConnection() != this) {
@@ -193,6 +193,6 @@ abstract class SshOverthereConnection extends OverthereConnection implements Ove
         return type + "://" + username + "@" + host + ":" + port;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(SshOverthereConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshConnection.class);
 
 }

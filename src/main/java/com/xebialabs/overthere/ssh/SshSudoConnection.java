@@ -35,7 +35,7 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to a remote host using SSH w/ SUDO.
  */
 @Protocol(name = "ssh_sudo")
-public class SshSudoOverthereConnection extends SshScpOverthereConnection {
+public class SshSudoConnection extends SshScpConnection {
 
 	public static final String SUDO_USERNAME = "sudoUsername";
 
@@ -45,7 +45,7 @@ public class SshSudoOverthereConnection extends SshScpOverthereConnection {
 
 	protected String sudoUsername;
 
-	public SshSudoOverthereConnection(String type, ConnectionOptions options) {
+	public SshSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.sudoUsername = options.get(SUDO_USERNAME);
 	}
@@ -101,7 +101,7 @@ public class SshSudoOverthereConnection extends SshScpOverthereConnection {
 	}
 
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSudoOverthereFile(this, hostPath, isTempFile);
+		return new SshSudoFile(this, hostPath, isTempFile);
 	}
 
 	@Override
@@ -119,6 +119,6 @@ public class SshSudoOverthereConnection extends SshScpOverthereConnection {
 		return type + "://" + username + "/" + sudoUsername + "@" + host + ":" + port;
 	}
 
-	private Logger logger = LoggerFactory.getLogger(SshSudoOverthereConnection.class);
+	private Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
 
 }

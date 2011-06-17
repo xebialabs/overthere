@@ -33,22 +33,22 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to a remote host using SSH w/ SFTP.
  */
 @Protocol(name = "ssh_sftp")
-public class SshSftpOverthereConnection extends SshOverthereConnection {
+public class SshSftpConnection extends SshConnection {
 
 	private SFTPClient sharedSftpClient;
 
-	public SshSftpOverthereConnection(String type, ConnectionOptions options) {
+	public SshSftpConnection(String type, ConnectionOptions options) {
 		super(type, options);
 	}
 
 	@Override
 	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSftpOverthereFile(this, hostPath);
+		return new SshSftpFile(this, hostPath);
 	}
 
     @Override
-    public SshOverthereConnection connect() throws RuntimeIOException {
-        SshOverthereConnection connect = super.connect();
+    public SshConnection connect() throws RuntimeIOException {
+        SshConnection connect = super.connect();
 
         logger.debug("Opening SFTP client to {}", this);
         try {
@@ -79,6 +79,6 @@ public class SshSftpOverthereConnection extends SshOverthereConnection {
 		return sharedSftpClient;
 	}
 
-    private Logger logger = LoggerFactory.getLogger(SshSftpOverthereConnection.class);
+    private Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);
 
 }

@@ -26,11 +26,11 @@ import org.junit.Test;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 
-public abstract class SshSudoOverthereConnectionItestBase extends SshOverthereConnectionItestBase {
+public abstract class SshSudoConnectionItestBase extends SshConnectionItestBase {
 
 	@Test
 	public void commandWithPipeShouldHaveTwoSudoSections() {
-		List<CmdLineArgument> prepended = ((SshSudoOverthereConnection) connection).prefixWithSudoCommand(CmdLine.build("a", "|", "b")).getArguments();
+		List<CmdLineArgument> prepended = ((SshSudoConnection) connection).prefixWithSudoCommand(CmdLine.build("a", "|", "b")).getArguments();
 		assertThat(prepended.size(), equalTo(9));
 		assertThat(prepended.get(0).toString(false), equalTo("sudo"));
 		assertThat(prepended.get(5).toString(false), equalTo("sudo"));
@@ -38,7 +38,7 @@ public abstract class SshSudoOverthereConnectionItestBase extends SshOverthereCo
 
 	@Test
 	public void commandWithSemiColonShouldHaveTwoSudoSections() {
-		List<CmdLineArgument> prepended = ((SshSudoOverthereConnection) connection).prefixWithSudoCommand(CmdLine.build("a", ";", "b")).getArguments();
+		List<CmdLineArgument> prepended = ((SshSudoConnection) connection).prefixWithSudoCommand(CmdLine.build("a", ";", "b")).getArguments();
 		assertThat(prepended.size(), equalTo(9));
 		assertThat(prepended.get(0).toString(false), equalTo("sudo"));
 		assertThat(prepended.get(5).toString(false), equalTo("sudo"));

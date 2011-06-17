@@ -16,29 +16,30 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 
-public class SshSftpOverthereConnectionItest extends SshOverthereConnectionItestBase {
+public class SshScpConnectionItest extends SshConnectionItestBase {
 
 	@Override
-	protected void setTypeAndOptions() {
-		type = "ssh_sftp";
+    protected void setTypeAndOptions() {
+		type = "ssh_scp";
 		options = new ConnectionOptions();
 		options.set("address", "overthere");
 		options.set("username", "overthere");
 		options.set("password", "overhere");
-		options.set("os", UNIX);
+		options.set("os", OperatingSystemFamily.UNIX);
 	}
 
 	@Test
-	public void hostSessionIsAnSshSftpHostSession() {
-		assertThat(connection, instanceOf(SshSftpOverthereConnection.class));
+	public void hostSessionIsAnSshScpHostSession() {
+		assertThat(connection, instanceOf(SshScpConnection.class));
 	}
 
 }
+

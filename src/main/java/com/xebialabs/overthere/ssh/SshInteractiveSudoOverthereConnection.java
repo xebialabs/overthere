@@ -30,7 +30,7 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to a remote host using SSH w/ interactive SUDO.
  */
 @Protocol(name = "ssh_interactive_sudo")
-public class SshInteractiveSudoOverthereConnection extends SshSudoOverthereConnection {
+public class SshInteractiveSudoOverthereConnection extends SshSudoConnection {
 
 	public SshInteractiveSudoOverthereConnection(String type, ConnectionOptions options) {
 		super(type, options);

@@ -16,29 +16,30 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
 
-public class SshScpOverthereConnectionItest extends SshOverthereConnectionItestBase {
+public class SshInteractiveSudoConnectionItest extends SshSudoConnectionItestBase {
 
 	@Override
     protected void setTypeAndOptions() {
-		type = "ssh_scp";
+		type = "ssh_interactive_sudo";
 		options = new ConnectionOptions();
 		options.set("address", "overthere");
-		options.set("username", "overthere");
-		options.set("password", "overhere");
-		options.set("os", OperatingSystemFamily.UNIX);
+		options.set("username", "untrusted");
+		options.set("password", "donttrustme");
+		options.set("sudoUsername", "overthere");
+		options.set("os", UNIX);
 	}
 
 	@Test
-	public void hostSessionIsAnSshScpHostSession() {
-		assertThat(connection, instanceOf(SshScpOverthereConnection.class));
+	public void hostSessionIsAnSshSudoHostSession() {
+		assertThat(connection, instanceOf(SshInteractiveSudoOverthereConnection.class));
 	}
 
 }

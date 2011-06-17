@@ -35,7 +35,7 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 /**
  * A file on a host connected through SSH w/ SUDO.
  */
-class SshSudoOverthereFile extends SshScpOverthereFile {
+class SshSudoFile extends SshScpFile {
 
 	private boolean isTempFile;
 
@@ -49,7 +49,7 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 	 * @param isTempFile
 	 *            is <code>true</code> if this is a temporary file; <code>false</code> otherwise
 	 */
-	public SshSudoOverthereFile(SshSudoOverthereConnection connection, String remotePath, boolean isTempFile) {
+	public SshSudoFile(SshSudoConnection connection, String remotePath, boolean isTempFile) {
 		super(connection, remotePath);
 		this.isTempFile = isTempFile;
 	}
@@ -57,7 +57,7 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 	@Override
 	protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
 		if (isTempFile) {
-			return ((SshSudoOverthereConnection) connection).noSudoExecute(handler, commandLine);
+			return ((SshSudoConnection) connection).noSudoExecute(handler, commandLine);
 		} else {
 			return super.executeCommand(handler, commandLine);
 		}
@@ -65,14 +65,14 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 
 	@Override
 	public OverthereFile getFile(String name) {
-		SshSudoOverthereFile f = (SshSudoOverthereFile) super.getFile(name);
+		SshSudoFile f = (SshSudoFile) super.getFile(name);
 		f.isTempFile = this.isTempFile;
 		return f;
 	}
 
 	@Override
 	public OverthereFile getParentFile() {
-		SshSudoOverthereFile f = (SshSudoOverthereFile) super.getParentFile();
+		SshSudoFile f = (SshSudoFile) super.getParentFile();
 		f.isTempFile = this.isTempFile;
 		return f;
 	}
@@ -148,6 +148,6 @@ class SshSudoOverthereFile extends SshScpOverthereFile {
 		}
 	}
 
-	private Logger logger = LoggerFactory.getLogger(SshSudoOverthereFile.class);
+	private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
 }

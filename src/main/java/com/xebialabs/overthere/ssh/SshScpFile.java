@@ -43,7 +43,7 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 /**
  * A file on a host connected through SSH w/ SCP.
  */
-class SshScpOverthereFile extends SshOverthereFile<SshScpOverthereConnection> {
+class SshScpFile extends SshFile<SshScpConnection> {
 
 	/**
 	 * Constructs an SshScpOverthereFile
@@ -53,7 +53,7 @@ class SshScpOverthereFile extends SshOverthereFile<SshScpOverthereConnection> {
 	 * @param remotePath
 	 *            the path of the file on the host
 	 */
-	public SshScpOverthereFile(SshScpOverthereConnection connection, String remotePath) {
+	public SshScpFile(SshScpConnection connection, String remotePath) {
 		super(connection, remotePath);
 	}
 
@@ -151,8 +151,8 @@ class SshScpOverthereFile extends SshOverthereFile<SshScpOverthereConnection> {
 		if (logger.isDebugEnabled())
 			logger.debug("Renaming " + this + " to " + dest);
 
-		if (dest instanceof SshScpOverthereFile) {
-			SshScpOverthereFile sshScpDestFile = (SshScpOverthereFile) dest;
+		if (dest instanceof SshScpFile) {
+			SshScpFile sshScpDestFile = (SshScpFile) dest;
 			if (sshScpDestFile.getConnection() == getConnection()) {
 				CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 				int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("mv", getPath(), sshScpDestFile.getPath()));
@@ -259,6 +259,6 @@ class SshScpOverthereFile extends SshOverthereFile<SshScpOverthereConnection> {
 	}
 
 
-    private Logger logger = LoggerFactory.getLogger(SshScpOverthereFile.class);
+    private Logger logger = LoggerFactory.getLogger(SshScpFile.class);
 
 }

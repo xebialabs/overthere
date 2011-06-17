@@ -37,12 +37,12 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to the local host.
  */
 @Protocol(name = "local")
-public class LocalOverthereConnection extends OverthereConnection implements OverthereConnectionBuilder {
+public class LocalConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
 	/**
 	 * Constructs a connection to the local host.
 	 */
-	public LocalOverthereConnection(String type, ConnectionOptions options) {
+	public LocalConnection(String type, ConnectionOptions options) {
 		super(type, getLocalHostOperatingSystemFamily(), options);
 	}
 
@@ -59,7 +59,7 @@ public class LocalOverthereConnection extends OverthereConnection implements Ove
 			// created simultaneously?
 			// FIXME: Answer from VP: we have to decide on the semantics. How do you create a temporary directory?
 			tempFile.delete();
-			return new LocalOverthereFile(this, tempFile);
+			return new LocalFile(this, tempFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
@@ -67,17 +67,17 @@ public class LocalOverthereConnection extends OverthereConnection implements Ove
 
 	@Override
 	public OverthereFile getFile(String path) throws RuntimeIOException {
-		return new LocalOverthereFile(this, new File(path));
+		return new LocalFile(this, new File(path));
 	}
 
 	@Override
 	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
-		if (!(parent instanceof LocalOverthereFile)) {
+		if (!(parent instanceof LocalFile)) {
 			throw new IllegalStateException("parent is not a LocalOverthereFile");
 		}
 
-		File childFile = new File(((LocalOverthereFile) parent).getFile(), child);
-		return new LocalOverthereFile(this, childFile);
+		File childFile = new File(((LocalFile) parent).getFile(), child);
+		return new LocalFile(this, childFile);
 	}
 
 	@Override

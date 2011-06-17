@@ -25,15 +25,15 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to a remote host using SSH w/ SCP.
  */
 @Protocol(name = "ssh_scp")
-public class SshScpOverthereConnection extends SshOverthereConnection {
+public class SshScpConnection extends SshConnection {
 
-	public SshScpOverthereConnection(String type, ConnectionOptions options) {
+	public SshScpConnection(String type, ConnectionOptions options) {
 		super(type, options);
 	}
 
 	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshScpOverthereFile(this, hostPath);
+		return new SshScpFile(this, hostPath);
 	}
 
 }

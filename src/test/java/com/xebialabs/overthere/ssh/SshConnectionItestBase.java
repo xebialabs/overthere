@@ -41,7 +41,7 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-public abstract class SshOverthereConnectionItestBase extends OverthereConnectionItestBase {
+public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
 
 	@Rule
 	public TemporaryFolder temp = new TemporaryFolder();

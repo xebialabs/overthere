@@ -31,11 +31,11 @@ import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
-public class CifsOverthereFile extends BaseOverthereFile<CifsTelnetOverthereConnection> {
+public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 
 	private SmbFile smbFile;
 
-	protected CifsOverthereFile(CifsTelnetOverthereConnection connection, SmbFile smbFile) {
+	protected CifsFile(CifsTelnetConnection connection, SmbFile smbFile) {
 		super(connection);
 		this.smbFile = smbFile;
 	}
@@ -61,7 +61,7 @@ public class CifsOverthereFile extends BaseOverthereFile<CifsTelnetOverthereConn
 	@Override
 	public OverthereFile getParentFile() {
 		try {
-			return new CifsOverthereFile(getConnection(), new SmbFile(smbFile.getParent()));
+			return new CifsFile(getConnection(), new SmbFile(smbFile.getParent()));
 		} catch (MalformedURLException exc) {
 			return null;
 		}
@@ -175,8 +175,8 @@ public class CifsOverthereFile extends BaseOverthereFile<CifsTelnetOverthereConn
 
 	@Override
 	public void renameTo(OverthereFile dest) throws RuntimeIOException {
-		if (dest instanceof CifsOverthereFile) {
-			SmbFile targetSmbFile = ((CifsOverthereFile) dest).getSmbFile();
+		if (dest instanceof CifsFile) {
+			SmbFile targetSmbFile = ((CifsFile) dest).getSmbFile();
 			try {
 				smbFile.renameTo(targetSmbFile);
 			} catch (SmbException exc) {
@@ -250,11 +250,11 @@ public class CifsOverthereFile extends BaseOverthereFile<CifsTelnetOverthereConn
 
 	@Override
 	public boolean equals(Object that) {
-		if (!(that instanceof CifsOverthereFile)) {
+		if (!(that instanceof CifsFile)) {
 			return false;
 		}
 
-		return getPath().equals(((CifsOverthereFile) that).getPath());
+		return getPath().equals(((CifsFile) that).getPath());
 	}
 
 	@Override

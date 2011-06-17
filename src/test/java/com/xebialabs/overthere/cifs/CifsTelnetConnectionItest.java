@@ -37,7 +37,7 @@ import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
-public class CifsTelnetOverthereConnectionItest extends OverthereConnectionItestBase {
+public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {

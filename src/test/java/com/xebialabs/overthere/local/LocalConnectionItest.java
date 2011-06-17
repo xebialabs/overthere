@@ -32,7 +32,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-public class LocalOverthereConnectionItest extends OverthereConnectionItestBase {
+public class LocalConnectionItest extends OverthereConnectionItestBase {
 
 	@Rule
 	public TemporaryFolder temp = new TemporaryFolder();

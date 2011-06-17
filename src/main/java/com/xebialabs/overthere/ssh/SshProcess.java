@@ -13,12 +13,12 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 
 class SshProcess implements OverthereProcess {
-    private SshOverthereConnection connection;
+    private SshConnection connection;
     private final Session session;
     private final CmdLine commandLine;
     private final Session.Command command;
 
-    SshProcess(final SshOverthereConnection connection, final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
+    SshProcess(final SshConnection connection, final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
         this.connection = connection;
         this.session = session;
         this.commandLine = commandLine;

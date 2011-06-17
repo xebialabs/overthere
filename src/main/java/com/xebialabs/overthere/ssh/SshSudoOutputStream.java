@@ -36,7 +36,7 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
  */
 class SshSudoOutputStream extends OutputStream {
 
-	private SshSudoOverthereFile destFile;
+	private SshSudoFile destFile;
 
 	private long length;
 
@@ -44,7 +44,7 @@ class SshSudoOutputStream extends OutputStream {
 
 	private OutputStream tempFileOutputStream;
 
-	public SshSudoOutputStream(SshSudoOverthereFile destFile, long length, OverthereFile tempFile) {
+	public SshSudoOutputStream(SshSudoFile destFile, long length, OverthereFile tempFile) {
 		this.destFile = destFile;
 		this.length = length;
 		this.tempFile = tempFile;

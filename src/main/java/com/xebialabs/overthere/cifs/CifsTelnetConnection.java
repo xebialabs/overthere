@@ -57,7 +57,7 @@ import com.xebialabs.overthere.spi.Protocol;
  * </ul>
  */
 @Protocol(name = "cifs_telnet")
-public class CifsTelnetOverthereConnection extends OverthereConnection implements OverthereConnectionBuilder {
+public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
 	private String address;
 
@@ -76,7 +76,7 @@ public class CifsTelnetOverthereConnection extends OverthereConnection implement
 	 */
 	public static final int EXITCODE_CANNOT_DETERMINE_ERRORLEVEL = -999999;
 
-	public CifsTelnetOverthereConnection(String type, ConnectionOptions options) {
+	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.address = options.get(ADDRESS);
 		this.username = options.get(USERNAME);
@@ -92,7 +92,7 @@ public class CifsTelnetOverthereConnection extends OverthereConnection implement
 	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		try {
 			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath));
-			return new CifsOverthereFile(this, smbFile);
+			return new CifsFile(this, smbFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);
 		}
@@ -347,6 +347,6 @@ public class CifsTelnetOverthereConnection extends OverthereConnection implement
 		return "cifs_telnet://" + username + "@" + address;
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(CifsTelnetOverthereConnection.class);
+	private static Logger logger = LoggerFactory.getLogger(CifsTelnetConnection.class);
 
 }

@@ -32,7 +32,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 @Ignore("Needs Windows image that is not on dexter")
-public class SshSftpOverthereConnectionOnWindowsItest extends SshSudoOverthereConnectionItestBase {
+public class SshSftpConnectionOnWindowsItest extends SshSudoConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {
