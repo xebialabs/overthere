@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.InputStream;
 
 import net.schmizz.sshj.connection.ConnectionException;
@@ -30,10 +32,11 @@ import com.xebialabs.overthere.spi.Protocol;
  * A connection to a remote host using SSH w/ interactive SUDO.
  */
 @Protocol(name = "ssh_interactive_sudo")
-public class SshInteractiveSudoOverthereConnection extends SshSudoConnection {
+public class SshInteractiveSudoConnection extends SshSudoConnection {
 
-	public SshInteractiveSudoOverthereConnection(String type, ConnectionOptions options) {
+	public SshInteractiveSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
+		checkArgument(password != null, "Cannot start an interactive SSH SUDO connection without a password");
 	}
 
     @Override
