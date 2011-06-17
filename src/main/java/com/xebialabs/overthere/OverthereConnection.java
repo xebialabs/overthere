@@ -90,7 +90,7 @@ public abstract class OverthereConnection {
 		logger.info("Disconnected from {}", this);
 	}
 
-    protected void doDisconnect() {}
+    protected abstract void doDisconnect();
 
     protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
 		if (sessionTemporaryDirectory == null) {

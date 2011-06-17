@@ -50,6 +50,11 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	public OverthereConnection connect() {
 		return this;
 	}
+	
+	@Override
+	public void doDisconnect() {
+		// no-op
+	}
 
 	@Override
 	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {

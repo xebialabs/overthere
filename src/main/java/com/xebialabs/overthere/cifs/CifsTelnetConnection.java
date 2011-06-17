@@ -87,6 +87,11 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	public OverthereConnection connect() {
 		return this;
 	}
+	
+	@Override
+	public void doDisconnect() {
+		// no-op
+	}
 
 	@Override
 	public OverthereFile getFile(String hostPath) throws RuntimeIOException {

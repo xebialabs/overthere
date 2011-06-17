@@ -75,7 +75,6 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
     @Override
     public void doDisconnect() {
         checkState(sshClient != null, "Already disconnected");
-        super.doDisconnect();
         try {
             sshClient.disconnect();
         } catch (IOException e) {
