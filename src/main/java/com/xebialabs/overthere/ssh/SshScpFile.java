@@ -31,6 +31,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import net.schmizz.sshj.xfer.LocalFileFilter;
+import net.schmizz.sshj.xfer.LocalSourceFile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,6 +206,78 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		}
 	}
 
+	@Override
+    protected void copyFrom(OverthereFile source) {
+		try {
+	        connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), getPath());
+        } catch (IOException e) {
+        	throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
+        }
+    }
+
+	private static class OverthereFileLocalSourceFile implements LocalSourceFile {
+
+		private OverthereFile f;
+
+		public OverthereFileLocalSourceFile(OverthereFile f) {
+			this.f = f;
+		}
+
+		@Override
+        public String getName() {
+	        return f.getName();
+        }
+
+		@Override
+        public long getLength() {
+	        return f.length();
+        }
+
+		@Override
+        public InputStream getInputStream() throws IOException {
+	        return f.getInputStream();
+        }
+
+		@Override
+        public int getPermissions() throws IOException {
+	        return f.isDirectory() ? 0755 : 0644;
+        }
+
+		@Override
+        public boolean isFile() {
+	        return !f.isDirectory();
+        }
+
+		@Override
+        public boolean isDirectory() {
+	        return f.isDirectory();
+        }
+
+		@Override
+        public Iterable<? extends LocalSourceFile> getChildren(LocalFileFilter filter) throws IOException {
+	         List<LocalSourceFile> files = newArrayList();
+	         for(OverthereFile each: f.listFiles()) {
+	        	 files.add(new OverthereFileLocalSourceFile(each));
+	         }
+	         return files;
+        }
+
+		@Override
+        public boolean providesAtimeMtime() {
+	        return false;
+        }
+
+		@Override
+        public long getLastAccessTime() throws IOException {
+	        return 0;
+        }
+
+		@Override
+        public long getLastModifiedTime() throws IOException {
+	        return 0;
+        }
+		
+	}
 
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {

@@ -27,6 +27,8 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,9 +37,13 @@ import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.OutputSupplier;
+import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class OverthereConnectionItestBase {
@@ -50,6 +56,9 @@ public abstract class OverthereConnectionItestBase {
 
 	protected OverthereConnection connection;
 
+	@Rule
+	TemporaryFolder temp = new TemporaryFolder();
+	
 	@Before
 	public void connect() {
 		setTypeAndOptions();
@@ -162,12 +171,53 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldWriteAndReadLargeFile() throws IOException {
+	public void shouldWriteLargeLocalFile() throws IOException {
+		File largeFile = temp.newFile("large.dat");
+		byte[] largeFileContentsWritten = writeRandomData(largeFile, LARGE_FILE_SIZE);
+		
+		OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
+		LocalFile.valueOf(largeFile).copyTo(remoteLargeFile);
+		
+		byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
+		InputStream largeIn = remoteLargeFile.getInputStream();
+		try {
+			ByteStreams.readFully(largeIn, largeFileContentsRead);
+		} finally {
+			largeIn.close();
+		}
+
+		assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+	}
+
+	@Test
+	public void shouldWriteLargeLocalDirectory() throws IOException {
+		File largeFolder = temp.newFolder("large.folder");
+		for(int i = 0; i < 100; i++) {
+			writeRandomData(new File(largeFolder, "large" + i + ".dat"), LARGE_FILE_SIZE / 10);
+		}
+
+		OverthereFile remoteLargeFolder = connection.getTempFile("large.folder");
+		LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);	
+	}
+
+	private static byte[] writeRandomData(final File f, final int size) throws IOException {
+		byte[] randomBytes = new byte[size];
+		new Random().nextBytes(randomBytes);
+		ByteStreams.write(randomBytes, new OutputSupplier<OutputStream>() {
+			@Override
+            public OutputStream getOutput() throws IOException {
+				return new FileOutputStream(f);
+            }
+		});
+		return randomBytes;
+	}
+
+	@Test
+	public void shouldWriteAndReadManyBytes() throws IOException {
 		OverthereFile largeFile = connection.getTempFile("large", ".dat");
 
 		byte[] largeFileContentsWritten = new byte[LARGE_FILE_SIZE];
-		Random r = new Random();
-		r.nextBytes(largeFileContentsWritten);
+		new Random().nextBytes(largeFileContentsWritten);
 		OutputStream largeOut = largeFile.getOutputStream(LARGE_FILE_SIZE);
 		try {
 			ByteStreams.copy(new ByteArrayInputStream(largeFileContentsWritten), largeOut);
