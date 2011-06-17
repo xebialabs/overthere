@@ -17,12 +17,12 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
-import static org.apache.commons.io.FilenameUtils.getBaseName;
-import static org.apache.commons.io.FilenameUtils.getExtension;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
+import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
 import java.io.InputStreamReader;
 import java.text.DateFormat;
@@ -32,6 +32,9 @@ import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+import com.xebialabs.overthere.util.OverthereUtils;
 
 /**
  * A connection on a host (local or remote) on which to manipulate files and execute commands.
@@ -182,7 +185,7 @@ public abstract class OverthereConnection {
 			}
 		}
 
-		if (isBlank(nameTemplate)) {
+		if (isNullOrEmpty(nameTemplate)) {
 			prefix = "hostsession";
 			suffix = ".tmp";
 		} else {

@@ -50,4 +50,34 @@ public class OverthereUtils {
 		}
 	}
 
+	public static String getName(String path) {
+		int lastSlash = path.lastIndexOf('/');
+		if(lastSlash >= 0) {
+			return path.substring(lastSlash + 1);
+		}
+
+		int lastBackslash = path.lastIndexOf('\\');
+		if(lastBackslash >= 0) {
+			return path.substring(lastBackslash + 1);
+		}
+		
+		return path;
+	}
+	
+	public static String getBaseName(String name) {
+		int dot = name.lastIndexOf('.');
+		if(dot >= 0) {
+			return name.substring(0, dot);
+		}
+		return name;
+	}
+	
+	public static String getExtension(String name) {
+		int dot = name.lastIndexOf('.');
+		if(dot >= 0) {
+			return name.substring(dot + 1);
+		}
+		return name;
+	}
+
 }

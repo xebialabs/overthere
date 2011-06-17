@@ -16,15 +16,14 @@
  */
 package com.xebialabs.overthere;
 
+import static com.google.common.base.Joiner.on;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static org.apache.commons.lang.StringUtils.replace;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 public class CmdLineTest {
@@ -78,7 +77,7 @@ public class CmdLineTest {
 		String encodedArgumentWithSpaces = "\"" + argumentWithSpaces + "\"";
 		String encodedArgumentWithSpecialChars = "\"heretheycome'\"\"\\;()${}andthatwasem\"";
 		String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
-		String expectedEncodedCommandLine = StringUtils.join(encodedCmdArray, ' ');
+		String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
 		assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
 	}
@@ -88,12 +87,12 @@ public class CmdLineTest {
 		CmdLine commandLine = CmdLine.build(command, regularArgument, emptyArgument, argumentWithSpaces, argumentWithSpecialChars);
 		String actualEncodedCommandLine = commandLine.toCommandLine(UNIX, false);
 
-		String encodedCommand = replace(replace(command, "\\", "\\\\"), " ", "\\ ");
+		String encodedCommand = command.replace("\\", "\\\\").replace(" ", "\\ ");
 		String encodedEmptyArgument = "\"\"";
-		String encodedArgumentWithSpaces = replace(argumentWithSpaces, " ", "\\ ");
+		String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
 		String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}andthatwasem";
 		String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
-		String expectedEncodedCommandLine = StringUtils.join(encodedCmdArray, ' ');
+		String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
 		assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
 	}

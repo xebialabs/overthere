@@ -23,12 +23,13 @@ import static org.junit.Assert.fail;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import com.google.common.io.CharStreams;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
@@ -83,7 +84,7 @@ public abstract class SshOverthereConnectionItestBase extends OverthereConnectio
 	@Test
 	public void shouldStartProcessSimpleCommand() throws IOException, InterruptedException {
 		OverthereProcess p = connection.startProcess(CmdLine.build("ls", "-ld", "/tmp"));
-		String commandOutput = IOUtils.toString(p.getStdout());
+		String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
 		assertThat(p.waitFor(), equalTo(0));
 		assertThat(commandOutput, containsString("drwxrwxrwt"));
 	}

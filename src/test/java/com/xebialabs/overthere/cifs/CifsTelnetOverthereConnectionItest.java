@@ -17,7 +17,6 @@
 package com.xebialabs.overthere.cifs;
 
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static org.apache.commons.io.IOUtils.copy;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -30,10 +29,11 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.io.ByteStreams;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
@@ -67,7 +67,7 @@ public class CifsTelnetOverthereConnectionItest extends OverthereConnectionItest
 		InputStream inputStream = file.getInputStream();
 		ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
 		try {
-			copy(inputStream, fileContents);
+			ByteStreams.copy(inputStream, fileContents);
 		} finally {
 			inputStream.close();
 		}

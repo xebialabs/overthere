@@ -9,7 +9,6 @@ import static com.xebialabs.overthere.CmdLineArgument.password;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang.StringUtils.containsAny;
 
 import java.io.Serializable;
 import java.util.List;
@@ -100,6 +99,15 @@ public class CmdLine implements Serializable {
 			}
 		}
 	}
+
+	private boolean containsAny(String str, String chars) {
+		for(char c : chars.toCharArray()) {
+			if(str.indexOf(c) >= 0) {
+				return true;
+			}
+		}
+		return false;
+    }
 
 	private void encodeEmptyArgument(StringBuilder collector) {
 		collector.append("\"\"");

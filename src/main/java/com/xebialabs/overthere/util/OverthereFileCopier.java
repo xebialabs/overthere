@@ -1,13 +1,15 @@
 package com.xebialabs.overthere.util;
 
+import static com.google.common.io.Closeables.closeQuietly;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Stack;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.ByteStreams;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.OverthereFileInputStreamTransformer.TransformedInputStream;
@@ -143,15 +145,15 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 			OutputStream out = dstFile.getOutputStream(in.length());
 			try {
 				try {
-					IOUtils.copy(in, out);
+					ByteStreams.copy(in, out);
 				} catch (IOException exc) {
 					throw new RuntimeIOException("Cannot copy stream to file", exc);
 				}
 			} finally {
-				IOUtils.closeQuietly(out);
+				closeQuietly(out);
 			}
 		} finally {
-			IOUtils.closeQuietly(in);
+			closeQuietly(in);
 		}
 	}
 

@@ -20,8 +20,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.apache.commons.lang.SystemUtils;
-
 /**
  * The family (flavour) of the operating system running on a host.
  */
@@ -40,7 +38,7 @@ public enum OperatingSystemFamily {
 	 * Returns the {@link OperatingSystemFamily} that corresponds to the local host
 	 */
 	public static OperatingSystemFamily getLocalHostOperatingSystemFamily() {
-		return SystemUtils.IS_OS_WINDOWS ? WINDOWS : UNIX;
+		return System.getProperty("os.name").startsWith("Windows") ? WINDOWS : UNIX;
 	}
 
 	/**
