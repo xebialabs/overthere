@@ -263,7 +263,7 @@ public class CifsOverthereFile extends OverthereFile {
 	}
 
 	public String toString() {
-		return connection + "://" + getPath();
+		return connection + "/" + getPath();
 	}
 
 }
