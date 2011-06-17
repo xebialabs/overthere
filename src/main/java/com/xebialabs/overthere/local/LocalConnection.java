@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static java.io.File.createTempFile;
 
@@ -26,6 +27,7 @@ import java.io.OutputStream;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
@@ -124,6 +126,15 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	@Override
 	public String toString() {
 		return "localhost";
+	}
+
+	/**
+	 * Creates a connection to the local host.
+	 */
+	public static OverthereConnection getLocalConnection() {
+		ConnectionOptions options = new ConnectionOptions();
+		options.set(TEMPORARY_DIRECTORY_PATH, System.getProperty("java.io.tmpdir"));
+		return Overthere.getConnection("local", options);
 	}
 
 }

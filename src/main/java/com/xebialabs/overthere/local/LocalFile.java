@@ -179,4 +179,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> {
 		return file.toString();
 	}
 
+	public static OverthereFile valueOf(File f) {
+		return new LocalFile((LocalConnection) LocalConnection.getLocalConnection(), f);
+	}
+
 }
