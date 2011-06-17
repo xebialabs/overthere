@@ -25,18 +25,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.io.ByteStreams;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class OverthereConnectionItestBase {
+
+	public static final int LARGE_FILE_SIZE = 10 * 1024 * 1024;
 
 	protected ConnectionOptions options;
 
@@ -153,6 +159,31 @@ public abstract class OverthereConnectionItestBase {
 		regularFile.delete();
 		tempDir.delete();
 		assertThat("Expected temporary directory to not exist after removing it when it was empty", tempDir.exists(), equalTo(false));
+	}
+
+	@Test
+	public void shouldWriteAndReadLargeFile() throws IOException {
+		OverthereFile largeFile = connection.getTempFile("large", ".dat");
+
+		byte[] largeFileContentsWritten = new byte[LARGE_FILE_SIZE];
+		Random r = new Random();
+		r.nextBytes(largeFileContentsWritten);
+		OutputStream largeOut = largeFile.getOutputStream(LARGE_FILE_SIZE);
+		try {
+			ByteStreams.copy(new ByteArrayInputStream(largeFileContentsWritten), largeOut);
+		} finally {
+			largeOut.close();
+		}
+
+		byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
+		InputStream largeIn = largeFile.getInputStream();
+		try {
+			ByteStreams.readFully(largeIn, largeFileContentsRead);
+		} finally {
+			largeIn.close();
+		}
+
+		assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
 	}
 
 }

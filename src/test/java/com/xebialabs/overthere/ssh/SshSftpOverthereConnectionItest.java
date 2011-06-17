@@ -16,17 +16,18 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import org.junit.Test;
-
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import org.junit.Test;
+
+import com.xebialabs.overthere.ConnectionOptions;
+
 public class SshSftpOverthereConnectionItest extends SshOverthereConnectionItestBase {
 
 	@Override
-    protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() {
 		type = "ssh_sftp";
 		options = new ConnectionOptions();
 		options.set("address", "overthere");
@@ -41,4 +42,3 @@ public class SshSftpOverthereConnectionItest extends SshOverthereConnectionItest
 	}
 
 }
-
