@@ -330,9 +330,7 @@ public class CifsTelnetOverthereConnection extends OverthereConnection implement
 			smbUrl.append(hostPath.substring(3).replace('\\', '/'));
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Encoded Windows host path \"" + hostPath + "\" to SMB URL \"" + smbUrl.toString() + "\"");
-		}
+		logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, smbUrl.toString());
 
 		return smbUrl.toString();
 	}

@@ -8,7 +8,7 @@
 	</appender>
 
 
-	<logger name="com.xebialabs" level="debug" />
+	<logger name="com.xebialabs" level="trace" />
 	<logger name="org.reflections" level="error" />
 
 	<root level="info">
