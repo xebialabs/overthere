@@ -16,22 +16,21 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
+import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Random;
 
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.SSHException;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.userauth.UserAuthException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.UserInfo;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
@@ -45,256 +44,155 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
  */
 abstract class SshOverthereConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
-	protected String host;
+    protected String host;
 
-	protected int port;
+    protected int port;
 
-	protected String username;
+    protected String username;
 
-	protected String password;
+    protected String password;
 
-	protected Session sharedSession;
+    protected SSHClient sshClient;
 
-	public static final int CHANNEL_CLOSED_POLL_INTERNAL_MILLIS = 50;
-	
-	public SshOverthereConnection(String type, ConnectionOptions options) {
-		super(type, options);
-		this.host = options.get(ConnectionOptions.ADDRESS);
-		this.port = options.get(ConnectionOptions.PORT, 22);
-		this.username = options.get(ConnectionOptions.USERNAME);
-		this.password = options.get(ConnectionOptions.PASSWORD);
-	}
+    public SshOverthereConnection(String type, ConnectionOptions options) {
+        super(type, options);
+        this.host = options.get(ConnectionOptions.ADDRESS);
+        this.port = options.get(ConnectionOptions.PORT, 22);
+        this.username = options.get(ConnectionOptions.USERNAME);
+        this.password = options.get(ConnectionOptions.PASSWORD);
+    }
 
-	public SshOverthereConnection connect() throws RuntimeIOException {
-		if (sharedSession == null) {
-			try {
-				sharedSession = openSession();
-			} catch (JSchException exc) {
-				throw new RuntimeIOException("Cannot connect to " + this, exc);
-			}
-		}
-		return this;
-	}
+    @Override
+    public SshOverthereConnection connect() throws RuntimeIOException {
+        try {
+            sshClient = openSession();
+        } catch (SSHException e) {
+            throw new RuntimeIOException("Cannot connect to " + this, e);
+        }
+        return this;
+    }
 
-	@Override
-	public void disconnect() {
-		super.disconnect();
-		disconnectSharedSession();
-	}
+    @Override
+    public void doDisconnect() {
+        checkState(sshClient != null, "Already disconnected");
+        super.doDisconnect();
+        try {
+            sshClient.disconnect();
+        } catch (IOException e) {
+            throw new RuntimeIOException("Could not disconnect from " + this, e);
+        } finally {
+            sshClient = null;
+        }
+    }
 
-	protected Session getSharedSession() {
-		if (sharedSession == null) {
-			throw new IllegalStateException("Not connected");
-		}
-		return sharedSession;
-	}
+    protected SSHClient getSshClient() {
+        checkState(sshClient != null, "Not (yet) connected");
+        return sshClient;
+    }
 
-	public void disconnectSharedSession() {
-		disconnectSession(sharedSession);
-		sharedSession = null;
-	}
+    protected SSHClient openSession() throws UserAuthException, TransportException {
+        SSHClient client = new SSHClient();
+        client.addHostKeyVerifier(new LaxKeyVerifier());
 
-	protected Session openSession() throws JSchException {
-		JSch jsch = new JSch();
+        try {
+            client.connect(host, port);
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
+        }
 
-		final String privateKeyFilename = System.getProperty("ssh.privatekey.filename");
-		if (privateKeyFilename != null) {
-			logger.info(format("found in System properties a private key filename '%s'", privateKeyFilename));
-			jsch.addIdentity(privateKeyFilename, System.getProperty("ssh.privatekey.passphrase"));
-		}
+        client.authPassword(username, password);
 
-		Session session = jsch.getSession(username, host, port);
+//		final String privateKeyFilename = System.getProperty("ssh.privatekey.filename");
+//		if (privateKeyFilename != null) {
+//			logger.info(format("found in System properties a private key filename '%s'", privateKeyFilename));
+//			jsch.addIdentity(privateKeyFilename, System.getProperty("ssh.privatekey.passphrase"));
+//		}
+//
+//		Session session = jsch.getSession(username, host, port);
+//
+//		session.setUserInfo(getUserInfo());
+//		session.connect(DEFAULT_CONNECTION_TIMEOUT_MS);
 
-		session.setUserInfo(getUserInfo());
-		session.connect(DEFAULT_CONNECTION_TIMEOUT_MS);
-		return session;
-	}
+        return client;
+    }
 
-	protected void disconnectSession(Session session) {
-		if (session != null) {
-			session.disconnect();
-		}
-	}
+    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+        return getFile(hostPath, false);
+    }
 
-	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
-		return getFile(hostPath, false);
-	}
+    protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
 
-	protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
+    public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+        return getFile(parent, child, false);
+    }
 
-	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
-		return getFile(parent, child, false);
-	}
+    protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+        if (!(parent instanceof SshOverthereFile)) {
+            throw new IllegalStateException("parent is not a file on an SSH host");
+        }
+        if (parent.getConnection() != this) {
+            throw new IllegalStateException("parent is not a file in this connection");
+        }
+        return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
+    }
 
-	protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
-		if (!(parent instanceof SshOverthereFile)) {
-			throw new IllegalStateException("parent is not a file on an SSH host");
-		}
-		if (parent.getConnection() != this) {
-			throw new IllegalStateException("parent is not a file in this connection");
-		}
-		return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
-	}
+    // FIXME: Move to OverthereHostConnectionUtils
+    public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
+        if (prefix == null)
+            throw new NullPointerException("prefix is null");
 
-	// FIXME: Move to OverthereHostConnectionUtils
-	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		if (prefix == null)
-			throw new NullPointerException("prefix is null");
+        if (suffix == null) {
+            suffix = ".tmp";
+        }
 
-		if (suffix == null) {
-			suffix = ".tmp";
-		}
+        Random r = new Random();
+        String infix = "";
+        for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
+            OverthereFile f = getFile(getTempDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
+            if (!f.exists()) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Created temporary file " + f);
 
-		Random r = new Random();
-		String infix = "";
-		for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-			OverthereFile f = getFile(getTempDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
-			if (!f.exists()) {
-				if (logger.isDebugEnabled())
-					logger.debug("Created temporary file " + f);
+                return f;
+            }
+            infix = "-" + Long.toString(Math.abs(r.nextLong()));
+        }
+        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
+    }
 
-				return f;
-			}
-			infix = "-" + Long.toString(Math.abs(r.nextLong()));
-		}
-		throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
-	}
+    public OverthereProcess startProcess(final CmdLine commandLine) {
+        try {
+            return createProcess(getSshClient().startSession(), commandLine);
+        } catch (SSHException e) {
+            throw new RuntimeIOException("Cannot execute remote command \"" + commandLine.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
+        }
 
-	public OverthereProcess startProcess(final CmdLine commandLine) {
-		final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
-		final String commandLineForLogging = commandLine.toCommandLine(getHostOperatingSystem(), true);
-		try {
-			final ChannelExec channel = createExecChannel();
-			channel.setCommand(commandLineForExecution);
-			channel.connect();
+    }
 
-			logger.info("Executing remote command \"" + commandLineForLogging + "\" on " + this + " and passing control to caller");
+    protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
+        return new SshProcess(this, session, commandLine);
+    }
 
-			return createProcess(commandLineForLogging, channel);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot execute remote command \"" + commandLineForLogging + "\" on " + this, exc);
-		}
+    static int waitForExitStatus(Session.Subsystem channel, String command) {
+        while (true) {
+            if (!channel.isOpen()) {
+                return channel.getExitStatus();
+            }
 
-	}
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException exc) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeIOException("Remote command \"" + command + "\" was interrupted", exc);
+            }
+        }
+    }
 
-	protected ChannelExec createExecChannel() throws JSchException {
-		return (ChannelExec) getSharedSession().openChannel("exec");
-	}
+    @Override
+    public String toString() {
+        return type + "://" + username + "@" + host + ":" + port;
+    }
 
-	protected OverthereProcess createProcess(final String command, final ChannelExec channel) {
-		return new ChannelExecProcess(channel, command);
-	}
-
-	protected static class ChannelExecProcess implements OverthereProcess {
-		private final ChannelExec channel;
-		private final String command;
-
-		protected ChannelExecProcess(final ChannelExec channel, final String command) {
-			this.channel = channel;
-			this.command = command;
-		}
-
-		@Override
-		public OutputStream getStdin() {
-			try {
-				return channel.getOutputStream();
-			} catch (IOException exc) {
-				throw new RuntimeIOException("Cannot open output stream to remote stdin");
-			}
-		}
-
-		@Override
-		public InputStream getStdout() {
-			try {
-				return channel.getInputStream();
-			} catch (IOException exc) {
-				throw new RuntimeIOException("Cannot open input stream from remote stdout");
-			}
-		}
-
-		@Override
-		public InputStream getStderr() {
-			try {
-				return channel.getErrStream();
-			} catch (IOException exc) {
-				throw new RuntimeIOException("Cannot open input stream from remote stderr");
-			}
-		}
-
-		@Override
-		public int waitFor() throws InterruptedException {
-			try {
-				while (true) {
-					if (channel.isClosed()) {
-						int exitValue = channel.getExitStatus();
-						logger.info("Finished executing remote command \"" + command + "\" on " + this + " with exit value " + exitValue + " (control was passed to caller)");
-						return exitValue;
-					}
-
-					Thread.sleep(CHANNEL_CLOSED_POLL_INTERNAL_MILLIS);
-				}
-			} finally {
-				destroy();
-			}
-		}
-
-		@Override
-		public void destroy() {
-			if (channel.isConnected()) {
-				channel.disconnect();
-			}
-		}
-
-	}
-
-	static int waitForExitStatus(ChannelExec channel, String command) {
-		while (true) {
-			if (channel.isClosed()) {
-				return channel.getExitStatus();
-			}
-
-			try {
-				Thread.sleep(CHANNEL_CLOSED_POLL_INTERNAL_MILLIS);
-			} catch (InterruptedException exc) {
-				Thread.currentThread().interrupt();
-				throw new RuntimeIOException("Remote command \"" + command + "\" was interrupted", exc);
-			}
-		}
-	}
-
-	protected UserInfo getUserInfo() {
-		return new UserInfo() {
-			public boolean promptPassword(String prompt) {
-				return true;
-			}
-
-			public String getPassword() {
-				return password;
-			}
-
-			public boolean promptPassphrase(String prompt) {
-				return false;
-			}
-
-			public String getPassphrase() {
-				return null;
-			}
-
-			public boolean promptYesNo(String prompt) {
-				return true;
-			}
-
-			public void showMessage(String msg) {
-				logger.info("Message recieved while connecting to " + username + "@" + host + ":" + port + ": " + msg);
-			}
-		};
-	}
-
-	@Override
-	public String toString() {
-		return type + "://" + username + "@" + host + ":" + port;
-	}
-
-	private static Logger logger = LoggerFactory.getLogger(SshOverthereConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshOverthereConnection.class);
 
 }

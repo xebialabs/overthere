@@ -16,71 +16,61 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import net.schmizz.sshj.sftp.FileAttributes;
+import net.schmizz.sshj.sftp.FileMode;
+import net.schmizz.sshj.sftp.OpenMode;
+import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import net.schmizz.sshj.xfer.FilePermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.ChannelSftp.LsEntry;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * A file on a host connected through SSH that is accessed using SFTP.
  */
-class SshSftpOverthereFile extends SshOverthereFile {
+class SshSftpOverthereFile extends SshOverthereFile<SshSftpOverthereConnection> {
 
 	public SshSftpOverthereFile(SshSftpOverthereConnection connection, String path) {
 		super(connection, path);
 	}
 
-	protected SftpATTRS stat() throws RuntimeIOException {
+	protected FileAttributes stat() throws RuntimeIOException {
 		logger.info("Statting file " + this);
 
 		try {
-			SftpATTRS attrs = ((SshSftpOverthereConnection) connection).getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
-			return attrs;
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot stat file " + this, exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot stat file " + this, exc);
-		}
-	}
+            return connection.getSharedSftpClient().stat(getPath());
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot stat file " + this, e);
+        }
+    }
 
 	public boolean exists() throws RuntimeIOException {
 		logger.info("Checking file " + getPath() + " for existence");
 
 		try {
-			((SshSftpOverthereConnection) connection).getSharedSftpChannel().stat(convertWindowsPathToWinSshdPath(getPath()));
-			return true;
-		} catch (SftpException exc) {
-			// if we get an SftpException while trying to stat the file, we
-			// assume it does not exist
-			return false;
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot check existence of file " + getPath(), exc);
+            return connection.getSharedSftpClient().statExistence(getPath()) != null;
+        } catch (IOException e) {
+			throw new RuntimeIOException("Cannot check existence of file " + getPath(), e);
 		}
 	}
 
 	@Override
 	public boolean isDirectory() throws RuntimeIOException {
-		return stat().isDir();
+		return stat().getType() == FileMode.Type.DIRECTORY;
 	}
 
 	@Override
 	public long lastModified() {
-		return stat().getMTime();
+		return stat().getMtime();
 	}
 
 	@Override
@@ -88,47 +78,46 @@ class SshSftpOverthereFile extends SshOverthereFile {
 		return stat().getSize();
 	}
 
-	@Override
-	public boolean canExecute() throws RuntimeIOException {
-		SftpATTRS attrs = stat();
-		return (attrs.getPermissions() & 0100) != 0;
-	}
-
-	@Override
+    @Override
 	public boolean canRead() throws RuntimeIOException {
-		SftpATTRS attrs = stat();
-		return (attrs.getPermissions() & 0400) != 0;
+        return hasPermission(FilePermission.USR_R);
 	}
 
 	@Override
 	public boolean canWrite() throws RuntimeIOException {
-		SftpATTRS attrs = stat();
-		return (attrs.getPermissions() & 0200) != 0;
+        return hasPermission(FilePermission.USR_W);
 	}
+
+    @Override
+    public boolean canExecute() throws RuntimeIOException {
+        return hasPermission(FilePermission.USR_X);
+    }
+
+    private boolean hasPermission(FilePermission perm) {
+        return stat().getPermissions().contains(perm);
+    }
 
 	@Override
 	public List<OverthereFile> listFiles() {
-		logger.info("Listing files in " + this);
+		logger.debug("Listing files in {}", this);
 
 		try {
 			// read files from host
-			@SuppressWarnings("unchecked")
-			Vector<LsEntry> ls = (Vector<LsEntry>) ((SshSftpOverthereConnection) connection).getSharedSftpChannel().ls(convertWindowsPathToWinSshdPath(getPath()));
+            List<RemoteResourceInfo> ls = connection.getSharedSftpClient().ls(getPath());
 
-			// copy files to list, skipping . and ..
+            // copy files to list, skipping . and ..
 			List<OverthereFile> files = newArrayList();
-			for (LsEntry lsEntry : ls) {
-				String filename = lsEntry.getFilename();
+            for (RemoteResourceInfo l : ls) {
+				String filename = l.getName();
 				if (filename.equals(".") || filename.equals("..")) {
 					continue;
 				}
 				files.add(getFile(filename));
 			}
+
 			return files;
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot list directory " + this + ": " + exc.toString(), exc);
+        } catch (IOException e) {
+			throw new RuntimeIOException("Cannot list directory " + this, e);
 		}
 	}
 
@@ -137,130 +126,88 @@ class SshSftpOverthereFile extends SshOverthereFile {
 		logger.info("Creating directory " + this);
 
 		try {
-			((SshSftpOverthereConnection) connection).getSharedSftpChannel().mkdir(convertWindowsPathToWinSshdPath(getPath()));
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot create directory " + getPath() + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot create directory " + getPath() + ": " + exc.toString(), exc);
-		}
-	}
+            connection.getSharedSftpClient().mkdir(getPath());
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot create directory " + getPath(), e);
+        }
+    }
 
 	@Override
 	public void mkdirs() throws RuntimeIOException {
-		logger.info("Creating directories " + this);
-
-		List<OverthereFile> allDirs = new ArrayList<OverthereFile>();
-		OverthereFile dir = this;
-		do {
-			allDirs.add(0, dir);
-		} while ((dir = dir.getParentFile()) != null);
-
-		for (OverthereFile each : allDirs) {
-			if (!each.exists()) {
-				each.mkdir();
-			}
-		}
+		logger.debug("Creating directories {}", this);
+        try {
+            connection.getSharedSftpClient().mkdirs(getPath());
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot create directories " + getPath(), e);
+        }
 	}
 
 	@Override
 	public void renameTo(OverthereFile dest) {
-		logger.info("Renaming " + this + " to " + dest);
+		logger.debug("Renaming {} to {}", this, dest);
 
 		if (dest instanceof SshSftpOverthereFile) {
 			SshSftpOverthereFile sftpDest = (SshSftpOverthereFile) dest;
 			if (sftpDest.getConnection() == getConnection()) {
 				try {
-					((SshSftpOverthereConnection) connection).getSharedSftpChannel().rename(getPath(), sftpDest.getPath());
-				} catch (SftpException exc) {
-					throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest + ": " + exc.toString(), exc);
-				} catch (JSchException exc) {
-					throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest + ": " + exc.toString(), exc);
-				}
-			} else {
-				throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to SSH/SCP file/directory " + dest
+					connection.getSharedSftpClient().rename(getPath(), sftpDest.getPath());
+				} catch (IOException e) {
+                    throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest, e);
+                }
+            } else {
+				throw new RuntimeIOException("Cannot move/rename SSH/SFTP file/directory " + this + " to SSH/SFTP file/directory " + dest
 				        + " because it is in a different connection");
 			}
 		} else {
-			throw new RuntimeIOException("Cannot move/rename SSH/SCP file/directory " + this + " to non-SSH/SCP file/directory " + dest);
+			throw new RuntimeIOException("Cannot move/rename SSH/SFTP file/directory " + this + " to non-SSH/SFTP file/directory " + dest);
 		}
 	}
 
 	@Override
 	protected void deleteFile() {
-		logger.info("Removing file " + this);
+		logger.debug("Removing file {}", this);
 
 		try {
-			((SshSftpOverthereConnection) connection).getSharedSftpChannel().rm(convertWindowsPathToWinSshdPath(getPath()));
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot delete file " + this + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot delete file " + this + ": " + exc.toString(), exc);
-		}
-	}
+            connection.getSharedSftpClient().rm(getPath());
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot delete file " + this, e);
+        }
+    }
 
 	@Override
 	protected void deleteDirectory() {
-		logger.info("Removing directory " + this);
+		logger.debug("Removing directory {}", this);
 
 		try {
-			((SshSftpOverthereConnection) connection).getSharedSftpChannel().rmdir(convertWindowsPathToWinSshdPath(getPath()));
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot delete directory " + this + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot delete directory " + this + ": " + exc.toString(), exc);
-		}
-	}
+            connection.getSharedSftpClient().rmdir(getPath());
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot delete directory " + this, e);
+        }
+    }
 
 	@Override
 	public InputStream getInputStream() {
-		logger.info("Opening SFTP input stream to read from file " + this);
+		logger.debug("Opening SFTP input stream to read from file {}", this);
 
-		try {
-			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel(false);
-			InputStream in = new SshSftpInputStream(this, sftpChannel, sftpChannel.get(convertWindowsPathToWinSshdPath(getPath())));
-			return in;
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot read from file " + getPath() + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot read from file " + getPath() + ": " + exc.toString(), exc);
-		}
+        try {
+            return connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.READ)).getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot read from file " + getPath(), e);
+        }
 	}
 
 	@Override
 	public OutputStream getOutputStream(long length) throws RuntimeIOException {
-		logger.info("Opening SFTP ouput stream to write to file " + this);
+		logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
-		try {
-			ChannelSftp sftpChannel = ((SshSftpOverthereConnection) connection).openSftpChannel(false);
-			OutputStream out = new SshSftpOutputStream(this, sftpChannel, sftpChannel.put(convertWindowsPathToWinSshdPath(getPath())));
-			return out;
-		} catch (SftpException exc) {
-			throw new RuntimeIOException("Cannot write to file " + getPath() + ": " + exc.toString(), exc);
-		} catch (JSchException exc) {
-			throw new RuntimeIOException("Cannot write to file " + getPath() + ": " + exc.toString(), exc);
-		}
+
+        try {
+            return connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE)).getOutputStream();
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot write to file " + getPath(), e);
+        }
 	}
 
-	/**
-	 * TODO: Do we still want to support WinSSHD? What about copssh?
-	 */
-	private String convertWindowsPathToWinSshdPath(String path) {
-		if (connection.getHostOperatingSystem() == OperatingSystemFamily.WINDOWS) {
-			String winSshdPath;
-			if (path.length() == 2 && path.charAt(1) == ':') {
-				winSshdPath = "/" + path.charAt(0);
-			} else if (path.length() > 2 && path.charAt(1) == ':' && path.charAt(2) == '\\') {
-				winSshdPath = "/" + path.replace('\\', '/').replace(":", "");
-			} else {
-				winSshdPath = path;
-			}
-			if (logger.isDebugEnabled())
-				logger.debug("Translated Windows path " + path + " to WinSSHD path " + winSshdPath);
-			path = winSshdPath;
-		}
-		return path;
-	}
-
-	private static Logger logger = LoggerFactory.getLogger(SshSftpOverthereFile.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpOverthereFile.class);
 
 }

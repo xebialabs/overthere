@@ -80,15 +80,19 @@ public abstract class OverthereConnection {
 	 * 
 	 * Never throws an exception, not even a {@link RuntimeException}
 	 */
-	public void disconnect() {
+	public final void disconnect() {
 		if (deleteTemporaryDirectoryOnDisconnect) {
 			deleteTemporaryDirectory();
 		}
 
-		logger.info("Disconnected from " + this);
+        doDisconnect();
+
+		logger.info("Disconnected from {}", this);
 	}
 
-	protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
+    protected void doDisconnect() {}
+
+    protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
 		if (sessionTemporaryDirectory == null) {
 			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 			Random r = new Random();

@@ -16,13 +16,15 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.InputStream;
-
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSchException;
+import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.spi.Protocol;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+
+import java.io.InputStream;
 
 /**
  * A connection to a remote host using SSH w/ interactive SUDO.
@@ -34,22 +36,19 @@ public class SshInteractiveSudoOverthereConnection extends SshSudoOverthereConne
 		super(type, options);
 	}
 
-	@Override
-	protected ChannelExec createExecChannel() throws JSchException {
-		ChannelExec channel = super.createExecChannel();
-		// FIXME: Move this to a connection option
-		channel.setPty(true);
-		return channel;
-	}
+    @Override
+    protected SshProcess createProcess(final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
+        return new SshProcess(this, session, commandLine) {
+            @Override
+            protected Session.Command startCommand() throws TransportException, ConnectionException {
+                session.allocateDefaultPTY();
+                return super.startCommand();
+            }
 
-	@Override
-	protected OverthereProcess createProcess(final String command, final ChannelExec channel) {
-		return new ChannelExecProcess(channel, command) {
-			@Override
-			public InputStream getStdout() {
-				return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password);
-			}
-		};
-	}
-
+            @Override
+            public InputStream getStdout() {
+                return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password);
+            }
+        };
+    }
 }

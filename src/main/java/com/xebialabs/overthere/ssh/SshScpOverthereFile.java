@@ -23,8 +23,7 @@ import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandle
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -39,7 +38,7 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 /**
  * A file on a host connected through SSH w/ SCP.
  */
-class SshScpOverthereFile extends SshOverthereFile {
+class SshScpOverthereFile extends SshOverthereFile<SshScpOverthereConnection> {
 
 	/**
 	 * Constructs an SshScpOverthereFile
@@ -49,7 +48,7 @@ class SshScpOverthereFile extends SshOverthereFile {
 	 * @param remotePath
 	 *            the path of the file on the host
 	 */
-	public SshScpOverthereFile(SshOverthereConnection connection, String remotePath) {
+	public SshScpOverthereFile(SshScpOverthereConnection connection, String remotePath) {
 		super(connection, remotePath);
 	}
 
@@ -199,22 +198,62 @@ class SshScpOverthereFile extends SshOverthereFile {
 		}
 	}
 
+
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {
-		if (logger.isDebugEnabled())
-			logger.debug("Opening SCP input stream to read from file " + this);
+        logger.debug("Opening SCP input stream to read from file {}", this);
 
-		return new SshScpInputStream(this);
+        try {
+            final File tempFile = File.createTempFile("scp_download", ".tmp");
+            tempFile.deleteOnExit();
+            connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
+            return new FileInputStream(tempFile) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } finally {
+                        tempFile.delete();
+                    }
+
+                }
+            };
+        } catch (IOException e) {
+            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+        }
 	}
 
 	@Override
 	public OutputStream getOutputStream(long length) throws RuntimeIOException {
-		if (logger.isDebugEnabled())
-			logger.debug("Opening SCP output stream to write to file " + this);
+		logger.debug("Opening SCP output stream to write to file {}", this);
 
-		return new SshScpOutputStream(this, length);
+        try {
+            final File tempFile = File.createTempFile("scp_upload", ".tmp");
+            tempFile.deleteOnExit();
+            return new FileOutputStream(tempFile) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } finally {
+                        uploadAndDelete(tempFile);
+                    }
+                }
+
+                private void uploadAndDelete(File tempFile) throws IOException {
+                    try {
+                        connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
+                    } finally {
+                        tempFile.delete();
+                    }
+                }
+            };
+        } catch (IOException e) {
+            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+        }
 	}
 
-	private Logger logger = LoggerFactory.getLogger(SshScpOverthereFile.class);
+
+    private Logger logger = LoggerFactory.getLogger(SshScpOverthereFile.class);
 
 }

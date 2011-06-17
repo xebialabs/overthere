@@ -25,18 +25,18 @@ import com.xebialabs.overthere.util.OverthereFileCopier;
 /**
  * A file system object (file, directory, etc.) on a remote system that is accessible through an {@link OverthereConnection}.
  */
-public abstract class OverthereFile {
+public abstract class OverthereFile<C extends OverthereConnection> {
 
-	protected OverthereConnection connection;
+	protected C connection;
 
-	protected OverthereFile(OverthereConnection connection) {
+	protected OverthereFile(C connection) {
 		this.connection = connection;
 	}
 
 	/**
 	 * The connection through which this file is accessible. If the connection is closed, this file may no longer be accessible.
 	 */
-	public final OverthereConnection getConnection() {
+	public final C getConnection() {
 		return connection;
 	}
 

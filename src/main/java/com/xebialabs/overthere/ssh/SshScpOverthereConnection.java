@@ -29,13 +29,15 @@ public class SshScpOverthereConnection extends SshOverthereConnection {
 
 	public SshScpOverthereConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		connect();
 	}
+
+
 
 	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		return new SshScpOverthereFile(this, hostPath);
 	}
+
 
 }
 

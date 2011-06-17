@@ -16,16 +16,16 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSchException;
+import com.google.common.base.Preconditions;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.Protocol;
+import net.schmizz.sshj.sftp.SFTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * A connection to a remote host using SSH w/ SFTP.
@@ -33,7 +33,7 @@ import com.xebialabs.overthere.spi.Protocol;
 @Protocol(name = "ssh_sftp")
 public class SshSftpOverthereConnection extends SshOverthereConnection {
 
-	private ChannelSftp sharedSftpChannel;
+	private SFTPClient sharedSftpClient;
 
 	public SshSftpOverthereConnection(String type, ConnectionOptions options) {
 		super(type, options);
@@ -44,38 +44,39 @@ public class SshSftpOverthereConnection extends SshOverthereConnection {
 		return new SshSftpOverthereFile(this, hostPath);
 	}
 
+    @Override
+    public SshOverthereConnection connect() throws RuntimeIOException {
+        SshOverthereConnection connect = super.connect();
+
+        logger.debug("Opening SFTP client to {}", this);
+        try {
+            sharedSftpClient = getSshClient().newSFTPClient();
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
+        }
+
+        return connect;
+    }
+
 	@Override
-	public void disconnect() {
-		super.disconnect();
+	public void doDisconnect() {
+        Preconditions.checkState(sharedSftpClient != null, "Not connected to SFTP");
 
-		if (sharedSftpChannel != null) {
-			closeSftpChannel(sharedSftpChannel, true);
-		}
+        logger.debug("Closing SFTP client to {}", this);
+        try {
+            sharedSftpClient.close();
+        } catch (IOException e) {
+            logger.error("Couldn't close the SFTP client", e);
+        }
+
+        sharedSftpClient = null;
+        super.doDisconnect();
 	}
 
-	protected ChannelSftp getSharedSftpChannel() throws JSchException {
-		if (sharedSftpChannel == null) {
-			sharedSftpChannel = openSftpChannel(true);
-		}
-		return sharedSftpChannel;
+    protected SFTPClient getSharedSftpClient() {
+		return sharedSftpClient;
 	}
 
-	protected ChannelSftp openSftpChannel(boolean shared) throws JSchException {
-		Channel channel = getSharedSession().openChannel("sftp");
-		if (logger.isDebugEnabled())
-			logger.debug((shared ? "Opening shared SFTP channel to " : "Opening SFTP channel to ") + this);
-		channel.connect();
-		return (ChannelSftp) channel;
-	}
-
-	protected void closeSftpChannel(ChannelSftp sftpChannel, boolean shared) {
-		if (sftpChannel != null) {
-			if (logger.isDebugEnabled())
-				logger.debug((shared ? "Closing shared SFTP channel to " : "Closing SFTP channel to ") + this);
-			sftpChannel.disconnect();
-		}
-	}
-
-	private Logger logger = LoggerFactory.getLogger(SshSftpOverthereConnection.class);
+    private Logger logger = LoggerFactory.getLogger(SshSftpOverthereConnection.class);
 
 }
