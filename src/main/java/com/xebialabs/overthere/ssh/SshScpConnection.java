@@ -37,4 +37,3 @@ public class SshScpConnection extends SshConnection {
 	}
 
 }
-

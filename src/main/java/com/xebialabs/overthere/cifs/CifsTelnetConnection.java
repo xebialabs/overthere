@@ -19,7 +19,6 @@ package com.xebialabs.overthere.cifs;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.Overthere.DEFAULT_CONNECTION_TIMEOUT_MS;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -121,7 +120,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 
 		try {
 			final TelnetClient tc = new TelnetClient();
-			tc.setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT_MS);
+			tc.setConnectTimeout(CONNECTION_TIMEOUT_MS);
 			tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
 			if (logger.isDebugEnabled()) {
 				logger.debug("Connecting to telnet://" + username + "@" + address);

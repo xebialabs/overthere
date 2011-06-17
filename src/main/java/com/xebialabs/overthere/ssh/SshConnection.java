@@ -27,6 +27,7 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.UserAuthException;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,15 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 
     protected String password;
 
-    protected SSHClient sshClient;
+	protected String privateKeyFile;
+
+	protected String passphrase;
+
+	protected SSHClient sshClient;
+
+	public static final String PRIVATE_KEY_FILE = "privateKeyFile";
+
+	public static final String PASSPHRASE = "passphrase";
 
     public SshConnection(String type, ConnectionOptions options) {
         super(type, options);
@@ -60,6 +69,8 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
         this.port = options.get(ConnectionOptions.PORT, 22);
         this.username = options.get(ConnectionOptions.USERNAME);
         this.password = options.get(ConnectionOptions.PASSWORD);
+		this.privateKeyFile = options.get(PRIVATE_KEY_FILE);
+		this.passphrase = options.get(PASSPHRASE);
     }
 
     @Override
@@ -91,6 +102,7 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 
     protected SSHClient openSession() throws UserAuthException, TransportException {
         SSHClient client = new SSHClient();
+        client.setConnectTimeout(CONNECTION_TIMEOUT_MS);
         client.addHostKeyVerifier(new LaxKeyVerifier());
 
         try {
@@ -99,18 +111,24 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
             throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
         }
 
-        client.authPassword(username, password);
-
-//		final String privateKeyFilename = System.getProperty("ssh.privatekey.filename");
-//		if (privateKeyFilename != null) {
-//			logger.info(format("found in System properties a private key filename '%s'", privateKeyFilename));
-//			jsch.addIdentity(privateKeyFilename, System.getProperty("ssh.privatekey.passphrase"));
-//		}
-//
-//		Session session = jsch.getSession(username, host, port);
-//
-//		session.setUserInfo(getUserInfo());
-//		session.connect(DEFAULT_CONNECTION_TIMEOUT_MS);
+		if (password != null) {
+			client.authPassword(username, password);
+			if (privateKeyFile != null) {
+				logger.warn("Both password and private key have been set for SSH connection {}. Using the password and ignoring the private key.", this);
+			}
+		} else if (privateKeyFile != null) {
+			KeyProvider keys;
+			try {
+				if (passphrase == null) {
+					keys = client.loadKeys(privateKeyFile);
+				} else {
+					keys = client.loadKeys(privateKeyFile, passphrase);
+				}
+			} catch (IOException e) {
+				throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
+			}
+			client.authPublickey(username, keys);
+		}
 
         return client;
     }

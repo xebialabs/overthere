@@ -47,8 +47,15 @@ public abstract class OverthereConnection {
 	protected OverthereFile sessionTemporaryDirectory;
 
 	protected boolean deleteTemporaryDirectoryOnDisconnect = true;
+
+	/**
+     * The timeout for opening a connection in milliseconds.
+     */
+    public static final int CONNECTION_TIMEOUT_MS = 120000;
 	
-	// FIXME: Move to connection options
+	/**
+	 * The number of tries made when creating a unique temporary file name.
+	 */
 	public static final long MAX_TEMP_RETRIES = 100;
 
 	protected OverthereConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {

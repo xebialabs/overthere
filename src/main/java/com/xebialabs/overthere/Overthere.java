@@ -37,12 +37,6 @@ import com.xebialabs.overthere.spi.Protocol;
 public class Overthere {
 	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
 
-	/**
-	 * The default timeout for opening a connection in milliseconds.
-	 */
-	// FIXME: should this not be moved somewhere else?
-	public static final int DEFAULT_CONNECTION_TIMEOUT_MS = 120000;
-
 	private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
 	        new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
 

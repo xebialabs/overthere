@@ -27,7 +27,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 public class SshInteractiveSudoConnectionItest extends SshSudoConnectionItestBase {
 
 	@Override
-    protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() {
 		type = "ssh_interactive_sudo";
 		options = new ConnectionOptions();
 		options.set("address", "overthere");
@@ -39,8 +39,7 @@ public class SshInteractiveSudoConnectionItest extends SshSudoConnectionItestBas
 
 	@Test
 	public void hostSessionIsAnSshSudoHostSession() {
-		assertThat(connection, instanceOf(SshInteractiveSudoOverthereConnection.class));
+		assertThat(connection, instanceOf(SshInteractiveSudoConnection.class));
 	}
 
 }
-

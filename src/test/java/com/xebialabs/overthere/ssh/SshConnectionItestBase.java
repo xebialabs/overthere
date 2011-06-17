@@ -18,18 +18,24 @@ package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Writer;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.io.CharStreams;
+import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
@@ -58,6 +64,8 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 
 	@Test
 	public void shouldNotConnectWithIncorrectPassword() {
+		assumeThat(options.get("password"), notNullValue());
+
 		options.set("password", "an-incorrect-password");
 		try {
 			Overthere.getConnection(type, options);
@@ -105,6 +113,23 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 		OverthereProcessOutputHandler handler = new ConsoleOverthereProcessOutputHandler();
 		int res = connection.execute(handler, CmdLine.build("cp", tempFile.getPath(), "/tmp/" + System.currentTimeMillis() + ".class"));
 		assertThat(res, equalTo(0));
+	}
+
+	protected File createPrivateKeyFile(String privateKey) {
+		try {
+			final File privateKeyFile = File.createTempFile("private", ".key");
+			privateKeyFile.deleteOnExit();
+
+			CharStreams.write(privateKey, new OutputSupplier<Writer>() {
+				@Override
+				public Writer getOutput() throws IOException {
+					return new FileWriter(privateKeyFile);
+				}
+			});
+			return privateKeyFile;
+		} catch (IOException exc) {
+			throw new RuntimeIOException("Cannot write private key file");
+		}
 	}
 
 }
