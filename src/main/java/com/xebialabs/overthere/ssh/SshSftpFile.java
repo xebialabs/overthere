@@ -46,7 +46,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	protected FileAttributes stat() {
-		logger.info("Statting file " + this);
+		logger.debug("Statting file " + this);
 
 		try {
             return connection.getSharedSftpClient().stat(getPath());
@@ -56,7 +56,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
     }
 
 	public boolean exists() {
-		logger.info("Checking file " + getPath() + " for existence");
+		logger.debug("Checking file " + getPath() + " for existence");
 
 		try {
             return connection.getSharedSftpClient().statExistence(getPath()) != null;
@@ -130,7 +130,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
 	@Override
 	public void mkdir() {
-		logger.info("Creating directory " + this);
+		logger.debug("Creating directory " + this);
 
 		try {
             connection.getSharedSftpClient().mkdir(getPath());

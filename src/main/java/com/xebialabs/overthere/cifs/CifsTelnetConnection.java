@@ -129,11 +129,8 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 			final TelnetClient tc = new TelnetClient();
 			tc.setConnectTimeout(CONNECTION_TIMEOUT_MS);
 			tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
-			if (logger.isDebugEnabled()) {
-				logger.debug("Connecting to telnet://" + username + "@" + address);
-			}
+			logger.info("Connecting to telnet://{}@{}", username, address);
 			tc.connect(address);
-			logger.info("Connected to telnet://" + username + "@" + address);
 			final InputStream stdout = tc.getInputStream();
 			final OutputStream stdin = tc.getOutputStream();
 			final PipedInputStream callersStdout = new PipedInputStream();
@@ -211,7 +208,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 					if (tc.isConnected()) {
 						try {
 							tc.disconnect();
-							logger.info("Disconnected from telnet://" + username + "@" + address);
+							logger.info("Disconnected from telnet://{}@{}", username, address);
 
 							toCallersStdout.close();
 						} catch (IOException exc) {
@@ -303,7 +300,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		Random r = new Random();
 		String infix = "";
 		for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-			OverthereFile f = getFile(getTempDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
+			OverthereFile f = getFile(getConnectionTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
 			if (!f.exists()) {
 				if (logger.isDebugEnabled())
 					logger.debug("Created temporary file " + f);

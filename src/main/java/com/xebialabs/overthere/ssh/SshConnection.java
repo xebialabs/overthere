@@ -158,7 +158,7 @@ abstract class SshConnection extends OverthereConnection {
         Random r = new Random();
         String infix = "";
         for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-            OverthereFile f = getFile(getTempDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
+            OverthereFile f = getFile(getConnectionTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
             if (!f.exists()) {
                 if (logger.isDebugEnabled())
                     logger.debug("Created temporary file " + f);

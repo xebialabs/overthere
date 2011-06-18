@@ -61,7 +61,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	@Override
 	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		try {
-			File tempFile = createTempFile(prefix, suffix, new File(getTempDirectory().getPath()));
+			File tempFile = createTempFile(prefix, suffix, new File(getConnectionTemporaryDirectory().getPath()));
 			// FIXME: Need to delete this file to make test work, but isn't it better to NOT do that so that a tempfile with the same name is not accidentally
 			// created simultaneously?
 			// FIXME: Answer from VP: we have to decide on the semantics. How do you create a temporary directory?

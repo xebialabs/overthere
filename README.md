@@ -2,8 +2,6 @@
 Runs something on a remote machine, i.e. over there.
 
 # TODO
-* Fix loglevels: trace for protocol implementations, debug for file operations, info for connect/disconnect/execute.
-  * Only show temporary directory message is a temporary directory has been created?
 * For small uploads in SCP use in-memory storage instead of a temporary file.
 * Clean up tempFile code scattered throughout codebase.
 * Clean up directory walker code and transformations.

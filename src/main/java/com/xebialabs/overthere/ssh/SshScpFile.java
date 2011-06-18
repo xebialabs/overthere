@@ -103,8 +103,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public List<OverthereFile> listFiles() {
-		if (logger.isDebugEnabled())
-			logger.debug("Listing directory " + this);
+		logger.debug("Listing directory {}", this);
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		// Yes, this *is* meant to be 'el es minus one'! Each file should go one a separate line, even if we create a pseudo-tty. Long format is NOT what we
@@ -123,15 +122,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	public void mkdir() {
-		if (logger.isDebugEnabled())
-			logger.debug("Creating directory " + this);
+		logger.debug("Creating directory {}", this);
 
 		mkdir(new String[0]);
 	}
 
 	public void mkdirs() {
-		if (logger.isDebugEnabled())
-			logger.debug("Creating directories " + this);
+		logger.debug("Creating directories {}", this);
 
 		mkdir("-p");
 	}
@@ -156,8 +153,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public void renameTo(OverthereFile dest) {
-		if (logger.isDebugEnabled())
-			logger.debug("Renaming " + this + " to " + dest);
+		logger.debug("Renaming {} to {}", this, dest);
 
 		if (dest instanceof SshScpFile) {
 			SshScpFile sshScpDestFile = (SshScpFile) dest;
@@ -177,8 +173,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	protected void deleteDirectory() {
-		if (logger.isDebugEnabled())
-			logger.debug("Deleting directory " + this);
+		logger.debug("Deleting directory {}", this);
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rmdir", getPath()));
@@ -189,8 +184,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	protected void deleteFile() {
-		if (logger.isDebugEnabled())
-			logger.debug("Deleting file " + this);
+		logger.debug("Deleting file {}", this);
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-f", getPath()));
@@ -201,18 +195,18 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public void deleteRecursively() throws RuntimeIOException {
-		if (logger.isDebugEnabled())
-			logger.debug("Recursively deleting file/directory " + this);
+		logger.debug("Recursively deleting file or directory {}", this);
 
 			CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-rf", getPath()));
 		if (errno != 0) {
-			throw new RuntimeIOException("Cannot recursively delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+			throw new RuntimeIOException("Cannot recursively delete file or directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
 	}
 
 	@Override
     protected void copyFrom(OverthereFile source) {
+		logger.debug("Copying file or directory {} to {}", source, this);
 		try {
 	        connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), getPath());
         } catch (IOException e) {

@@ -64,4 +64,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 		return connection;
 	}
 
+	public String toString() {
+		return connection.toString();
+	}
+
 }

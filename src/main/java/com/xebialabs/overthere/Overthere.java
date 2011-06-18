@@ -74,11 +74,8 @@ public class Overthere {
 		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
 			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class);
-			if (logger.isDebugEnabled()) {
-				logger.debug("Opening connection with protocol " + protocol);
-			}
 			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options);
-			logger.info("Connecing to {}", connectionBuilder);
+			logger.info("Connecting to {}", connectionBuilder);
 			OverthereConnection connection = connectionBuilder.connect();
 			return connection;
 		} catch (NoSuchMethodException exc) {

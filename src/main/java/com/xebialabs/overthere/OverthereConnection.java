@@ -101,7 +101,7 @@ public abstract class OverthereConnection {
 
 	protected abstract void doDisconnect();
 
-	protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
+	protected synchronized OverthereFile getConnectionTemporaryDirectory() throws RuntimeIOException {
 		if (connectionTemporaryDirectory == null) {
 			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 			Random r = new Random();
@@ -138,7 +138,7 @@ public abstract class OverthereConnection {
 				logger.info("Removing connection temporary directory {}", connectionTemporaryDirectory);
 				connectionTemporaryDirectory.deleteRecursively();
 			} catch (RuntimeException exc) {
-				logger.warn("Got exception while removing connection temporary directory " + connectionTemporaryDirectory, exc);
+				logger.warn("Got exception while removing connection temporary directory {}. Ignoring it.", connectionTemporaryDirectory, exc);
 			}
 		}
 	}
