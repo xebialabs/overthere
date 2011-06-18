@@ -70,7 +70,13 @@ public abstract class OverthereConnectionItestBase {
 	@After
 	public void disconnect() {
 		if (connection != null) {
-			connection.disconnect();
+			try {
+				connection.disconnect();
+				connection = null;
+			} catch(Exception exc) {
+				System.out.println("Exception while disconnecting at end of test case:");
+				exc.printStackTrace(System.out);
+			}
 		}
 	}
 

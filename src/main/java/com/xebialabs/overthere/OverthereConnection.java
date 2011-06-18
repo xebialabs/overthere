@@ -47,7 +47,7 @@ public abstract class OverthereConnection {
 
 	protected String temporaryDirectoryPath;
 
-	protected OverthereFile sessionTemporaryDirectory;
+	protected OverthereFile connectionTemporaryDirectory;
 
 	protected boolean deleteTemporaryDirectoryOnDisconnect = true;
 
@@ -102,7 +102,7 @@ public abstract class OverthereConnection {
 	protected abstract void doDisconnect();
 
 	protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
-		if (sessionTemporaryDirectory == null) {
+		if (connectionTemporaryDirectory == null) {
 			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 			Random r = new Random();
 			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
@@ -112,15 +112,15 @@ public abstract class OverthereConnection {
 			for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
 				OverthereFile tempDir = createSessionTempDirectory(temporaryDirectory, prefix + infix + suffix);
 				if (tempDir != null) {
-					sessionTemporaryDirectory = tempDir;
-					logger.info("Created connection temporary directory " + sessionTemporaryDirectory);
-					return sessionTemporaryDirectory;
+					connectionTemporaryDirectory = tempDir;
+					logger.info("Created connection temporary directory " + connectionTemporaryDirectory);
+					return connectionTemporaryDirectory;
 				}
 				infix = "-" + Long.toString(Math.abs(r.nextLong()));
 			}
 			throw new RuntimeIOException("Cannot create connection temporary directory on " + this);
 		}
-		return sessionTemporaryDirectory;
+		return connectionTemporaryDirectory;
 	}
 
 	protected OverthereFile createSessionTempDirectory(OverthereFile systemTempDirectory, String name) {
@@ -133,12 +133,12 @@ public abstract class OverthereConnection {
 	}
 
 	protected void deleteTemporaryDirectory() {
-		if (sessionTemporaryDirectory != null) {
+		if (connectionTemporaryDirectory != null) {
 			try {
-				sessionTemporaryDirectory.deleteRecursively();
-				logger.info("Removed connection temporary directory " + sessionTemporaryDirectory);
+				logger.info("Removing connection temporary directory {}", connectionTemporaryDirectory);
+				connectionTemporaryDirectory.deleteRecursively();
 			} catch (RuntimeException exc) {
-				logger.warn("Got exception while removing connection temporary directory " + sessionTemporaryDirectory, exc);
+				logger.warn("Got exception while removing connection temporary directory " + connectionTemporaryDirectory, exc);
 			}
 		}
 	}
@@ -222,7 +222,7 @@ public abstract class OverthereConnection {
 		Thread stdoutReaderThread = null;
 		Thread stderrReaderThread = null;
 		try {
-			stdoutReaderThread = new Thread("Stdout reader thread for " + this) {
+			stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
 				public void run() {
 					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
 					try {
@@ -249,7 +249,7 @@ public abstract class OverthereConnection {
 			};
 			stdoutReaderThread.start();
 
-			stderrReaderThread = new Thread("Stderr reader thread for " + this) {
+			stderrReaderThread = new Thread("Stderr reader thread for command " + commandLine + " on " + this) {
 				public void run() {
 					InputStreamReader stderrReader = new InputStreamReader(process.getStderr());
 					try {

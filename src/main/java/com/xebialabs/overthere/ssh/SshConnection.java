@@ -26,7 +26,6 @@ import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
-import net.schmizz.sshj.userauth.UserAuthException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
 import org.slf4j.Logger;
@@ -76,7 +75,35 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
     @Override
     public SshConnection connect() throws RuntimeIOException {
         try {
-            sshClient = openSession();
+            SSHClient client = new SSHClient();
+            client.setConnectTimeout(CONNECTION_TIMEOUT_MS);
+            client.addHostKeyVerifier(new LaxKeyVerifier());
+            
+            try {
+                client.connect(host, port);
+            } catch (IOException e) {
+                throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
+            }
+            
+            if (password != null) {
+            	client.authPassword(username, password);
+            	if (privateKeyFile != null) {
+            		logger.warn("Both password and private key have been set for SSH connection {}. Using the password and ignoring the private key.", this);
+            	}
+            } else if (privateKeyFile != null) {
+            	KeyProvider keys;
+            	try {
+            		if (passphrase == null) {
+            			keys = client.loadKeys(privateKeyFile);
+            		} else {
+            			keys = client.loadKeys(privateKeyFile, passphrase);
+            		}
+            	} catch (IOException e) {
+            		throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
+            	}
+            	client.authPublickey(username, keys);
+            }
+			sshClient = client;
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot connect to " + this, e);
         }
@@ -85,7 +112,7 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 
     @Override
     public void doDisconnect() {
-        checkState(sshClient != null, "Already disconnected");
+    	checkState(sshClient != null, "Already disconnected");
         try {
             sshClient.disconnect();
         } catch (IOException e) {
@@ -98,39 +125,6 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
     protected SSHClient getSshClient() {
         checkState(sshClient != null, "Not (yet) connected");
         return sshClient;
-    }
-
-    protected SSHClient openSession() throws UserAuthException, TransportException {
-        SSHClient client = new SSHClient();
-        client.setConnectTimeout(CONNECTION_TIMEOUT_MS);
-        client.addHostKeyVerifier(new LaxKeyVerifier());
-
-        try {
-            client.connect(host, port);
-        } catch (IOException e) {
-            throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
-        }
-
-		if (password != null) {
-			client.authPassword(username, password);
-			if (privateKeyFile != null) {
-				logger.warn("Both password and private key have been set for SSH connection {}. Using the password and ignoring the private key.", this);
-			}
-		} else if (privateKeyFile != null) {
-			KeyProvider keys;
-			try {
-				if (passphrase == null) {
-					keys = client.loadKeys(privateKeyFile);
-				} else {
-					keys = client.loadKeys(privateKeyFile, passphrase);
-				}
-			} catch (IOException e) {
-				throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
-			}
-			client.authPublickey(username, keys);
-		}
-
-        return client;
     }
 
     public OverthereFile getFile(String hostPath) throws RuntimeIOException {
@@ -178,6 +172,7 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
     }
 
     public OverthereProcess startProcess(final CmdLine commandLine) {
+    	logger.info("Executing command {} on {}", commandLine, this);
         try {
             return createProcess(getSshClient().startSession(), commandLine);
         } catch (SSHException e) {

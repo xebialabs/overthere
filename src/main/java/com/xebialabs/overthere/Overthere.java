@@ -70,28 +70,29 @@ public class Overthere {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
-		final Class<? extends OverthereConnectionBuilder> connectionBuilder = protocols.get().get(protocol);
+		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
-			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilder.getConstructor(String.class, ConnectionOptions.class);
+			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Opening connection with protocol " + protocol);
 			}
-			OverthereConnection connection = constructor.newInstance(protocol, options).connect();
-			logger.info("Connected to " + connection);
+			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options);
+			logger.info("Connecing to {}", connectionBuilder);
+			OverthereConnection connection = connectionBuilder.connect();
 			return connection;
 		} catch (NoSuchMethodException exc) {
-			throw new IllegalStateException(connectionBuilder + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
+			throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
 		} catch (IllegalArgumentException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
 		} catch (InstantiationException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
 		} catch (IllegalAccessException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
+			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
 		} catch (InvocationTargetException exc) {
 			if (exc.getCause() instanceof RuntimeException) {
 				throw (RuntimeException) exc.getCause();
 			} else {
-				throw new IllegalStateException("Cannot instantiate " + connectionBuilder, exc);
+				throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
 			}
 		}
 	}
