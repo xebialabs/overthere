@@ -103,9 +103,7 @@ class SshSudoFile extends SshScpFile {
 
 	@Override
 	public void mkdir() throws RuntimeIOException {
-		if (!isTempFile) {
-			super.mkdir();
-		} else {
+		if (isTempFile) {
 			/*
 			 * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is world writable with the
 			 * sticky bit set.
@@ -114,14 +112,14 @@ class SshSudoFile extends SshScpFile {
 				logger.debug("Creating world-writable directory (with sticky bit, mode 01777)");
 			}
 			mkdir("-m", "1777");
+		} else {
+			super.mkdir();
 		}
 	}
 
 	@Override
 	public void mkdirs() throws RuntimeIOException {
-		if (!isTempFile) {
-			super.mkdirs();
-		} else {
+		if (isTempFile) {
 			/*
 			 * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is world writable with the
 			 * sticky bit set.
@@ -130,6 +128,8 @@ class SshSudoFile extends SshScpFile {
 				logger.debug("Creating world-writable directories (with sticky bit, mode 01777)");
 			}
 			mkdir("-p", "-m", "1777");
+		} else {
+			super.mkdirs();
 		}
 	}
 
