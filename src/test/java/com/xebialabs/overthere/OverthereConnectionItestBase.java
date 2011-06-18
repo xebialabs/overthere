@@ -61,12 +61,12 @@ public abstract class OverthereConnectionItestBase {
 	public TemporaryFolder temp = new TemporaryFolder();
 	
 	@Before
-	public void connect() {
+	public void connect() throws Exception {
 		setTypeAndOptions();
 		connection = Overthere.getConnection(type, options);
 	}
 
-	protected abstract void setTypeAndOptions();
+	protected abstract void setTypeAndOptions() throws Exception;
 
 	@After
 	public void disconnect() {

@@ -27,6 +27,8 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
@@ -34,7 +36,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 public class SshScpConnectionItest extends SshConnectionItestBase {
 
 	@Override
-	protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() throws IOException {
 		type = "ssh";
 		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, SCP);

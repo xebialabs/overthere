@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -28,11 +30,14 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Writer;
 
 import org.junit.Test;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.CmdLine;
@@ -42,10 +47,22 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
+
+	protected File createPrivateKeyFile(String privateKey) throws IOException {
+		final File privateKeyFile = temp.newFile("private.key");
+		CharStreams.write(privateKey, new OutputSupplier<Writer>() {
+			@Override
+			public Writer getOutput() throws IOException {
+				return new FileWriter(privateKeyFile);
+			}
+		});
+		return privateKeyFile;
+	}
 
 	@Test
 	public void shouldNotConnectWithIncorrectUsername() {
@@ -114,21 +131,75 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 		assertThat(res, equalTo(0));
 	}
 
-	protected File createPrivateKeyFile(String privateKey) {
-		try {
-			final File privateKeyFile = File.createTempFile("private", ".key");
-			privateKeyFile.deleteOnExit();
+	/**
+	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (e.g. sudo).
+	 */
+	@Test
+	public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectory() throws IOException {
+		final OverthereFile homeDir = connection.getFile(getHomeDirPath());
+		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+		
+		final byte[] contentsWritten = generateRandomBytes(SMALL_FILE_SIZE);
+		ByteStreams.write(contentsWritten, new OutputSupplier<OutputStream>() {
+			@Override
+            public OutputStream getOutput() throws IOException {
+	            return fileInHomeDir.getOutputStream();
+            }
+		});
+		
+		assertThat(fileInHomeDir.exists(), equalTo(true));
 
-			CharStreams.write(privateKey, new OutputSupplier<Writer>() {
-				@Override
-				public Writer getOutput() throws IOException {
-					return new FileWriter(privateKeyFile);
-				}
-			});
-			return privateKeyFile;
-		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot write private key file");
+		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
+		InputStream in = fileInHomeDir.getInputStream();
+		try {
+			ByteStreams.readFully(in, contentsRead);
+		} finally {
+			in.close();
 		}
+		assertThat(contentsRead, equalTo(contentsWritten));
+		
+		fileInHomeDir.delete();
+		assertThat(fileInHomeDir.exists(), equalTo(false));
 	}
+
+	/**
+	 * Tests whether copyTo has the right permission behaviour (e.g. sudo).
+	 */
+	@Test
+	public void shouldCopyFileToAndFromSudoUserHomeDirectory() throws IOException {
+		final OverthereFile homeDir = connection.getFile(getHomeDirPath());
+		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+
+		File smallFile = temp.newFile("small.dat");
+		byte[] contentsWritten = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+		OverthereFile smallLocalFile = LocalFile.valueOf(smallFile);
+		
+		smallLocalFile.copyTo(fileInHomeDir);
+
+		assertThat(fileInHomeDir.exists(), equalTo(true));
+
+		File smallFileReadBack = temp.newFile("small-read-back.dat");
+		OverthereFile smallLocalFileReadBack = LocalFile.valueOf(smallFileReadBack);
+		fileInHomeDir.copyTo(smallLocalFileReadBack);
+		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
+		InputStream in = smallLocalFileReadBack.getInputStream();
+		ByteStreams.readFully(in, contentsRead);
+
+		assertThat(contentsRead, equalTo(contentsWritten));
+		
+		fileInHomeDir.delete();
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+	}
+
+	protected String getHomeDirPath() {
+		String sudoUsername = options.get(SUDO_USERNAME);
+		if(sudoUsername != null) {
+			return "/home/" + sudoUsername;
+		} else {
+			return "/home/" + options.get(USERNAME);
+		}
+    }
 
 }

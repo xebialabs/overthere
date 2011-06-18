@@ -336,7 +336,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         }
     }
 
-	private static class OverthereFileLocalSourceFile implements LocalSourceFile {
+	protected static class OverthereFileLocalSourceFile implements LocalSourceFile {
 
 		private OverthereFile f;
 

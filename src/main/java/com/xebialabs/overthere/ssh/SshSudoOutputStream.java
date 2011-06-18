@@ -16,20 +16,10 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 /**
  * An output stream to a file on a host connected through SSH w/ SUDO.
@@ -45,9 +35,6 @@ class SshSudoOutputStream extends OutputStream {
 	public SshSudoOutputStream(SshSudoFile destFile, OverthereFile tempFile) {
 		this.destFile = destFile;
 		this.tempFile = tempFile;
-	}
-
-	void open() {
 		tempFileOutputStream = tempFile.getOutputStream();
 	}
 
@@ -69,24 +56,7 @@ class SshSudoOutputStream extends OutputStream {
 	@Override
 	public void close() throws IOException {
 		tempFileOutputStream.close();
-		copyTempFileToHostFile();
+		destFile.copyfromTempFile(tempFile);
 	}
-
-	private void copyTempFileToHostFile() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Copying " + tempFile + " to " + destFile + " after writing");
-		}
-
-		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int result = destFile.getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("cp", tempFile.getPath(), destFile.getPath()));
-		if (result != 0) {
-			String errorMessage = capturedOutput.getAll();
-			throw new RuntimeIOException("Cannot copy " + tempFile + " to " + destFile + " after writing: " + errorMessage);
-		}
-
-		logger.info("Copied " + tempFile + " to " + destFile + " after writing");
-	}
-
-	private Logger logger = LoggerFactory.getLogger(SshSudoOutputStream.class);
 
 }

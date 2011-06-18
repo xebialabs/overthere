@@ -17,9 +17,11 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -83,24 +85,9 @@ class SshSudoFile extends SshScpFile {
 			return super.getInputStream();
 		} else {
 			OverthereFile tempFile = connection.getTempFile(getName());
-			copyHostFileToTempFile(tempFile);
+			copyToTempFile(tempFile);
 			return tempFile.getInputStream();
 		}
-	}
-
-	private void copyHostFileToTempFile(OverthereFile tempFile) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Copying " + this + " to " + tempFile + " for reading");
-		}
-
-		CapturingOverthereProcessOutputHandler capturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
-		int result = connection.execute(multiHandler(loggingHandler(logger), capturedOutput), build("cp", this.getPath(), tempFile.getPath()));
-		if (result != 0) {
-			String errorMessage = capturedOutput.getAll();
-			throw new RuntimeIOException("Cannot copy " + this + " to " + tempFile + " for reading: " + errorMessage);
-		}
-
-		logger.info("Copied " + this + " to " + tempFile + " for reading");
 	}
 
 	@Override
@@ -109,9 +96,7 @@ class SshSudoFile extends SshScpFile {
 			return super.getOutputStream();
 		} else {
 			SshSudoOutputStream out = new SshSudoOutputStream(this, connection.getTempFile(getName()));
-			out.open();
-			if (logger.isDebugEnabled())
-				logger.debug("Opened SUDO output stream to remote file " + this);
+			logger.debug("Opened SUDO output stream to remote file {}", this);
 			return out;
 		}
 	}
@@ -147,6 +132,45 @@ class SshSudoFile extends SshScpFile {
 			mkdir("-p", "-m", "1777");
 		}
 	}
+
+	@Override
+    protected void copyFrom(OverthereFile source) {
+		if(isTempFile) {
+			super.copyFrom(source);
+		} else {
+			logger.debug("Copying file or directory {} to {}", source, this);
+			OverthereFile tempFile = getConnection().getTempFile(getName());
+			try {
+		        connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), tempFile.getPath());
+	        } catch (IOException e) {
+	        	throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
+	        }
+	        copyfromTempFile(tempFile);
+		}
+    }
+
+	 void copyToTempFile(OverthereFile tempFile) {
+		logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
+
+		CapturingOverthereProcessOutputHandler capturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
+		int result = getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), build("cp", "-pr", this.getPath(), tempFile.getPath()));
+		if (result != 0) {
+			String errorMessage = capturedOutput.getAll();
+			throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
+		}
+	}
+
+	 void copyfromTempFile(OverthereFile tempFile) {
+		logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
+
+		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+		int result = getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("cp", "-pr", tempFile.getPath(), this.getPath()));
+		if (result != 0) {
+			String errorMessage = capturedOutput.getAll();
+			throw new RuntimeIOException("Cannot copy temporary file " + tempFile + " to actual file " + this + " after upload: " + errorMessage);
+		}
+	}
+
 
 	private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
