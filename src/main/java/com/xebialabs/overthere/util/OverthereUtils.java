@@ -1,15 +1,7 @@
 package com.xebialabs.overthere.util;
 
-import static com.google.common.io.ByteStreams.copy;
-import static com.google.common.io.Closeables.close;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
@@ -17,27 +9,6 @@ import com.xebialabs.overthere.RuntimeIOException;
  * Contains a number of static helper methods.
  */
 public class OverthereUtils {
-
-	/**
-	 * Writes the contents of an input stream to an {@link OverthereFile}. Does not close the input stream.
-	 * 
-	 * @param from
-	 *            the input stream to copy from.
-	 * @param to
-	 *            the file to copy to.
-	 */
-	public static void write(final InputStream from, final OverthereFile to) {
-		try {
-			final OutputStream out = to.getOutputStream();
-			try {
-				copy(from, out);
-			} finally {
-				close(out, false);
-			}
-		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot copy inputstream to " + to, exc);
-		}
-	}
 
 	/**
 	 * Writes the contents of a byte array to an {@link OverthereFile}.
@@ -48,17 +19,7 @@ public class OverthereUtils {
 	 *            the file to copy to.
 	 */
 	public static void write(final byte[] from, final OverthereFile to) {
-		try {
-			ByteStreams.write(from, new OutputSupplier<OutputStream>() {
-				@Override
-				public OutputStream getOutput() throws IOException {
-					return to.getOutputStream();
-				}
-			});
-		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot copy inputstream to " + to, exc);
-		}
-
+		new ByteArrayFile(to.getPath(), from).copyTo(to);
 	}
 
 	/**

@@ -220,26 +220,26 @@ public abstract class OverthereConnectionItestBase {
 
 	@Test
 	public void shouldWriteAndReadManyBytes() throws IOException {
-		OverthereFile largeFile = connection.getTempFile("large", ".dat");
-
-		byte[] largeFileContentsWritten = new byte[LARGE_FILE_SIZE];
-		new Random().nextBytes(largeFileContentsWritten);
-		OutputStream largeOut = largeFile.getOutputStream();
-		try {
-			ByteStreams.copy(new ByteArrayInputStream(largeFileContentsWritten), largeOut);
-		} finally {
-			largeOut.close();
-		}
-
-		byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
-		InputStream largeIn = largeFile.getInputStream();
-		try {
-			ByteStreams.readFully(largeIn, largeFileContentsRead);
-		} finally {
-			largeIn.close();
-		}
-
-		assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+		OverthereFile f = connection.getTempFile("large", ".dat");
+        
+        byte[] contentsWritten = new byte[LARGE_FILE_SIZE];
+        new Random().nextBytes(contentsWritten);
+        OutputStream out = f.getOutputStream();
+        try {
+        	ByteStreams.copy(new ByteArrayInputStream(contentsWritten), out);
+        } finally {
+        	out.close();
+        }
+        
+        byte[] contentsRead = new byte[LARGE_FILE_SIZE];
+        InputStream largeIn = f.getInputStream();
+        try {
+        	ByteStreams.readFully(largeIn, contentsRead);
+        } finally {
+        	largeIn.close();
+        }
+        
+        assertThat(contentsRead, equalTo(contentsWritten));
 	}
 
 }

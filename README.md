@@ -2,7 +2,6 @@
 Runs something on a remote machine, i.e. over there.
 
 # TODO
-* For small uploads in SCP use in-memory storage instead of a temporary file.
 * Clean up tempFile code scattered throughout codebase.
 * Clean up directory walker code and transformations.
 * Port fixes made in HostSession framework since fork. Including, but not limited to:
