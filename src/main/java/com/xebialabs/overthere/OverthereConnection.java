@@ -280,10 +280,11 @@ public abstract class OverthereConnection {
 				return process.waitFor();
 			} catch (InterruptedException exc) {
 				Thread.currentThread().interrupt();
-				process.destroy();
 				throw new RuntimeIOException("Execution interrupted", exc);
 			}
 		} finally {
+			process.destroy();
+
 			if (stdoutReaderThread != null) {
 				try {
 					// interrupt the stdout reader thread in case it is stuck waiting for output that will never come
