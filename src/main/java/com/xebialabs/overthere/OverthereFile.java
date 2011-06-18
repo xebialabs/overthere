@@ -9,62 +9,62 @@ public interface OverthereFile {
 	/**
 	 * The connection through which this file is accessible. If the connection is closed, this file may no longer be accessible.
 	 */
-	public abstract OverthereConnection getConnection();
+	OverthereConnection getConnection();
 
 	/**
 	 * The full path of the file on the remote system.
 	 * 
 	 * @return the path of the file.
 	 */
-	public abstract String getPath();
+	String getPath();
 
 	/**
 	 * The name of the file on the remote system.
 	 * 
 	 * @return the name of the file.
 	 */
-	public abstract String getName();
+	String getName();
 
 	/**
 	 * The parent file of 
 	 * @return
 	 */
-	public abstract OverthereFile getParentFile();
+	OverthereFile getParentFile();
 
-	public abstract OverthereFile getFile(String child);
+	OverthereFile getFile(String child);
 
-	public abstract long length();
+	long length();
 
-	public abstract long lastModified();
+	long lastModified();
 
-	public abstract boolean exists();
+	boolean exists();
 
-	public abstract boolean isDirectory();
+	boolean isDirectory();
 
-	public abstract boolean isHidden();
+	boolean isHidden();
 
-	public abstract boolean canRead();
+	boolean canRead();
 
-	public abstract boolean canWrite();
+	boolean canWrite();
 
-	public abstract boolean canExecute();
+	boolean canExecute();
 
-	public abstract InputStream getInputStream();
+	InputStream getInputStream();
 
-	public abstract OutputStream getOutputStream(long length);
+	OutputStream getOutputStream(long length);
 
-	public abstract void delete();
+	void delete();
 
-	public abstract void deleteRecursively() throws RuntimeIOException;
+	void deleteRecursively() throws RuntimeIOException;
 
-	public abstract List<OverthereFile> listFiles();
+	List<OverthereFile> listFiles();
 
-	public abstract void mkdir();
+	void mkdir();
 
-	public abstract void mkdirs();
+	void mkdirs();
 
-	public abstract void renameTo(OverthereFile dest);
+	void renameTo(OverthereFile dest);
 
-	public abstract void copyTo(final OverthereFile dest);
+	void copyTo(final OverthereFile dest);
 
 }
