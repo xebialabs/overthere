@@ -87,9 +87,13 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	@Test
 	public void shouldStartProcessSimpleCommand() throws IOException, InterruptedException {
 		OverthereProcess p = connection.startProcess(CmdLine.build("ls", "-ld", "/tmp"));
-		String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
-		assertThat(p.waitFor(), equalTo(0));
-		assertThat(commandOutput, containsString("drwxrwxrwt"));
+		try {
+			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
+			assertThat(p.waitFor(), equalTo(0));
+			assertThat(commandOutput, containsString("drwxrwxrwt"));
+		} finally {
+			p.destroy();
+		}
 	}
 
 	@Test
