@@ -9,7 +9,7 @@
 
 
 	<logger name="com.xebialabs" level="trace" />
-	<logger name="org.reflections" level="error" />
+	<logger name="net.schmizz.sshj" level="error" /> 
 
 	<root level="info">
 		<appender-ref ref="STDOUT" />
