@@ -2,9 +2,8 @@
 Runs something on a remote machine, i.e. over there.
 
 # TODO
-* Write Javadoc (incl. package-info.java) for API (com.xebialabs.overthere package)
 * Write Javadoc (incl. package-info.java) for SPI (com.xebialabs.overthere.spi package)
-* Write Javadoc (incl. package-info.jav for protocol packages.
+* Write Javadoc (incl. package-info.java) for protocol packages.
 * For small uploads in SCP use in-memory storage instead of a temporary file.
 * Port fixes made in HostSession framework since fork. Including, but not limited to:
   - Port fix for sudo-copying from remote to local (file and directory).

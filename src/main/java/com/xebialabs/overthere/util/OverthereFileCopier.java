@@ -139,7 +139,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
 	private static void copyStreamToFile(TransformedInputStream in, OverthereFile dstFile) {
 		try {
-			OutputStream out = dstFile.getOutputStream(in.length());
+			OutputStream out = dstFile.getOutputStream();
 			try {
 				try {
 					ByteStreams.copy(in, out);

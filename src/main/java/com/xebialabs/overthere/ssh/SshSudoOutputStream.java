@@ -38,20 +38,17 @@ class SshSudoOutputStream extends OutputStream {
 
 	private SshSudoFile destFile;
 
-	private long length;
-
 	private OverthereFile tempFile;
 
 	private OutputStream tempFileOutputStream;
 
-	public SshSudoOutputStream(SshSudoFile destFile, long length, OverthereFile tempFile) {
+	public SshSudoOutputStream(SshSudoFile destFile, OverthereFile tempFile) {
 		this.destFile = destFile;
-		this.length = length;
 		this.tempFile = tempFile;
 	}
 
 	void open() {
-		tempFileOutputStream = tempFile.getOutputStream(length);
+		tempFileOutputStream = tempFile.getOutputStream();
 	}
 
 	@Override

@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * An executing command on a host.
+ * Represents an executing process.
  */
 public interface OverthereProcess {
 
@@ -46,7 +46,7 @@ public interface OverthereProcess {
 	InputStream getStderr();
 
 	/**
-	 * Waits for the command to complete its execution.
+	 * Waits for the command to complete its execution. Note that {@link #destroy()} still needs to be invoked to clean up any resources that may be left!
 	 * 
 	 * @return the exit value of the executed command
 	 * 
@@ -55,6 +55,9 @@ public interface OverthereProcess {
 	 */
 	int waitFor() throws InterruptedException;
 
+	/**
+	 * Destroys the executing process.
+	 */
 	void destroy();
 
 }

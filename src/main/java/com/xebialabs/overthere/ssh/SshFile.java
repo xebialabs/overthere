@@ -16,11 +16,11 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 /**
  * A file on a host connected through SSH.

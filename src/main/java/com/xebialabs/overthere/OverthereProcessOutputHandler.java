@@ -22,7 +22,7 @@ package com.xebialabs.overthere;
 public interface OverthereProcessOutputHandler {
 
 	/**
-	 * Invoked when an executed command generates a character of output (stdout).
+	 * Invoked when an executed command generates a single character of output (stdout).
 	 * 
 	 * @param c
 	 *            the character of output generated.

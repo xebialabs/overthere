@@ -86,7 +86,7 @@ public abstract class OverthereConnectionItestBase {
 		assertThat("Expected name of temporary file to end with the suffix", tempFile.getName(), endsWith(suffix));
 		assertThat("Expected temporary file to not exist yet", tempFile.exists(), equalTo(false));
 
-		OutputStream outputStream = tempFile.getOutputStream(contents.length);
+		OutputStream outputStream = tempFile.getOutputStream();
 		try {
 			outputStream.write(contents);
 		} finally {
@@ -218,7 +218,7 @@ public abstract class OverthereConnectionItestBase {
 
 		byte[] largeFileContentsWritten = new byte[LARGE_FILE_SIZE];
 		new Random().nextBytes(largeFileContentsWritten);
-		OutputStream largeOut = largeFile.getOutputStream(LARGE_FILE_SIZE);
+		OutputStream largeOut = largeFile.getOutputStream();
 		try {
 			ByteStreams.copy(new ByteArrayInputStream(largeFileContentsWritten), largeOut);
 		} finally {

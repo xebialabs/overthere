@@ -33,6 +33,9 @@ import org.slf4j.LoggerFactory;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
+/**
+ * Factory object to create {@link OverthereConnection connections}.
+ */
 @SuppressWarnings("unchecked")
 public class Overthere {
 	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
@@ -53,6 +56,15 @@ public class Overthere {
 		}
 	}
 
+	/**
+	 * Creates a connection.
+	 * 
+	 * @param protocol
+	 *            The protocol to use, e.g. "local".
+	 * @param options
+	 *            A set of options to use for the connection.
+	 * @return the connection.
+	 */
 	public static OverthereConnection getConnection(String protocol, ConnectionOptions options) {
 		if (!protocols.get().containsKey(protocol)) {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);

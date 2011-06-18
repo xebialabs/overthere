@@ -17,7 +17,7 @@ public class OverthereUtils {
 
 	public static void write(final InputStream from, final long length, final OverthereFile to) {
 		try {
-			final OutputStream out = to.getOutputStream(length);
+			final OutputStream out = to.getOutputStream();
 			try {
 				copy(from, out);
 			} finally {
@@ -33,7 +33,7 @@ public class OverthereUtils {
 			ByteStreams.write(from, new OutputSupplier<OutputStream>() {
 				@Override
 				public OutputStream getOutput() throws IOException {
-					return to.getOutputStream(from.length);
+					return to.getOutputStream();
 				}
 			});
 		} catch (IOException exc) {

@@ -104,11 +104,11 @@ class SshSudoFile extends SshScpFile {
 	}
 
 	@Override
-	public OutputStream getOutputStream(long length) throws RuntimeIOException {
+	public OutputStream getOutputStream() throws RuntimeIOException {
 		if (isTempFile) {
-			return super.getOutputStream(length);
+			return super.getOutputStream();
 		} else {
-			SshSudoOutputStream out = new SshSudoOutputStream(this, length, connection.getTempFile(getName()));
+			SshSudoOutputStream out = new SshSudoOutputStream(this, connection.getTempFile(getName()));
 			out.open();
 			if (logger.isDebugEnabled())
 				logger.debug("Opened SUDO output stream to remote file " + this);

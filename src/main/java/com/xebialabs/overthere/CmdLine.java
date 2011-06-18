@@ -28,32 +28,74 @@ public class CmdLine implements Serializable {
 
 	List<CmdLineArgument> arguments = newArrayList();
 
+	/**
+	 * Adds a regular argument to the command line. A regular argument is an argument that is intended to be passed to the program that is invoked.
+	 * 
+	 * @param arg
+	 *            the argument string to add.
+	 * @return this.
+	 */
 	public CmdLine addArgument(String arg) {
 		arguments.add(arg(arg));
 		return this;
 	}
 
+	/**
+	 * Adds a password argument to the command line. A password argument is an argument that is intended to be passed to the program that is invoked and that
+	 * should not be shown in logs.
+	 * 
+	 * @param arg
+	 *            the argument string to add.
+	 * @return this.
+	 */
 	public CmdLine addPassword(String arg) {
 		arguments.add(password(arg));
 		return this;
 	}
 
+	/**
+	 * Adds an {@link CmdLineArgument argument}.
+	 * 
+	 * @param arg
+	 *            the argument to add.
+	 * @return this.
+	 */
 	public CmdLine add(CmdLineArgument arg) {
 		checkNotNull(arg, "Cannot add null CmdLineArgument");
 		arguments.add(arg);
 		return this;
 	}
 
+	/**
+	 * Adds a list of {@link CmdLineArgument arguments}.
+	 * 
+	 * @param arg
+	 *            the argument to add.
+	 * @return this.
+	 */
 	public CmdLine add(List<CmdLineArgument> args) {
 		checkNotNull(args, "Cannot add null List<CmdLineArgument>");
 		arguments.addAll(args);
 		return this;
 	}
 
+	/**
+	 * Returns the argument on this command line.
+	 * 
+	 * @return the list of {@link CmdLineArgument arguments}.
+	 */
 	public List<CmdLineArgument> getArguments() {
 		return unmodifiableList(arguments);
 	}
 
+	/**
+	 * Converts this command line to a string array. All arguments are {@link CmdLineArgument#toString(boolean) converted to their string representation} and
+	 * then returned as an array.
+	 * 
+	 * @param forLogging
+	 *            <code>true</code> if these string representations will be used for logging.
+	 * @return an array with the string representations of the command line arguments.
+	 */
 	public String[] toCommandArray(final boolean forLogging) {
 		checkState(arguments.size() > 0, "Cannot encode empty command line");
 		return transform(arguments, new Function<CmdLineArgument, String>() {
@@ -64,6 +106,15 @@ public class CmdLine implements Serializable {
 		}).toArray(new String[arguments.size()]);
 	}
 
+	/**
+	 * Converts this command line to a single String for execution on (or logging to) a specific target operating system.
+	 * 
+	 * @param os
+	 *            the operating system on which the result will be executed.
+	 * @param forLogging
+	 *            <code>true</code> if the created command line will be used for logging.
+	 * @return
+	 */
 	public String toCommandLine(OperatingSystemFamily os, final boolean forLogging) {
 		checkState(arguments.size() > 0, "Cannot encode empty command line");
 		StringBuilder sb = new StringBuilder();
@@ -101,13 +152,13 @@ public class CmdLine implements Serializable {
 	}
 
 	private boolean containsAny(String str, String chars) {
-		for(char c : chars.toCharArray()) {
-			if(str.indexOf(c) >= 0) {
+		for (char c : chars.toCharArray()) {
+			if (str.indexOf(c) >= 0) {
 				return true;
 			}
 		}
 		return false;
-    }
+	}
 
 	private void encodeEmptyArgument(StringBuilder collector) {
 		collector.append("\"\"");
@@ -139,13 +190,23 @@ public class CmdLine implements Serializable {
 		}
 	}
 
+	/**
+	 * Returns a string representation of this command line. All passwords are hidden.
+	 */
 	public String toString() {
 		return toCommandLine(UNIX, true);
 	}
 
-	public static CmdLine build(String... cmdarray) {
+	/**
+	 * Builds a simple command line from one or more strings. For each string, a regular argument is created.
+	 * 
+	 * @param args
+	 *            the regular arguments
+	 * @return the created command line
+	 */
+	public static CmdLine build(String... args) {
 		CmdLine cmdLine = new CmdLine();
-		for (String s : cmdarray) {
+		for (String s : args) {
 			cmdLine.addArgument(s);
 		}
 		return cmdLine;

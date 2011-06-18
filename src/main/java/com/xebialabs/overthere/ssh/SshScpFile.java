@@ -66,6 +66,11 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	@Override
+	public boolean isFile() {
+		return getFileInfo(this).isFile;
+	}
+
+	@Override
 	public boolean isDirectory() {
 		return getFileInfo(this).isDirectory;
 	}
@@ -245,7 +250,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 		@Override
         public boolean isFile() {
-	        return !f.isDirectory();
+	        return f.isFile();
         }
 
 		@Override
@@ -304,7 +309,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	@Override
-	public OutputStream getOutputStream(long length) throws RuntimeIOException {
+	public OutputStream getOutputStream() throws RuntimeIOException {
 		logger.debug("Opening SCP output stream to write to file {}", this);
 
         try {

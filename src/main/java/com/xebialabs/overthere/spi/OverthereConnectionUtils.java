@@ -21,6 +21,7 @@ public class OverthereConnectionUtils {
 	 */
 	public static class LsResults {
 		public boolean exists;
+		public boolean isFile;
 		public boolean isDirectory;
 		public long length = -1;
 
@@ -62,13 +63,15 @@ public class OverthereConnectionUtils {
 				String group = outputTokens.nextToken();
 				String size = outputTokens.nextToken();
 
+				results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';
 				results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
 				results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
 				results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
 				results.canExecute = permissions.length() >= 4 && permissions.charAt(3) == 'x';
 				try {
 					results.length = Integer.parseInt(size);
-				} catch (NumberFormatException ignore) {
+				} catch (NumberFormatException exc) {
+					logger.warn("Cannot parse length of " + file + " from ls output: " + outputLine + ". Length will be reported as -1.", exc);
 				}
 			}
 		} else {

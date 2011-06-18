@@ -26,9 +26,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 /**
  * A local file.
@@ -74,6 +74,11 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> {
 	@Override
 	public boolean exists() {
 		return file.exists();
+	}
+
+	@Override
+	public boolean isFile() {
+		return file.isFile();
 	}
 
 	@Override
@@ -153,7 +158,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> {
 	}
 
 	@Override
-	public OutputStream getOutputStream(long length) {
+	public OutputStream getOutputStream() {
 		try {
 			return new FileOutputStream(file);
 		} catch (FileNotFoundException exc) {

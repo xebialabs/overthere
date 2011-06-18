@@ -24,6 +24,7 @@ import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A connection on a host (local or remote) on which to manipulate files and execute commands.
+ * 
+ * All methods in this interface may throw a {@link RuntimeIOException} if an error occurs. Checked {@link IOException IOExceptions} are never thrown.
  */
 public abstract class OverthereConnection {
 
@@ -49,10 +52,10 @@ public abstract class OverthereConnection {
 	protected boolean deleteTemporaryDirectoryOnDisconnect = true;
 
 	/**
-     * The timeout for opening a connection in milliseconds.
-     */
-    public static final int CONNECTION_TIMEOUT_MS = 120000;
-	
+	 * The timeout for opening a connection in milliseconds.
+	 */
+	public static final int CONNECTION_TIMEOUT_MS = 120000;
+
 	/**
 	 * The number of tries made when creating a unique temporary file name.
 	 */
@@ -64,7 +67,7 @@ public abstract class OverthereConnection {
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 
 		Object deleteTemporaryDirectoryOnDisconnectObject = options.get(ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
-		if(deleteTemporaryDirectoryOnDisconnectObject instanceof String && "false".equalsIgnoreCase((String) deleteTemporaryDirectoryOnDisconnectObject)) {
+		if (deleteTemporaryDirectoryOnDisconnectObject instanceof String && "false".equalsIgnoreCase((String) deleteTemporaryDirectoryOnDisconnectObject)) {
 			deleteTemporaryDirectoryOnDisconnect = false;
 		}
 	}
@@ -83,23 +86,22 @@ public abstract class OverthereConnection {
 	}
 
 	/**
-	 * Closes the host connection. Destroys any temporary files that may have been created on the host.
-	 * 
-	 * Never throws an exception, not even a {@link RuntimeException}
+	 * Closes the connection. Depending on the {@link ConnectionOptions#TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT} connection option, deletes all temporary files
+	 * that have been created on the host.
 	 */
 	public final void disconnect() {
 		if (deleteTemporaryDirectoryOnDisconnect) {
 			deleteTemporaryDirectory();
 		}
 
-        doDisconnect();
+		doDisconnect();
 
 		logger.info("Disconnected from {}", this);
 	}
 
-    protected abstract void doDisconnect();
+	protected abstract void doDisconnect();
 
-    protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
+	protected synchronized OverthereFile getTempDirectory() throws RuntimeIOException {
 		if (sessionTemporaryDirectory == null) {
 			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 			Random r = new Random();
@@ -130,7 +132,7 @@ public abstract class OverthereConnection {
 		return null;
 	}
 
-	public void deleteTemporaryDirectory() {
+	protected void deleteTemporaryDirectory() {
 		if (sessionTemporaryDirectory != null) {
 			try {
 				sessionTemporaryDirectory.deleteRecursively();
@@ -147,8 +149,6 @@ public abstract class OverthereConnection {
 	 * @param hostPath
 	 *            the path of the host
 	 * @return a reference to the file
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
 	 */
 	public abstract OverthereFile getFile(String hostPath);
 
@@ -160,8 +160,6 @@ public abstract class OverthereConnection {
 	 * @param child
 	 *            the name of the file in the directory
 	 * @return a reference to the file in the directory
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
 	 */
 	public abstract OverthereFile getFile(OverthereFile parent, String child);
 
@@ -172,8 +170,6 @@ public abstract class OverthereConnection {
 	 * @param nameTemplate
 	 *            the template on which to base the name of the temporary file. May be <code>null</code>.
 	 * @return a reference to the temporary file on the host
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
 	 */
 	public final OverthereFile getTempFile(String nameTemplate) {
 		String prefix, suffix;
@@ -209,8 +205,6 @@ public abstract class OverthereConnection {
 	 * @param suffix
 	 *            the suffix string to be used in generating the file's name; may be <code>null</code>, in which case the suffix ".tmp" will be used
 	 * @return a reference to the temporary file on the host
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
 	 */
 	public abstract OverthereFile getTempFile(String prefix, String suffix);
 
@@ -218,12 +212,10 @@ public abstract class OverthereConnection {
 	 * Executes a command with its arguments.
 	 * 
 	 * @param handler
-	 *            the callback handler that will be invoked when the executed command generated output.
+	 *            the handler that will be invoked when the executed command generated output.
 	 * @param commandLine
 	 *            the command line to execute.
-	 * @return the exit value of the executed command. Is 0 on succesfull execution.
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
+	 * @return the exit value of the executed command. Usually 0 on successful execution.
 	 */
 	public final int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
 		final OverthereProcess process = startProcess(commandLine);
@@ -315,13 +307,11 @@ public abstract class OverthereConnection {
 	}
 
 	/**
-	 * Starts the execution of a command and gives the caller full control over the execution.
+	 * Starts a command with its argument and returns control to the caller.
 	 * 
 	 * @param commandLine
 	 *            the command line to execute.
 	 * @return an object representing the executing command or <tt>null</tt> if this is not supported by the host connection.
-	 * @throws RuntimeIOException
-	 *             if an I/O error occurs
 	 */
 	public abstract OverthereProcess startProcess(CmdLine commandLine);
 

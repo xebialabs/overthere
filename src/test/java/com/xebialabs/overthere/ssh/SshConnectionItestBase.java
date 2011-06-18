@@ -30,9 +30,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;

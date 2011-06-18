@@ -45,7 +45,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		super(connection, path);
 	}
 
-	protected FileAttributes stat() throws RuntimeIOException {
+	protected FileAttributes stat() {
 		logger.info("Statting file " + this);
 
 		try {
@@ -55,7 +55,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
         }
     }
 
-	public boolean exists() throws RuntimeIOException {
+	public boolean exists() {
 		logger.info("Checking file " + getPath() + " for existence");
 
 		try {
@@ -66,7 +66,12 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	@Override
-	public boolean isDirectory() throws RuntimeIOException {
+	public boolean isFile() {
+		return stat().getType() == FileMode.Type.REGULAR;
+	}
+
+	@Override
+	public boolean isDirectory() {
 		return stat().getType() == FileMode.Type.DIRECTORY;
 	}
 
@@ -76,22 +81,22 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	@Override
-	public long length() throws RuntimeIOException {
+	public long length() {
 		return stat().getSize();
 	}
 
     @Override
-	public boolean canRead() throws RuntimeIOException {
+	public boolean canRead() {
         return hasPermission(FilePermission.USR_R);
 	}
 
 	@Override
-	public boolean canWrite() throws RuntimeIOException {
+	public boolean canWrite() {
         return hasPermission(FilePermission.USR_W);
 	}
 
     @Override
-    public boolean canExecute() throws RuntimeIOException {
+    public boolean canExecute() {
         return hasPermission(FilePermission.USR_X);
     }
 
@@ -124,7 +129,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	@Override
-	public void mkdir() throws RuntimeIOException {
+	public void mkdir() {
 		logger.info("Creating directory " + this);
 
 		try {
@@ -135,7 +140,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
     }
 
 	@Override
-	public void mkdirs() throws RuntimeIOException {
+	public void mkdirs() {
 		logger.debug("Creating directories {}", this);
         try {
             connection.getSharedSftpClient().mkdirs(getPath());
@@ -199,7 +204,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	@Override
-	public OutputStream getOutputStream(long length) throws RuntimeIOException {
+	public OutputStream getOutputStream() {
 		logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
 

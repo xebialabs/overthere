@@ -27,9 +27,9 @@ import java.util.List;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
-import com.xebialabs.overthere.BaseOverthereFile;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 
@@ -77,20 +77,38 @@ public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 	}
 
 	@Override
-	public long length() throws RuntimeIOException {
+	public boolean canRead() throws RuntimeIOException {
 		try {
-			return smbFile.length();
+			return smbFile.canRead();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine length of file " + this + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be read: " + exc.toString(), exc);
 		}
 	}
 
 	@Override
-	public long lastModified() {
+	public boolean canWrite() throws RuntimeIOException {
 		try {
-			return smbFile.lastModified();
+			return smbFile.canWrite();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine last modification timestamp of " + this + ": " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be written: " + exc.toString(), exc);
+		}
+	}
+
+	@Override
+	public boolean canExecute() throws RuntimeIOException {
+		try {
+			return smbFile.canRead();
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot determine whether " + this + " can be executed: " + exc.toString(), exc);
+		}
+	}
+
+	@Override
+	public boolean isFile() throws RuntimeIOException {
+		try {
+			return smbFile.isFile();
+		} catch (SmbException exc) {
+			throw new RuntimeIOException("Cannot determine whether " + this + " is a directory: " + exc.toString(), exc);
 		}
 	}
 
@@ -113,29 +131,20 @@ public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 	}
 
 	@Override
-	public boolean canExecute() throws RuntimeIOException {
+	public long lastModified() {
 		try {
-			return smbFile.canRead();
+			return smbFile.lastModified();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be executed: " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine last modification timestamp of " + this + ": " + exc.toString(), exc);
 		}
 	}
 
 	@Override
-	public boolean canRead() throws RuntimeIOException {
+	public long length() throws RuntimeIOException {
 		try {
-			return smbFile.canRead();
+			return smbFile.length();
 		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be read: " + exc.toString(), exc);
-		}
-	}
-
-	@Override
-	public boolean canWrite() throws RuntimeIOException {
-		try {
-			return smbFile.canWrite();
-		} catch (SmbException exc) {
-			throw new RuntimeIOException("Cannot determine whether " + this + " can be written: " + exc.toString(), exc);
+			throw new RuntimeIOException("Cannot determine length of file " + this + ": " + exc.toString(), exc);
 		}
 	}
 
@@ -230,7 +239,7 @@ public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 	}
 
 	@Override
-	public OutputStream getOutputStream(long length) {
+	public OutputStream getOutputStream() {
 		try {
 			return smbFile.getOutputStream();
 		} catch (IOException exc) {

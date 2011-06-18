@@ -15,17 +15,20 @@
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * The host connection framework. This framework allows plugin authors to work with local or remote systems ("hosts") conveniently. Some of the features:
+ * The Overthere library. This library allows users to work with local or remote systems through an abstraction layer. Some of the features:
  * <ul>
  * <li>Files can be manipulated, read and written.<li>
  * <li>Commands can be executed.</li>
- * <li>A remote system can be accessed using SSH in one of three methods: SFTP, SCP or SCP with SUDO.</li>
  * <li>A local system ("localhost") can be accessed directly.</li>
+ * <li>A remote system can be accessed using any number of connection methods implemented: SSH, CIFS/Telnet, etc.</li>
  * <li>The host can be a Windows or a Unix machine.</li>
  * </ul>
+ * 
+ * To start, create a {@link com.xebialabs.overthere.OverthereConnection connection} by invoking {@link Overthere#getConnection(String, ConnectionOptions)}.
+ * Then, create file objects using {@link com.xebialabs.overthere.OverthereConnection#getFile(String)} and manipulate them or execute commands using
+ * {@link com.xebialabs.overthere.OverthereConnection#execute(OverthereProcessOutputHandler, CmdLine)}).
  *
  * @version 1.0
  */
 package com.xebialabs.overthere;
-
 
