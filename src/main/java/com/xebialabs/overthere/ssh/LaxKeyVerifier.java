@@ -9,7 +9,7 @@ import java.security.PublicKey;
 /**
  * Always trusts the host, 
  */
-public class LaxKeyVerifier implements HostKeyVerifier {
+class LaxKeyVerifier implements HostKeyVerifier {
     @Override
     public boolean verify(String hostname, int port, PublicKey key) {
         logger.debug("Trusting host %s:%d", hostname, port);

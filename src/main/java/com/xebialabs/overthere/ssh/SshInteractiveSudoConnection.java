@@ -26,13 +26,11 @@ import net.schmizz.sshj.transport.TransportException;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ interactive SUDO.
  */
-@Protocol(name = "ssh_interactive_sudo")
-public class SshInteractiveSudoConnection extends SshSudoConnection {
+class SshInteractiveSudoConnection extends SshSudoConnection {
 
 	public SshInteractiveSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);

@@ -38,6 +38,7 @@ import com.xebialabs.overthere.spi.Protocol;
  */
 @SuppressWarnings("unchecked")
 public class Overthere {
+	// The "logger" field has to be declared and defined at the top so that the static initializer below can access it
 	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
 
 	private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(

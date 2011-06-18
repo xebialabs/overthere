@@ -16,7 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -28,13 +34,14 @@ public class SshInteractiveSudoConnectionItest extends SshSudoConnectionItestBas
 
 	@Override
 	protected void setTypeAndOptions() {
-		type = "ssh_interactive_sudo";
+		type = "ssh";
 		options = new ConnectionOptions();
-		options.set("address", "overthere");
-		options.set("username", "untrusted");
-		options.set("password", "donttrustme");
+		options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
+		options.set(OPERATING_SYSTEM, UNIX);
+		options.set(ADDRESS, "overthere");
+		options.set(USERNAME, "untrusted");
+		options.set(PASSWORD, "donttrustme");
 		options.set("sudoUsername", "overthere");
-		options.set("os", UNIX);
 	}
 
 	@Test

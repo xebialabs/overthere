@@ -31,7 +31,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-public class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
+class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 
 	private SmbFile smbFile;
 

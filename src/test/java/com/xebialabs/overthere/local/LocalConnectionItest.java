@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -36,7 +37,7 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 	protected void setTypeAndOptions() {
 		type = "local";
 		options = new ConnectionOptions();
-		options.set("temporaryDirectoryPath", temp.getRoot().getPath());
+		options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
 	}
 
 	@Test

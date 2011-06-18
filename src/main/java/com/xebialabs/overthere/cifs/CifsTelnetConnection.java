@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
@@ -75,6 +76,9 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	 */
 	public static final int EXITCODE_CANNOT_DETERMINE_ERRORLEVEL = -999999;
 
+	/**
+	 * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
+	 */
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.address = options.get(ADDRESS);

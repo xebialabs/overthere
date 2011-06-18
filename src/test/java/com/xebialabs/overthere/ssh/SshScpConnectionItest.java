@@ -16,7 +16,14 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -28,11 +35,13 @@ public class SshScpConnectionItest extends SshConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {
-		type = "ssh_scp";
+		type = "ssh";
 		options = new ConnectionOptions();
-		options.set("address", "overthere");
-		options.set("username", "overthere");
-		options.set("privateKeyFile", createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "Proc-Type: 4,ENCRYPTED\r\n" + "DEK-Info: AES-128-CBC,EB6F3B5C2F847A0F47AC9C8C757E0AD8\r\n"
+		options.set(CONNECTION_TYPE, SCP);
+		options.set(OPERATING_SYSTEM, UNIX);
+		options.set(ADDRESS, "overthere");
+		options.set(USERNAME, "overthere");
+		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "Proc-Type: 4,ENCRYPTED\r\n" + "DEK-Info: AES-128-CBC,EB6F3B5C2F847A0F47AC9C8C757E0AD8\r\n"
 		        + "IvSSAW5r/sPwtH99/csjEZdtnUci80ak0E+7Puvjo4+H4r+ObFF1gEHOUaNi1rf+\r\n" + "5EDhqtPWy6q1zDYBjOdG5jnDhiVSv2P8ZsxA+w1xVR6Lrm5Q5XWcNO+/xXp2/WUc\r\n"
 		        + "ae1KsyDKCYAsMwD3TaXs01aNrzAD58kNBvFZLkQh8y8ilDiHec0IMtOJHHi2rW0T\r\n" + "42crCMyvMvnZNVEQrbXLeThQrAmDWALXrQ14p/D9yEQftv+yDjNnnPB7sjEM1cdi\r\n"
 		        + "dwM7kHV1YtkYE+mlBPONAqNQURVkVUSyNGgF7qLMhW6UUH8pboXcILFrqEvHPBWn\r\n" + "lhnMH1VJUEB0K6r9BvwNKQlNHbAdghT/2oTANzirPXZX7ZTg4Tq6IPAVkDMYARu6\r\n"
@@ -46,8 +55,7 @@ public class SshScpConnectionItest extends SshConnectionItestBase {
 		        + "yvE0S/S4eY57NL8zJ2/cvTZfe0QLqJF2lYN4RmNhjXY69MC/quy/Ida2p+noxVqP\r\n" + "R2a/uGVMCAT38bX66YXVI4Muc2dsxH96pMh7OiOb6/KoWx6+IFoKxFL0AvC5qFeo\r\n"
 		        + "TzIHrzs33O6ejXFXamXqRfnobGdvHijaNdAPFJhIfrA2OWoGaAZpiQKdTaCQXBbx\r\n" + "8q65UtXR7Cv2+vJ7B1gkHMTY0qxwJD0b55KGgjhvIcGR16TrIe24puJbpMvAdP1J\r\n"
 		        + "w42kSNNrOIp8/Bq/t+6sUEqd7Cz7dzl/xi5s6CxJuq3U3ypfCdL9Ij0K8EiOa/a2\r\n" + "-----END RSA PRIVATE KEY-----\r\n").getPath());
-		options.set("passphrase", "letmein");
-		options.set("os", UNIX);
+		options.set(PASSPHRASE, "letmein");
 	}
 
 	@Test

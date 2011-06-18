@@ -18,6 +18,7 @@ package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +30,11 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ SUDO.
  */
-@Protocol(name = "ssh_sudo")
-public class SshSudoConnection extends SshScpConnection {
-
-	public static final String SUDO_USERNAME = "sudoUsername";
+class SshSudoConnection extends SshScpConnection {
 
 	public static final String SUDO_COMMAND = "sudo";
 

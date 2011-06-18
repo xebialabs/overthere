@@ -17,6 +17,12 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 
 import java.io.IOException;
 import java.util.Random;
@@ -37,12 +43,11 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 
 /**
  * Base class for host connections using SSH.
  */
-abstract class SshConnection extends OverthereConnection implements OverthereConnectionBuilder {
+abstract class SshConnection extends OverthereConnection {
 
     protected String host;
 
@@ -58,22 +63,17 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 
 	protected SSHClient sshClient;
 
-	public static final String PRIVATE_KEY_FILE = "privateKeyFile";
-
-	public static final String PASSPHRASE = "passphrase";
-
-    public SshConnection(String type, ConnectionOptions options) {
+	public SshConnection(String type, ConnectionOptions options) {
         super(type, options);
-        this.host = options.get(ConnectionOptions.ADDRESS);
-        this.port = options.get(ConnectionOptions.PORT, 22);
-        this.username = options.get(ConnectionOptions.USERNAME);
-        this.password = options.get(ConnectionOptions.PASSWORD);
+        this.host = options.get(ADDRESS);
+        this.port = options.get(PORT, 22);
+        this.username = options.get(USERNAME);
+        this.password = options.get(PASSWORD);
 		this.privateKeyFile = options.get(PRIVATE_KEY_FILE);
 		this.passphrase = options.get(PASSPHRASE);
     }
 
-    @Override
-    public SshConnection connect() throws RuntimeIOException {
+	protected void connect() {
         try {
             SSHClient client = new SSHClient();
             client.setConnectTimeout(CONNECTION_TIMEOUT_MS);
@@ -106,9 +106,8 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 			sshClient = client;
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot connect to " + this, e);
-        }
-        return this;
-    }
+        }		
+	}
 
     @Override
     public void doDisconnect() {
@@ -183,21 +182,6 @@ abstract class SshConnection extends OverthereConnection implements OverthereCon
 
     protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
         return new SshProcess(this, session, commandLine);
-    }
-
-    static int waitForExitStatus(Session.Subsystem channel, String command) {
-        while (true) {
-            if (!channel.isOpen()) {
-                return channel.getExitStatus();
-            }
-
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException exc) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeIOException("Remote command \"" + command + "\" was interrupted", exc);
-            }
-        }
     }
 
     @Override

@@ -14,24 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.ssh;
-
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-
 /**
- * A connection to a remote host using SSH w/ SCP.
+ * This package contains the implements of the <code>cifs_telnet</code> protocol.
  */
-class SshScpConnection extends SshConnection {
+package com.xebialabs.overthere.cifs;
 
-	public SshScpConnection(String type, ConnectionOptions options) {
-		super(type, options);
-	}
-
-	@Override
-	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshScpFile(this, hostPath);
-	}
-
-}

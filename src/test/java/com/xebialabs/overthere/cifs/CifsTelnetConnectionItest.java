@@ -16,6 +16,11 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -32,7 +37,6 @@ import org.junit.Test;
 import com.google.common.io.ByteStreams;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
@@ -43,11 +47,11 @@ public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 	protected void setTypeAndOptions() {
 		type = "cifs_telnet";
 		options = new ConnectionOptions();
-		options.set("address", "wls-11g-win");
-		options.set("username", "itestuser");
+		options.set(OPERATING_SYSTEM, WINDOWS);
+		options.set(ADDRESS, "wls-11g-win");
+		options.set(USERNAME, "itestuser");
 		// ensure the test user contains some reserved characters such as ';', ':' or '@'
-		options.set("password", "hello@:;<>myfriend");
-		options.set("os", OperatingSystemFamily.WINDOWS);
+		options.set(PASSWORD, "hello@:;<>myfriend");
 	}
 
 	@Test

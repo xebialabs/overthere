@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 
 import net.schmizz.sshj.sftp.SFTPClient;
@@ -23,17 +25,14 @@ import net.schmizz.sshj.sftp.SFTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.Protocol;
 
 /**
  * A connection to a remote host using SSH w/ SFTP.
  */
-@Protocol(name = "ssh_sftp")
-public class SshSftpConnection extends SshConnection {
+class SshSftpConnection extends SshConnection {
 
 	private SFTPClient sharedSftpClient;
 
@@ -42,27 +41,20 @@ public class SshSftpConnection extends SshConnection {
 	}
 
 	@Override
-	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSftpFile(this, hostPath);
+	protected void connect() {
+		super.connect();
+		
+	    logger.debug("Opening SFTP client to {}", this);
+	    try {
+	        sharedSftpClient = getSshClient().newSFTPClient();
+	    } catch (IOException e) {
+	        throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
+	    }
 	}
-
-    @Override
-    public SshConnection connect() throws RuntimeIOException {
-        SshConnection connect = super.connect();
-
-        logger.debug("Opening SFTP client to {}", this);
-        try {
-            sharedSftpClient = getSshClient().newSFTPClient();
-        } catch (IOException e) {
-            throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
-        }
-
-        return connect;
-    }
 
 	@Override
 	public void doDisconnect() {
-        Preconditions.checkState(sharedSftpClient != null, "Not connected to SFTP");
+        checkState(sharedSftpClient != null, "Not connected to SFTP");
 
         logger.debug("Closing SFTP client to {}", this);
         try {
@@ -77,6 +69,11 @@ public class SshSftpConnection extends SshConnection {
 
     protected SFTPClient getSharedSftpClient() {
 		return sharedSftpClient;
+	}
+
+	@Override
+	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+		return new SshSftpFile(this, hostPath);
 	}
 
     private Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);

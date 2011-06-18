@@ -16,7 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
@@ -28,12 +34,13 @@ public class SshSftpConnectionItest extends SshConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {
-		type = "ssh_sftp";
+		type = "ssh";
 		options = new ConnectionOptions();
-		options.set("address", "overthere");
-		options.set("username", "overthere");
-		options.set("password", "overhere");
-		options.set("os", UNIX);
+		options.set(CONNECTION_TYPE, SFTP);
+		options.set(OPERATING_SYSTEM, UNIX);
+		options.set(ADDRESS, "overthere");
+		options.set(USERNAME, "overthere");
+		options.set(PASSWORD, "overhere");
 	}
 
 	@Test
