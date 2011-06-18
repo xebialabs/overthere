@@ -97,7 +97,7 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	}
 
 	@Test
-	public void shouldBeAbleToWriteToTemporaryFile() throws Exception {
+	public void shouldWriteToTemporaryFile() throws Exception {
 		OverthereFile tempFile = connection.getTempFile("temporaryFileCanBeWritten.txt");
 		OverthereUtils.write("Some test data", "UTF-8", tempFile);
 
@@ -105,7 +105,7 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	}
 
 	@Test
-	public void shouldBeAbleToCopyTemporaryFileToOtherLocation() throws IOException {
+	public void shouldCopyTemporaryFileToOtherLocation() throws IOException {
 		OverthereFile tempFile = connection.getTempFile("temporaryFileCanBeWritten.txt");
 		OverthereUtils.write("Some test data", "UTF-8", tempFile);
 

@@ -24,12 +24,20 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.junit.Test;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
 
 public class SshSudoConnectionItest extends SshSudoConnectionItestBase {
 
@@ -61,6 +69,30 @@ public class SshSudoConnectionItest extends SshSudoConnectionItestBase {
 	@Test
 	public void hostSessionIsAnSshSudoHostSession() {
 		assertThat(connection, instanceOf(SshSudoConnection.class));
+	}
+
+	@Test
+	public void shouldWriteToAndReadFromSudoUserHomeDirectory() throws IOException {
+		final OverthereFile homeDir = connection.getFile("/home/overthere");
+		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+		
+		final byte[] contentsWritten = generateRandomBytes(SMALL_FILE_SIZE);
+		ByteStreams.write(contentsWritten, new OutputSupplier<OutputStream>() {
+			@Override
+            public OutputStream getOutput() throws IOException {
+	            return fileInHomeDir.getOutputStream();
+            }
+		});
+		
+		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
+		InputStream in = fileInHomeDir.getInputStream();
+		try {
+			ByteStreams.readFully(in, contentsRead);
+		} finally {
+			in.close();
+		}
+		assertThat(contentsRead, equalTo(contentsWritten));
 	}
 
 }

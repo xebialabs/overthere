@@ -47,6 +47,8 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class OverthereConnectionItestBase {
 
+	public static final int SMALL_FILE_SIZE = 10 * 1024;
+
 	public static final int LARGE_FILE_SIZE = 10 * 1024 * 1024;
 
 	protected ConnectionOptions options;
@@ -80,7 +82,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void createWriteReadAndRemoveTemporaryFile() throws IOException {
+	public void shouldCreateWriteReadAndRemoveTemporaryFile() throws IOException {
 		final String prefix = "prefix";
 		final String suffix = "suffix";
 		final byte[] contents = ("Contents of the temporary file created at " + System.currentTimeMillis() + "ms since the epoch").getBytes();
@@ -124,7 +126,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void createPopulateListAndRemoveTemporaryDirectory() throws IOException {
+	public void shouldCreatePopulateListAndRemoveTemporaryDirectory() throws IOException {
 		final String prefix = "prefix";
 		final String suffix = "suffix";
 
@@ -178,7 +180,7 @@ public abstract class OverthereConnectionItestBase {
 	@Test
 	public void shouldCopyLargeFile() throws IOException {
 		File largeFile = temp.newFile("large.dat");
-		byte[] largeFileContentsWritten = writeRandomData(largeFile, LARGE_FILE_SIZE);
+		byte[] largeFileContentsWritten = writeRandomBytes(largeFile, LARGE_FILE_SIZE);
 		
 		OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
 		LocalFile.valueOf(largeFile).copyTo(remoteLargeFile);
@@ -198,16 +200,15 @@ public abstract class OverthereConnectionItestBase {
 	public void shouldCopyDirectoryWithManyFiles() throws IOException {
 		File largeFolder = temp.newFolder("large.folder");
 		for(int i = 0; i < 100; i++) {
-			writeRandomData(new File(largeFolder, "large" + i + ".dat"), LARGE_FILE_SIZE / 10);
+			writeRandomBytes(new File(largeFolder, "large" + i + ".dat"), LARGE_FILE_SIZE / 10);
 		}
 
 		OverthereFile remoteLargeFolder = connection.getTempFile("large.folder");
 		LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);	
 	}
 
-	private static byte[] writeRandomData(final File f, final int size) throws IOException {
-		byte[] randomBytes = new byte[size];
-		new Random().nextBytes(randomBytes);
+	protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
+		byte[] randomBytes = generateRandomBytes(size);
 		ByteStreams.write(randomBytes, new OutputSupplier<OutputStream>() {
 			@Override
             public OutputStream getOutput() throws IOException {
@@ -216,5 +217,11 @@ public abstract class OverthereConnectionItestBase {
 		});
 		return randomBytes;
 	}
+
+	protected static byte[] generateRandomBytes(final int size) {
+	    byte[] randomBytes = new byte[size];
+		new Random().nextBytes(randomBytes);
+	    return randomBytes;
+    }
 
 }

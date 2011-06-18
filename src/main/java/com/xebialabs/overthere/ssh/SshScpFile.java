@@ -18,7 +18,6 @@ package com.xebialabs.overthere.ssh;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
-import static com.xebialabs.overthere.spi.OverthereConnectionUtils.getFileInfo;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.schmizz.sshj.xfer.LocalFileFilter;
 import net.schmizz.sshj.xfer.LocalSourceFile;
@@ -62,17 +62,32 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public boolean exists() {
-		return getFileInfo(this).exists;
+		return getFileInfo().exists;
 	}
 
 	@Override
+	public boolean canRead() {
+		return getFileInfo().canRead;
+	}
+
+	@Override
+	public boolean canWrite() {
+		return getFileInfo().canWrite;
+	}
+
+	@Override
+	public boolean canExecute() {
+		return getFileInfo().canExecute;
+	}
+	
+	@Override
 	public boolean isFile() {
-		return getFileInfo(this).isFile;
+		return getFileInfo().isFile;
 	}
 
 	@Override
 	public boolean isDirectory() {
-		return getFileInfo(this).isDirectory;
+		return getFileInfo().isDirectory;
 	}
 
 	@Override
@@ -83,22 +98,75 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public long length() {
-		return getFileInfo(this).length;
+		return getFileInfo().length;
 	}
 
-	@Override
-	public boolean canRead() {
-		return getFileInfo(this).canRead;
+	/**
+	 * Gets information about the file by executing "ls -ld" on it.
+	 * 
+	 * @param file
+	 *            the file
+	 * @return the information about the file, never <code>null</code>.
+	 * @throws RuntimeIOException
+	 *             if an I/O exception occurs
+	 */
+	public LsResults getFileInfo() throws RuntimeIOException {
+		LsResults results = new LsResults();
+		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+		int errno = executeCommand(capturedOutput, CmdLine.build("ls", "-ld", getPath()));
+		if (errno == 0) {
+			results.exists = true;
+			if (capturedOutput.getOutputLines().size() > 0) {
+				// parse ls results
+				String outputLine = capturedOutput.getOutputLines().get(0);
+				if (logger.isDebugEnabled())
+					logger.debug("ls output = " + outputLine);
+				StringTokenizer outputTokens = new StringTokenizer(outputLine);
+				if (outputTokens.countTokens() < 5) {
+					throw new RuntimeIOException("ls -ld " + getPath() + " returned output that contains less than the expected 5 tokens");
+				}
+				String permissions = outputTokens.nextToken();
+				@SuppressWarnings("unused")
+				String inodelinkes = outputTokens.nextToken();
+				@SuppressWarnings("unused")
+				String owner = outputTokens.nextToken();
+				@SuppressWarnings("unused")
+				String group = outputTokens.nextToken();
+				String size = outputTokens.nextToken();
+
+				results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';
+				results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
+				results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
+				results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
+				results.canExecute = permissions.length() >= 4 && permissions.charAt(3) == 'x';
+				try {
+					results.length = Integer.parseInt(size);
+				} catch (NumberFormatException exc) {
+					logger.warn("Cannot parse length of " + this.getPath() + " from ls output: " + outputLine + ". Length will be reported as -1.", exc);
+				}
+			}
+		} else {
+			results.exists = false;
+		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("Listed file " + this + ": exists=" + results.exists + ", isDirectory=" + results.isDirectory + ", length=" + results.length
+			        + ", canRead=" + results.canRead + ", canWrite=" + results.canWrite + ", canExecute=" + results.canExecute);
+		return results;
 	}
 
-	@Override
-	public boolean canWrite() {
-		return getFileInfo(this).canWrite;
-	}
+	/**
+	 * Holds results of an ls call
+	 */
+	public static class LsResults {
+		public boolean exists;
+		public boolean isFile;
+		public boolean isDirectory;
+		public long length = -1;
 
-	@Override
-	public boolean canExecute() {
-		return getFileInfo(this).canExecute;
+		public boolean canRead;
+		public boolean canWrite;
+		public boolean canExecute;
 	}
 
 	@Override
@@ -332,7 +400,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
         }
 	}
 
-
-    private Logger logger = LoggerFactory.getLogger(SshScpFile.class);
+	private Logger logger = LoggerFactory.getLogger(SshScpFile.class);
 
 }
