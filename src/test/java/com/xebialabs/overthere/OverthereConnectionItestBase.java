@@ -25,7 +25,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -177,7 +176,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldWriteLargeLocalFile() throws IOException {
+	public void shouldCopyLargeFile() throws IOException {
 		File largeFile = temp.newFile("large.dat");
 		byte[] largeFileContentsWritten = writeRandomData(largeFile, LARGE_FILE_SIZE);
 		
@@ -196,7 +195,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldWriteLargeLocalDirectory() throws IOException {
+	public void shouldCopyDirectoryWithManyFiles() throws IOException {
 		File largeFolder = temp.newFolder("large.folder");
 		for(int i = 0; i < 100; i++) {
 			writeRandomData(new File(largeFolder, "large" + i + ".dat"), LARGE_FILE_SIZE / 10);
@@ -216,30 +215,6 @@ public abstract class OverthereConnectionItestBase {
             }
 		});
 		return randomBytes;
-	}
-
-	@Test
-	public void shouldWriteAndReadManyBytes() throws IOException {
-		OverthereFile f = connection.getTempFile("large", ".dat");
-        
-        byte[] contentsWritten = new byte[LARGE_FILE_SIZE];
-        new Random().nextBytes(contentsWritten);
-        OutputStream out = f.getOutputStream();
-        try {
-        	ByteStreams.copy(new ByteArrayInputStream(contentsWritten), out);
-        } finally {
-        	out.close();
-        }
-        
-        byte[] contentsRead = new byte[LARGE_FILE_SIZE];
-        InputStream largeIn = f.getInputStream();
-        try {
-        	ByteStreams.readFully(largeIn, contentsRead);
-        } finally {
-        	largeIn.close();
-        }
-        
-        assertThat(contentsRead, equalTo(contentsWritten));
 	}
 
 }
