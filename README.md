@@ -4,8 +4,6 @@ Runs something on a remote machine, i.e. over there.
 # TODO
 * Clean up tempFile code scattered throughout codebase.
 * Clean up directory walker code and transformations.
-* Port fixes made in HostSession framework since fork. Including, but not limited to:
-  - Port fix for sudo-copying from remote to local (file and directory).
 * Allow constants to be overridden through ConnectionOptions:
   - Connection timeout.
   - Number of attempts to create a temporary file.

@@ -149,28 +149,34 @@ class SshSudoFile extends SshScpFile {
 		}
     }
 
-	 void copyToTempFile(OverthereFile tempFile) {
+	void copyToTempFile(OverthereFile tempFile) {
 		logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
 
-		CapturingOverthereProcessOutputHandler capturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
-		int result = getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), build("cp", "-pr", this.getPath(), tempFile.getPath()));
-		if (result != 0) {
-			String errorMessage = capturedOutput.getAll();
+		CapturingOverthereProcessOutputHandler cpCapturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
+		int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), build("cp", "-pr", this.getPath(), tempFile.getPath()));
+		if (cpResult != 0) {
+			String errorMessage = cpCapturedOutput.getAll();
 			throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
+		}
+
+		CapturingOverthereProcessOutputHandler chmodCapturedOutput = capturingHandler();
+		int chmodResult = getConnection().execute(multiHandler(loggingHandler(logger), chmodCapturedOutput), CmdLine.build("chmod", "-R", "go+rX", tempFile.getPath()));
+		if (chmodResult != 0) {
+			String errorMessage = chmodCapturedOutput.getAll();
+			throw new RuntimeIOException("Cannot grant group and other read and execute permissions (chmod -R go+rX) to file " + tempFile + " before download: " + errorMessage);
 		}
 	}
 
-	 void copyfromTempFile(OverthereFile tempFile) {
+	void copyfromTempFile(OverthereFile tempFile) {
 		logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
 
-		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int result = getConnection().execute(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("cp", "-pr", tempFile.getPath(), this.getPath()));
-		if (result != 0) {
-			String errorMessage = capturedOutput.getAll();
+		CapturingOverthereProcessOutputHandler cpCapturedOutput = capturingHandler();
+		int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), CmdLine.build("cp", "-pr", tempFile.getPath(), this.getPath()));
+		if (cpResult != 0) {
+			String errorMessage = cpCapturedOutput.getAll();
 			throw new RuntimeIOException("Cannot copy temporary file " + tempFile + " to actual file " + this + " after upload: " + errorMessage);
 		}
 	}
-
 
 	private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 

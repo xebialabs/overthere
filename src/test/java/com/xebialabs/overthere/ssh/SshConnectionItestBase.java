@@ -132,14 +132,16 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	}
 
 	/**
-	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (e.g. sudo).
+	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (specifically for SSH/SUDO connections).
 	 */
 	@Test
 	public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectory() throws IOException {
+		// get handle to file in home dir
 		final OverthereFile homeDir = connection.getFile(getHomeDirPath());
 		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
 		assertThat(fileInHomeDir.exists(), equalTo(false));
-		
+
+		// write data to file in home dir
 		final byte[] contentsWritten = generateRandomBytes(SMALL_FILE_SIZE);
 		ByteStreams.write(contentsWritten, new OutputSupplier<OutputStream>() {
 			@Override
@@ -150,6 +152,10 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 		
 		assertThat(fileInHomeDir.exists(), equalTo(true));
 
+		// restrict access to file in home dir
+		connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
+
+		// read file from home dir
 		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
 		InputStream in = fileInHomeDir.getInputStream();
 		try {
@@ -158,37 +164,48 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 			in.close();
 		}
 		assertThat(contentsRead, equalTo(contentsWritten));
-		
+
+		// restrict access to file in home dir
 		fileInHomeDir.delete();
 		assertThat(fileInHomeDir.exists(), equalTo(false));
 	}
 
 	/**
-	 * Tests whether copyTo has the right permission behaviour (e.g. sudo).
+	 * Tests whether copyTo has the right permission behaviour (specifically for SSH/SUDO connections).
 	 */
 	@Test
 	public void shouldCopyFileToAndFromSudoUserHomeDirectory() throws IOException {
+		// get handle to file in home dir
 		final OverthereFile homeDir = connection.getFile(getHomeDirPath());
 		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
 		assertThat(fileInHomeDir.exists(), equalTo(false));
 
+		// write random data to local file
 		File smallFile = temp.newFile("small.dat");
 		byte[] contentsWritten = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
 		OverthereFile smallLocalFile = LocalFile.valueOf(smallFile);
 		
+		// copy local file to file in home dir
 		smallLocalFile.copyTo(fileInHomeDir);
 
 		assertThat(fileInHomeDir.exists(), equalTo(true));
+		
+		// restrict access to file in home dir
+		connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
 
+		// copy file in home dir to local file
 		File smallFileReadBack = temp.newFile("small-read-back.dat");
 		OverthereFile smallLocalFileReadBack = LocalFile.valueOf(smallFileReadBack);
 		fileInHomeDir.copyTo(smallLocalFileReadBack);
+		
+		// read new local file
 		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
 		InputStream in = smallLocalFileReadBack.getInputStream();
 		ByteStreams.readFully(in, contentsRead);
 
 		assertThat(contentsRead, equalTo(contentsWritten));
-		
+
+		// remove file from home dir
 		fileInHomeDir.delete();
 		assertThat(fileInHomeDir.exists(), equalTo(false));
 	}
