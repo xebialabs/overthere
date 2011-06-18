@@ -48,6 +48,11 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 	}
 
 	@Override
+	public boolean isHidden() {
+		return getName().startsWith(".");
+	}
+
+	@Override
 	public String getName() {
 		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
 		int lastFileSepPos = path.lastIndexOf(fileSep);
@@ -83,11 +88,6 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 				deleteFile();
 			}
 		}
-	}
-
-	@Override
-	public boolean isHidden() {
-		return getName().startsWith(".");
 	}
 
 	protected abstract void deleteFile();
