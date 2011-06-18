@@ -57,7 +57,7 @@ public abstract class OverthereConnectionItestBase {
 	protected OverthereConnection connection;
 
 	@Rule
-	TemporaryFolder temp = new TemporaryFolder();
+	public TemporaryFolder temp = new TemporaryFolder();
 	
 	@Before
 	public void connect() {

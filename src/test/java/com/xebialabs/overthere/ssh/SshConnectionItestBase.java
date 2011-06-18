@@ -49,9 +49,6 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
 
-	@Rule
-	public TemporaryFolder temp = new TemporaryFolder();
-
 	@Test
 	public void shouldNotConnectWithIncorrectUsername() {
 		options.set("username", "an-incorrect-username");
