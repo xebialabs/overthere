@@ -21,9 +21,7 @@ import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandle
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -33,9 +31,6 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public class LocalConnectionItest extends OverthereConnectionItestBase {
-
-	@Rule
-	public TemporaryFolder temp = new TemporaryFolder();
 
 	@Override
 	protected void setTypeAndOptions() {
