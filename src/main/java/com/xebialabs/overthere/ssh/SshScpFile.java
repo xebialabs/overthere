@@ -170,6 +170,60 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	@Override
+	public InputStream getInputStream() throws RuntimeIOException {
+        logger.debug("Opening SCP input stream to read from file {}", this);
+
+        try {
+            final File tempFile = File.createTempFile("scp_download", ".tmp");
+            tempFile.deleteOnExit();
+            connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
+            return new FileInputStream(tempFile) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } finally {
+                        tempFile.delete();
+                    }
+
+                }
+            };
+        } catch (IOException e) {
+            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+        }
+	}
+
+	@Override
+	public OutputStream getOutputStream() throws RuntimeIOException {
+		logger.debug("Opening SCP output stream to write to file {}", this);
+
+        try {
+            final File tempFile = File.createTempFile("scp_upload", ".tmp");
+            tempFile.deleteOnExit();
+            return new FileOutputStream(tempFile) {
+                @Override
+                public void close() throws IOException {
+                    try {
+                        super.close();
+                    } finally {
+                        uploadAndDelete(tempFile);
+                    }
+                }
+
+                private void uploadAndDelete(File tempFile) throws IOException {
+                    try {
+                        connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
+                    } finally {
+                        tempFile.delete();
+                    }
+                }
+            };
+        } catch (IOException e) {
+            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+        }
+	}
+
+	@Override
 	public List<OverthereFile> listFiles() {
 		logger.debug("Listing directory {}", this);
 
@@ -344,60 +398,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	        return 0;
         }
 		
-	}
-
-	@Override
-	public InputStream getInputStream() throws RuntimeIOException {
-        logger.debug("Opening SCP input stream to read from file {}", this);
-
-        try {
-            final File tempFile = File.createTempFile("scp_download", ".tmp");
-            tempFile.deleteOnExit();
-            connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
-            return new FileInputStream(tempFile) {
-                @Override
-                public void close() throws IOException {
-                    try {
-                        super.close();
-                    } finally {
-                        tempFile.delete();
-                    }
-
-                }
-            };
-        } catch (IOException e) {
-            throw new RuntimeIOException("Could not open " + this + " for reading", e);
-        }
-	}
-
-	@Override
-	public OutputStream getOutputStream() throws RuntimeIOException {
-		logger.debug("Opening SCP output stream to write to file {}", this);
-
-        try {
-            final File tempFile = File.createTempFile("scp_upload", ".tmp");
-            tempFile.deleteOnExit();
-            return new FileOutputStream(tempFile) {
-                @Override
-                public void close() throws IOException {
-                    try {
-                        super.close();
-                    } finally {
-                        uploadAndDelete(tempFile);
-                    }
-                }
-
-                private void uploadAndDelete(File tempFile) throws IOException {
-                    try {
-                        connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
-                    } finally {
-                        tempFile.delete();
-                    }
-                }
-            };
-        } catch (IOException e) {
-            throw new RuntimeIOException("Could not open " + this + " for reading", e);
-        }
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshScpFile.class);
