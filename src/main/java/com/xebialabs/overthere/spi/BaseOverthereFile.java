@@ -66,4 +66,10 @@ public abstract class BaseOverthereFile<C extends OverthereConnection> implement
 		OverthereFileCopier.copy(source, this, null);
 	}
 
+	/**
+	 * Subclasses MUST implement toString properly.
+	 */
+	@Override
+	public abstract String toString();
+
 }

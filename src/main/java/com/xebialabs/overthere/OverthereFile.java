@@ -181,10 +181,4 @@ public interface OverthereFile {
 	 */
 	void copyTo(final OverthereFile dest);
 
-	/**
-	 * Subclasses MUST implement toString properly.
-	 */
-	@Override
-	public abstract String toString();
-
 }
