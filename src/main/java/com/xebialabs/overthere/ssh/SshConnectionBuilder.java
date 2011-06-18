@@ -7,6 +7,9 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
+/**
+ * Builds SSH connections.
+ */
 @Protocol(name = "ssh")
 public class SshConnectionBuilder implements OverthereConnectionBuilder {
 

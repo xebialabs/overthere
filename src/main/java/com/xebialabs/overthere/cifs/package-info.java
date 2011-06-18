@@ -15,7 +15,7 @@
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * This package contains the implements of the <code>cifs_telnet</code> protocol.
+ * Contains the implementation of the <code>cifs_telnet</code> protocol.
  */
 package com.xebialabs.overthere.cifs;
 

@@ -15,7 +15,7 @@
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * This package contains the implements of the <code>ssh</code> protocol.
+ * Contains the implementation of the <code>ssh</code> protocol.
  */
 package com.xebialabs.overthere.ssh;
 

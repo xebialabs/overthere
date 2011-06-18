@@ -69,8 +69,8 @@ public class CmdLine implements Serializable {
 	/**
 	 * Adds a list of {@link CmdLineArgument arguments}.
 	 * 
-	 * @param arg
-	 *            the argument to add.
+	 * @param args
+	 *            the arguments to add.
 	 * @return this.
 	 */
 	public CmdLine add(List<CmdLineArgument> args) {
@@ -113,7 +113,7 @@ public class CmdLine implements Serializable {
 	 *            the operating system on which the result will be executed.
 	 * @param forLogging
 	 *            <code>true</code> if the created command line will be used for logging.
-	 * @return
+	 * @return the command line as a single string
 	 */
 	public String toCommandLine(OperatingSystemFamily os, final boolean forLogging) {
 		checkState(arguments.size() > 0, "Cannot encode empty command line");

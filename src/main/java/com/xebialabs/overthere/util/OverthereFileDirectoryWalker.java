@@ -57,6 +57,8 @@ import com.xebialabs.overthere.RuntimeIOException;
  * </pre>
  *
  * Adapted from the DirectoryWalker class in Common IO.
+ * 
+ * FIXME: Move to its proper place
  */
 public abstract class OverthereFileDirectoryWalker {
 

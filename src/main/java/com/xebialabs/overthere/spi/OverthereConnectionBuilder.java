@@ -16,10 +16,21 @@
  */
 package com.xebialabs.overthere.spi;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 
+/**
+ * Implemented by {@link Protocol protocol} implementations.
+ */
 public interface OverthereConnectionBuilder {
 
+	/**
+	 * Creates the connection that corresponds to the arguments that were passed in the two-arg constructor of this class. The first argument is a
+	 * {@link String} that specifies the type (and is identical to the name field of the {@link Protocol} annotation). The second argument is the
+	 * {@link ConnectionOptions}.
+	 * 
+	 * @return the created connection.
+	 */
 	OverthereConnection connect();
 }
 

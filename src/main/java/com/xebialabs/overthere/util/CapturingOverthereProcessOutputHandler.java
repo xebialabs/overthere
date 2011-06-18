@@ -35,6 +35,9 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
 	private final List<String> allLines = new ArrayList<String>();
 
+	private CapturingOverthereProcessOutputHandler() {
+	}
+
 	public void handleOutputLine(final String line) {
 		outputLines.add(line);
 		allLines.add(line);
@@ -103,10 +106,11 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 		return on('\n').join(allLines);
 	}
 
-	public String toString() {
-		return this.getClass().getName() + "[output=\"" + getOutput() + "\", error=\"" + getError() + "\"]";
-	}
-
+	/**
+	 * Creates a {@link CapturingOverthereProcessOutputHandler}.
+	 * 
+	 * @return the created {@link CapturingOverthereProcessOutputHandler}.
+	 */
 	public static CapturingOverthereProcessOutputHandler capturingHandler() {
 		return new CapturingOverthereProcessOutputHandler();
 	}

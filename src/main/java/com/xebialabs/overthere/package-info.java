@@ -15,7 +15,7 @@
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * The Overthere library. This library allows users to work with local or remote systems through an abstraction layer. Some of the features:
+ * Contains the core API of the Overthere library. This library allows users to work with local or remote systems through an abstraction layer. Some of the features:
  * <ul>
  * <li>Files can be manipulated, read and written.<li>
  * <li>Commands can be executed.</li>
@@ -24,7 +24,7 @@
  * <li>The host can be a Windows or a Unix machine.</li>
  * </ul>
  * 
- * To start, create a {@link com.xebialabs.overthere.OverthereConnection connection} by invoking {@link Overthere#getConnection(String, ConnectionOptions)}.
+ * To start, create a {@link com.xebialabs.overthere.OverthereConnection connection} by invoking {@link com.xebialabs.overthere.Overthere#getConnection(String, ConnectionOptions)}.
  * Then, create file objects using {@link com.xebialabs.overthere.OverthereConnection#getFile(String)} and manipulate them or execute commands using
  * {@link com.xebialabs.overthere.OverthereConnection#execute(OverthereProcessOutputHandler, CmdLine)}).
  *

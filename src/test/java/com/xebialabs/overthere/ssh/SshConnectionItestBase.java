@@ -17,6 +17,7 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -42,7 +43,6 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
@@ -105,7 +105,7 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 		OverthereFile tempFile = connection.getTempFile("temporaryFileCanBeWritten.txt");
 		OverthereUtils.write("Some test data", "UTF-8", tempFile);
 
-		OverthereProcessOutputHandler handler = new ConsoleOverthereProcessOutputHandler();
+		OverthereProcessOutputHandler handler = consoleHandler();
 		int res = connection.execute(handler, CmdLine.build("cp", tempFile.getPath(), "/tmp/" + System.currentTimeMillis() + ".class"));
 		assertThat(res, equalTo(0));
 	}

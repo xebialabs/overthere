@@ -1,5 +1,7 @@
 package com.xebialabs.overthere.spi;
 
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+
 import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
@@ -41,7 +43,7 @@ public class OverthereConnectionUtils {
 	 */
 	public static LsResults getFileInfo(OverthereFile file) throws RuntimeIOException {
 		LsResults results = new LsResults();
-		CapturingOverthereProcessOutputHandler capturedOutput = new CapturingOverthereProcessOutputHandler();
+		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = file.getConnection().execute(capturedOutput, CmdLine.build("ls", "-ld", file.getPath()));
 		if (errno == 0) {
 			results.exists = true;

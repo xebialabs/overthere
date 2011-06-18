@@ -49,10 +49,13 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
 /**
+ * A connection to a remote host using CIFS and Telnet.
+ * 
+ * Limitations:
  * <ul>
- * <li>Windows Telnet Service in stream mode:<br/>
+ * <li>Windows Telnet Service must be configured to use stream mode:<br/>
  * <tt>&gt; tlntadmn config mode=stream</tt></li>
- * <li>Shares with names like C$ are available for all drives you access.</li>
+ * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator access is needed.</li>
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */

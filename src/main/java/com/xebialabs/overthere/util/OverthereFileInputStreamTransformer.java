@@ -32,14 +32,17 @@ import java.io.InputStream;
 
 import com.xebialabs.overthere.OverthereFile;
 
+/**
+ * FIXME: Move to its proper place.
+ */
 public interface OverthereFileInputStreamTransformer {
 	
 	/**
-	 * Transforms a source {@link HostFile}
+	 * Transforms a source {@link OverthereFile}
 	 * 
 	 * Can transform paths or contents of the file.
 	 * 
-	 * @param input hostfile
+	 * @param input OverthereFile
 	 * @return the transformed InputStream 
 	 */
 	TransformedInputStream transform(OverthereFile input);

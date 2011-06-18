@@ -19,9 +19,12 @@ package com.xebialabs.overthere.util;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 /**
- * Implementation of the {@link OverthereProcessOutputHandler} interface that print the output to the console ({@link System#out} and {@link System#err}).
+ * Implementation of the {@link OverthereProcessOutputHandler} interface that prints the output to the console ({@link System#out} and {@link System#err}).
  */
 public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
+
+	private ConsoleOverthereProcessOutputHandler() {
+	}
 
 	public void handleOutputLine(final String line) {
 		System.out.println(line);
@@ -35,7 +38,12 @@ public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOut
 		// no-op
 	}
 
-	public static ConsoleOverthereProcessOutputHandler simpleHandler() {
+	/**
+	 * Creates a {@link ConsoleOverthereProcessOutputHandler}.
+	 * 
+	 * @return the created {@link ConsoleOverthereProcessOutputHandler}.
+	 */
+	public static ConsoleOverthereProcessOutputHandler consoleHandler() {
 		return new ConsoleOverthereProcessOutputHandler();
 	}
 

@@ -14,19 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.spi;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import com.xebialabs.overthere.ConnectionOptions;
-
 /**
- * Annotation used to specify that a class is an Overthere protocol. It will be registered on startup of the application and will register under the provided
- * name. It must also have a two-arg constructor ({@link String}, {@link ConnectionOptions}) and implement the {@link OverthereConnectionBuilder} interface.
+ * Contains the SPI interface of the Overthere library.
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Protocol {
-	String name();
-}
+package com.xebialabs.overthere.spi;
 

@@ -16,6 +16,8 @@ import com.xebialabs.overthere.util.OverthereFileInputStreamTransformer.Transfor
 
 /**
  * OverthereFile copy utility that uses only the input and output streams exposed by the OverthereFile to perform the copying action.
+ * 
+ * FIXME: Move to its proper place
  */
 public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
