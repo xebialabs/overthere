@@ -12,7 +12,7 @@ import java.security.PublicKey;
 class LaxKeyVerifier implements HostKeyVerifier {
     @Override
     public boolean verify(String hostname, int port, PublicKey key) {
-        logger.debug("Trusting host %s:%d", hostname, port);
+        logger.debug("Trusting host {}:{}", hostname, port);
         return true;
     }
 
