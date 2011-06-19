@@ -28,7 +28,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Random;
 
 import jcifs.smb.SmbFile;
 
@@ -45,6 +44,7 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -60,7 +60,7 @@ import com.xebialabs.overthere.spi.Protocol;
  * </ul>
  */
 @Protocol(name = "cifs_telnet")
-public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
+public class CifsTelnetConnection extends BaseOverthereConnection implements OverthereConnectionBuilder {
 
 	private String address;
 
@@ -120,6 +120,11 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		return getFile(childPath.toString());
 	}
 
+    @Override
+    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+    	return getFile(parent, name);
+    }
+
 	@Override
 	public OverthereProcess startProcess(final CmdLine commandLine) {
 		final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
@@ -127,7 +132,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 
 		try {
 			final TelnetClient tc = new TelnetClient();
-			tc.setConnectTimeout(CONNECTION_TIMEOUT_MS);
+			tc.setConnectTimeout(connectionTimeoutMillis);
 			tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
 			logger.info("Connecting to telnet://{}@{}", username, address);
 			tc.connect(address);
@@ -286,30 +291,6 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		byte[] bytesToSend = (lineToSend + "\r\n").getBytes();
 		stdin.write(bytesToSend);
 		stdin.flush();
-	}
-
-	// FIXME: Move to OverthereConnectionUtils
-	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		if (prefix == null)
-			throw new NullPointerException("prefix is null");
-
-		if (suffix == null) {
-			suffix = ".tmp";
-		}
-
-		Random r = new Random();
-		String infix = "";
-		for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-			OverthereFile f = getFile(getConnectionTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix);
-			if (!f.exists()) {
-				if (logger.isDebugEnabled())
-					logger.debug("Created temporary file " + f);
-
-				return f;
-			}
-			infix = "-" + Long.toString(Math.abs(r.nextLong()));
-		}
-		throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
 	}
 
 	private String encodeAsSmbUrl(String hostPath) {

@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static java.io.File.createTempFile;
@@ -45,8 +46,17 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	 * Constructs a connection to the local host.
 	 */
 	public LocalConnection(String type, ConnectionOptions options) {
-		super(type, getLocalHostOperatingSystemFamily(), options);
+		super(type, fixOptions(options));
 	}
+
+	private static ConnectionOptions fixOptions(ConnectionOptions options) {
+		options = new ConnectionOptions(options);
+		options.set(OPERATING_SYSTEM, getLocalHostOperatingSystemFamily());
+		if(options.get(TEMPORARY_DIRECTORY_PATH) == null) {
+			options.set(TEMPORARY_DIRECTORY_PATH, System.getProperty("java.io.tmpdir"));
+		}
+	    return options;
+    }
 
 	@Override
 	public OverthereConnection connect() {
@@ -54,17 +64,16 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	}
 	
 	@Override
-	public void doDisconnect() {
+	public void disconnect() {
 		// no-op
 	}
 
 	@Override
 	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
 		try {
-			File tempFile = createTempFile(prefix, suffix, new File(getConnectionTemporaryDirectory().getPath()));
-			// FIXME: Need to delete this file to make test work, but isn't it better to NOT do that so that a tempfile with the same name is not accidentally
-			// created simultaneously?
-			// FIXME: Answer from VP: we have to decide on the semantics. How do you create a temporary directory?
+			File tempFile = createTempFile(prefix, suffix);
+			// Delete file because semantics of {@link OverthereFile#getTempFile} are that the temp file does not exist yet, so that it can be created as a
+			// regular file or a directory.
 			tempFile.delete();
 			return new LocalFile(this, tempFile);
 		} catch (IOException exc) {
@@ -132,9 +141,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	 * Creates a connection to the local host.
 	 */
 	public static OverthereConnection getLocalConnection() {
-		ConnectionOptions options = new ConnectionOptions();
-		options.set(TEMPORARY_DIRECTORY_PATH, System.getProperty("java.io.tmpdir"));
-		return Overthere.getConnection("local", options);
+		return Overthere.getConnection("local", new ConnectionOptions());
 	}
 
 }

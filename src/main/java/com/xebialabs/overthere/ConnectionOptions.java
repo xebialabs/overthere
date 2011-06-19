@@ -16,19 +16,91 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.HashMap;
+import static com.google.common.collect.Maps.newHashMap;
+
 import java.util.Map;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
  */
 public class ConnectionOptions {
-	private Map<String, Object> options = new HashMap<String, Object>();
+
+	/**
+	 * Connection option for all protocols that specifies the operating system to connect to. This is used to determine how to encode paths and commands and to
+	 * determine the default temporary directory path.
+	 */
+	public static final String OPERATING_SYSTEM = "os";
+
+	/**
+	 * Connection option for most protocols that specifies the directory in which the connection-scope temporary directory is created. Any
+	 * {@link OverthereConnection#getTempFile(String)} temporary file created, will be created in this directory.
+	 */
+	public static final String TEMPORARY_DIRECTORY_PATH = "tmp";
+
+	/**
+	 * Connection option (Boolean) for most protocols that specifies whether to delete the connection-scope temporary directory when the connection is closed.
+	 */
+	public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmp.deleteOnDisconnect";
+
+	/**
+	 * Default value (true) for the connection option that specifies whether to delete the connection-scope temporary directory when the connection is closed.
+	 */
+	public static final boolean TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT = true;
+
+	/**
+	 * Connection option (int) for most protocol that specifies how many times to retry creating a unique temporary file name before giving up. 
+	 */
+	public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmp.fileCreationRetries";
+
+	/**
+	 * Defalut value (100) for connection option that specifies how many times to retry creating a unique temporary file name before giving up. 
+	 */
+	public static final int TEMPORARY_FILE_CREATION_RETRIES_DEFAULT = 100;
+
+	/**
+	 * Connection option (Integer) for all protocol that specifies the connection timeout in milliseconds to use.
+	 */
+	public static final String CONNECTION_TIMEOUT_MILLIS = "connectionTimeoutMillis";
+	
+	/**
+	 * Default value (120000) for the connection option that specifies the connection timeout in milliseconds to use.
+	 */
+	public static final int CONNECTION_TIMEOUT_MILLIS_DEFAULT = 120000;
+
+	/**
+	 * Common connection option that specifies the address to connect to.
+	 */
+	public static final String ADDRESS = "address";
+
+	/**
+	 * Common connection option that specifies the port to connect to.
+	 */
+	public static final String PORT = "port";
+
+	/**
+	 * Common connection option that specifies the username with which to connect.
+	 */
+	public static final String USERNAME = "username";
+
+	/**
+	 * Common connection option that specifies the password with which to connect.
+	 */
+	public static final String PASSWORD = "password";
+
+	private final Map<String, Object> options;
 
 	/**
 	 * Creates an empty options object.
 	 */
 	public ConnectionOptions() {
+		options = newHashMap();
+	}
+
+	/**
+	 * Creates a copy of an existing options object.
+	 */
+	public ConnectionOptions(ConnectionOptions options) {
+		this.options = newHashMap(options.options);
 	}
 
 	/**
@@ -76,44 +148,5 @@ public class ConnectionOptions {
 			return defaultValue;
 		}
 	}
-
-	/**
-	 * Connection options for all protocols that specifies the operating system to connect to. This is used to determine how to encode paths and commands and to
-	 * determine the default temporary directory path.
-	 */
-	public static final String OPERATING_SYSTEM = "os";
-
-	/**
-	 * Connection option for all protocols that specifies the directory in which the connection-scope temporary directory is created. Any
-	 * {@link OverthereConnection#getTempFile(String)} temporary file created, will be created in this directory. Defaults to
-	 * {@link OperatingSystemFamily#getDefaultTemporaryDirectoryPath()}.
-	 */
-	public static final String TEMPORARY_DIRECTORY_PATH = "tmp";
-
-	/**
-	 * Connection options for all protocols that specifies whether to delete the connection-scope temporary directory when the connection is closed. Defaults to
-	 * true.
-	 */
-	public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmp.deleteOnDisconnect";
-
-	/**
-	 * Common connection options that specifies the address to connect to.
-	 */
-	public static final String ADDRESS = "address";
-
-	/**
-	 * Common connection options that specifies the port to connect to.
-	 */
-	public static final String PORT = "port";
-
-	/**
-	 * Common connection options that specifies the username with which to connect.
-	 */
-	public static final String USERNAME = "username";
-
-	/**
-	 * Common connection options that specifies the password with which to connect.
-	 */
-	public static final String PASSWORD = "password";
 
 }

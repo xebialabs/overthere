@@ -19,17 +19,14 @@ package com.xebialabs.overthere;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.io.Closeables.closeQuietly;
+import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
+import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,35 +42,12 @@ public abstract class OverthereConnection {
 
 	protected OperatingSystemFamily os;
 
-	protected String temporaryDirectoryPath;
-
-	protected OverthereFile connectionTemporaryDirectory;
-
-	protected boolean deleteTemporaryDirectoryOnDisconnect = true;
-
-	/**
-	 * The timeout for opening a connection in milliseconds.
-	 */
-	public static final int CONNECTION_TIMEOUT_MS = 120000;
-
-	/**
-	 * The number of tries made when creating a unique temporary file name.
-	 */
-	public static final long MAX_TEMP_RETRIES = 100;
-
-	protected OverthereConnection(String type, OperatingSystemFamily os, ConnectionOptions options) {
-		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
-		this.os = checkNotNull(os, "Cannot create HostConnection with null os");
-		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
-
-		Object deleteTemporaryDirectoryOnDisconnectObject = options.get(ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
-		if (deleteTemporaryDirectoryOnDisconnectObject instanceof String && "false".equalsIgnoreCase((String) deleteTemporaryDirectoryOnDisconnectObject)) {
-			deleteTemporaryDirectoryOnDisconnect = false;
-		}
-	}
+	protected int connectionTimeoutMillis;
 
 	protected OverthereConnection(String type, ConnectionOptions options) {
-		this(type, options.<OperatingSystemFamily> get(OPERATING_SYSTEM), options);
+		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
+		this.os = checkNotNull(options.<OperatingSystemFamily>get(OPERATING_SYSTEM), "Cannot create HostConnection with null os");
+		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT);
 	}
 
 	/**
@@ -86,62 +60,9 @@ public abstract class OverthereConnection {
 	}
 
 	/**
-	 * Closes the connection. Depending on the {@link ConnectionOptions#TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT} connection option, deletes all temporary files
-	 * that have been created on the host.
+	 * Closes the connection.
 	 */
-	public final void disconnect() {
-		if (deleteTemporaryDirectoryOnDisconnect) {
-			deleteTemporaryDirectory();
-		}
-
-		doDisconnect();
-
-		logger.info("Disconnected from {}", this);
-	}
-
-	protected abstract void doDisconnect();
-
-	protected synchronized OverthereFile getConnectionTemporaryDirectory() throws RuntimeIOException {
-		if (connectionTemporaryDirectory == null) {
-			OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
-			Random r = new Random();
-			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
-			String prefix = "deployit-" + dateFormat.format(new Date());
-			String infix = "";
-			String suffix = ".tmp";
-			for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-				OverthereFile tempDir = createSessionTempDirectory(temporaryDirectory, prefix + infix + suffix);
-				if (tempDir != null) {
-					connectionTemporaryDirectory = tempDir;
-					logger.info("Created connection temporary directory " + connectionTemporaryDirectory);
-					return connectionTemporaryDirectory;
-				}
-				infix = "-" + Long.toString(Math.abs(r.nextLong()));
-			}
-			throw new RuntimeIOException("Cannot create connection temporary directory on " + this);
-		}
-		return connectionTemporaryDirectory;
-	}
-
-	protected OverthereFile createSessionTempDirectory(OverthereFile systemTempDirectory, String name) {
-		OverthereFile f = getFile(systemTempDirectory, name);
-		if (!f.exists()) {
-			f.mkdir();
-			return f;
-		}
-		return null;
-	}
-
-	protected void deleteTemporaryDirectory() {
-		if (connectionTemporaryDirectory != null) {
-			try {
-				logger.info("Removing connection temporary directory {}", connectionTemporaryDirectory);
-				connectionTemporaryDirectory.deleteRecursively();
-			} catch (RuntimeException exc) {
-				logger.warn("Got exception while removing connection temporary directory {}. Ignoring it.", connectionTemporaryDirectory, exc);
-			}
-		}
-	}
+	public abstract void disconnect();
 
 	/**
 	 * Creates a reference to a file on the host.
@@ -275,7 +196,6 @@ public abstract class OverthereConnection {
 			};
 			stderrReaderThread.start();
 
-			// FIXME: Add configurable wait-for timeout
 			try {
 				return process.waitFor();
 			} catch (InterruptedException exc) {

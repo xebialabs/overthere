@@ -25,7 +25,6 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 
 import java.io.IOException;
-import java.util.Random;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.SSHException;
@@ -39,15 +38,15 @@ import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 /**
  * Base class for host connections using SSH.
  */
-abstract class SshConnection extends OverthereConnection {
+abstract class SshConnection extends BaseOverthereConnection {
 
     protected String host;
 
@@ -76,7 +75,7 @@ abstract class SshConnection extends OverthereConnection {
 	protected void connect() {
         try {
             SSHClient client = new SSHClient();
-            client.setConnectTimeout(CONNECTION_TIMEOUT_MS);
+            client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new LaxKeyVerifier());
             
             try {
@@ -130,11 +129,16 @@ abstract class SshConnection extends OverthereConnection {
         return getFile(hostPath, false);
     }
 
-    protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
-
     public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
         return getFile(parent, child, false);
     }
+
+    @Override
+    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+    	return getFile(parent, name, true);
+    }
+
+    protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
 
     protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
         if (!(parent instanceof SshFile)) {
@@ -144,30 +148,6 @@ abstract class SshConnection extends OverthereConnection {
             throw new IllegalStateException("parent is not a file in this connection");
         }
         return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
-    }
-
-    // FIXME: Move to OverthereHostConnectionUtils
-    public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-        if (prefix == null)
-            throw new NullPointerException("prefix is null");
-
-        if (suffix == null) {
-            suffix = ".tmp";
-        }
-
-        Random r = new Random();
-        String infix = "";
-        for (int i = 0; i < MAX_TEMP_RETRIES; i++) {
-            OverthereFile f = getFile(getConnectionTemporaryDirectory().getPath() + getHostOperatingSystem().getFileSeparator() + prefix + infix + suffix, true);
-            if (!f.exists()) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Created temporary file " + f);
-
-                return f;
-            }
-            infix = "-" + Long.toString(Math.abs(r.nextLong()));
-        }
-        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
     }
 
     public OverthereProcess startProcess(final CmdLine commandLine) {

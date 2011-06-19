@@ -102,16 +102,6 @@ class SshSudoConnection extends SshScpConnection {
 	}
 
 	@Override
-	protected OverthereFile createSessionTempDirectory(OverthereFile systemTempDirectory, String name) {
-		OverthereFile f = getFile(systemTempDirectory, name, true);
-		if (!f.exists()) {
-			f.mkdir();
-			return f;
-		}
-		return null;
-	}
-
-	@Override
 	public String toString() {
 		return type + "://" + username + "/" + sudoUsername + "@" + host + ":" + port;
 	}
