@@ -78,7 +78,7 @@ public abstract class BaseOverthereConnection extends OverthereConnection {
 	    	OverthereFile tempDir = getFileForTempFile(temporaryDirectory, prefix + infix + suffix);
 	    	if(!tempDir.exists()) {
 	    		tempDir.mkdir();
-	    		logger.info("Created connection temporary directory " + connectionTemporaryDirectory);
+	    		logger.info("Created connection temporary directory {}", tempDir);
 	    		return tempDir;
 	    	}
 	    	infix = "-" + Long.toString(Math.abs(r.nextLong()));
