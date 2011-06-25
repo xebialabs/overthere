@@ -1,28 +1,39 @@
 package com.xebialabs.overthere.util;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
+import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.local.LocalConnection;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-class ByteArrayFile extends BaseOverthereFile<LocalConnection> {
+class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
 	private String path;
 
 	private byte[] contents;
 
 	ByteArrayFile(String path, byte[] contents) {
-		super((LocalConnection) getLocalConnection());
+		super(createConnection());
 		this.path = path;
 		this.contents = contents;
 	}
+
+	private static ByteArrayConnection createConnection() {
+		ConnectionOptions options = new ConnectionOptions();
+		OperatingSystemFamily os = getLocalHostOperatingSystemFamily();
+		options.set(OPERATING_SYSTEM, os);
+		options.set(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
+	    return new ByteArrayConnection("byte_array", options);
+    }
 
 	@Override
 	public String getPath() {

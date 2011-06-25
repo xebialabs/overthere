@@ -178,6 +178,24 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	public void shouldWriteLargeFile() throws IOException {
+		byte[] largeFileContentsWritten = generateRandomBytes(LARGE_FILE_SIZE);
+		
+		OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
+		OverthereUtils.write(largeFileContentsWritten, remoteLargeFile);
+		
+		byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
+		InputStream largeIn = remoteLargeFile.getInputStream();
+		try {
+			ByteStreams.readFully(largeIn, largeFileContentsRead);
+		} finally {
+			largeIn.close();
+		}
+
+		assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+	}
+
+	@Test
 	public void shouldCopyLargeFile() throws IOException {
 		File largeFile = temp.newFile("large.dat");
 		byte[] largeFileContentsWritten = writeRandomBytes(largeFile, LARGE_FILE_SIZE);
