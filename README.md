@@ -2,6 +2,8 @@
 Runs something on a remote machine, i.e. over there.
 
 # TODO
+* Fix (or limit) interactive sude password prompt problem.
+* Allow for "raw" arguments.
 * Clean up directory walker code and transformations.
 * Allow constants to be overridden through ConnectionOptions:
   - Enable/disable pesudo-tty on SSH connections.

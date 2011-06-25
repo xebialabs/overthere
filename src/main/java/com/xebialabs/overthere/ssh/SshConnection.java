@@ -38,15 +38,15 @@ import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 /**
  * Base class for host connections using SSH.
  */
-abstract class SshConnection extends BaseOverthereConnection {
+abstract class SshConnection extends OverthereConnection {
 
     protected String host;
 

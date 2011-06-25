@@ -19,7 +19,6 @@ package com.xebialabs.overthere.local;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
-import static java.io.File.createTempFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,21 +63,8 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	}
 	
 	@Override
-	public void disconnect() {
+	public void doDisconnect() {
 		// no-op
-	}
-
-	@Override
-	public OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-		try {
-			File tempFile = createTempFile(prefix, suffix);
-			// Delete file because semantics of {@link OverthereFile#getTempFile} are that the temp file does not exist yet, so that it can be created as a
-			// regular file or a directory.
-			tempFile.delete();
-			return new LocalFile(this, tempFile);
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
 	}
 
 	@Override
@@ -95,6 +81,11 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 		File childFile = new File(((LocalFile) parent).getFile(), child);
 		return new LocalFile(this, childFile);
 	}
+
+	@Override
+    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+	    return getFile(parent, name);
+    }
 
 	@Override
 	public OverthereProcess startProcess(CmdLine commandLine) {

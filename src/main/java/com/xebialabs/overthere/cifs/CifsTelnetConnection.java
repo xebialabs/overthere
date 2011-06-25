@@ -44,7 +44,6 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -60,7 +59,7 @@ import com.xebialabs.overthere.spi.Protocol;
  * </ul>
  */
 @Protocol(name = "cifs_telnet")
-public class CifsTelnetConnection extends BaseOverthereConnection implements OverthereConnectionBuilder {
+public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
 	private String address;
 
