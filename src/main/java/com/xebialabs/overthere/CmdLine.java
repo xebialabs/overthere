@@ -24,7 +24,7 @@ public class CmdLine implements Serializable {
 	/**
 	 * String containing special characters that require quoting or escaping.
 	 */
-	private static final String SPECIAL_CHARS = " '\"\\;()${}";
+	private static final String SPECIAL_CHARS = " '\"\\;()${}*?";
 
 	List<CmdLineArgument> arguments = newArrayList();
 
