@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
@@ -185,7 +186,9 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> {
 	}
 
 	public static OverthereFile valueOf(File f) {
-		return new LocalFile((LocalConnection) LocalConnection.getLocalConnection(), f);
+		// Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from appearing
+		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection("local", new ConnectionOptions());
+		return new LocalFile(localConnectionThatWillNeverBeDisconnected, f);
 	}
 
 }
