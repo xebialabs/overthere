@@ -97,4 +97,11 @@ public class CmdLineTest {
 		assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
 	}
 
+	@Test
+	public void shouldLeaveRawArgumentAsIs() {
+		CmdLine commandLine = new CmdLine().addArgument("rm").addArgument("-rf").addRaw("*");
+		String actualEncodedCommandLine = commandLine.toCommandLine(UNIX, false);
+		assertThat(actualEncodedCommandLine, equalTo("rm -rf *"));
+	}
+
 }

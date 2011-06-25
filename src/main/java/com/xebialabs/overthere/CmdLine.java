@@ -6,6 +6,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static com.xebialabs.overthere.CmdLineArgument.arg;
 import static com.xebialabs.overthere.CmdLineArgument.password;
+import static com.xebialabs.overthere.CmdLineArgument.raw;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static java.util.Collections.unmodifiableList;
@@ -29,7 +30,7 @@ public class CmdLine implements Serializable {
 	List<CmdLineArgument> arguments = newArrayList();
 
 	/**
-	 * Adds a regular argument to the command line. A regular argument is an argument that is intended to be passed to the program that is invoked.
+	 * Adds {@link CmdLineArgument#arg(String) a regular argument} to the command line.
 	 * 
 	 * @param arg
 	 *            the argument string to add.
@@ -41,8 +42,7 @@ public class CmdLine implements Serializable {
 	}
 
 	/**
-	 * Adds a password argument to the command line. A password argument is an argument that is intended to be passed to the program that is invoked and that
-	 * should not be shown in logs.
+	 * Adds {@link CmdLineArgument#password(String) a password argument} to the command line.
 	 * 
 	 * @param arg
 	 *            the argument string to add.
@@ -50,6 +50,18 @@ public class CmdLine implements Serializable {
 	 */
 	public CmdLine addPassword(String arg) {
 		arguments.add(password(arg));
+		return this;
+	}
+
+	/**
+	 * Adds {@link CmdLineArgument#raw(String) a raw argument} to the command line.
+	 * 
+	 * @param arg
+	 *            the argument string to add.
+	 * @return this.
+	 */
+	public CmdLine addRaw(String arg) {
+		arguments.add(raw(arg));
 		return this;
 	}
 
@@ -126,7 +138,7 @@ public class CmdLine implements Serializable {
 			if (forLogging && a.isPassword()) {
 				encodePasswordArgument(a.toString(), sb);
 			} else {
-				encodeArgument(os, a.toString(forLogging), sb);
+				encodeArgument(a.toString(forLogging), a.isRaw(), os, sb);
 			}
 		}
 
@@ -137,11 +149,11 @@ public class CmdLine implements Serializable {
 		collector.append("********");
 	}
 
-	private void encodeArgument(OperatingSystemFamily os, String argument, StringBuilder collector) {
+	private void encodeArgument(String argument, boolean isRaw, OperatingSystemFamily os, StringBuilder collector) {
 		if (argument.length() == 0) {
 			encodeEmptyArgument(collector);
-		} else if (!containsAny(argument, SPECIAL_CHARS)) {
-			encodeRegularArgument(argument, collector);
+		} else if (isRaw || !containsAny(argument, SPECIAL_CHARS)) {
+			doNotEncodeArgument(argument, collector);
 		} else {
 			if (os == WINDOWS) {
 				encodeArgumentWithSpecialCharactersForWindows(argument, collector);
@@ -164,7 +176,7 @@ public class CmdLine implements Serializable {
 		collector.append("\"\"");
 	}
 
-	private void encodeRegularArgument(String argument, StringBuilder collector) {
+	private void doNotEncodeArgument(String argument, StringBuilder collector) {
 		collector.append(argument);
 	}
 

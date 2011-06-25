@@ -13,10 +13,13 @@ public class CmdLineArgument implements Serializable {
 	private String arg;
 
 	private boolean isPassword;
+	
+	private boolean isRaw;
 
-	private CmdLineArgument(String arg, boolean password) {
+	private CmdLineArgument(String arg, boolean password, boolean raw) {
 		this.arg = arg;
 		isPassword = password;
+		isRaw = raw;
 	}
 
 	/**
@@ -28,11 +31,12 @@ public class CmdLineArgument implements Serializable {
 	 */
 	public static CmdLineArgument arg(String arg) {
 		checkNotNull(arg, "Cannot create null argument");
-		return new CmdLineArgument(arg, false);
+		return new CmdLineArgument(arg, false, false);
 	}
 
 	/**
-	 * Creates a password argument.
+	 * Creates a password argument. When encoded for execution, a password argument is encoded like a regular argument. When encoded for logging, a password
+	 * argument is always encoded as eight stars (********).
 	 * 
 	 * @param arg
 	 *            the argument string.
@@ -40,7 +44,15 @@ public class CmdLineArgument implements Serializable {
 	 */
 	public static CmdLineArgument password(String arg) {
 		checkNotNull(arg, "Cannot create null password argument");
-		return new CmdLineArgument(arg, true);
+		return new CmdLineArgument(arg, true, false);
+	}
+
+	/**
+	 * Creates a raw argument. When encoded for execution or for logging, a raw argument is left as-is.
+	 */
+	public static CmdLineArgument raw(String arg) {
+		checkNotNull(arg, "Cannot create null password argument");
+		return new CmdLineArgument(arg, false, true);
 	}
 
 	/**
@@ -59,6 +71,15 @@ public class CmdLineArgument implements Serializable {
 	 */
 	public boolean isPassword() {
 		return isPassword;
+	}
+
+	/**
+	 * Tests whether this argument is a raw argument.
+	 * 
+	 * @return <code>true</code> if and only if this argument is a raw argument.
+	 */
+	public boolean isRaw() {
+		return isRaw;
 	}
 
 	/**
