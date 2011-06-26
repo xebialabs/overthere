@@ -57,6 +57,10 @@ public class SshScpConnectionItest extends SshConnectionItestBase {
 		        + "yvE0S/S4eY57NL8zJ2/cvTZfe0QLqJF2lYN4RmNhjXY69MC/quy/Ida2p+noxVqP\r\n" + "R2a/uGVMCAT38bX66YXVI4Muc2dsxH96pMh7OiOb6/KoWx6+IFoKxFL0AvC5qFeo\r\n"
 		        + "TzIHrzs33O6ejXFXamXqRfnobGdvHijaNdAPFJhIfrA2OWoGaAZpiQKdTaCQXBbx\r\n" + "8q65UtXR7Cv2+vJ7B1gkHMTY0qxwJD0b55KGgjhvIcGR16TrIe24puJbpMvAdP1J\r\n"
 		        + "w42kSNNrOIp8/Bq/t+6sUEqd7Cz7dzl/xi5s6CxJuq3U3ypfCdL9Ij0K8EiOa/a2\r\n" + "-----END RSA PRIVATE KEY-----\r\n").getPath());
+		// Corresponding public key:
+		// ssh-rsa
+		// AAAAB3NzaC1yc2EAAAADAQABAAABAQDSuXwO9Pvcde3onMWQ+ek3zYq38XOU/vcHgy0sr1yjeGqt8H2WQZOjW4wfpKs5TVhfjMoL4Znw6uSV7UHqsDw3K5lnI/3jV+SwiPry4DlMQ+wNoNCTZUBxhRWWK6AwFrkOGfH7JwTgzUvwxgoxi67jP+G5sCiAux2NHnkQCX4wq8O5bygHS5FgTVAPqKrkGBPZVDBGhi2VmEsFeUZQEFhe8Vb3ywk2O6hLWANmevpfTSdS/7tgcoxV13HJuC/KvdWnsCw+/CCV6QIY0+u23zcHL3uQi9Ytl4s5jQBfuO4L5L/TQm1U9X8a4Tx8WAtnUh7o2MwYFGgarw0mGN11M7sn
+		// overthere@overthere
 		options.set(PASSPHRASE, "letmein");
 	}
 
