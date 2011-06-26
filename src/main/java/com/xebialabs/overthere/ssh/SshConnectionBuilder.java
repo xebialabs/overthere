@@ -36,6 +36,13 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */	
 	public static final String SUDO_USERNAME = "sudoUsername";
 
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty should be allocated when executing a command. All sudo
+	 * implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash
+	 * when it is allocated. Defaults to true.
+	 */
+	public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
+	
 	private SshConnection connection;
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {

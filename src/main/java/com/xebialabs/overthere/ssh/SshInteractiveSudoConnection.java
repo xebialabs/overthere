@@ -41,12 +41,6 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
     protected SshProcess createProcess(final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
         return new SshProcess(this, session, commandLine) {
             @Override
-            protected Session.Command startCommand() throws TransportException, ConnectionException {
-                session.allocateDefaultPTY();
-                return super.startCommand();
-            }
-
-            @Override
             public InputStream getStdout() {
                 return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password);
             }

@@ -21,6 +21,7 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 
@@ -48,17 +49,19 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 abstract class SshConnection extends OverthereConnection {
 
-    protected String host;
+    protected final String host;
 
-    protected int port;
+    protected final int port;
 
-    protected String username;
+    protected final String username;
 
-    protected String password;
+    protected final String password;
 
-	protected String privateKeyFile;
+	protected final String privateKeyFile;
 
-	protected String passphrase;
+	protected final String passphrase;
+
+	protected final boolean allocateDefaultPty;
 
 	protected SSHClient sshClient;
 
@@ -70,6 +73,7 @@ abstract class SshConnection extends OverthereConnection {
         this.password = options.get(PASSWORD);
 		this.privateKeyFile = options.get(PRIVATE_KEY_FILE);
 		this.passphrase = options.get(PASSPHRASE);
+		this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
     }
 
 	protected void connect() {
@@ -153,7 +157,12 @@ abstract class SshConnection extends OverthereConnection {
     public OverthereProcess startProcess(final CmdLine commandLine) {
     	logger.info("Executing command {} on {}", commandLine, this);
         try {
-            return createProcess(getSshClient().startSession(), commandLine);
+        	Session session = getSshClient().startSession();
+        	if(allocateDefaultPty) {
+        		logger.debug("Allocating default PTY");
+        		session.allocateDefaultPTY();
+        	}
+			return createProcess(session, commandLine);
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot execute remote command \"" + commandLine.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
         }
@@ -161,7 +170,7 @@ abstract class SshConnection extends OverthereConnection {
     }
 
     protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
-        return new SshProcess(this, session, commandLine);
+    	return new SshProcess(this, session, commandLine);
     }
 
     @Override
