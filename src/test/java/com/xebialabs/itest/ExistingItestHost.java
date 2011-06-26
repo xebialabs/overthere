@@ -1,11 +1,13 @@
 package com.xebialabs.itest;
 
+import java.util.Properties;
+
 class ExistingItestHost implements ItestHost {
 
-	private final String hostId;
+	private final String hostname;
 
-	public ExistingItestHost(String hostId) {
-		this.hostId = hostId;
+	public ExistingItestHost(String hostId, Properties itestProperties) {
+		this.hostname = itestProperties.getProperty(hostId + ".hostname", hostId);
 	}
 
 	@Override
@@ -20,7 +22,7 @@ class ExistingItestHost implements ItestHost {
 
 	@Override
 	public String getHostName() {
-		return hostId;
+		return hostname;
 	}
 
 }

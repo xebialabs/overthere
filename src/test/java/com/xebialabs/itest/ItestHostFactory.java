@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 
 public class ItestHostFactory {
 
+	// The field logger needs to be defined up here so that the static initialized below can use the logger
+	private static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
+
 	private static Properties itestProperties;
 
 	static {
@@ -25,7 +28,7 @@ public class ItestHostFactory {
 		}
 
 		logger.info("Using existing host for integration tests on " + hostId);
-		return new ExistingItestHost(hostId);
+		return new ExistingItestHost(hostId, itestProperties);
 	}
 
 	private static Properties readItestProperties() {
@@ -39,6 +42,8 @@ public class ItestHostFactory {
 				} finally {
 					in.close();
 				}
+			} else {
+				logger.warn("itest.properties not found, falling back to using existing hosts");
 			}
 			return itestProperties;
 		} catch (IOException exc) {
@@ -46,6 +51,4 @@ public class ItestHostFactory {
 		}
 	}
 	
-	private static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
-
 }
