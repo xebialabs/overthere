@@ -47,9 +47,11 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class OverthereConnectionItestBase {
 
+	private static final int NR_OF_SMALL_FILES = 100;
+
 	public static final int SMALL_FILE_SIZE = 10 * 1024;
 
-	public static final int LARGE_FILE_SIZE = 10 * 1024 * 1024;
+	public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
 
 	protected ConnectionOptions options;
 
@@ -217,8 +219,8 @@ public abstract class OverthereConnectionItestBase {
 	@Test
 	public void shouldCopyDirectoryWithManyFiles() throws IOException {
 		File largeFolder = temp.newFolder("large.folder");
-		for(int i = 0; i < 100; i++) {
-			writeRandomBytes(new File(largeFolder, "large" + i + ".dat"), LARGE_FILE_SIZE / 10);
+		for(int i = 0; i < NR_OF_SMALL_FILES; i++) {
+			writeRandomBytes(new File(largeFolder, "large" + i + ".dat"), SMALL_FILE_SIZE);
 		}
 
 		OverthereFile remoteLargeFolder = connection.getTempFile("large.folder");

@@ -38,7 +38,7 @@ public class SshInteractiveSudoConnectionItest extends SshSudoConnectionItestBas
 		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
 		options.set(OPERATING_SYSTEM, UNIX);
-		options.set(ADDRESS, "overthere");
+		options.set(ADDRESS, host.getHostName());
 		options.set(USERNAME, "untrusted");
 		options.set(PASSWORD, "donttrustme");
 		options.set("sudoUsername", "overthere");

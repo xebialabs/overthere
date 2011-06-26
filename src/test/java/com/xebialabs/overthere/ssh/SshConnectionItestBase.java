@@ -16,10 +16,12 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -35,11 +37,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
+import com.xebialabs.itest.ItestHost;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
@@ -52,6 +57,19 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
+
+	protected static ItestHost host;
+
+	@BeforeClass
+	public static void setupHost() {
+		host = getItestHost("overthere-unix");
+		host.setup();
+	}
+	
+	@AfterClass
+	public static void teardownHost() {
+		host.teardown();
+	}
 
 	protected File createPrivateKeyFile(String privateKey) throws IOException {
 		final File privateKeyFile = temp.newFile("private.key");
@@ -88,16 +106,17 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 
 	@Test
 	public void shouldExecuteSimpleCommand() {
-		CapturingOverthereProcessOutputHandler handler = capturingHandler();
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		OverthereProcessOutputHandler handler = multiHandler(consoleHandler(), captured);
 		int res = connection.execute(handler, CmdLine.build("ls", "-ld", "/tmp"));
 		assertThat(res, equalTo(0));
-		if (handler.getOutputLines().size() == 2) {
+		if (captured.getOutputLines().size() == 2) {
 			// When using ssh_interactive_sudo, the first line may contain a password prompt.
-			assertThat(handler.getOutputLines().get(0), containsString("assword"));
-			assertThat(handler.getOutputLines().get(1), containsString("drwxrwxrwt"));
+			assertThat(captured.getOutputLines().get(0), containsString("assword"));
+			assertThat(captured.getOutputLines().get(1), containsString("drwxrwxrwt"));
 		} else {
-			assertThat(handler.getOutputLines().size(), equalTo(1));
-			assertThat(handler.getOutput(), containsString("drwxrwxrwt"));
+			assertThat(captured.getOutputLines().size(), equalTo(1));
+			assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
 		}
 	}
 

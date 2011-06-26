@@ -41,7 +41,7 @@ public class SshSudoConnectionItest extends SshSudoConnectionItestBase {
 		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, SUDO);
 		options.set(OPERATING_SYSTEM, UNIX);
-		options.set(ADDRESS, "overthere");
+		options.set(ADDRESS, host.getHostName());
 		options.set(USERNAME, "trusted");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "MIIEpgIBAAKCAQEA65Jf19SCv8rZ/kLyfOw+OjHt5fQnxHVQR2B6UW0B0q6RhSSg\r\n"
 		        + "YA2gOUEPJph7+O5605jjrMlblScsXO7VnFJtBTMRFoQjBlOP8VFuEg0MoaN5RPQU\r\n" + "ZVYoFKP9V6ycEKpmfeSmVhpEipUdgL+fUjb1nsw+Cpx8WNLXf3Cvqrk4d1xZ0f0i\r\n"

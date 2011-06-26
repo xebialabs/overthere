@@ -38,7 +38,7 @@ public class SshSftpConnectionItest extends SshConnectionItestBase {
 		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, SFTP);
 		options.set(OPERATING_SYSTEM, UNIX);
-		options.set(ADDRESS, "overthere");
+		options.set(ADDRESS, host.getHostName());
 		options.set(USERNAME, "overthere");
 		options.set(PASSWORD, "overhere");
 	}

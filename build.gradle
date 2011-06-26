@@ -32,11 +32,14 @@ dependencies {
 
 	runtime 'com.jcraft:jzlib:1.0.7'
 	runtime 'org.bouncycastle:bcprov-jdk16:1.45'
-    
+
+	testCompile 'com.amazonaws:aws-java-sdk:1.2.2'    
 	testCompile 'ch.qos.logback:logback-classic:0.9.24'
 	testCompile 'junit:junit:4.8.1'
 	testCompile 'org.hamcrest:hamcrest-all:1.1'
 	testCompile 'org.mockito:mockito-all:1.8.5'
+	testCompile 'org.slf4j:jcl-over-slf4j:1.6.1'
+	testCompile 'org.slf4j:log4j-over-slf4j:1.6.1'
 }
 
 apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/repositories.gradle'

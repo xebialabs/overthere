@@ -41,7 +41,7 @@ public class SshScpConnectionItest extends SshConnectionItestBase {
 		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, SCP);
 		options.set(OPERATING_SYSTEM, UNIX);
-		options.set(ADDRESS, "overthere");
+		options.set(ADDRESS, host.getHostName());
 		options.set(USERNAME, "overthere");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "Proc-Type: 4,ENCRYPTED\r\n" + "DEK-Info: AES-128-CBC,EB6F3B5C2F847A0F47AC9C8C757E0AD8\r\n"
 		        + "IvSSAW5r/sPwtH99/csjEZdtnUci80ak0E+7Puvjo4+H4r+ObFF1gEHOUaNi1rf+\r\n" + "5EDhqtPWy6q1zDYBjOdG5jnDhiVSv2P8ZsxA+w1xVR6Lrm5Q5XWcNO+/xXp2/WUc\r\n"
