@@ -53,9 +53,9 @@ public abstract class OverthereConnectionItestBase {
 
 	public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
 
-	protected ConnectionOptions options;
-
 	protected String type;
+
+	protected ConnectionOptions options;
 
 	protected OverthereConnection connection;
 

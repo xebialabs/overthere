@@ -16,13 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -30,22 +30,20 @@ import static org.junit.Assume.assumeThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Writer;
+import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
-import com.xebialabs.itest.ItestHost;
 import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
@@ -58,28 +56,22 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
 
-	protected static ItestHost host;
-
-	@BeforeClass
-	public static void setupHost() {
-		host = getItestHost("overthere-unix");
-		host.setup();
-	}
-	
-	@AfterClass
-	public static void teardownHost() {
-		host.teardown();
+	@Test
+	public void commandWithPipeShouldHaveTwoSudoSections() {
+		Assume.assumeThat(connection, instanceOf(SshSudoConnection.class));
+		List<CmdLineArgument> prepended = ((SshSudoConnection) connection).prefixWithSudoCommand(CmdLine.build("a", "|", "b")).getArguments();
+		assertThat(prepended.size(), equalTo(9));
+		assertThat(prepended.get(0).toString(false), equalTo("sudo"));
+		assertThat(prepended.get(5).toString(false), equalTo("sudo"));
 	}
 
-	protected File createPrivateKeyFile(String privateKey) throws IOException {
-		final File privateKeyFile = temp.newFile("private.key");
-		CharStreams.write(privateKey, new OutputSupplier<Writer>() {
-			@Override
-			public Writer getOutput() throws IOException {
-				return new FileWriter(privateKeyFile);
-			}
-		});
-		return privateKeyFile;
+	@Test
+	public void commandWithSemiColonShouldHaveTwoSudoSections() {
+		Assume.assumeThat(connection, instanceOf(SshSudoConnection.class));
+		List<CmdLineArgument> prepended = ((SshSudoConnection) connection).prefixWithSudoCommand(CmdLine.build("a", ";", "b")).getArguments();
+		assertThat(prepended.size(), equalTo(9));
+		assertThat(prepended.get(0).toString(false), equalTo("sudo"));
+		assertThat(prepended.get(5).toString(false), equalTo("sudo"));
 	}
 
 	@Test
@@ -133,21 +125,15 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	}
 
 	@Test
-	public void shouldWriteToTemporaryFile() throws Exception {
-		OverthereFile tempFile = connection.getTempFile("temporaryFileCanBeWritten.txt");
-		OverthereUtils.write("Some test data", "UTF-8", tempFile);
-
-		assertThat("Expected temp file to have been written", tempFile.exists(), equalTo(true));
-	}
-
-	@Test
 	public void shouldCopyTemporaryFileToOtherLocation() throws IOException {
 		OverthereFile tempFile = connection.getTempFile("temporaryFileCanBeWritten.txt");
 		OverthereUtils.write("Some test data", "UTF-8", tempFile);
 
-		OverthereProcessOutputHandler handler = consoleHandler();
-		int res = connection.execute(handler, CmdLine.build("cp", tempFile.getPath(), "/tmp/" + System.currentTimeMillis() + ".class"));
+		String dest = "/tmp/" + System.currentTimeMillis() + ".tmp";
+		int res = connection.execute(consoleHandler(), CmdLine.build("cp", tempFile.getPath(), dest));
 		assertThat(res, equalTo(0));
+
+		connection.execute(consoleHandler(), CmdLine.build("rm", dest));
 	}
 
 	/**
