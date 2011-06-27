@@ -36,6 +36,8 @@ public class WinRMClientItest {
 	static final int DEFAULT_PORT = WinRMHost.DEFAULT_HTTP_PORT;
 	static final String DEFAULT_USERNAME = "hilversum";
 	static final String DEFAULT_PASSWORD = "Xe%%bia";
+	static final String KRB5_CONF = "src/test/resources/krb5.conf";
+	static final String LOGIN_CONF = "src/test/resources/login.conf";
 
 	private WinRMHost host;
 
@@ -43,8 +45,8 @@ public class WinRMClientItest {
 	public void setup() {
 		host = new WinRMHost(DEFAULT_SERVER, DEFAULT_PORT, DEFAULT_USERNAME, DEFAULT_PASSWORD);
 
-		System.setProperty("java.security.krb5.conf", "src/main/resources/krb5.conf");
-		System.setProperty("java.security.auth.login.config", "src/main/resources/login.conf");
+		System.setProperty("java.security.krb5.conf", KRB5_CONF);
+		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
 		System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
 
 	}
@@ -119,7 +121,7 @@ public class WinRMClientItest {
 	@Test(expected = BlankValueRuntimeException.class)
 	public void testWinRMClientMisConfigurationBlankForKerberos() {
 		tearDown();
-		System.setProperty("java.security.auth.login.config", "src/main/resources/login.conf");
+		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
 
 		System.setProperty("java.security.krb5.conf", "");
 
@@ -130,7 +132,7 @@ public class WinRMClientItest {
 	@Test(expected = InvalidFilePathRuntimeException.class)
 	public void testWinRMClientMisConfigurationWrongPathForKerberos() {
 		tearDown();
-		System.setProperty("java.security.auth.login.config", "src/main/resources/login.conf");
+		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
 
 		System.setProperty("java.security.krb5.conf", "/path/to/nowhere/file.conf");
 
