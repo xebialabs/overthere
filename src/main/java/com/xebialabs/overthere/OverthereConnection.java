@@ -36,6 +36,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -246,10 +248,13 @@ public abstract class OverthereConnection {
 		final OverthereProcess process = startProcess(commandLine);
 		Thread stdoutReaderThread = null;
 		Thread stderrReaderThread = null;
+		final CountDownLatch latch = new CountDownLatch(2);
+		boolean finishedSuccessfully = false;
 		try {
 			stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
 				public void run() {
 					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
+					latch.countDown();
 					try {
 						int readInt = stdoutReader.read();
 						StringBuffer lineBuffer = new StringBuffer();
@@ -277,6 +282,7 @@ public abstract class OverthereConnection {
 			stderrReaderThread = new Thread("Stderr reader thread for command " + commandLine + " on " + this) {
 				public void run() {
 					InputStreamReader stderrReader = new InputStreamReader(process.getStderr());
+					latch.countDown();
 					try {
 						int readInt = stderrReader.read();
 						StringBuffer lineBuffer = new StringBuffer();
@@ -301,13 +307,19 @@ public abstract class OverthereConnection {
 			stderrReaderThread.start();
 
 			try {
-				return process.waitFor();
+				latch.await();
+				int exitCode = process.waitFor();
+				finishedSuccessfully = exitCode == 0;
+				return exitCode;
 			} catch (InterruptedException exc) {
 				Thread.currentThread().interrupt();
 				throw new RuntimeIOException("Execution interrupted", exc);
 			}
 		} finally {
-			process.destroy();
+			if (!finishedSuccessfully) {
+				logger.info("Not finished successfully, destroying the process.");
+				process.destroy();
+			}
 
 			if (stdoutReaderThread != null) {
 				try {
