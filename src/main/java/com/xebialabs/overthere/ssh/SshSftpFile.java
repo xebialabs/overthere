@@ -24,10 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import net.schmizz.sshj.sftp.FileAttributes;
-import net.schmizz.sshj.sftp.FileMode;
-import net.schmizz.sshj.sftp.OpenMode;
-import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import com.google.common.io.Closeables;
+import net.schmizz.sshj.sftp.*;
 import net.schmizz.sshj.xfer.FilePermission;
 
 import org.slf4j.Logger;
@@ -197,7 +195,59 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Opening SFTP input stream to read from file {}", this);
 
         try {
-            return connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.READ)).getInputStream();
+	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.READ));
+	        final RemoteFile.RemoteFileInputStream stream = remoteFile.getInputStream();
+	        return new InputStream() {
+
+		        @Override
+		        public int read() throws IOException {
+			        return stream.read();
+		        }
+
+		        @Override
+		        public int read(byte[] b) throws IOException {
+			        return stream.read(b);
+		        }
+
+		        @Override
+		        public int read(byte[] b, int off, int len) throws IOException {
+			        return stream.read(b, off, len);
+		        }
+
+		        @Override
+		        public long skip(long n) throws IOException {
+			        return stream.skip(n);
+		        }
+
+		        @Override
+		        public int available() throws IOException {
+			        return stream.available();
+		        }
+
+		        @Override
+		        public void close() throws IOException {
+			        try {
+			            super.close();
+			        } finally {
+				        Closeables.closeQuietly(remoteFile);
+			        }
+		        }
+
+		        @Override
+		        public void mark(int readlimit) {
+			        stream.mark(readlimit);
+		        }
+
+		        @Override
+		        public void reset() throws IOException {
+			        stream.reset();
+		        }
+
+		        @Override
+		        public boolean markSupported() {
+			        return stream.markSupported();
+		        }
+	        };
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot read from file " + getPath(), e);
         }
@@ -207,9 +257,41 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	public OutputStream getOutputStream() {
 		logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
-
         try {
-            return connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE)).getOutputStream();
+	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE));
+	        final OutputStream wrapped = remoteFile.getOutputStream();
+
+	        return new OutputStream() {
+
+		        @Override
+		        public void write(int b) throws IOException {
+			        wrapped.write(b);
+		        }
+
+		        @Override
+		        public void write(byte[] b) throws IOException {
+			        wrapped.write(b);
+		        }
+
+		        @Override
+		        public void write(byte[] b, int off, int len) throws IOException {
+			        wrapped.write(b, off, len);
+		        }
+
+		        @Override
+		        public void flush() throws IOException {
+			        wrapped.flush();
+		        }
+
+		        @Override
+		        public void close() throws IOException {
+			        try {
+				        wrapped.close();
+			        } finally {
+				        Closeables.closeQuietly(remoteFile);
+			        }
+		        }
+	        };
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot write to file " + getPath(), e);
         }

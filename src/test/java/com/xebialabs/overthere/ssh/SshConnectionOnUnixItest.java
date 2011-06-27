@@ -93,7 +93,6 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 
 	private static ConnectionOptions createScpOptions() throws IOException {
 		ConnectionOptions options = new ConnectionOptions();
-		options = new ConnectionOptions();
 		options.set(CONNECTION_TYPE, SCP);
 		options.set(USERNAME, "overthere");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(
