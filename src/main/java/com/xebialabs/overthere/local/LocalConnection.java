@@ -34,6 +34,8 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A connection to the local host.
@@ -89,6 +91,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 
 	@Override
 	public OverthereProcess startProcess(CmdLine commandLine) {
+		logger.info("Executing command {} on {}", commandLine, this);
 		try {
 			final Process p = Runtime.getRuntime().exec(commandLine.toCommandLine(getHostOperatingSystem(), false));
 			return new OverthereProcess() {
@@ -135,4 +138,5 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 		return Overthere.getConnection("local", new ConnectionOptions());
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
 }
