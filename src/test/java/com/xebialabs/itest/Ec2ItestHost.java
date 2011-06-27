@@ -55,8 +55,8 @@ class Ec2ItestHost implements ItestHost {
 		this.hostId = hostId;
 		this.amiId = amiId;
 		this.awsEndpointURL = itestProperties.getProperty(AWS_ENDPOINT, AWS_ENDPOINT_DEFAULT);
-		this.awsAccessKey = checkNotNull(itestProperties.getProperty(AWS_ACCESS_KEY), "Required property " + AWS_ACCESS_KEY + " missing");
-		this.awsSecretKey = checkNotNull(itestProperties.getProperty(AWS_SECRET_KEY), "Required property " + AWS_SECRET_KEY + " missing");
+		this.awsAccessKey = checkNotNull(itestProperties.getProperty(AWS_ACCESS_KEY), "Required property %s missing", AWS_ACCESS_KEY);
+		this.awsSecretKey = checkNotNull(itestProperties.getProperty(AWS_SECRET_KEY), "Required property %s missing", AWS_SECRET_KEY);
 		this.amiInstanceType = itestProperties.getProperty(AMI_INSTANCE_TYPE);
 		this.amiSecurityGroup = itestProperties.getProperty(AMI_SECURITY_GROUP);
 		this.amiKeyName = itestProperties.getProperty(AMI_KEY_NAME);
@@ -114,7 +114,7 @@ class Ec2ItestHost implements ItestHost {
 				return instance.getPublicDnsName();
 			}
 
-			logger.info("Instance " + instanceId + " is still " + instance.getState().getName() + ". Waiting...");
+			logger.info("Instance {} is still {}. Waiting...", instanceId, instance.getState().getName());
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -126,7 +126,7 @@ class Ec2ItestHost implements ItestHost {
 
 	protected void waitForAmiBoot() {
 	    try {
-	    	logger.info("Waiting " + amiBootSeconds + " for the image to boot");
+	    	logger.info("Waiting {} for the image to boot", amiBootSeconds);
 	        Thread.sleep(amiBootSeconds * 1000);
         } catch (InterruptedException e) {
         	Thread.currentThread().interrupt();

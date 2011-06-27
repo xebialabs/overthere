@@ -23,11 +23,11 @@ public class ItestHostFactory {
 		String amiId = itestProperties.getProperty(hostId + ".amiId");
 
 		if (amiId != null) {
-			logger.info("Using Amazon EC2 for integration tests on " + hostId);
+			logger.info("Using Amazon EC2 for integration tests on {}", hostId);
 			return new Ec2ItestHost(hostId, amiId, itestProperties);
 		}
 
-		logger.info("Using existing host for integration tests on " + hostId);
+		logger.info("Using existing host for integration tests on {}", hostId);
 		return new ExistingItestHost(hostId, itestProperties);
 	}
 
