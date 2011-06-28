@@ -17,6 +17,7 @@
 package com.xebialabs.overthere.winrm;
 
 import com.google.common.io.Closeables;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
 import org.apache.commons.codec.binary.Base64;
 import org.dom4j.Document;
@@ -28,20 +29,19 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
 import java.util.List;
 
 
 public class WinRMClient {
-
-
 	private static final String DEFAULT_TIMEOUT = "PT60.000S";
 	private static final int DEFAULT_MAX_ENV_SIZE = 153600;
 	private static final String DEFAULT_LOCALE = "en-US";
@@ -56,9 +56,6 @@ public class WinRMClient {
 
 	private final URL targetURL;
 
-	private final StringBuffer stdout = new StringBuffer();
-	private final StringBuffer stderr = new StringBuffer();
-
 	private String exitCode;
 	private String shellId;
 	private String commandId;
@@ -66,16 +63,10 @@ public class WinRMClient {
 	private int chunk = 0;
 
 	private final HttpConnector connector;
-	private PipedInputStream stdoutInputStream;
-	private PipedOutputStream stdoutInputStreamPiped;
 
-	Pipe stdPipe;
+	private final Pipe stdoutPipe;
+	private final Pipe stderrPipe;
 
-
-
-	private PipedInputStream stderrInputStream = new PipedInputStream();
-	private WritableByteChannel writableStdChannel;
-	private ReadableByteChannel readableStdChannel;
 
 	@Deprecated
 	public WinRMClient(WinRMHost host) {
@@ -85,9 +76,13 @@ public class WinRMClient {
 	public WinRMClient(HttpConnector connector, URL targetURL) {
 		this.connector = connector;
 		this.targetURL = targetURL;
-
+		try {
+			stdoutPipe = Pipe.open();
+			stderrPipe = Pipe.open();
+		} catch (IOException e) {
+			throw new RuntimeIOException(e);
+		}
 	}
-
 
 	public void runCmd(String... commandLine) {
 		StringBuffer cmd = new StringBuffer();
@@ -104,44 +99,36 @@ public class WinRMClient {
 		} finally {
 			cleanUp();
 			closeShell();
+			destroy();
 		}
 	}
 
 	public void destroy() {
+		Closeables.closeQuietly(stderrPipe.sink());
+		Closeables.closeQuietly(stderrPipe.source());
 
-		Closeables.closeQuietly(writableStdChannel);
-		Closeables.closeQuietly(readableStdChannel);
-		//cleanUp();
-		//closeShell();
+		Closeables.closeQuietly(stdoutPipe.sink());
+		Closeables.closeQuietly(stdoutPipe.source());
 	}
 
 
 	public InputStream getStdoutStream() {
-		if (stdPipe == null) {
-			try {
-				stdPipe = Pipe.open();
-				writableStdChannel = stdPipe.sink();
-				readableStdChannel = stdPipe.source();
-			} catch (IOException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-			}
-		}
-		final InputStream in = Channels.newInputStream(readableStdChannel);
-		return new BufferedInputStream(in);
+		return new BufferedInputStream(Channels.newInputStream(stdoutPipe.source()));
 	}
-
 
 
 	public InputStream getStderrStream() {
-		return stderrInputStream;
+		return new BufferedInputStream(Channels.newInputStream(stderrPipe.source()));
 	}
 
+	@Deprecated
 	public StringBuffer getStdout() {
-		return stdout;
+		throw new RuntimeIOException("Not use");
 	}
 
+	@Deprecated
 	public StringBuffer getStderr() {
-		return stderr;
+		throw new RuntimeIOException("Not use");
 	}
 
 	private void closeShell() {
@@ -169,21 +156,32 @@ public class WinRMClient {
 		bodyContent.addElement(QName.get("DesiredStream", WinRMURI.NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
 		final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
 
-		final OutputStream outputStdStream = Channels.newOutputStream(writableStdChannel);
-		final PrintWriter printWriter = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outputStdStream)));
+		final Pipe.SinkChannel stdSink = stdoutPipe.sink();
+		try {
+			stdSink.write(ByteBuffer.wrap("-- Winrm Stdout --\n".getBytes()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		final Pipe.SinkChannel stdErrSink = stderrPipe.sink();
+		try {
+			stdErrSink.write(ByteBuffer.wrap("-- Winrm Stderr --\n".getBytes()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		for (; ; ) {
 			Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
-			final StringBuffer obj = handleStream(responseDocument, ResponseExtractor.STDOUT);
-			final ByteBuffer wrap = ByteBuffer.wrap(obj.toString().getBytes());
-
+			try {
+				stdSink.write(ByteBuffer.wrap(handleStream(responseDocument, ResponseExtractor.STDOUT).getBytes()));
+			} catch (IOException e) {
+				throw new RuntimeIOException("getCommandOutput: stdout Write fails", e);
+			}
 
 			try {
-				writableStdChannel.write(wrap);
+				stdErrSink.write(ByteBuffer.wrap(handleStream(responseDocument, ResponseExtractor.STDERR).getBytes()));
 			} catch (IOException e) {
-				e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+				throw new RuntimeIOException("getCommandOutput: Stderr Write fails", e);
 			}
-			stderr.append(handleStream(responseDocument, ResponseExtractor.STDERR));
 
 			if (chunk == 0) {
 				try {
@@ -220,7 +218,7 @@ public class WinRMClient {
 
 	}
 
-	private StringBuffer handleStream(Document responseDocument, ResponseExtractor stream) {
+	private String handleStream(Document responseDocument, ResponseExtractor stream) {
 		StringBuffer buffer = new StringBuffer();
 		final List streams = stream.getXPath().selectNodes(responseDocument);
 		if (!streams.isEmpty()) {
@@ -234,7 +232,7 @@ public class WinRMClient {
 			}
 		}
 		logger.debug("handleStream {} buffer {}", stream, buffer);
-		return buffer;
+		return buffer.toString();
 
 	}
 

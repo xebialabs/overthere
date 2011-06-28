@@ -6,7 +6,6 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.winrm.tokengenerator.KerberosTokenGenerator;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -82,13 +81,12 @@ public class CifsWinRMConnection extends CifsTelnetConnection implements Overthe
 
 			@Override
 			public InputStream getStdout() {
-				//xturn new ByteArrayInputStream(winRMClient.getStdout().toString().getBytes());
 				return winRMClient.getStdoutStream();
 			}
 
 			@Override
 			public InputStream getStderr() {
-				return new ByteArrayInputStream(winRMClient.getStderr().toString().getBytes());
+				return winRMClient.getStderrStream();
 			}
 
 			@Override

@@ -32,6 +32,22 @@ public class WinRMItest extends OverthereConnectionItestBase {
 		assertThat(handler.getOutput(), containsString("172.16.74.129"));
 	}
 
+	@Test
+	public void testWinRMClientWrongCommandLine() {
+		CapturingOverthereProcessOutputHandler handler = capturingHandler();
+		int res = connection.execute(handler, CmdLine.build("ifconfig"));
+		assertThat(res, equalTo(1));
+		assertThat(handler.getError(), containsString("'ifconfig' is not recognized as an internal or external command"));
+	}
+
+	@Test
+	public void testWinRMClientVerboseDir() {
+		CapturingOverthereProcessOutputHandler handler = capturingHandler();
+		int res = connection.execute(handler, CmdLine.build("dir", "/s"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("Total Files Listed"));
+	}
+
 	@Before
 	public void setup() {
 		System.setProperty("java.security.krb5.conf", KRB5_CONF);
