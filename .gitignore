@@ -8,5 +8,4 @@ bin/
 *.iml
 *.ipr
 *.iws
-s101plugin.state
 itest.properties

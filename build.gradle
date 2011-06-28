@@ -1,3 +1,5 @@
+// build.gradle for overthere repository containing the overthere and itest-support projects
+
 buildscript {
 	repositories {
 		add(new org.apache.ivy.plugins.resolver.URLResolver()) {
@@ -11,51 +13,48 @@ buildscript {
 	}
 }
 
-apply plugin: 'license'
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+defaultTasks 'build'
+apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/dependencies.gradle'
 
-version = "1.0-alpha-7-SNAPSHOT"
-group = "com.xebialabs.overthere"
+allprojects {
+	version = "1.0-alpha-7-SNAPSHOT"
+	group = "com.xebialabs.overthere"
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
-
-dependencies {
-	compile 'com.google.guava:guava:r09'
-	compile 'commons-net:commons-net:2.0'
-	compile 'net.schmizz:sshj:0.4.1'
-	compile 'nl.javadude.scannit:scannit:0.6'
-	compile 'org.samba:jcifs:1.3.1'
-	compile 'org.slf4j:slf4j-api:1.6.1'
-
-	runtime 'com.jcraft:jzlib:1.0.7'
-	runtime 'org.bouncycastle:bcprov-jdk16:1.45'
-
-	testCompile 'com.amazonaws:aws-java-sdk:1.2.2'    
-	testCompile 'ch.qos.logback:logback-classic:0.9.24'
-	testCompile 'junit:junit:4.8.1'
-	testCompile 'org.hamcrest:hamcrest-all:1.1'
-	testCompile 'org.mockito:mockito-all:1.8.5'
-	testCompile 'org.slf4j:jcl-over-slf4j:1.6.1'
-	testCompile 'org.slf4j:log4j-over-slf4j:1.6.1'
+	apply plugin: 'idea'
 }
 
-apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/repositories.gradle'
-apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
-apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/artifacts.gradle'
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'license'
 
-task itest(type: Test) {
-    includes = ['**/*Itest.*']
-    testResultsDir = file("${buildDir}/itest-results")
-    systemProperties['itests'] = project.hasProperty('itests') ? project.getProperty('itests') : ''
-    systemProperties['testconfig'] = project.hasProperty('testconfig') ? project.getProperty('testconfig') : ''
-    systemProperties['testimage'] = project.hasProperty('testimage') ? project.getProperty('testimage') : ''
-}
+	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/repositories.gradle'
+	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
+	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/artifacts.gradle'
 
+	sourceCompatibility = 1.6
+	targetCompatibility = 1.6	
 
-test {
-    excludes = ['**/*Itest.*', '**/acceptance/*']
+	dependencies {
+		testCompile deps.junit
+		compile deps.slf4j_api
+		testRuntime deps.logback_classic
+	}
+	
+	configurations {
+	    compile {
+	        transitive = false
+	    }
+	}
+	
+	test {
+		excludes = ["**/*Itest.*"]
+	}
+
+	task itest(type: Test) {
+		includes = ['**/*Itest.*']
+		testResultsDir = file("${buildDir}/itest-results")
+		systemProperties['itests'] = project.hasProperty('itests') ? project.getProperty('itests') : ''
+	}
 }
 

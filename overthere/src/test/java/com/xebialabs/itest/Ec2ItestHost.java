@@ -69,10 +69,10 @@ class Ec2ItestHost implements ItestHost {
 	public void setup() {
 		instanceId = runInstance();
 
-		setInstanceName();
-
 		publicDnsAddress = waitUntilRunningAndGetPublicDnsName();
 		
+		setInstanceName();
+
 		waitForAmiBoot();
 	}
 
@@ -126,7 +126,7 @@ class Ec2ItestHost implements ItestHost {
 
 	protected void waitForAmiBoot() {
 	    try {
-	    	logger.info("Waiting {} for the image to boot", amiBootSeconds);
+	    	logger.info("Waiting {} for the image to finish booting", amiBootSeconds);
 	        Thread.sleep(amiBootSeconds * 1000);
         } catch (InterruptedException e) {
         	Thread.currentThread().interrupt();
