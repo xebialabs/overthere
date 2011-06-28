@@ -1,0 +1,11 @@
+// build.gradle for the itest-support project
+
+dependencies {
+	compile 'com.amazonaws:aws-java-sdk:1.2.2'    
+	compile 'com.google.guava:guava:r09'
+	compile 'org.slf4j:slf4j-api:1.6.1'
+
+	runtime 'org.slf4j:jcl-over-slf4j:1.6.1'
+	runtime 'org.slf4j:log4j-over-slf4j:1.6.1'
+}
+
