@@ -1,0 +1,64 @@
+package com.xebialabs.overthere.winrm;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
+
+public class WinRMItest extends OverthereConnectionItestBase {
+
+	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
+	static final int DEFAULT_PORT = WinRMHost.DEFAULT_HTTP_PORT;
+	static final String DEFAULT_USERNAME = "hilversum";
+	static final String DEFAULT_PASSWORD = "Xe%%bia";
+	static final String KRB5_CONF = "src/test/resources/krb5.conf";
+	static final String LOGIN_CONF = "src/test/resources/login.conf";
+
+	@Test
+	public void testWinRMClient() {
+		CapturingOverthereProcessOutputHandler handler = capturingHandler();
+		int res = connection.execute(handler, CmdLine.build("ipconfig"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("172.16.74.129"));
+	}
+
+	@Before
+	public void setup() {
+		System.setProperty("java.security.krb5.conf", KRB5_CONF);
+		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
+		System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
+	}
+
+	@After
+	public void tearDown() {
+		System.setProperty("java.security.krb5.conf", "");
+		System.setProperty("java.security.auth.login.config", "");
+		System.setProperty("javax.security.auth.useSubjectCredsOnly", "");
+	}
+
+	@Override
+	protected void setTypeAndOptions() throws Exception {
+		type = "cifs_winrm";
+		options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, WINDOWS);
+		options.set(ADDRESS, DEFAULT_SERVER);
+		options.set(USERNAME, DEFAULT_USERNAME);
+		// ensure the test user contains some reserved characters such as ';', ':' or '@'
+		options.set(PASSWORD, DEFAULT_PASSWORD);
+		options.set(PORT, DEFAULT_PORT);
+		options.set("CONTEXT", WinRMHost.DEFAULT_WINRM_CONTEXT);
+		options.set("PROTOCOL", Protocol.HTTP);
+		options.set("AUTHENTICATION", AuthenticationMode.KERBEROS);
+
+	}
+}
