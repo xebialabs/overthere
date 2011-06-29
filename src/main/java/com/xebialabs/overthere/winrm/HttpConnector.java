@@ -18,11 +18,7 @@ package com.xebialabs.overthere.winrm;
 
 import org.dom4j.Document;
 
-import java.net.URL;
-
 
 public interface HttpConnector {
 	Document sendMessage(Document requestDocument, SoapAction soapAction);
-
-	URL getTargetURL();
 }

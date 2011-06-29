@@ -4,6 +4,7 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsTelnetConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.winrm.tokengenerator.BasicTokenGenerator;
 import com.xebialabs.overthere.winrm.tokengenerator.KerberosTokenGenerator;
 
 import java.io.ByteArrayOutputStream;
@@ -56,6 +57,8 @@ public class CifsWinRMConnection extends CifsTelnetConnection implements Overthe
 		switch (this.authenticationMode) {
 			case KERBEROS:
 				return new KerberosTokenGenerator(address, username, password);
+			case BASIC:
+				return new BasicTokenGenerator(address, username, password);
 		}
 		throw new IllegalArgumentException("the " + this.authenticationMode + " is not supported");
 
@@ -63,7 +66,7 @@ public class CifsWinRMConnection extends CifsTelnetConnection implements Overthe
 
 	@Override
 	public void doDisconnect() {
-
+		System.out.println("CifsWinRMConnection.doDisconnect.....");
 	}
 
 	@Override
@@ -108,7 +111,7 @@ public class CifsWinRMConnection extends CifsTelnetConnection implements Overthe
 
 	@Override
 	public String toString() {
-		return "cifs_winrm://" + username + "@" + address+":"+port;
+		return "cifs_winrm://" + username + "@" + address + ":" + port;
 	}
 
 	@Override

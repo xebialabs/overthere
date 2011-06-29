@@ -74,7 +74,7 @@ public class WinRMItest extends OverthereConnectionItestBase {
 		options.set(PORT, DEFAULT_PORT);
 		options.set("CONTEXT", WinRMHost.DEFAULT_WINRM_CONTEXT);
 		options.set("PROTOCOL", Protocol.HTTP);
-		options.set("AUTHENTICATION", AuthenticationMode.KERBEROS);
+		options.set("AUTHENTICATION", AuthenticationMode.BASIC);
 
 	}
 }

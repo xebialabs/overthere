@@ -115,11 +115,6 @@ public class JdkHttpConnector implements HttpConnector {
 		}
 	}
 
-	@Override
-	public URL getTargetURL() {
-		return targetURL;
-	}
-
 
 	private String toString(Document doc) {
 		StringWriter stringWriter = new StringWriter();

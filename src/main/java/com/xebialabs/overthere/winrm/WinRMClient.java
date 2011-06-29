@@ -70,7 +70,7 @@ public class WinRMClient {
 
 	@Deprecated
 	public WinRMClient(WinRMHost host) {
-		this(HttpConnectorFactory.newHttpConnector(host), HttpConnectorFactory.newHttpConnector(host).getTargetURL());
+		this(HttpConnectorFactory.newHttpConnector(host), null);
 	}
 
 	public WinRMClient(HttpConnector connector, URL targetURL) {

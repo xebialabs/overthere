@@ -47,7 +47,9 @@ import java.net.URL;
 import java.util.List;
 
 /**
+ * No more used...
  */
+@Deprecated
 public class ApacheHCHttpConnector implements HttpConnector {
 
 	private final HttpClient httpclient;
@@ -156,10 +158,6 @@ public class ApacheHCHttpConnector implements HttpConnector {
 		}
 	}
 
-	@Override
-	public URL getTargetURL() {
-		return targetURL;
-	}
 
 	private String toString(Document doc) {
 		StringWriter stringWriter = new StringWriter();
