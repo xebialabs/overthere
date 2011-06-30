@@ -20,7 +20,6 @@ import com.google.common.io.Closeables;
 import com.xebialabs.overthere.winrm.HttpConnector;
 import com.xebialabs.overthere.winrm.SoapAction;
 import com.xebialabs.overthere.winrm.TokenGenerator;
-import com.xebialabs.overthere.winrm.WinRMHost;
 import com.xebialabs.overthere.winrm.exception.BlankValueRuntimeException;
 import com.xebialabs.overthere.winrm.exception.InvalidFilePathRuntimeException;
 import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
@@ -43,10 +42,6 @@ public class JdkHttpConnector implements HttpConnector {
 	private final URL targetURL;
 
 	private final TokenGenerator tokenGenerator;
-
-	public JdkHttpConnector(WinRMHost host) {
-		this(host.getTargetURL(), host.getTokenGenerator());
-	}
 
 	public JdkHttpConnector(URL targetURL, TokenGenerator tokenGenerator) {
 		this.targetURL = targetURL;

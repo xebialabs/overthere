@@ -17,7 +17,6 @@
 package com.xebialabs.overthere.winrm.connector;
 
 import com.xebialabs.overthere.winrm.TokenGenerator;
-import com.xebialabs.overthere.winrm.WinRMHost;
 
 import java.net.URL;
 
@@ -27,10 +26,6 @@ import java.net.URL;
  * http://blog.ippon.fr/2008/10/20/certificats-auto-signe-et-communication-ssl-en-java/
  */
 public class JdkHttpsConnector extends  JdkHttpConnector {
-
-	public JdkHttpsConnector(WinRMHost host) {
-		super(host);
-	}
 
 	public JdkHttpsConnector(URL targetURL, TokenGenerator tokenGenerator) {
 		super(targetURL, tokenGenerator);

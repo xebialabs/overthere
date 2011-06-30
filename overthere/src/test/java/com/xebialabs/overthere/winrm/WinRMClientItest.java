@@ -39,13 +39,11 @@ public class WinRMClientItest  {
 	protected OverthereConnection connection;
 
 	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
-	static final int DEFAULT_PORT = WinRMHost.DEFAULT_HTTP_PORT;
+	static final int DEFAULT_PORT = WinRMClient.DEFAULT_HTTP_PORT;
 	static final String DEFAULT_USERNAME = "hilversum";
 	static final String DEFAULT_PASSWORD = "Xe%%bia";
 	static final String KRB5_CONF = "src/test/resources/krb5.conf";
 	static final String LOGIN_CONF = "src/test/resources/login.conf";
-
-	private WinRMHost host;
 
 	@Before
 	public void setup() {
@@ -101,7 +99,7 @@ public class WinRMClientItest  {
 		// ensure the test user contains some reserved characters such as ';', ':' or '@'
 		options.set(PASSWORD, DEFAULT_PASSWORD);
 		options.set(PORT, DEFAULT_PORT);
-		options.set("CONTEXT", WinRMHost.DEFAULT_WINRM_CONTEXT);
+		options.set("CONTEXT", WinRMClient.DEFAULT_WINRM_CONTEXT);
 		options.set("PROTOCOL", Protocol.HTTP);
 		options.set("AUTHENTICATION", AuthenticationMode.KERBEROS);
 		connection = Overthere.getConnection(type, options);

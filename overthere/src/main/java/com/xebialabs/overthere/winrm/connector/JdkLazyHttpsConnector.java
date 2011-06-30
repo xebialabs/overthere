@@ -17,7 +17,6 @@
 package com.xebialabs.overthere.winrm.connector;
 
 import com.xebialabs.overthere.winrm.TokenGenerator;
-import com.xebialabs.overthere.winrm.WinRMHost;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
@@ -30,10 +29,6 @@ public class JdkLazyHttpsConnector extends JdkHttpConnector {
 	static {
 		HttpsURLConnection.setDefaultHostnameVerifier(new LazyHostnameVerifier());
 		HttpsURLConnection.setDefaultSSLSocketFactory(new LazySSLSocketFactory());
-	}
-
-	public JdkLazyHttpsConnector(WinRMHost host) {
-		super(host);
 	}
 
 	public JdkLazyHttpsConnector(URL targetURL, TokenGenerator tokenGenerator) {

@@ -45,6 +45,9 @@ public class WinRMClient {
 	private static final String DEFAULT_TIMEOUT = "PT60.000S";
 	private static final int DEFAULT_MAX_ENV_SIZE = 153600;
 	private static final String DEFAULT_LOCALE = "en-US";
+	public static final int DEFAULT_HTTP_PORT = 5985;
+	public static final int DEFAULT_HTTPS_PORT = 5986;
+	public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
 
 	//eg PT60.000S I don't know what is this format ...
 	private String timeout = DEFAULT_TIMEOUT;
@@ -66,12 +69,6 @@ public class WinRMClient {
 
 	private final Pipe stdoutPipe;
 	private final Pipe stderrPipe;
-
-
-	@Deprecated
-	public WinRMClient(WinRMHost host) {
-		this(HttpConnectorFactory.newHttpConnector(host), null);
-	}
 
 	public WinRMClient(HttpConnector connector, URL targetURL) {
 		this.connector = connector;
