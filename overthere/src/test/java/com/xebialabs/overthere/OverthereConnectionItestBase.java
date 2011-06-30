@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeThat;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -225,6 +227,20 @@ public abstract class OverthereConnectionItestBase {
 
 		OverthereFile remoteLargeFolder = connection.getTempFile("large.folder");
 		LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);	
+	}
+
+	@Test
+	public void shouldSetExecutable() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+
+		OverthereFile remoteFile = connection.getTempFile("executable.sh");
+		OverthereUtils.write(generateRandomBytes(256), remoteFile);
+		
+		assertThat(remoteFile.canExecute(), equalTo(false));
+		remoteFile.setExecutable(true);
+		assertThat(remoteFile.canExecute(), equalTo(true));
+		remoteFile.setExecutable(false);
+		assertThat(remoteFile.canExecute(), equalTo(false));
 	}
 
 	protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {

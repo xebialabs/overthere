@@ -294,6 +294,17 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	@Override
+	public void setExecutable(boolean executable) {
+		logger.debug("Setting execute permission on {} to {}", this, executable);
+ 
+		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("chmod", executable ? "+x" : "-x", getPath()));
+		if (errno != 0) {
+			throw new RuntimeIOException("Cannot set execute permission on file " + this + " to " + executable + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+		}		
+	}
+
+	@Override
 	protected void deleteDirectory() {
 		logger.debug("Deleting directory {}", this);
 

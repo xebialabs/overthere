@@ -136,6 +136,13 @@ public interface OverthereFile {
 	OutputStream getOutputStream();
 
 	/**
+	 * Sets the execute permission on this file.
+	 * 
+	 * @param executable If <code>true</code>, sets the access permission to allow execute operations; if <code>false</code> to disallow execute operations.
+	 */
+	void setExecutable(boolean executable);
+
+	/**
 	 * Deletes this file or directory. If this file is a directory and it is not empty, a {@link RuntimeIOException} is thrown.
 	 */
 	void delete();

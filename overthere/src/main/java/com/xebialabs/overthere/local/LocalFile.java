@@ -108,6 +108,11 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> {
 	}
 
 	@Override
+    public void setExecutable(boolean executable) {
+		file.setExecutable(executable);
+    }
+
+	@Override
 	public void delete() {
 		if (!file.delete()) {
 			throw new RuntimeIOException("Cannot delete " + this);

@@ -197,6 +197,11 @@ class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
 	}
 
 	@Override
+    public void setExecutable(boolean executable) {
+		// the execute permission does not exist on Windows
+    }
+
+	@Override
 	public void delete() throws RuntimeIOException {
 		try {
 			if (smbFile.isDirectory()) {

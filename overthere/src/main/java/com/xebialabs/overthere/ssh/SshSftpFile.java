@@ -169,11 +169,28 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	}
 
 	@Override
+	public void setExecutable(boolean executable) {
+		logger.debug("Setting execute permission on {} to {}", this, executable);
+
+		try {
+			int permissionsMask = connection.getSharedSftpClient().stat(path).getMode().getPermissionsMask();
+			if(executable) {
+				permissionsMask |= 0111;
+			} else {
+				permissionsMask &= ~0111;
+			}
+			connection.getSharedSftpClient().chmod(path, permissionsMask);
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot delete file " + this, e);
+        }
+	}
+
+	@Override
 	protected void deleteFile() {
 		logger.debug("Removing file {}", this);
 
 		try {
-            connection.getSharedSftpClient().rm(getPath());
+            connection.getSharedSftpClient().rm(path);
 		} catch (IOException e) {
             throw new RuntimeIOException("Cannot delete file " + this, e);
         }

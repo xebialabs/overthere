@@ -111,6 +111,11 @@ class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 	}
 
 	@Override
+    public void setExecutable(boolean executable) {
+		throw new UnsupportedOperationException("Cannot set permission of a byte array file");
+    }
+
+	@Override
 	public void delete() {
 		throw new UnsupportedOperationException("Cannot delete a byte array file");
 	}
