@@ -58,14 +58,7 @@ public class WinRMClientItest {
 		System.setProperty("javax.security.auth.useSubjectCredsOnly", "");
 	}
 
-	@Test
-	public void testWinRMClient() {
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
-		assertEquals(0, client.getExitCode());
-		assertEquals(1, client.getChunk());
-		assertTrue(client.getStdout().toString().contains("172.16.74.129"));
-	}
+
 
 	private WinRMClient newWinRMClient() {
 		return new WinRMClient(host);
@@ -74,7 +67,7 @@ public class WinRMClientItest {
 
 	@Test
 	public void testWinRMClientHttps() {
-		//sudo keytool -import -keystore src/test/resources/key/cacerts -alias WIN-2MGY3RY6XSH -file src/test/resources/key/remote.host.pem
+
 		System.setProperty("javax.net.ssl.trustStore", "src/test/resources/key/cacerts");
 		host.setPort(WinRMHost.DEFAULT_HTTPS_PORT);
 		host.setProtocol(Protocol.HTTPS);
@@ -141,24 +134,6 @@ public class WinRMClientItest {
 	}
 
 
-	@Test
-	public void testWinRMClientWrongCommandLine() {
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ifconfig");
-		assertEquals(1, client.getExitCode());
-		assertEquals(1, client.getChunk());
-		assertTrue(client.getStderr().toString().contains("'ifconfig' is not recognized as an internal or external command"));
-
-	}
-
-	@Test
-	public void testWinRMClientVerboseDir() {
-		WinRMClient client = newWinRMClient();
-		client.runCmd("dir", "/s ");
-		assertEquals(0, client.getExitCode());
-		assertTrue(client.getChunk() > 1);
-		System.out.println(client.getStdout());
-	}
 
 
 }
