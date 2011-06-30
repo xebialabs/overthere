@@ -17,20 +17,26 @@
 package com.xebialabs.overthere.winrm;
 
 
-import com.xebialabs.overthere.winrm.exception.BlankValueRuntimeException;
-import com.xebialabs.overthere.winrm.exception.InvalidFilePathRuntimeException;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnection;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 
-public class WinRMClientItest {
+public class WinRMClientItest  {
 
-	private static Logger logger = LoggerFactory.getLogger(WinRMClientItest.class);
+
+	protected String type;
+
+	protected ConnectionOptions options;
+
+	protected OverthereConnection connection;
 
 	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
 	static final int DEFAULT_PORT = WinRMHost.DEFAULT_HTTP_PORT;
@@ -43,8 +49,6 @@ public class WinRMClientItest {
 
 	@Before
 	public void setup() {
-		host = new WinRMHost(DEFAULT_SERVER, DEFAULT_PORT, DEFAULT_USERNAME, DEFAULT_PASSWORD);
-
 		System.setProperty("java.security.krb5.conf", KRB5_CONF);
 		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
 		System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
@@ -58,82 +62,62 @@ public class WinRMClientItest {
 		System.setProperty("javax.security.auth.useSubjectCredsOnly", "");
 	}
 
-
-
-	private WinRMClient newWinRMClient() {
-		return new WinRMClient(host);
-	}
-
-
-	@Test
-	public void testWinRMClientHttps() {
-
-		System.setProperty("javax.net.ssl.trustStore", "src/test/resources/key/cacerts");
-		host.setPort(WinRMHost.DEFAULT_HTTPS_PORT);
-		host.setProtocol(Protocol.HTTPS);
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
-		assertEquals(0, client.getExitCode());
-		assertEquals(1, client.getChunk());
-		assertTrue(client.getStdout().toString().contains("172.16.74.129"));
-	}
-
-	@Test
-	public void testWinRMClientFakeHttps() {
-
-		//Security.setProperty("ssl.SocketFactory.provider", LazySSLSocketFactory.class.getName());
-		host.setPort(WinRMHost.DEFAULT_HTTPS_PORT);
-		host.setProtocol(Protocol.HTTPS_LAZY);
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
-		assertEquals(0, client.getExitCode());
-		assertEquals(1, client.getChunk());
-		assertTrue(client.getStdout().toString().contains("172.16.74.129"));
-	}
-
-
-	@Test(expected = BlankValueRuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void testWinRMClientMisConfigurationBlankForLogin() {
-
 		tearDown();
-
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
+		connection.execute(capturingHandler(), CmdLine.build("ipconfig"));
 	}
 
-	@Test(expected = InvalidFilePathRuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void testWinRMClientMisConfigurationWrongPathForLogin() {
 		tearDown();
-
 		System.setProperty("java.security.auth.login.config", "/not/exist/file.conf");
-
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
+		connection.execute(capturingHandler(), CmdLine.build("ipconfig"));
 	}
 
-	@Test(expected = BlankValueRuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void testWinRMClientMisConfigurationBlankForKerberos() {
 		tearDown();
 		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
-
 		System.setProperty("java.security.krb5.conf", "");
-
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
+		connection.execute(capturingHandler(), CmdLine.build("ipconfig"));
 	}
 
-	@Test(expected = InvalidFilePathRuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void testWinRMClientMisConfigurationWrongPathForKerberos() {
 		tearDown();
 		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
-
 		System.setProperty("java.security.krb5.conf", "/path/to/nowhere/file.conf");
-
-		WinRMClient client = newWinRMClient();
-		client.runCmd("ipconfig");
+		connection.execute(capturingHandler(), CmdLine.build("ipconfig"));
 	}
 
+	@Before
+	public void setTypeAndOptions() throws Exception {
+		type = "cifs_winrm";
+		options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, WINDOWS);
+		options.set(ADDRESS, DEFAULT_SERVER);
+		options.set(USERNAME, DEFAULT_USERNAME);
+		// ensure the test user contains some reserved characters such as ';', ':' or '@'
+		options.set(PASSWORD, DEFAULT_PASSWORD);
+		options.set(PORT, DEFAULT_PORT);
+		options.set("CONTEXT", WinRMHost.DEFAULT_WINRM_CONTEXT);
+		options.set("PROTOCOL", Protocol.HTTP);
+		options.set("AUTHENTICATION", AuthenticationMode.KERBEROS);
+		connection = Overthere.getConnection(type, options);
 
+	}
 
-
+	@After
+	public void disconnect() {
+		if (connection != null) {
+			try {
+				connection.disconnect();
+				connection = null;
+			} catch (Exception exc) {
+				System.out.println("Exception while disconnecting at end of test case:");
+				exc.printStackTrace(System.out);
+			}
+		}
+	}
 }
