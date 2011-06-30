@@ -31,6 +31,15 @@ public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 	}
 
 	@Test
+	public void testWinRMClientWithoutPassword() {
+		options.set(PASSWORD, "");
+		CapturingOverthereProcessOutputHandler handler = capturingHandler();
+		int res = connection.execute(handler, CmdLine.build("ipconfig"));
+		assertThat(res, equalTo(0));
+		assertThat(handler.getOutput(), containsString("172.16.74.129"));
+	}
+
+	@Test
 	public void testWinRMClientWrongCommandLine() {
 		CapturingOverthereProcessOutputHandler handler = capturingHandler();
 		int res = connection.execute(handler, CmdLine.build("ifconfig"));
