@@ -16,7 +16,7 @@ public interface ItestHost {
 	void teardown();
 
 	/**
-	 * Returns the host name of the host
+	 * Returns the host name of the host. Can only be called after {@link #setup()} has been invoked.
 	 * 
 	 * @return the host name.
 	 */

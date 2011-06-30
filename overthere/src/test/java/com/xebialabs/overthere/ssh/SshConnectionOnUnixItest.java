@@ -54,7 +54,9 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 
 	@AfterClass
 	public static void teardownHost() {
-		host.teardown();
+		if(host != null) {
+			host.teardown();
+		}
 	}
 
 	public SshConnectionOnUnixItest(ConnectionOptions partialOptions, Class<?> expectedClass) {

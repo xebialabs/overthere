@@ -1,10 +1,10 @@
 package com.xebialabs.itest;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.itest.ItestHostFactory.getItestProperty;
+import static com.xebialabs.itest.ItestHostFactory.getRequiredItestProperty;
 
 import java.util.Date;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,15 +29,15 @@ class Ec2ItestHost implements ItestHost {
 
 	public static final String AWS_SECRET_KEY = "aws.secretKey";
 
-	public static final String AMI_INSTANCE_TYPE = "ami.instanceType";
+	public static final String AMI_INSTANCE_TYPE_SUFFIX = ".amiInstanceType";
 
-	public static final String AMI_SECURITY_GROUP = "ami.securityGroup";
+	public static final String AMI_SECURITY_GROUP_SUFFIX = ".amiSecurityGroup";
 
-	public static final String AMI_KEY_NAME = "ami.keyName";
-	
-	public static final String AMI_BOOT_SECONDS = "ami.bootSeconds";
+	public static final String AMI_KEY_NAME_SUFFIX = ".amiKeyName";
 
-	private final String hostId;
+	public static final String AMI_BOOT_SECONDS_SUFFIX = ".amiBootSeconds";
+
+	private final String hostLabel;
 	private final String amiId;
 	private final String awsEndpointURL;
 	private final String awsAccessKey;
@@ -51,16 +51,17 @@ class Ec2ItestHost implements ItestHost {
 	private String instanceId;
 	private String publicDnsAddress;
 
-	public Ec2ItestHost(String hostId, String amiId, Properties itestProperties) {
-		this.hostId = hostId;
+	public Ec2ItestHost(String hostLabel, String amiId) {
+		this.hostLabel = hostLabel;
 		this.amiId = amiId;
-		this.awsEndpointURL = itestProperties.getProperty(AWS_ENDPOINT, AWS_ENDPOINT_DEFAULT);
-		this.awsAccessKey = checkNotNull(itestProperties.getProperty(AWS_ACCESS_KEY), "Required property %s missing", AWS_ACCESS_KEY);
-		this.awsSecretKey = checkNotNull(itestProperties.getProperty(AWS_SECRET_KEY), "Required property %s missing", AWS_SECRET_KEY);
-		this.amiInstanceType = itestProperties.getProperty(AMI_INSTANCE_TYPE);
-		this.amiSecurityGroup = itestProperties.getProperty(AMI_SECURITY_GROUP);
-		this.amiKeyName = itestProperties.getProperty(AMI_KEY_NAME);
-		this.amiBootSeconds = Integer.valueOf(itestProperties.getProperty(AMI_BOOT_SECONDS, "120"));
+		this.awsEndpointURL = getItestProperty(AWS_ENDPOINT, AWS_ENDPOINT_DEFAULT);
+		this.awsAccessKey = getRequiredItestProperty(AWS_ACCESS_KEY);
+		this.awsSecretKey = getRequiredItestProperty(AWS_SECRET_KEY);
+		this.amiInstanceType = getRequiredItestProperty(hostLabel + AMI_INSTANCE_TYPE_SUFFIX);
+		this.amiSecurityGroup = getRequiredItestProperty(hostLabel + AMI_SECURITY_GROUP_SUFFIX);
+		this.amiKeyName = getRequiredItestProperty(hostLabel + AMI_KEY_NAME_SUFFIX);
+		this.amiBootSeconds = Integer.valueOf(getRequiredItestProperty(hostLabel + AMI_BOOT_SECONDS_SUFFIX));
+
 		ec2 = new AmazonEC2Client(new BasicAWSCredentials(awsAccessKey, awsSecretKey));
 		ec2.setEndpoint(awsEndpointURL);
 	}
@@ -70,7 +71,7 @@ class Ec2ItestHost implements ItestHost {
 		instanceId = runInstance();
 
 		publicDnsAddress = waitUntilRunningAndGetPublicDnsName();
-		
+
 		setInstanceName();
 
 		waitForAmiBoot();
@@ -103,7 +104,7 @@ class Ec2ItestHost implements ItestHost {
 	}
 
 	protected void setInstanceName() {
-		ec2.createTags(new CreateTagsRequest(newArrayList(instanceId), newArrayList(new Tag("Name", hostId + " started at " + new Date()))));
+		ec2.createTags(new CreateTagsRequest(newArrayList(instanceId), newArrayList(new Tag("Name", hostLabel + " started at " + new Date()))));
 	}
 
 	public String waitUntilRunningAndGetPublicDnsName() {
@@ -125,13 +126,13 @@ class Ec2ItestHost implements ItestHost {
 	}
 
 	protected void waitForAmiBoot() {
-	    try {
-	    	logger.info("Waiting {} for the image to finish booting", amiBootSeconds);
-	        Thread.sleep(amiBootSeconds * 1000);
-        } catch (InterruptedException e) {
-        	Thread.currentThread().interrupt();
-        }
-    }
+		try {
+			logger.info("Waiting {} for the image to finish booting", amiBootSeconds);
+			Thread.sleep(amiBootSeconds * 1000);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Ec2ItestHost.class);
 
