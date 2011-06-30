@@ -16,7 +16,6 @@ import static org.junit.matchers.JUnitMatchers.containsString;
 public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 
 	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
-	static final int DEFAULT_PORT = WinRMClient.DEFAULT_HTTP_PORT;
 	static final String DEFAULT_USERNAME = "hilversum";
 	static final String DEFAULT_PASSWORD = "Xe%%bia";
 	static final String KRB5_CONF = "src/test/resources/krb5.conf";
@@ -62,12 +61,11 @@ public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 		options.set(OPERATING_SYSTEM, WINDOWS);
 		options.set(ADDRESS, DEFAULT_SERVER);
 		options.set(USERNAME, DEFAULT_USERNAME);
-		// ensure the test user contains some reserved characters such as ';', ':' or '@'
 		options.set(PASSWORD, DEFAULT_PASSWORD);
-		options.set(PORT, DEFAULT_PORT);
-		options.set("CONTEXT", WinRMClient.DEFAULT_WINRM_CONTEXT);
-		options.set("PROTOCOL", Protocol.HTTP);
-		options.set("AUTHENTICATION", AuthenticationMode.BASIC);
+		options.set(PORT, CifsWinRMConnectionBuilder.DEFAULT_HTTP_PORT);
+		options.set(CifsWinRMConnectionBuilder.CONTEXT, CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT);
+		options.set(CifsWinRMConnectionBuilder.PROTOCOL, Protocol.HTTP);
+		options.set(CifsWinRMConnectionBuilder.AUTHENTICATION, AuthenticationMode.BASIC);
 
 	}
 }

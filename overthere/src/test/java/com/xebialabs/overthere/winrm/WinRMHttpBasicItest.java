@@ -9,7 +9,7 @@ public class WinRMHttpBasicItest extends WinRMItestBase {
 		super.setTypeAndOptions();
 		options.set(USERNAME, DEFAULT_USERNAME);
 		options.set(PASSWORD, DEFAULT_PASSWORD);
-		options.set(PORT, DEFAULT_PORT);
+		options.set(PORT, CifsWinRMConnectionBuilder.DEFAULT_HTTP_PORT);
 		options.set("PROTOCOL", Protocol.HTTP);
 		options.set("AUTHENTICATION", AuthenticationMode.BASIC);
 	}

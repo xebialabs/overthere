@@ -42,33 +42,22 @@ import java.util.List;
 
 
 public class WinRMClient {
-	private static final String DEFAULT_TIMEOUT = "PT60.000S";
-	private static final int DEFAULT_MAX_ENV_SIZE = 153600;
-	private static final String DEFAULT_LOCALE = "en-US";
-	public static final int DEFAULT_HTTP_PORT = 5985;
-	public static final int DEFAULT_HTTPS_PORT = 5986;
-	public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
-
-	//eg PT60.000S I don't know what is this format ...
-	private String timeout = DEFAULT_TIMEOUT;
-	//default 153600
-	private long envelopSize = DEFAULT_MAX_ENV_SIZE;
-
-	//default en-US
-	private String locale = DEFAULT_LOCALE;
 
 	private final URL targetURL;
+	private final HttpConnector connector;
+
+	private final Pipe stdoutPipe;
+	private final Pipe stderrPipe;
+
+	private String timeout;
+	private long envelopSize;
+	private String locale;
 
 	private String exitCode;
 	private String shellId;
 	private String commandId;
 
 	private int chunk = 0;
-
-	private final HttpConnector connector;
-
-	private final Pipe stdoutPipe;
-	private final Pipe stderrPipe;
 
 	public WinRMClient(HttpConnector connector, URL targetURL) {
 		this.connector = connector;
@@ -79,13 +68,6 @@ public class WinRMClient {
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
-	}
-
-	public void runCmd(String... commandLine) {
-		StringBuffer cmd = new StringBuffer();
-		for (String c : commandLine)
-			cmd.append(c).append(" ");
-		runCmd(cmd.toString().trim());
 	}
 
 	public void runCmd(String command) {
@@ -116,16 +98,6 @@ public class WinRMClient {
 
 	public InputStream getStderrStream() {
 		return new BufferedInputStream(Channels.newInputStream(stderrPipe.source()));
-	}
-
-	@Deprecated
-	public StringBuffer getStdout() {
-		throw new RuntimeIOException("Not use");
-	}
-
-	@Deprecated
-	public StringBuffer getStderr() {
-		throw new RuntimeIOException("Not use");
 	}
 
 	private void closeShell() {
@@ -367,6 +339,10 @@ public class WinRMClient {
 
 	public int getChunk() {
 		return chunk;
+	}
+
+	public URL getTargetURL() {
+		return targetURL;
 	}
 
 	private static Logger logger = LoggerFactory.getLogger(WinRMClient.class);

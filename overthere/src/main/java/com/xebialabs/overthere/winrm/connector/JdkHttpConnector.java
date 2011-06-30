@@ -69,7 +69,7 @@ public class JdkHttpConnector implements HttpConnector {
 			}
 
 			final String requestDocAsString = toString(requestDocument);
-			logger.debug("send message:request {}", requestDocAsString);
+			logger.debug("send message to {}:request {}", targetURL, requestDocAsString);
 			BufferedWriter bw = new BufferedWriter(
 					new OutputStreamWriter(
 							con.getOutputStream()));

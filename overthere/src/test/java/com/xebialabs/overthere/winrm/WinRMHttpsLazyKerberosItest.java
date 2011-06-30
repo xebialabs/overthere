@@ -12,9 +12,9 @@ public class WinRMHttpsLazyKerberosItest extends WinRMItestBase {
 		super.setTypeAndOptions();
 		options.set(USERNAME, DEFAULT_USERNAME);
 		options.set(PASSWORD, DEFAULT_PASSWORD);
-		options.set(PORT, DEFAULT_PORT+1);
-		options.set("PROTOCOL", Protocol.HTTPS_LAZY);
-		options.set("AUTHENTICATION", AuthenticationMode.KERBEROS);
+		options.set(PORT, CifsWinRMConnectionBuilder.DEFAULT_HTTPS_PORT);
+		options.set(CifsWinRMConnectionBuilder.PROTOCOL, Protocol.HTTPS_LAZY);
+		options.set(CifsWinRMConnectionBuilder.AUTHENTICATION, AuthenticationMode.KERBEROS);
 	}
 
 	@Before
