@@ -4,8 +4,6 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
@@ -15,7 +13,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
-public class WinRMItest extends OverthereConnectionItestBase {
+public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 
 	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
 	static final int DEFAULT_PORT = WinRMHost.DEFAULT_HTTP_PORT;
@@ -46,20 +44,6 @@ public class WinRMItest extends OverthereConnectionItestBase {
 		int res = connection.execute(handler, CmdLine.build("dir", "/s"));
 		assertThat(res, equalTo(0));
 		assertThat(handler.getOutput(), containsString("Total Files Listed"));
-	}
-
-	@Before
-	public void setup() {
-		System.setProperty("java.security.krb5.conf", KRB5_CONF);
-		System.setProperty("java.security.auth.login.config", LOGIN_CONF);
-		System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
-	}
-
-	@After
-	public void tearDown() {
-		System.setProperty("java.security.krb5.conf", "");
-		System.setProperty("java.security.auth.login.config", "");
-		System.setProperty("javax.security.auth.useSubjectCredsOnly", "");
 	}
 
 	@Override
