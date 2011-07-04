@@ -42,6 +42,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 * when it is allocated. Defaults to true.
 	 */
 	public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
+
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify which expression to look for in interactive sudo before sending the password.
+	 */
+	public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
 	
 	private SshConnection connection;
 

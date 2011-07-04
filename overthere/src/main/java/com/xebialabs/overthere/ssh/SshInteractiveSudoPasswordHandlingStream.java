@@ -16,25 +16,32 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.regex.Pattern;
 
 class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 	private final OutputStream remoteStdin;
 	private final byte[] passwordBytes;
+	private final String passwordRegex;
+	private final Pattern passwordPattern;
 
 	private final StringBuilder receivedOutputBuffer = new StringBuilder();
+
 	private boolean onFirstLine = true;
 
-	protected SshInteractiveSudoPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password) {
+	protected SshInteractiveSudoPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password, String passwordPromptRegex) {
 		super(remoteStdout);
 		this.remoteStdin = remoteStdin;
 		this.passwordBytes = (password + "\r\n").getBytes();
+
+		this.passwordRegex = passwordPromptRegex;
+		this.passwordPattern = Pattern.compile(passwordRegex);
 	}
 
 	@Override
@@ -59,30 +66,23 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 
 	private void handleChar(char c) {
 		if (onFirstLine) {
-			switch (c) {
-			case ':':
+			if (c == '\n') {
+				onFirstLine = false;
+			} else if (c == passwordRegex.charAt(passwordRegex.length() - 1)) {
+				receivedOutputBuffer.append(c);
 				String receivedOutput = receivedOutputBuffer.toString();
-				if (receivedOutput.contains("assword")) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Found password prompt in first line of output: " + receivedOutput);
-					}
+				if (passwordPattern.matcher(receivedOutput).matches()) {
+					logger.info("Found password prompt in first line of output: {}", receivedOutput);
 					try {
 						remoteStdin.write(passwordBytes);
 						remoteStdin.flush();
-						if (logger.isDebugEnabled()) {
-							logger.debug("Sent password");
-						}
+						logger.debug("Sent password");
 					} catch (IOException exc) {
 						logger.error("Cannot send password", exc);
 					}
 				}
-				break;
-			case '\n':
-				onFirstLine = false;
-				break;
-			default:
+			} else {
 				receivedOutputBuffer.append(c);
-				break;
 			}
 		}
 	}

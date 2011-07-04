@@ -17,6 +17,7 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 
 import java.io.InputStream;
 
@@ -32,8 +33,13 @@ import com.xebialabs.overthere.ConnectionOptions;
  */
 class SshInteractiveSudoConnection extends SshSudoConnection {
 
+	private String passwordPromptRegex;
+
 	public SshInteractiveSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
+		passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, "[Pp]assword.*:");
+		checkArgument(!passwordPromptRegex.endsWith("*"), "Interactive SUDO password prompt regex should not end in a wildcard");
+		checkArgument(!passwordPromptRegex.endsWith("?"), "Interactive SUDO password prompt regex should not end in a wildcard");
 		checkArgument(password != null, "Cannot start an interactive SSH SUDO connection without a password");
 	}
 
@@ -42,7 +48,7 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
         return new SshProcess(this, session, commandLine) {
             @Override
             public InputStream getStdout() {
-                return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password);
+                return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password, passwordPromptRegex);
             }
         };
     }
