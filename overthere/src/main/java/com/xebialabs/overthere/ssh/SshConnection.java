@@ -117,8 +117,9 @@ abstract class SshConnection extends OverthereConnection {
     	checkState(sshClient != null, "Already disconnected");
         try {
             sshClient.disconnect();
-        } catch (IOException e) {
-            throw new RuntimeIOException("Could not disconnect from " + this, e);
+        } catch (Exception e) {
+        	// Even though we get an exception, we expect the connection to have been closed, so we are ignoring 
+            logger.error("Unexpected exception received while disconnecting from " + this, e);
         } finally {
             sshClient = null;
         }
