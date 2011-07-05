@@ -68,21 +68,22 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 		if (onFirstLine) {
 			if (c == '\n') {
 				onFirstLine = false;
-			} else if (c == passwordRegex.charAt(passwordRegex.length() - 1)) {
-				receivedOutputBuffer.append(c);
-				String receivedOutput = receivedOutputBuffer.toString();
-				if (passwordPattern.matcher(receivedOutput).matches()) {
-					logger.info("Found password prompt in first line of output: {}", receivedOutput);
-					try {
-						remoteStdin.write(passwordBytes);
-						remoteStdin.flush();
-						logger.debug("Sent password");
-					} catch (IOException exc) {
-						logger.error("Cannot send password", exc);
-					}
-				}
 			} else {
 				receivedOutputBuffer.append(c);
+
+				if (c == passwordRegex.charAt(passwordRegex.length() - 1)) {
+					String receivedOutput = receivedOutputBuffer.toString();
+					if (passwordPattern.matcher(receivedOutput).matches()) {
+						logger.info("Found password prompt in first line of output: {}", receivedOutput);
+						try {
+							remoteStdin.write(passwordBytes);
+							remoteStdin.flush();
+							logger.debug("Sent password");
+						} catch (IOException exc) {
+							logger.error("Cannot send password", exc);
+						}
+					}
+				}
 			}
 		}
 	}

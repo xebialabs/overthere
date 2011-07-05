@@ -48,7 +48,14 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
 	
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify which expression to look for in interactive sudo before sending the
+	 * password.
+	 */
+	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
+
 	private SshConnection connection;
+
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {
 		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE, SFTP);
