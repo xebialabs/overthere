@@ -1,15 +1,16 @@
 package com.xebialabs.overthere.ssh;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.*;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class SshInteractiveSudoPasswordHandlingStreamTest {
 
@@ -42,4 +43,5 @@ public class SshInteractiveSudoPasswordHandlingStreamTest {
 			foo.read();
 		}
 	}
+
 }
