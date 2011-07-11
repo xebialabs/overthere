@@ -1,7 +1,10 @@
 // build.gradle for the itest-support project
 
 dependencies {
-	compile 'com.amazonaws:aws-java-sdk:1.2.2'    
+	compile('com.amazonaws:aws-java-sdk:1.2.2') {
+		exclude group: 'commons-codec', module: 'commons-codec'
+	}
+	compile 'commons-codec:commons-codec:1.5'
 	compile 'com.google.guava:guava:r09'
 	compile 'org.slf4j:slf4j-api:1.6.1'
 
