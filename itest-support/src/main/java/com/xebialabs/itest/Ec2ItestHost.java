@@ -1,6 +1,14 @@
 package com.xebialabs.itest;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.itest.ItestHostFactory.AMI_BOOT_SECONDS_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_INSTANCE_TYPE_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_KEY_NAME_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_SECURITY_GROUP_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ACCESS_KEY_PROPERTY;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_DEFAULT;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_PROPERTY;
+import static com.xebialabs.itest.ItestHostFactory.AWS_SECRET_KEY_PROPERTY;
 import static com.xebialabs.itest.ItestHostFactory.getItestProperty;
 import static com.xebialabs.itest.ItestHostFactory.getRequiredItestProperty;
 
@@ -21,22 +29,6 @@ import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 
 class Ec2ItestHost implements ItestHost {
 
-	public static final String AWS_ENDPOINT = "aws.endpoint";
-
-	public static final String AWS_ENDPOINT_DEFAULT = "https://ec2.amazonaws.com";
-
-	public static final String AWS_ACCESS_KEY = "aws.accessKey";
-
-	public static final String AWS_SECRET_KEY = "aws.secretKey";
-
-	public static final String AMI_INSTANCE_TYPE_SUFFIX = ".amiInstanceType";
-
-	public static final String AMI_SECURITY_GROUP_SUFFIX = ".amiSecurityGroup";
-
-	public static final String AMI_KEY_NAME_SUFFIX = ".amiKeyName";
-
-	public static final String AMI_BOOT_SECONDS_SUFFIX = ".amiBootSeconds";
-
 	private final String hostLabel;
 	private final String amiId;
 	private final String awsEndpointURL;
@@ -54,13 +46,13 @@ class Ec2ItestHost implements ItestHost {
 	public Ec2ItestHost(String hostLabel, String amiId) {
 		this.hostLabel = hostLabel;
 		this.amiId = amiId;
-		this.awsEndpointURL = getItestProperty(AWS_ENDPOINT, AWS_ENDPOINT_DEFAULT);
-		this.awsAccessKey = getRequiredItestProperty(AWS_ACCESS_KEY);
-		this.awsSecretKey = getRequiredItestProperty(AWS_SECRET_KEY);
-		this.amiInstanceType = getRequiredItestProperty(hostLabel + AMI_INSTANCE_TYPE_SUFFIX);
-		this.amiSecurityGroup = getRequiredItestProperty(hostLabel + AMI_SECURITY_GROUP_SUFFIX);
-		this.amiKeyName = getRequiredItestProperty(hostLabel + AMI_KEY_NAME_SUFFIX);
-		this.amiBootSeconds = Integer.valueOf(getRequiredItestProperty(hostLabel + AMI_BOOT_SECONDS_SUFFIX));
+		this.awsEndpointURL = getItestProperty(AWS_ENDPOINT_PROPERTY, AWS_ENDPOINT_DEFAULT);
+		this.awsAccessKey = getRequiredItestProperty(AWS_ACCESS_KEY_PROPERTY);
+		this.awsSecretKey = getRequiredItestProperty(AWS_SECRET_KEY_PROPERTY);
+		this.amiInstanceType = getRequiredItestProperty(hostLabel + AMI_INSTANCE_TYPE_PROPERTY_SUFFIX);
+		this.amiSecurityGroup = getRequiredItestProperty(hostLabel + AMI_SECURITY_GROUP_PROPERTY_SUFFIX);
+		this.amiKeyName = getRequiredItestProperty(hostLabel + AMI_KEY_NAME_PROPERTY_SUFFIX);
+		this.amiBootSeconds = Integer.valueOf(getRequiredItestProperty(hostLabel + AMI_BOOT_SECONDS_PROPERTY_SUFFIX));
 
 		ec2 = new AmazonEC2Client(new BasicAWSCredentials(awsAccessKey, awsSecretKey));
 		ec2.setEndpoint(awsEndpointURL);
@@ -86,6 +78,11 @@ class Ec2ItestHost implements ItestHost {
 	public String getHostName() {
 		return publicDnsAddress;
 	}
+
+	@Override
+    public int getPort(int port) {
+	    return port;
+    }
 
 	protected String runInstance() {
 		RunInstancesRequest run = new RunInstancesRequest(amiId, 1, 1);

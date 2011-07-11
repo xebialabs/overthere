@@ -25,4 +25,9 @@ class ExistingItestHost implements ItestHost {
 		return hostname;
 	}
 
+	@Override
+    public int getPort(int port) {
+	    return port;
+    }
+
 }
