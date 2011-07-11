@@ -16,43 +16,29 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.OutputSupplier;
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.local.LocalFile;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.OverthereUtils;
+import org.junit.Assume;
+import org.junit.Test;
+
+import java.io.*;
+import java.util.List;
+
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.List;
-
-import org.junit.Assume;
-import org.junit.Test;
-
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-import com.google.common.io.OutputSupplier;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class SshConnectionItestBase extends OverthereConnectionItestBase {
 
@@ -135,6 +121,41 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 
 		connection.execute(consoleHandler(), CmdLine.build("rm", dest));
 	}
+
+    @Test
+	public void shouldCopyDirectoryContentToOtherLocation() throws IOException {
+		OverthereFile tempDir = connection.getTempFile("tempdir");
+        tempDir.mkdir();
+
+        OverthereFile target = tempDir.getFile("targetFolder");
+
+        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
+        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
+        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+
+        sourceFolder.copyTo(target);
+
+        assertThat(target.getFile("sourceFile").exists(), is(true));
+	}
+
+    @Test
+	public void shouldCopyDirectoryContentToExistingOtherLocation() throws IOException {
+		OverthereFile tempDir = connection.getTempFile("tempdir");
+        tempDir.mkdir();
+
+        OverthereFile target = tempDir.getFile("targetFolder");
+        target.mkdir();
+
+        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
+        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
+        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+
+        sourceFolder.copyTo(target);
+
+        assertThat(target.getFile("sourceFile").exists(), is(true));
+	}
+
+
 
 	/**
 	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (specifically for SSH/SUDO connections).

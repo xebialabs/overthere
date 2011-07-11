@@ -34,6 +34,7 @@ import java.util.StringTokenizer;
 import net.schmizz.sshj.xfer.LocalFileFilter;
 import net.schmizz.sshj.xfer.LocalSourceFile;
 
+import net.schmizz.sshj.xfer.scp.SCPUploadClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -340,8 +341,17 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	@Override
     protected void copyFrom(OverthereFile source) {
 		logger.debug("Copying file or directory {} to {}", source, this);
-		try {
-	        connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), getPath());
+
+        SCPUploadClient uploadClient = connection.getSshClient().newSCPFileTransfer().newSCPUploadClient();
+
+        try {
+            if (source.isDirectory() && this.exists()) {
+                for(OverthereFile sourceFile : source.listFiles()) {
+                    uploadClient.copy(new OverthereFileLocalSourceFile(sourceFile), getPath());
+                }
+            } else {
+                uploadClient.copy(new OverthereFileLocalSourceFile(source), getPath());
+            }
         } catch (IOException e) {
         	throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
         }
