@@ -248,7 +248,6 @@ public abstract class OverthereConnection {
 		Thread stdoutReaderThread = null;
 		Thread stderrReaderThread = null;
 		final CountDownLatch latch = new CountDownLatch(2);
-		boolean finishedSuccessfully = false;
 		try {
 			stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
 				public void run() {
@@ -307,19 +306,16 @@ public abstract class OverthereConnection {
 
 			try {
 				latch.await();
-				int exitCode = process.waitFor();
-				finishedSuccessfully = exitCode == 0;
-				return exitCode;
+				return process.waitFor();
 			} catch (InterruptedException exc) {
 				Thread.currentThread().interrupt();
+
+				logger.info("Execution interrupted, destroying the process.");
+				process.destroy();
+				
 				throw new RuntimeIOException("Execution interrupted", exc);
 			}
 		} finally {
-			if (!finishedSuccessfully) {
-				logger.info("Not finished successfully, destroying the process.");
-				process.destroy();
-			}
-
 			if (stdoutReaderThread != null) {
 				try {
 					// interrupt the stdout reader thread in case it is stuck waiting for output that will never come
