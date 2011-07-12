@@ -126,8 +126,8 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 	public void shouldCopyDirectoryContentToOtherLocation() throws IOException {
 		OverthereFile tempDir = connection.getTempFile("tempdir");
         tempDir.mkdir();
-
-        OverthereFile target = tempDir.getFile("targetFolder");
+        //Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
+        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
 
         OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
         OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
@@ -135,7 +135,12 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 
         sourceFolder.copyTo(target);
 
-        assertThat(target.getFile("sourceFile").exists(), is(true));
+        try {
+            assertThat(target.getFile("sourceFile").exists(), is(true));
+        } finally {
+            //When using sudo connection, the target folder has different rights to the temp folder it was create in.
+            target.deleteRecursively();
+        }
 	}
 
     @Test
@@ -143,7 +148,8 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 		OverthereFile tempDir = connection.getTempFile("tempdir");
         tempDir.mkdir();
 
-        OverthereFile target = tempDir.getFile("targetFolder");
+        //Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
+        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
         target.mkdir();
 
         OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
@@ -152,7 +158,12 @@ public abstract class SshConnectionItestBase extends OverthereConnectionItestBas
 
         sourceFolder.copyTo(target);
 
-        assertThat(target.getFile("sourceFile").exists(), is(true));
+        try {
+            assertThat(target.getFile("sourceFile").exists(), is(true));
+        } finally {
+            //When using sudo connection, the target folder has different rights to the temp folder it was create in.
+            target.deleteRecursively();
+        }
 	}
 
 

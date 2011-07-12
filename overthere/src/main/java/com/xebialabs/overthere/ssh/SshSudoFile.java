@@ -16,23 +16,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.CmdLine.build;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
 /**
  * A file on a host connected through SSH w/ SUDO.
@@ -171,7 +170,15 @@ class SshSudoFile extends SshScpFile {
 		logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
 
 		CapturingOverthereProcessOutputHandler cpCapturedOutput = capturingHandler();
-		int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), CmdLine.build("cp", "-pr", tempFile.getPath(), this.getPath()));
+        CmdLine cmdLine = CmdLine.build("cp", "-pr");
+        String sourcePath = tempFile.getPath();
+        if (this.exists() && tempFile.isDirectory()) {
+            sourcePath += "/*";
+        }
+        cmdLine.addRaw(sourcePath);
+        cmdLine.addArgument(this.getPath());
+
+        int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cmdLine);
 		if (cpResult != 0) {
 			String errorMessage = cpCapturedOutput.getAll();
 			throw new RuntimeIOException("Cannot copy temporary file " + tempFile + " to actual file " + this + " after upload: " + errorMessage);
