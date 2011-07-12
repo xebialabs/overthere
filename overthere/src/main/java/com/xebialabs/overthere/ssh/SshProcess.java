@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.connection.channel.direct.Signal;
 import net.schmizz.sshj.transport.TransportException;
 
 import org.slf4j.Logger;
@@ -62,7 +63,13 @@ class SshProcess implements OverthereProcess {
 
     @Override
     public void destroy() {
-	    closeSession();
+	    try {
+		    command.signal(Signal.KILL);
+	    } catch (TransportException e) {
+		    logger.warn("Could not send the KILL signal to the command, closing the session.", e);
+	    } finally {
+		    closeSession();
+	    }
     }
 
 	private void closeSession() {
