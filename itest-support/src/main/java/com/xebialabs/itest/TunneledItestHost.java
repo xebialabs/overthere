@@ -50,8 +50,9 @@ class TunneledItestHost implements ItestHost {
                         } catch (IOException ignore) {
                         }
 					}
-				}, "SSH port forwarder thread from " + localPort + " to " + actualItestHost.getHostName() + ":" + remotePort);
+				}, "SSH port forwarder thread from local port " + localPort + " to " + actualItestHost.getHostName() + ":" + remotePort);
 	        	forwarderThread.setDaemon(true);
+	        	ItestHostFactory.logger.info("Starting {}", forwarderThread.getName());
 	        	forwarderThread.start();
 	        }
         } catch (IOException exc) {

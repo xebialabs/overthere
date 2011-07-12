@@ -43,7 +43,7 @@ public class ItestHostFactory {
 	public static final String TUNNEL_PORTS_PROPERTY_SUFFIX = ".tunnel.ports";
 
 	// The field logger needs to be defined up here so that the static initialized below can use the logger
-	private static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
+	public static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
 
 	private static Properties itestProperties;
 
@@ -94,7 +94,7 @@ public class ItestHostFactory {
 			return actualItestHost;
 		}
 		
-		logger.info("Using tunneled hosts for integration tests on {}", hostLabel);
+		logger.info("Starting SSH tunnels for integration tests on {}", hostLabel);
 
 		String tunnelPassword = getRequiredItestProperty(hostLabel + TUNNEL_PASSWORD_PROPERTY_SUFFIX);
 		String ports = getRequiredItestProperty(hostLabel + TUNNEL_PORTS_PROPERTY_SUFFIX);
