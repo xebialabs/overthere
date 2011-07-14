@@ -40,8 +40,7 @@ import java.nio.channels.Pipe;
 import java.util.Iterator;
 import java.util.List;
 
-
-public class WinRMClient {
+class WinRMClient {
 
 	private final URL targetURL;
 	private final HttpConnector connector;
@@ -105,7 +104,8 @@ public class WinRMClient {
 			return;
 		logger.debug("closeShell shellId {}", shellId);
 		final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, shellId, null);
-		Document responseDocument = sendMessage(requestDocument, null);
+		@SuppressWarnings("unused")
+        Document responseDocument = sendMessage(requestDocument, null);
 	}
 
 	private void cleanUp() {
@@ -115,7 +115,8 @@ public class WinRMClient {
 		final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", WinRMURI.NS_WIN_SHELL)).addAttribute("CommandId", commandId);
 		bodyContent.addElement(QName.get("Code", WinRMURI.NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
 		final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
-		Document responseDocument = sendMessage(requestDocument, SoapAction.SIGNAL);
+		@SuppressWarnings("unused")
+        Document responseDocument = sendMessage(requestDocument, SoapAction.SIGNAL);
 
 	}
 
@@ -173,7 +174,7 @@ public class WinRMClient {
 											 <rsp:ExitCode>0</rsp:ExitCode>
 										 </rsp:CommandState>
 									 */
-			final List list = ResponseExtractor.STREAM_DONE.getXPath().selectNodes(responseDocument);
+			final List<?> list = ResponseExtractor.STREAM_DONE.getXPath().selectNodes(responseDocument);
 			if (!list.isEmpty()) {
 				exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
 				logger.info("exit code {}", exitCode);
@@ -189,7 +190,8 @@ public class WinRMClient {
 
 	private String handleStream(Document responseDocument, ResponseExtractor stream) {
 		StringBuffer buffer = new StringBuffer();
-		final List streams = stream.getXPath().selectNodes(responseDocument);
+		@SuppressWarnings("unchecked")
+        final List<Element> streams = (List<Element>) stream.getXPath().selectNodes(responseDocument);
 		if (!streams.isEmpty()) {
 			final Base64 base64 = new Base64();
 			Iterator<Element> itStreams = streams.iterator();
@@ -229,7 +231,8 @@ public class WinRMClient {
 
 
 	private String getFirstElement(Document doc, ResponseExtractor extractor) {
-		final List nodes = extractor.getXPath().selectNodes(doc);
+		@SuppressWarnings("unchecked")
+        final List<Element> nodes = (List<Element>) extractor.getXPath().selectNodes(doc);
 		if (nodes.isEmpty())
 			throw new RuntimeException("Cannot find " + extractor.getXPath() + " in " + toString(doc));
 

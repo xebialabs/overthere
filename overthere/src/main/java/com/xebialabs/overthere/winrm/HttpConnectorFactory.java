@@ -16,11 +16,10 @@
  */
 package com.xebialabs.overthere.winrm;
 
-import com.xebialabs.overthere.winrm.connector.JdkHttpConnector;
-import com.xebialabs.overthere.winrm.connector.JdkHttpsConnector;
-import com.xebialabs.overthere.winrm.connector.JdkLazyHttpsConnector;
-
 import java.net.URL;
+
+import com.xebialabs.overthere.winrm.connector.JdkHttpConnector;
+import com.xebialabs.overthere.winrm.connector.LaxJdkHttpConnector;
 
 /**
  */
@@ -30,9 +29,7 @@ public class HttpConnectorFactory {
 			case HTTP:
 				return new JdkHttpConnector(targetURL, tokenGenerator);
 			case HTTPS:
-				return new JdkHttpsConnector(targetURL, tokenGenerator);
-			case HTTPS_LAZY:
-				return new JdkLazyHttpsConnector(targetURL, tokenGenerator);
+				return new LaxJdkHttpConnector(targetURL, tokenGenerator);
 		}
 		throw new IllegalArgumentException("Unsupported protocol " + p);
 	}

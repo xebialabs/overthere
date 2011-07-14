@@ -16,22 +16,20 @@
  */
 package com.xebialabs.overthere.winrm.connector;
 
-import com.xebialabs.overthere.winrm.TokenGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.HttpsURLConnection;
-import java.net.URL;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
-/**
- * Lazy SSL Connection ....
- */
-public class JdkLazyHttpsConnector extends JdkHttpConnector {
+class LaxHostnameVerifier implements HostnameVerifier {
 
-	static {
-		HttpsURLConnection.setDefaultHostnameVerifier(new LazyHostnameVerifier());
-		HttpsURLConnection.setDefaultSSLSocketFactory(new LazySSLSocketFactory());
+	@Override
+	public boolean verify(String hostname, SSLSession sslSession) {
+        logger.debug("Trusting host {}", hostname);
+		return true;
+
 	}
+	private static Logger logger = LoggerFactory.getLogger(LaxHostnameVerifier.class);
 
-	public JdkLazyHttpsConnector(URL targetURL, TokenGenerator tokenGenerator) {
-		super(targetURL, tokenGenerator);
-	}
 }

@@ -16,14 +16,17 @@
  */
 package com.xebialabs.overthere.winrm.exception;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import com.xebialabs.overthere.RuntimeIOException;
 
-public class WinRMRuntimeIOException extends RuntimeException {
+@SuppressWarnings("serial")
+public class WinRMRuntimeIOException extends RuntimeIOException {
 
 	final Document in;
 	final Document out;

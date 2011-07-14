@@ -16,7 +16,9 @@
  */
 package com.xebialabs.overthere.winrm.exception;
 
+@SuppressWarnings("serial")
 public class BlankValueRuntimeException extends RuntimeException {
+
 	public BlankValueRuntimeException(String message) {
 		super(message);
 	}

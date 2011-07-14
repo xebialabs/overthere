@@ -1,23 +1,19 @@
 package com.xebialabs.overthere.winrm;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import org.junit.Test;
-
-import static com.xebialabs.overthere.ConnectionOptions.*;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
+import org.junit.Test;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+
 public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 
-	static final String DEFAULT_SERVER = "WIN-2MGY3RY6XSH.deployit.local";
-	static final String DEFAULT_USERNAME = "hilversum";
-	static final String DEFAULT_PASSWORD = "Xe%%bia";
 	static final String KRB5_CONF = "src/test/resources/krb5.conf";
 	static final String LOGIN_CONF = "src/test/resources/login.conf";
 
@@ -26,7 +22,7 @@ public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 		CapturingOverthereProcessOutputHandler handler = capturingHandler();
 		int res = connection.execute(handler, CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
-		assertThat(handler.getOutput(), containsString("172.16.74.129"));
+		assertThat(handler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
 	@Test
@@ -35,7 +31,7 @@ public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 		CapturingOverthereProcessOutputHandler handler = capturingHandler();
 		int res = connection.execute(handler, CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
-		assertThat(handler.getOutput(), containsString("172.16.74.129"));
+		assertThat(handler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
 	@Test
@@ -54,18 +50,4 @@ public abstract class WinRMItestBase extends OverthereConnectionItestBase {
 		assertThat(handler.getOutput(), containsString("Total Files Listed"));
 	}
 
-	@Override
-	protected void setTypeAndOptions() throws Exception {
-		type = "cifs_winrm";
-		options = new ConnectionOptions();
-		options.set(OPERATING_SYSTEM, WINDOWS);
-		options.set(ADDRESS, DEFAULT_SERVER);
-		options.set(USERNAME, DEFAULT_USERNAME);
-		options.set(PASSWORD, DEFAULT_PASSWORD);
-		options.set(PORT, CifsWinRMConnectionBuilder.DEFAULT_HTTP_PORT);
-		options.set(CifsWinRMConnectionBuilder.CONTEXT, CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT);
-		options.set(CifsWinRMConnectionBuilder.PROTOCOL, Protocol.HTTP);
-		options.set(CifsWinRMConnectionBuilder.AUTHENTICATION, AuthenticationMode.BASIC);
-
-	}
 }

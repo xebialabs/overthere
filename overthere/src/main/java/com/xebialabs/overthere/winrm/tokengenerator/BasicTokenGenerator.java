@@ -24,4 +24,5 @@ public class BasicTokenGenerator implements TokenGenerator {
 	}
 
 	private final static Logger logger = LoggerFactory.getLogger(BasicTokenGenerator.class);
+
 }

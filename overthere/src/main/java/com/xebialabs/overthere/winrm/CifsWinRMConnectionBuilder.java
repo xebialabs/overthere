@@ -1,16 +1,18 @@
 package com.xebialabs.overthere.winrm;
 
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.winrm.tokengenerator.BasicTokenGenerator;
-import com.xebialabs.overthere.winrm.tokengenerator.KerberosTokenGenerator;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import static com.xebialabs.overthere.ConnectionOptions.*;
 
 @com.xebialabs.overthere.spi.Protocol(name = "cifs_winrm")
 public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
@@ -70,8 +72,6 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 		AuthenticationMode authenticationMode = options.get(AUTHENTICATION);
 
 		switch (authenticationMode) {
-			case KERBEROS:
-				return new KerberosTokenGenerator(address, username, password);
 			case BASIC:
 				return new BasicTokenGenerator(address, username, password);
 		}

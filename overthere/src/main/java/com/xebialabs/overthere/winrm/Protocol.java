@@ -22,7 +22,7 @@ package com.xebialabs.overthere.winrm;
  */
 public enum Protocol {
 
-	HTTP("http"), HTTPS("https"), HTTPS_LAZY("https");
+	HTTP("http"), HTTPS("https");
 
 	private final String protocol;
 

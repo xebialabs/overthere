@@ -16,26 +16,24 @@
  */
 package com.xebialabs.overthere.winrm.connector;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.security.SecureRandom;
+
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
 
-/**
- */
-public class LazySSLSocketFactory extends SSLSocketFactory {
+class LaxSSLSocketFactory extends SSLSocketFactory {
+
 	private SSLSocketFactory factory;
 
-	public LazySSLSocketFactory() {
+	public LaxSSLSocketFactory() {
 		try {
 			SSLContext sslcontext = SSLContext.getInstance("TLS");
-			sslcontext.init(
-					null, // No KeyManager required
-					new TrustManager[]{new LazyTrustManager()},
-					new java.security.SecureRandom());
+			sslcontext.init(null, new TrustManager[] { new LaxTrustManager() }, new SecureRandom());
 			factory = sslcontext.getSocketFactory();
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -43,7 +41,7 @@ public class LazySSLSocketFactory extends SSLSocketFactory {
 	}
 
 	public static SocketFactory getDefault() {
-		return new LazySSLSocketFactory();
+		return new LaxSSLSocketFactory();
 	}
 
 	public Socket createSocket() throws IOException {

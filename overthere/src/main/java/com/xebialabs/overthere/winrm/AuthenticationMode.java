@@ -19,5 +19,5 @@ package com.xebialabs.overthere.winrm;
 /**
  */
 public enum AuthenticationMode {
-	BASIC, KERBEROS
+	BASIC
 }

@@ -37,4 +37,5 @@ public enum Action {
 	public Element getElement() {
 		return DocumentHelper.createElement(QName.get("Action", WinRMURI.NS_ADDRESSING)).addAttribute("mustUnderstand", "true").addText(uri);
 	}
+
 }
