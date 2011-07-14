@@ -1,19 +1,49 @@
 package com.xebialabs.itest;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Maps.newHashMap;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ItestHostFactory {
 
+	public static final String HOSTNAME_PROPERTY_SUFFIX = ".hostname";
+
+	public static final String AMI_ID_PROPERTY_SUFFIX = ".amiId";
+
+	public static final String AWS_ENDPOINT_PROPERTY = "aws.endpoint";
+
+	public static final String AWS_ENDPOINT_DEFAULT = "https://ec2.amazonaws.com";
+
+	public static final String AWS_ACCESS_KEY_PROPERTY = "aws.accessKey";
+
+	public static final String AWS_SECRET_KEY_PROPERTY = "aws.secretKey";
+
+	public static final String AMI_INSTANCE_TYPE_PROPERTY_SUFFIX = ".amiInstanceType";
+
+	public static final String AMI_SECURITY_GROUP_PROPERTY_SUFFIX = ".amiSecurityGroup";
+
+	public static final String AMI_KEY_NAME_PROPERTY_SUFFIX = ".amiKeyName";
+
+	public static final String AMI_BOOT_SECONDS_PROPERTY_SUFFIX = ".amiBootSeconds";
+
+	public static final String TUNNEL_USERNAME_PROPERTY_SUFFIX = ".tunnel.username";
+
+	public static final String TUNNEL_PASSWORD_PROPERTY_SUFFIX = ".tunnel.password";
+
+	public static final String TUNNEL_PORTS_PROPERTY_SUFFIX = ".tunnel.ports";
+
 	// The field logger needs to be defined up here so that the static initialized below can use the logger
-	private static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
+	public static Logger logger = LoggerFactory.getLogger(ItestHostFactory.class);
 
 	private static Properties itestProperties;
 
@@ -30,12 +60,18 @@ public class ItestHostFactory {
 	}
 
 	private static ItestHost getItestHost(String hostLabel, boolean disableEc2) {
-		String hostname = getItestProperty(hostLabel + ".hostname");
-		String amiId = getItestProperty(hostLabel + ".amiId");
+		String hostname = getItestProperty(hostLabel + HOSTNAME_PROPERTY_SUFFIX);
+		String amiId = getItestProperty(hostLabel + AMI_ID_PROPERTY_SUFFIX);
 
 		checkState(hostname == null || amiId == null, "Both a hostname (" + hostname + ") and an AMI id (" + amiId + ") have been specified for host label " + hostLabel);
 
-		if (hostname != null) {
+		ItestHost ih = createItestHost(hostLabel, disableEc2, hostname, amiId);
+		ih = wrapItestHost(hostLabel, ih);
+		return ih;
+	}
+
+	protected static ItestHost createItestHost(String hostLabel, boolean disableEc2, String hostname, String amiId) {
+	    if (hostname != null) {
 			logger.info("Using existing host for integration tests on {}", hostLabel);
 			return new ExistingItestHost(hostLabel);
 		}
@@ -50,7 +86,38 @@ public class ItestHostFactory {
 		}
 
 		throw new IllegalStateException("Neither a hostname (" + hostname + ") nor an AMI id (" + amiId + ") have been specified for host label " + hostLabel);
-	}
+    }
+
+	private static ItestHost wrapItestHost(String hostLabel, ItestHost actualItestHost) {
+		String tunnelUsername = getItestProperty(hostLabel + TUNNEL_USERNAME_PROPERTY_SUFFIX);
+		if(tunnelUsername == null) {
+			return actualItestHost;
+		}
+		
+		logger.info("Starting SSH tunnels for integration tests on {}", hostLabel);
+
+		String tunnelPassword = getRequiredItestProperty(hostLabel + TUNNEL_PASSWORD_PROPERTY_SUFFIX);
+		String ports = getRequiredItestProperty(hostLabel + TUNNEL_PORTS_PROPERTY_SUFFIX);
+		Map<Integer, Integer> portForwardMap = parsePortsProperty(ports);
+		return new TunneledItestHost(actualItestHost, tunnelUsername, tunnelPassword, portForwardMap);
+    }
+
+	private static Map<Integer, Integer> parsePortsProperty(String ports) {
+		Map<Integer, Integer> portForwardMap = newHashMap();
+		StringTokenizer toker = new StringTokenizer(ports, ",");
+		while(toker.hasMoreTokens()) {
+			String[] localAndRemotePort = toker.nextToken().split(":");
+			checkArgument(localAndRemotePort.length == 2, "Property value \"%s\" does not have the right format, e.g. 2222:22,1445:445", ports);
+			try {
+				int localPort = Integer.parseInt(localAndRemotePort[0]);
+				int remotePort = Integer.parseInt(localAndRemotePort[1]);
+				portForwardMap.put(remotePort, localPort);
+			} catch(NumberFormatException exc) {
+				throw new IllegalArgumentException("Property value \"" + ports + "\" does not have the right format, e.g. 2222:22,1445:445", exc);
+			}
+		}
+		return portForwardMap;
+    }
 
 	private static Properties readItestProperties() {
 		try {

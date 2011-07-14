@@ -16,36 +16,20 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
 import jcifs.smb.SmbFile;
-
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
-import com.xebialabs.overthere.spi.Protocol;
+import java.io.*;
+import java.net.URLEncoder;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
 
 /**
  * A connection to a remote host using CIFS and Telnet.
@@ -61,11 +45,23 @@ import com.xebialabs.overthere.spi.Protocol;
 @Protocol(name = "cifs_telnet")
 public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
-	private String address;
+	/**
+	 * Connection option that specifies the CIFS port to connect to.
+	 */
+	public static final String CIFS_PORT = "cifsPort";
 
-	private String username;
+	/**
+	 * Default value for connection option that specifies the CIFS port to connect to.
+	 */
+	public static final int CIFS_PORT_DEFAULT = 445;
 
-	private String password;
+	protected String address;
+
+	protected int cifsPort;
+
+	protected String username;
+
+	protected String password;
 
 	private static final String DETECTABLE_WINDOWS_PROMPT = "WINDOWS4DEPLOYIT ";
 
@@ -84,6 +80,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.address = options.get(ADDRESS);
+		this.cifsPort = options.get(CIFS_PORT, CIFS_PORT_DEFAULT);
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
 	}
@@ -300,6 +297,10 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		smbUrl.append(urlEncode(password));
 		smbUrl.append("@");
 		smbUrl.append(urlEncode(address));
+		if(cifsPort != CIFS_PORT_DEFAULT) {
+			smbUrl.append(":");
+			smbUrl.append(cifsPort);
+		}
 		smbUrl.append("/");
 
 		if (hostPath.length() < 2) {

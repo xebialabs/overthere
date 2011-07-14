@@ -110,11 +110,9 @@ public class ConnectionOptions {
 	 *            the key of the connection option.
 	 * @param value
 	 *            the value of the connection option.
-	 * @return a reference to the updated object so that method calls can be chained together.
 	 */
-	public ConnectionOptions set(String key, Object value) {
+	public void set(String key, Object value) {
 		options.put(key, value);
-		return this;
 	}
 
 	/**

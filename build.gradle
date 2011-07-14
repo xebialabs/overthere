@@ -33,14 +33,14 @@ subprojects {
 	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/artifacts.gradle'
 
 	sourceCompatibility = 1.6
-	targetCompatibility = 1.6	
+	targetCompatibility = 1.6
 
 	configurations {
 	    compile {
 	        transitive = false
 	    }
 	}
-	
+
 	test {
 		excludes = ["**/*Itest.*"]
 	}

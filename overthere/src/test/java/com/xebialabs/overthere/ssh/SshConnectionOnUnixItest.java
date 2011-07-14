@@ -5,11 +5,13 @@ import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
@@ -67,7 +69,10 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 	@Override
 	protected void setTypeAndOptions() throws Exception {
 		type = "ssh";
-		options = new ConnectionOptions(partialOptions).set(OPERATING_SYSTEM, UNIX).set(ADDRESS, host.getHostName());
+		options = new ConnectionOptions(partialOptions);
+		options.set(OPERATING_SYSTEM, UNIX);
+		options.set(ADDRESS, host.getHostName());
+		options.set(PORT, host.getPort(22));
 	}
 	
 	@Test
@@ -152,6 +157,7 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 		options.set(USERNAME, "untrusted");
 		options.set(PASSWORD, "donttrustme");
 		options.set("sudoUsername", "overthere");
+		options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
 		return options;
     }
 
