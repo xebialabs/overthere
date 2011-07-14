@@ -45,7 +45,19 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 @Protocol(name = "cifs_telnet")
 public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
+	/**
+	 * Connection option that specifies the CIFS port to connect to.
+	 */
+	public static final String CIFS_PORT = "cifsPort";
+
+	/**
+	 * Default value for connection option that specifies the CIFS port to connect to.
+	 */
+	public static final int CIFS_PORT_DEFAULT = 445;
+
 	protected String address;
+
+	protected int cifsPort;
 
 	protected String username;
 
@@ -68,6 +80,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.address = options.get(ADDRESS);
+		this.cifsPort = options.get(CIFS_PORT, CIFS_PORT_DEFAULT);
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
 	}
@@ -284,6 +297,10 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		smbUrl.append(urlEncode(password));
 		smbUrl.append("@");
 		smbUrl.append(urlEncode(address));
+		if(cifsPort != CIFS_PORT_DEFAULT) {
+			smbUrl.append(":");
+			smbUrl.append(cifsPort);
+		}
 		smbUrl.append("/");
 
 		if (hostPath.length() < 2) {
