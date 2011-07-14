@@ -69,7 +69,10 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 	@Override
 	protected void setTypeAndOptions() throws Exception {
 		type = "ssh";
-		options = new ConnectionOptions(partialOptions).set(OPERATING_SYSTEM, UNIX).set(ADDRESS, host.getHostName()).set(PORT, host.getPort(22));
+		options = new ConnectionOptions(partialOptions);
+		options.set(OPERATING_SYSTEM, UNIX);
+		options.set(ADDRESS, host.getHostName());
+		options.set(PORT, host.getPort(22));
 	}
 	
 	@Test
