@@ -19,12 +19,13 @@ dependencies {
 
 	// WinRM
 	compile('dom4j:dom4j:1.6.1') {
-		exclude group: 'xml-apis'
+		exclude group: 'xml-apis', module: 'xml-apis'
 	}
 	compile('jaxen:jaxen:1.1.1') {
-		exclude group: 'xml-apis'
-		exclude group: 'xalan'
-		exclude group: 'xerces'
+		exclude group: 'xml-apis', module: 'xml-apis'
+		exclude group: 'xalan', module: 'xalan'
+		exclude group: 'xerces', module: 'xmlParserAPIs'
+		exclude group: 'xerces', module: 'xercesImpl'
 	}
 	compile 'org.apache.httpcomponents:httpclient:4.1.1'
 	compile 'commons-codec:commons-codec:1.5'
