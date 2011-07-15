@@ -40,7 +40,7 @@ public class ConnectionOptions {
 	/**
 	 * Connection option (Boolean) for most protocols that specifies whether to delete the connection-scope temporary directory when the connection is closed.
 	 */
-	public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmp.deleteOnDisconnect";
+	public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmpDeleteOnDisconnect";
 
 	/**
 	 * Default value (true) for the connection option that specifies whether to delete the connection-scope temporary directory when the connection is closed.
@@ -50,7 +50,7 @@ public class ConnectionOptions {
 	/**
 	 * Connection option (int) for most protocol that specifies how many times to retry creating a unique temporary file name before giving up. 
 	 */
-	public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmp.fileCreationRetries";
+	public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmpFileCreationRetries";
 
 	/**
 	 * Defalut value (100) for connection option that specifies how many times to retry creating a unique temporary file name before giving up. 
