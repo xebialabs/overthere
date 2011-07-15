@@ -4,6 +4,8 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
+import static com.xebialabs.overthere.winrm.Protocol.HTTP;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,20 +19,27 @@ import com.xebialabs.overthere.winrm.tokengenerator.BasicTokenGenerator;
 @com.xebialabs.overthere.spi.Protocol(name = "cifs_winrm")
 public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 
-	public static final String PROTOCOL = "protocol";
-	public static final String CONTEXT = "context";
-	public static final String TIMEMOUT = "timemout";
-	public static final String ENVELOP_SIZE = "envelopSize";
-	public static final String LOCALE = "locale";
-	public static final String AUTHENTICATION = "authenticationMode";
+	public static final int DEFAULT_PORT_HTTP = 5985;
+	public static final int DEFAULT_PORT_HTTPS = 5986;
 
-	//eg PT60.000S I don't know what is this format ...
-	public static final String DEFAULT_TIMEOUT = "PT60.000S";
-	public static final long DEFAULT_MAX_ENV_SIZE = 153600;
-	public static final String DEFAULT_LOCALE = "en-US";
+	public static final String PROTOCOL = "winrmProtocol";
+	public static final Protocol DEFAULT_PROTOCOL = Protocol.HTTP;
+	
+	public static final String CONTEXT = "winrmContext";
 	public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
-	public static final int DEFAULT_HTTP_PORT = 5985;
-	public static final int DEFAULT_HTTPS_PORT = 5986;
+	
+	public static final String AUTHENTICATION = "winrmAuthenticationMode";
+	private static final AuthenticationMode DEFAULT_AUTHENTICATION = BASIC;
+
+	public static final String TIMEMOUT = "winrmTimeout";
+	public static final String DEFAULT_TIMEOUT = "PT60.000S";
+	// FIXME: Figure out what format this is
+
+	public static final String ENVELOP_SIZE = "winrmEnvelopSize";
+	public static final long DEFAULT_ENVELOP_SIZE = 153600;
+
+	public static final String LOCALE = "winrmLocale";
+	public static final String DEFAULT_LOCALE = "en-US";
 
 
 	private final HttpConnector httpConnector;
@@ -39,14 +48,14 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 	private final WinRMClient winRMClient;
 
 	public CifsWinRMConnectionBuilder(String type, ConnectionOptions options) {
-		Protocol protocol = options.get(PROTOCOL, Protocol.HTTP);
+		Protocol protocol = options.get(PROTOCOL, DEFAULT_PROTOCOL);
 		TokenGenerator tokenGenerator = getTokenGenerator(options);
 		targetURL = getTargetURL(protocol, options);
 		httpConnector = HttpConnectorFactory.newHttpConnector(protocol, targetURL, tokenGenerator);
 
 		winRMClient = new WinRMClient(httpConnector, targetURL);
 		winRMClient.setTimeout(options.<String>get(TIMEMOUT, DEFAULT_TIMEOUT));
-		winRMClient.setEnvelopSize(options.<Long>get(ENVELOP_SIZE, DEFAULT_MAX_ENV_SIZE));
+		winRMClient.setEnvelopSize(options.<Long>get(ENVELOP_SIZE, DEFAULT_ENVELOP_SIZE));
 		winRMClient.setLocale(options.get(LOCALE, DEFAULT_LOCALE));
 
 		connection = new CifsWinRMConnection(type, options, winRMClient);
@@ -55,7 +64,7 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 	private URL getTargetURL(Protocol protocol, ConnectionOptions options) {
 		String address = options.get(ADDRESS);
 		String context = options.get(CONTEXT, DEFAULT_WINRM_CONTEXT);
-		int port = options.get(PORT, DEFAULT_HTTP_PORT);
+		int port = options.get(PORT, protocol == HTTP ? DEFAULT_PORT_HTTP : DEFAULT_PORT_HTTPS);
 
 		try {
 			return new URL(protocol.get(), address, port, context);
@@ -69,7 +78,7 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 		String address = options.get(ADDRESS);
 		String username = options.get(USERNAME);
 		String password = options.get(PASSWORD);
-		AuthenticationMode authenticationMode = options.get(AUTHENTICATION);
+		AuthenticationMode authenticationMode = options.get(AUTHENTICATION, DEFAULT_AUTHENTICATION);
 
 		switch (authenticationMode) {
 			case BASIC:

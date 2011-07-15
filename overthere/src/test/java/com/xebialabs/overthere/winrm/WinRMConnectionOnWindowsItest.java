@@ -13,8 +13,8 @@ import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAUL
 import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.AUTHENTICATION;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.CONTEXT;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_HTTPS_PORT;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_HTTP_PORT;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTPS;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTP;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.PROTOCOL;
 import static com.xebialabs.overthere.winrm.Protocol.HTTP;
@@ -46,7 +46,7 @@ public class WinRMConnectionOnWindowsItest extends WinRMItestBase {
 
 	@BeforeClass
 	public static void setupHost() {
-		host = getItestHost("overthere-win");
+		host = getItestHost("overthere-windows");
 		host.setup();
 	}
 	
@@ -75,7 +75,7 @@ public class WinRMConnectionOnWindowsItest extends WinRMItestBase {
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
 		lopco.add(new Object[] { createHttpBasicOptions() });
-		lopco.add(new Object[] { createHttpsLazyBasicOptions() });
+		lopco.add(new Object[] { createHttpsBasicOptions() });
 		return lopco;
 	}
 
@@ -85,18 +85,18 @@ public class WinRMConnectionOnWindowsItest extends WinRMItestBase {
 		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		partialOptions.set(PROTOCOL, HTTP);
-		partialOptions.set(PORT, DEFAULT_HTTP_PORT);
+		partialOptions.set(PORT, DEFAULT_PORT_HTTP);
 		partialOptions.set(AUTHENTICATION, BASIC);
 	    return partialOptions;
     }
 
-	private static ConnectionOptions createHttpsLazyBasicOptions() {
+	private static ConnectionOptions createHttpsBasicOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
 		partialOptions.set(USERNAME, DEFAULT_USERNAME);
 		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		partialOptions.set(PROTOCOL, HTTPS);
-		partialOptions.set(PORT, DEFAULT_HTTPS_PORT);
+		partialOptions.set(PORT, DEFAULT_PORT_HTTPS);
 		partialOptions.set(AUTHENTICATION, BASIC);
 		return partialOptions;
 	}
