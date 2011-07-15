@@ -17,7 +17,7 @@ defaultTasks 'build'
 apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/dependencies.gradle'
 
 allprojects {
-	version = "1.0-alpha-13"
+	version = "1.0-alpha-14-SNAPSHOT"
 	group = "com.xebialabs.overthere"
 
 	apply plugin: 'idea'
