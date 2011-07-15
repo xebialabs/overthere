@@ -49,7 +49,7 @@ class WinRMClient {
 	private final Pipe stderrPipe;
 
 	private String timeout;
-	private long envelopSize;
+	private int envelopSize;
 	private String locale;
 
 	private String exitCode;
@@ -324,11 +324,11 @@ class WinRMClient {
 		this.timeout = timeout;
 	}
 
-	public long getEnvelopSize() {
+	public int getEnvelopSize() {
 		return envelopSize;
 	}
 
-	public void setEnvelopSize(long envelopSize) {
+	public void setEnvelopSize(int envelopSize) {
 		this.envelopSize = envelopSize;
 	}
 

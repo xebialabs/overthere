@@ -36,7 +36,7 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 	// FIXME: Figure out what format this is
 
 	public static final String ENVELOP_SIZE = "winrmEnvelopSize";
-	public static final long DEFAULT_ENVELOP_SIZE = 153600;
+	public static final int DEFAULT_ENVELOP_SIZE = 153600;
 
 	public static final String LOCALE = "winrmLocale";
 	public static final String DEFAULT_LOCALE = "en-US";
@@ -54,8 +54,8 @@ public class CifsWinRMConnectionBuilder implements OverthereConnectionBuilder {
 		httpConnector = HttpConnectorFactory.newHttpConnector(protocol, targetURL, tokenGenerator);
 
 		winRMClient = new WinRMClient(httpConnector, targetURL);
-		winRMClient.setTimeout(options.<String>get(TIMEMOUT, DEFAULT_TIMEOUT));
-		winRMClient.setEnvelopSize(options.<Long>get(ENVELOP_SIZE, DEFAULT_ENVELOP_SIZE));
+		winRMClient.setTimeout(options.get(TIMEMOUT, DEFAULT_TIMEOUT));
+		winRMClient.setEnvelopSize(options.get(ENVELOP_SIZE, DEFAULT_ENVELOP_SIZE));
 		winRMClient.setLocale(options.get(LOCALE, DEFAULT_LOCALE));
 
 		connection = new CifsWinRMConnection(type, options, winRMClient);
