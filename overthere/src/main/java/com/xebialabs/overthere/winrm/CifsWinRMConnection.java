@@ -26,7 +26,7 @@ public class CifsWinRMConnection extends CifsTelnetConnection {
 
 	@Override
 	public void doDisconnect() {
-		System.out.println("CifsWinRMConnection.doDisconnect.....");
+		// no-op
 	}
 
 	@Override
