@@ -3,7 +3,7 @@
 dependencies {
 	// General dependencies
 	compile 'com.google.guava:guava:r09'
-	compile 'nl.javadude.scannit:scannit:0.6'
+	compile 'nl.javadude.scannit:scannit:0.9'
 	compile 'org.slf4j:slf4j-api:1.6.1'
 
 	// SSH
