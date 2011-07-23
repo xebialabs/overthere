@@ -25,7 +25,7 @@ public class CifsWinRMConnection extends CifsTelnetConnection {
 	}
 
 	@Override
-	public void doDisconnect() {
+	public void doClose() {
 		// no-op
 	}
 

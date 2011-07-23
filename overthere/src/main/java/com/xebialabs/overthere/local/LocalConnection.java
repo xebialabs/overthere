@@ -65,7 +65,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	}
 	
 	@Override
-	public void doDisconnect() {
+	public void doClose() {
 		// no-op
 	}
 

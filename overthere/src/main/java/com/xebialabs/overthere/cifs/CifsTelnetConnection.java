@@ -91,7 +91,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	}
 	
 	@Override
-	public void doDisconnect() {
+	public void doClose() {
 		// no-op
 	}
 

@@ -53,7 +53,7 @@ class SshSftpConnection extends SshConnection {
 	}
 
 	@Override
-	public void doDisconnect() {
+	public void doClose() {
         checkState(sharedSftpClient != null, "Not connected to SFTP");
 
         logger.debug("Closing SFTP client to {}", this);
@@ -64,7 +64,7 @@ class SshSftpConnection extends SshConnection {
         }
 
         sharedSftpClient = null;
-        super.doDisconnect();
+        super.doClose();
 	}
 
     protected SFTPClient getSharedSftpClient() {

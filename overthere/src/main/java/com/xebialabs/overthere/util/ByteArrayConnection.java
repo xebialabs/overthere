@@ -13,7 +13,7 @@ class ByteArrayConnection extends OverthereConnection {
     }
 
 	@Override
-	protected void doDisconnect() {
+	protected void doClose() {
 		// no-op
 	}
 

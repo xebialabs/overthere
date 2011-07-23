@@ -113,7 +113,7 @@ abstract class SshConnection extends OverthereConnection {
 	}
 
     @Override
-    public void doDisconnect() {
+    public void doClose() {
     	checkState(sshClient != null, "Already disconnected");
         try {
             sshClient.disconnect();

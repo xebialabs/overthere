@@ -30,6 +30,7 @@ import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
@@ -46,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * 
  * All methods in this interface may throw a {@link RuntimeIOException} if an error occurs. Checked {@link IOException IOExceptions} are never thrown.
  */
-public abstract class OverthereConnection {
+public abstract class OverthereConnection implements Closeable {
 
 	protected String type;
 
@@ -85,12 +86,12 @@ public abstract class OverthereConnection {
 	 * Closes the connection. Depending on the {@link ConnectionOptions#TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT} connection option, deletes all temporary files
 	 * that have been created on the host.
 	 */
-	public final void disconnect() {
+	public final void close() {
 		if (deleteTemporaryDirectoryOnDisconnect) {
 			deleteConnectionTemporaryDirectory();
 		}
 
-		doDisconnect();
+		doClose();
 
 		logger.info("Disconnected from {}", this);
 	}
@@ -98,7 +99,7 @@ public abstract class OverthereConnection {
 	/**
 	 * To be overridden by a base class to implement connection specific disconnection logic.
 	 */
-	protected abstract void doDisconnect();
+	protected abstract void doClose();
 
 	/**
 	 * Creates a reference to a file on the host.
