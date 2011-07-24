@@ -16,8 +16,17 @@
  */
 package com.xebialabs.overthere;
 
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.endsWith;
@@ -26,12 +35,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
+import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Random;
@@ -41,10 +52,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.local.LocalFile;
+import com.xebialabs.overthere.ssh.SshSudoTests;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 public abstract class OverthereConnectionItestBase {
@@ -84,6 +100,116 @@ public abstract class OverthereConnectionItestBase {
 			}
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+    @Test
+	public void shouldNotConnectWithIncorrectUsername() {
+		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs_telnet")), not(equalTo("cifs_winrm"))));
+
+		options.set("username", "an-incorrect-username");
+		try {
+			Overthere.getConnection(type, options);
+			fail("Expected not to be able to connect with an incorrect username");
+		} catch (RuntimeIOException expected) {
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+    @Test
+	public void shouldNotConnectWithIncorrectPassword() {
+		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs_telnet")), not(equalTo("cifs_winrm"))));
+
+		assumeThat(options.get("password"), notNullValue());
+
+		options.set("password", "an-incorrect-password");
+		try {
+			Overthere.getConnection(type, options);
+			fail("Expected not to be able to connect with an incorrect password");
+		} catch (RuntimeIOException expected) {
+		}
+	}
+
+	@Test
+	public void commandWithPipeShouldHaveTwoSudoSections() {
+		SshSudoTests.commandWithPipeShouldHaveTwoSudoSections(connection);
+	}
+
+	@Test
+	public void commandWithSemiColonShouldHaveTwoSudoSections() {
+		SshSudoTests.commandWithSemiColonShouldHaveTwoSudoSections(connection);
+	}
+
+
+	@Test
+	public void shouldExecuteSimpleCommandOnUnix() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("ls", "-ld", "/tmp/."));
+		assertThat(res, equalTo(0));
+		if (captured.getOutputLines().size() == 2) {
+			// When using ssh_interactive_sudo, the first line may contain a password prompt.
+			assertThat(captured.getOutputLines().get(0), containsString("assword"));
+			assertThat(captured.getOutputLines().get(1), containsString("drwxrwxrwt"));
+		} else {
+			assertThat(captured.getOutputLines().size(), equalTo(1));
+			assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
+		}
+	}
+
+	@Test
+	public void shouldStartProcessSimpleCommandOnUnix() throws IOException, InterruptedException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+
+		OverthereProcess p = connection.startProcess(CmdLine.build("ls", "-ld", "/tmp/."));
+		try {
+			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
+			assertThat(p.waitFor(), equalTo(0));
+			assertThat(commandOutput, containsString("drwxrwxrwt"));
+		} finally {
+			p.destroy();
+		}
+	}
+
+	@Test
+	public void shouldListFilesInCDriveOnWindows() throws IOException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+
+		OverthereFile cDrive = connection.getFile("C:");
+		OverthereFile autoexecBat = cDrive.getFile("Program Files");
+		List<OverthereFile> filesInCDrive = cDrive.listFiles();
+
+		assertThat(filesInCDrive.contains(autoexecBat), equalTo(true));
+	}
+
+	@Test
+	public void shouldExecuteSimpleCommandOnWindows() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
+		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
+	}
+	
+	@Test
+	public void shouldExecuteCommandWithArgumentOnWindows() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/w"));
+		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), containsString("[..]"));
+	}
+
+	@Test
+	public void shoudNotExecuteIncorrectCommandOnWindows() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+
+		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
+		assertThat(res, not(equalTo(0)));
+	}
+
 
 	@Test
 	public void shouldCreateWriteReadAndRemoveTemporaryFile() throws IOException {
@@ -229,8 +355,146 @@ public abstract class OverthereConnectionItestBase {
 		LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);	
 	}
 
+    @Test
+	public void shouldCopyDirectoryContentToOtherLocation() throws IOException {
+		OverthereFile tempDir = connection.getTempFile("tempdir");
+        tempDir.mkdir();
+        //Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
+        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
+
+        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
+        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
+        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+
+        sourceFolder.copyTo(target);
+
+        try {
+            assertThat(target.getFile("sourceFile").exists(), is(true));
+        } finally {
+            // When using a sudo connection, the target folder has different rights to the temp folder it was created in.
+            target.deleteRecursively();
+        }
+	}
+
+    @Test
+	public void shouldCopyDirectoryContentToExistingOtherLocation() throws IOException {
+		OverthereFile tempDir = connection.getTempFile("tempdir");
+        tempDir.mkdir();
+
+        //Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
+        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
+        target.mkdir();
+
+        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
+        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
+        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+
+        sourceFolder.copyTo(target);
+
+        try {
+            assertThat(target.getFile("sourceFile").exists(), is(true));
+        } finally {
+            // When using a sudo connection, the target folder has different rights to the temp folder it was created in.
+            target.deleteRecursively();
+        }
+	}
+
+	/**
+	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (specifically for SSH/SUDO connections).
+	 */
 	@Test
-	public void shouldSetExecutable() {
+	public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectoryOnUnix() throws IOException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+		assumeThat(type, not(equalTo("local")));
+
+		// get handle to file in home dir
+		final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());
+		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+
+		// write data to file in home dir
+		final byte[] contentsWritten = generateRandomBytes(SMALL_FILE_SIZE);
+		ByteStreams.write(contentsWritten, new OutputSupplier<OutputStream>() {
+			@Override
+            public OutputStream getOutput() throws IOException {
+	            return fileInHomeDir.getOutputStream();
+            }
+		});
+		
+		assertThat(fileInHomeDir.exists(), equalTo(true));
+
+		// restrict access to file in home dir
+		connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
+
+		// read file from home dir
+		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
+		InputStream in = fileInHomeDir.getInputStream();
+		try {
+			ByteStreams.readFully(in, contentsRead);
+		} finally {
+			in.close();
+		}
+		assertThat(contentsRead, equalTo(contentsWritten));
+
+		// restrict access to file in home dir
+		fileInHomeDir.delete();
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+	}
+
+	/**
+	 * Tests whether copyTo has the right permission behaviour (specifically for SSH/SUDO connections).
+	 */
+	@Test
+	public void shouldCopyFileToAndFromSudoUserHomeDirectoryOnUnix() throws IOException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+		assumeThat(type, not(equalTo("local")));
+
+		// get handle to file in home dir
+		final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());
+		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+
+		// write random data to local file
+		File smallFile = temp.newFile("small.dat");
+		byte[] contentsWritten = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+		OverthereFile smallLocalFile = LocalFile.valueOf(smallFile);
+		
+		// copy local file to file in home dir
+		smallLocalFile.copyTo(fileInHomeDir);
+
+		assertThat(fileInHomeDir.exists(), equalTo(true));
+		
+		// restrict access to file in home dir
+		connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
+
+		// copy file in home dir to local file
+		File smallFileReadBack = temp.newFile("small-read-back.dat");
+		OverthereFile smallLocalFileReadBack = LocalFile.valueOf(smallFileReadBack);
+		fileInHomeDir.copyTo(smallLocalFileReadBack);
+		
+		// read new local file
+		byte[] contentsRead = new byte[SMALL_FILE_SIZE];
+		InputStream in = smallLocalFileReadBack.getInputStream();
+		ByteStreams.readFully(in, contentsRead);
+
+		assertThat(contentsRead, equalTo(contentsWritten));
+
+		// remove file from home dir
+		fileInHomeDir.delete();
+		assertThat(fileInHomeDir.exists(), equalTo(false));
+	}
+
+	protected String getUnixHomeDirPath() {
+		String sudoUsername = options.get(SUDO_USERNAME);
+		if(sudoUsername != null) {
+			return "/home/" + sudoUsername;
+		} else {
+			return "/home/" + options.get(USERNAME);
+		}
+    }
+
+	@Test
+	public void shouldSetExecutableOnUnix() {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
 
 		OverthereFile remoteFile = connection.getTempFile("executable.sh");
@@ -259,5 +523,7 @@ public abstract class OverthereConnectionItestBase {
 		new Random().nextBytes(randomBytes);
 	    return randomBytes;
     }
+
+	private static Logger logger = LoggerFactory.getLogger(OverthereConnectionItestBase.class);
 
 }

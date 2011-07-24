@@ -1,19 +1,23 @@
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+
 import org.junit.Before;
 import org.junit.Test;
 
-public class SshInteractiveSudoConnectionTest {
+import com.xebialabs.overthere.ConnectionOptions;
+
+public class SshInteractiveSudoConnectionOptionsTest {
 
 	private ConnectionOptions connectionOptions;
 
 	@Before
 	public void init() {
 		connectionOptions = new ConnectionOptions();
-		connectionOptions.set(ConnectionOptions.PASSWORD, "foo");
-		connectionOptions.set(ConnectionOptions.OPERATING_SYSTEM, OperatingSystemFamily.UNIX);
+		connectionOptions.set(OPERATING_SYSTEM, UNIX);
+		connectionOptions.set(PASSWORD, "foo");
 	}
 
 	@Test(expected = IllegalArgumentException.class)

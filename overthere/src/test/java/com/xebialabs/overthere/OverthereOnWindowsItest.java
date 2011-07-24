@@ -27,9 +27,6 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsTelnetConnection.TELNET_PORT_DEFAULT;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.AUTHENTICATION;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.CONTEXT;
@@ -39,10 +36,6 @@ import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_W
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.PROTOCOL;
 import static com.xebialabs.overthere.winrm.Protocol.HTTP;
 import static com.xebialabs.overthere.winrm.Protocol.HTTPS;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -50,18 +43,11 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.xebialabs.itest.ItestHost;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 @RunWith(Parameterized.class)
 public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
@@ -141,37 +127,4 @@ public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 		options.set(CIFS_PORT, host.getPort(CIFS_PORT_DEFAULT));
 	}
 
-	@Test
-	public void shouldListFilesInCDrive() throws IOException {
-		OverthereFile cDrive = connection.getFile("C:");
-		OverthereFile autoexecBat = cDrive.getFile("Program Files");
-		List<OverthereFile> filesInCDrive = cDrive.listFiles();
-
-		assertThat(filesInCDrive.contains(autoexecBat), equalTo(true));
-	}
-
-	@Test
-	public void shouldExecuteSimpleCommand() {
-		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
-		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
-	}
-	
-	@Test
-	public void shouldExecuteCommandWithArgument() {
-		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/w"));
-		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), containsString("[..]"));
-	}
-
-	@Test
-	public void shoudNotExecuteIncorrectCommand() {
-		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
-		assertThat(res, not(equalTo(0)));
-	}
-
-	private static Logger logger = LoggerFactory.getLogger(OverthereOnWindowsItest.class);
-	
 }

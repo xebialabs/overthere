@@ -1,4 +1,4 @@
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.itest.ItestHostFactory.getItestHost;
@@ -17,7 +17,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
@@ -37,16 +37,15 @@ import org.junit.runners.Parameterized.Parameters;
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 import com.xebialabs.itest.ItestHost;
-import com.xebialabs.overthere.ConnectionOptions;
 
 @RunWith(Parameterized.class)
-public class SshConnectionOnUnixItest extends SshConnectionItestBase {
+public class OverthereOnUnixItest extends OverthereConnectionItestBase {
 
 	protected static ItestHost host;
 
 	private final ConnectionOptions partialOptions;
 	
-	private final Class<?> expectedClass;
+	private final String expectedClass;
 
 	@BeforeClass
 	public static void setupHost() {
@@ -61,7 +60,7 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 		}
 	}
 
-	public SshConnectionOnUnixItest(ConnectionOptions partialOptions, Class<?> expectedClass) {
+	public OverthereOnUnixItest(ConnectionOptions partialOptions, String expectedClass) {
 		this.partialOptions = partialOptions;
 		this.expectedClass = expectedClass;
 	}
@@ -77,16 +76,16 @@ public class SshConnectionOnUnixItest extends SshConnectionItestBase {
 	
 	@Test
 	public void connectionObjectShouldBeInstanceOfExpectedClass() {
-		assertThat(connection, instanceOf(expectedClass));
+		assertThat(connection.getClass().getName(), equalTo(expectedClass));
 	}
 
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { createSftpOptions(), SshSftpConnection.class });
-		lopco.add(new Object[] { createScpOptions(), SshScpConnection.class });
-		lopco.add(new Object[] { createSudoOptions(), SshSudoConnection.class });
-		lopco.add(new Object[] { createInteractiveSudoOptions(), SshInteractiveSudoConnection.class });
+		lopco.add(new Object[] { createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
+		lopco.add(new Object[] { createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
+		lopco.add(new Object[] { createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
+		lopco.add(new Object[] { createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
 		return lopco;
 	}
 
