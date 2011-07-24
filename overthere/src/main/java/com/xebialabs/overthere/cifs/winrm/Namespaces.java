@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
 import org.dom4j.Namespace;
 
 /**
+ * Contains namespaces used by WinRM.
  */
-public class WinRMURI {
+public class Namespaces {
 
 	public static final Namespace NS_SOAP_ENV = Namespace.get("env", "http://www.w3.org/2003/05/soap-envelope");
 	public static final Namespace NS_ADDRESSING = Namespace.get("a", "http://schemas.xmlsoap.org/ws/2004/08/addressing");

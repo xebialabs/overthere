@@ -2,7 +2,7 @@ package com.xebialabs.overthere;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,8 +28,8 @@ public abstract class ParametrizedOverthereConnectionItestBase extends ItestHost
 		options = new ConnectionOptions(partialOptions);
 		options.set(ADDRESS, host.getHostName());
 		options.set(PORT, host.getPort(partialOptions.<Integer>get(PORT)));
-		if(options.get(CIFS_PORT) != null) {
-			options.set(CIFS_PORT, host.getPort(options.<Integer>get(CIFS_PORT)));
+		if(options.getOptional(CIFS_PORT) != null) {
+			options.set(CIFS_PORT, host.getPort(options.<Integer>getOptional(CIFS_PORT)));
 		}
 	}
 

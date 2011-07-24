@@ -14,10 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm.connector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public interface TokenGenerator {
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
-	public String generateToken();
+class LaxHostnameVerifier implements HostnameVerifier {
+
+	@Override
+	public boolean verify(String hostname, SSLSession sslSession) {
+        logger.debug("Trusting host {}", hostname);
+		return true;
+
+	}
+	private static Logger logger = LoggerFactory.getLogger(LaxHostnameVerifier.class);
+
 }

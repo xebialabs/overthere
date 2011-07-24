@@ -14,23 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
+import com.google.common.collect.Lists;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
 
-public enum ResourceURI {
+import java.util.List;
 
-	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
+/**
+ */
+public enum OptionSet {
 
-	private final String uri;
+	OPEN_SHELL(Lists.newArrayList(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437"))),
+	RUN_COMMAND(Lists.newArrayList(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE")));
 
-	ResourceURI(String uri) {
-		this.uri = uri;
+	private final List<KeyValuePair> keyValuePairs;
+
+
+	OptionSet(List<KeyValuePair> keyValuePairs) {
+		this.keyValuePairs = keyValuePairs;
 	}
 
 	public Element getElement() {
-		return DocumentHelper.createElement(QName.get("ResourceURI", WinRMURI.NS_WSMAN_DMTF)).addAttribute("mustUnderstand", "true").addText(uri);
+		final Element optionSet = DocumentHelper.createElement(QName.get("OptionSet", Namespaces.NS_WSMAN_DMTF));
+		for (KeyValuePair p : keyValuePairs) {
+			optionSet.addElement(QName.get("Option", Namespaces.NS_WSMAN_DMTF)).addAttribute("Name", p.getKey()).addText(p.getValue());
+		}
+		return optionSet;
 	}
 }

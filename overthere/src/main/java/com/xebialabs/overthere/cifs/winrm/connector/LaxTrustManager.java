@@ -14,12 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm.exception;
+package com.xebialabs.overthere.cifs.winrm.connector;
 
-@SuppressWarnings("serial")
-public class InvalidFilePathRuntimeException extends RuntimeException {
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
-	public InvalidFilePathRuntimeException(String key, String file) {
-		super(String.format("the file %s set by the %s property does not exist", file, key));
+import javax.net.ssl.X509TrustManager;
+
+class LaxTrustManager implements X509TrustManager {
+
+	@Override
+	public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
 	}
+
+	@Override
+	public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+	}
+
+	@Override
+	public X509Certificate[] getAcceptedIssuers() {
+        return new X509Certificate[0];
+	}
+
 }

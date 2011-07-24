@@ -14,15 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm.connector;
 
 import com.google.common.io.Closeables;
-import com.xebialabs.overthere.winrm.HttpConnector;
-import com.xebialabs.overthere.winrm.SoapAction;
-import com.xebialabs.overthere.winrm.TokenGenerator;
-import com.xebialabs.overthere.winrm.exception.BlankValueRuntimeException;
-import com.xebialabs.overthere.winrm.exception.InvalidFilePathRuntimeException;
-import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.HttpConnector;
+import com.xebialabs.overthere.cifs.winrm.SoapAction;
+import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
+import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;

@@ -14,22 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+@SuppressWarnings("serial")
+public class InvalidFilePathRuntimeException extends RuntimeException {
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-
-class LaxHostnameVerifier implements HostnameVerifier {
-
-	@Override
-	public boolean verify(String hostname, SSLSession sslSession) {
-        logger.debug("Trusting host {}", hostname);
-		return true;
-
+	public InvalidFilePathRuntimeException(String key, String file) {
+		super(String.format("the file %s set by the %s property does not exist", file, key));
 	}
-	private static Logger logger = LoggerFactory.getLogger(LaxHostnameVerifier.class);
-
 }

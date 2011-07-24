@@ -45,7 +45,7 @@ public class ConnectionOptions {
 	/**
 	 * Default value (true) for the connection option that specifies whether to delete the connection-scope temporary directory when the connection is closed.
 	 */
-	public static final boolean TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT = true;
+	public static final boolean DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = true;
 
 	/**
 	 * Connection option (int) for most protocol that specifies how many times to retry creating a unique temporary file name before giving up. 
@@ -55,7 +55,7 @@ public class ConnectionOptions {
 	/**
 	 * Defalut value (100) for connection option that specifies how many times to retry creating a unique temporary file name before giving up. 
 	 */
-	public static final int TEMPORARY_FILE_CREATION_RETRIES_DEFAULT = 100;
+	public static final int DEFAULT_TEMPORARY_FILE_CREATION_RETRIES = 100;
 
 	/**
 	 * Connection option (Integer) for all protocol that specifies the connection timeout in milliseconds to use.
@@ -65,7 +65,7 @@ public class ConnectionOptions {
 	/**
 	 * Default value (120000) for the connection option that specifies the connection timeout in milliseconds to use.
 	 */
-	public static final int CONNECTION_TIMEOUT_MILLIS_DEFAULT = 120000;
+	public static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 120000;
 
 	/**
 	 * Common connection option that specifies the address to connect to.
@@ -116,7 +116,26 @@ public class ConnectionOptions {
 	}
 
 	/**
-	 * Retrieves the value of a connection option.
+	 * Retrieves the value of a required connection option.
+	 * 
+	 * @param <T>
+	 *            the type of the connection option.
+	 * @param key
+	 *            the key of the connection option.
+	 * @return the value of the connection option.
+	 * @throws IllegalArgumentException if no value was supplied for the connection option
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T get(String key) throws IllegalArgumentException {
+		T value = (T) options.get(key);
+		if(value == null) {
+			throw new IllegalArgumentException("No value specified for required connection option " + key);
+		}
+		return value;
+	}
+
+	/**
+	 * Retrieves the value of an optional connection option.
 	 * 
 	 * @param <T>
 	 *            the type of the connection option.
@@ -125,7 +144,7 @@ public class ConnectionOptions {
 	 * @return the value of the connection option or <code>null</code> if that option was not specified.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T get(String key) {
+	public <T> T getOptional(String key) {
 		return (T) options.get(key);
 	}
 

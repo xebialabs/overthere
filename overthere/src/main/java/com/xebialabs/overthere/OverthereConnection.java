@@ -20,13 +20,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
-import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_CONNECTION_TIMEOUT_MILLIS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_FILE_CREATION_RETRIES;
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
@@ -66,11 +66,11 @@ public abstract class OverthereConnection implements Closeable {
 
 	protected OverthereConnection(String type, ConnectionOptions options) {
 		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
-		this.os = checkNotNull(options.<OperatingSystemFamily>get(OPERATING_SYSTEM), "Cannot create HostConnection with null os");
-		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT);
+		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
+		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
-		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT);
-		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
+		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
+		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 	}
 
 	/**

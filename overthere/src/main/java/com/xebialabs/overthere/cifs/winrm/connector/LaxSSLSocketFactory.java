@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm.connector;
 
 import java.io.IOException;
 import java.net.InetAddress;

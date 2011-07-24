@@ -31,11 +31,11 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-class CifsFile extends BaseOverthereFile<CifsTelnetConnection> {
+class CifsFile extends BaseOverthereFile<CifsConnection> {
 
 	private SmbFile smbFile;
 
-	protected CifsFile(CifsTelnetConnection connection, SmbFile smbFile) {
+	protected CifsFile(CifsConnection connection, SmbFile smbFile) {
 		super(connection);
 		this.smbFile = smbFile;
 	}

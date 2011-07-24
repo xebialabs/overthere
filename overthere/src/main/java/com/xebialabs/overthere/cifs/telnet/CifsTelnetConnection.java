@@ -14,61 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs;
+package com.xebialabs.overthere.cifs.telnet;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
-import com.xebialabs.overthere.spi.Protocol;
-import jcifs.smb.SmbFile;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.URLEncoder;
-
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.CifsConnection;
 
 /**
  * A connection to a remote host using CIFS and Telnet.
  * 
  * Limitations:
  * <ul>
+ * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator access is needed.</li>
  * <li>Windows Telnet Service must be configured to use stream mode:<br/>
  * <tt>&gt; tlntadmn config mode=stream</tt></li>
- * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator access is needed.</li>
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */
-@Protocol(name = "cifs_telnet")
-public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
-
-	/**
-	 * Default value for connection option that specifies the Telnet port to connect to.
-	 */
-	public static final int TELNET_PORT_DEFAULT = 23;
-
-	/**
-	 * Connection option that specifies the CIFS port to connect to.
-	 */
-	public static final String CIFS_PORT = "cifsPort";
-
-	/**
-	 * Default value for {@link #CIFS_PORT connection option that specifies the CIFS port to connect to}.
-	 */
-	public static final int CIFS_PORT_DEFAULT = 445;
-
-	protected String address;
-	
-	protected int telnetPort;
-
-	protected int cifsPort;
-
-	protected String username;
-
-	protected String password;
+public class CifsTelnetConnection extends CifsConnection {
 
 	private static final String DETECTABLE_WINDOWS_PROMPT = "WINDOWS4DEPLOYIT ";
 
@@ -86,48 +65,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	 */
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
-		this.address = options.get(ADDRESS);
-		this.telnetPort = options.get(PORT, TELNET_PORT_DEFAULT);
-		this.cifsPort = options.get(CIFS_PORT, CIFS_PORT_DEFAULT);
-		this.username = options.get(USERNAME);
-		this.password = options.get(PASSWORD);
 	}
-
-	@Override
-	public OverthereConnection connect() {
-		return this;
-	}
-	
-	@Override
-	public void doClose() {
-		// no-op
-	}
-
-	@Override
-	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
-		try {
-			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath));
-			return new CifsFile(this, smbFile);
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-	}
-
-	@Override
-	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
-		StringBuilder childPath = new StringBuilder();
-		childPath.append(parent.getPath());
-		if(!parent.getPath().endsWith(getHostOperatingSystem().getFileSeparator())) {
-			childPath.append(getHostOperatingSystem().getFileSeparator());
-		}
-		childPath.append(child.replace('\\', '/'));
-		return getFile(childPath.toString());
-	}
-
-    @Override
-    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-    	return getFile(parent, name);
-    }
 
 	@Override
 	public OverthereProcess startProcess(final CmdLine commandLine) {
@@ -139,7 +77,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 			tc.setConnectTimeout(connectionTimeoutMillis);
 			tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
 			logger.info("Connecting to telnet://{}@{}", username, address);
-			tc.connect(address, telnetPort);
+			tc.connect(address, port);
 			final InputStream stdout = tc.getInputStream();
 			final OutputStream stdin = tc.getOutputStream();
 			final PipedInputStream callersStdout = new PipedInputStream();
@@ -298,53 +236,6 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		byte[] bytesToSend = (lineToSend + "\r\n").getBytes();
 		stdin.write(bytesToSend);
 		stdin.flush();
-	}
-
-	private String encodeAsSmbUrl(String hostPath) {
-		StringBuffer smbUrl = new StringBuffer();
-		smbUrl.append("smb://");
-		smbUrl.append(urlEncode(username.replaceFirst("\\\\", ";")));
-		smbUrl.append(":");
-		smbUrl.append(urlEncode(password));
-		smbUrl.append("@");
-		smbUrl.append(urlEncode(address));
-		if(cifsPort != CIFS_PORT_DEFAULT) {
-			smbUrl.append(":");
-			smbUrl.append(cifsPort);
-		}
-		smbUrl.append("/");
-
-		if (hostPath.length() < 2) {
-			throw new RuntimeIOException("Host path \"" + hostPath + "\" is too short");
-		}
-
-		if (hostPath.charAt(1) != ':') {
-			throw new RuntimeIOException("Host path \"" + hostPath + "\" does not have a colon (:) as its second character");
-		}
-		smbUrl.append(hostPath.charAt(0));
-		smbUrl.append("$/");
-		if (hostPath.length() >= 3) {
-			if (hostPath.charAt(2) != '\\') {
-				throw new RuntimeIOException("Host path \"" + hostPath + "\" does not have a backslash (\\) as its third character");
-			}
-			smbUrl.append(hostPath.substring(3).replace('\\', '/'));
-		}
-
-		logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, smbUrl.toString());
-
-		return smbUrl.toString();
-	}
-
-	private static String urlEncode(String value) {
-		try {
-			return URLEncoder.encode(value, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeIOException("Unable to construct SMB URL", e);
-		}
-	}
-
-	public String toString() {
-		return "cifs_telnet://" + username + "@" + address;
 	}
 
 	private static Logger logger = LoggerFactory.getLogger(CifsTelnetConnection.class);

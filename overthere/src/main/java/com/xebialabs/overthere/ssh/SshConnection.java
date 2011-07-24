@@ -22,6 +22,7 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 
@@ -49,7 +50,9 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 abstract class SshConnection extends OverthereConnection {
 
-    protected final String host;
+	protected final SshConnectionType sshConnectionType;
+
+	protected final String host;
 
     protected final int port;
 
@@ -67,12 +70,13 @@ abstract class SshConnection extends OverthereConnection {
 
 	public SshConnection(String type, ConnectionOptions options) {
         super(type, options);
+		this.sshConnectionType = options.get(CONNECTION_TYPE);
         this.host = options.get(ADDRESS);
         this.port = options.get(PORT, 22);
         this.username = options.get(USERNAME);
-        this.password = options.get(PASSWORD);
-		this.privateKeyFile = options.get(PRIVATE_KEY_FILE);
-		this.passphrase = options.get(PASSPHRASE);
+        this.password = options.getOptional(PASSWORD);
+		this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
+		this.passphrase = options.getOptional(PASSPHRASE);
 		this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
     }
 
@@ -176,7 +180,7 @@ abstract class SshConnection extends OverthereConnection {
 
     @Override
     public String toString() {
-        return type + "://" + username + "@" + host + ":" + port;
+        return "ssh:" + sshConnectionType + "://" + username + "@" + host + ":" + port;
     }
 
     private static Logger logger = LoggerFactory.getLogger(SshConnection.class);

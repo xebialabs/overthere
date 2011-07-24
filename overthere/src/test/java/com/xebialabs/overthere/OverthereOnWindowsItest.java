@@ -22,18 +22,17 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsTelnetConnection.TELNET_PORT_DEFAULT;
-import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.AUTHENTICATION;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.CONTEXT;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTP;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTPS;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.PROTOCOL;
-import static com.xebialabs.overthere.winrm.Protocol.HTTP;
-import static com.xebialabs.overthere.winrm.Protocol.HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,8 +40,8 @@ import java.util.List;
 
 import org.junit.runners.Parameterized.Parameters;
 
-import com.xebialabs.overthere.cifs.CifsTelnetConnection;
-import com.xebialabs.overthere.winrm.CifsWinRMConnection;
+import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
+import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 
 public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItestBase {
 
@@ -60,46 +59,44 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { "cifs_telnet", createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
-		lopco.add(new Object[] { "cifs_winrm", createCifsWinRmHttpOptions(), CifsWinRMConnection.class.getName() });
-		lopco.add(new Object[] { "cifs_winrm", createCifsWinRmHttpsOptions(), CifsWinRMConnection.class.getName() });
+		lopco.add(new Object[] { "cifs", createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
+		lopco.add(new Object[] { "cifs", createCifsWinRmHttpOptions(), CifsWinRmConnection.class.getName() });
+		lopco.add(new Object[] { "cifs", createCifsWinRmHttpsOptions(), CifsWinRmConnection.class.getName() });
 		return lopco;
 	}
 
 	private static ConnectionOptions createCifsTelnetOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
 		partialOptions.set(OPERATING_SYSTEM, WINDOWS);
+		partialOptions.set(CONNECTION_TYPE, TELNET);
 		partialOptions.set(USERNAME, ITEST_USERNAME);
 		partialOptions.set(PASSWORD, ITEST_PASSWORD);
-		partialOptions.set(PORT, TELNET_PORT_DEFAULT);
-		partialOptions.set(CIFS_PORT, CIFS_PORT_DEFAULT);
-		partialOptions.set(AUTHENTICATION, BASIC);
+		partialOptions.set(PORT, DEFAULT_TELNET_PORT);
+		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
 	    return partialOptions;
     }
 
 	private static ConnectionOptions createCifsWinRmHttpOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
 		partialOptions.set(OPERATING_SYSTEM, WINDOWS);
+		partialOptions.set(CONNECTION_TYPE, WINRM_HTTP);
 		partialOptions.set(USERNAME, ITEST_USERNAME);
 		partialOptions.set(PASSWORD, ITEST_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
-		partialOptions.set(PROTOCOL, HTTP);
-		partialOptions.set(PORT, DEFAULT_PORT_HTTP);
-		partialOptions.set(CIFS_PORT, CIFS_PORT_DEFAULT);
-		partialOptions.set(AUTHENTICATION, BASIC);
+		partialOptions.set(PORT, DEFAULT_WINRM_HTTP_PORT);
+		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
 	    return partialOptions;
     }
 
 	private static ConnectionOptions createCifsWinRmHttpsOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
 		partialOptions.set(OPERATING_SYSTEM, WINDOWS);
+		partialOptions.set(CONNECTION_TYPE, WINRM_HTTPS);
 		partialOptions.set(USERNAME, ITEST_USERNAME);
 		partialOptions.set(PASSWORD, ITEST_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
-		partialOptions.set(PROTOCOL, HTTPS);
-		partialOptions.set(PORT, DEFAULT_PORT_HTTPS);
-		partialOptions.set(CIFS_PORT, CIFS_PORT_DEFAULT);
-		partialOptions.set(AUTHENTICATION, BASIC);
+		partialOptions.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
+		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
 		return partialOptions;
 	}
 

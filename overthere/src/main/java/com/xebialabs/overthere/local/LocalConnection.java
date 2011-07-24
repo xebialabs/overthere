@@ -53,7 +53,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	private static ConnectionOptions fixOptions(ConnectionOptions options) {
 		options = new ConnectionOptions(options);
 		options.set(OPERATING_SYSTEM, getLocalHostOperatingSystemFamily());
-		if(options.get(TEMPORARY_DIRECTORY_PATH) == null) {
+		if(options.getOptional(TEMPORARY_DIRECTORY_PATH) == null) {
 			options.set(TEMPORARY_DIRECTORY_PATH, System.getProperty("java.io.tmpdir"));
 		}
 	    return options;

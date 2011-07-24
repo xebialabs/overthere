@@ -47,7 +47,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		options.set(ADDRESS, host.getHostName());
 		options.set(PORT, host.getPort(22));
 	}
-	
+
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();

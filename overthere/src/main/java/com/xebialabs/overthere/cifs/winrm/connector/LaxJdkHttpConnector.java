@@ -14,22 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm.connector;
 
-public class KeyValuePair {
-	final String key;
-	final String value;
+import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
 
-	public KeyValuePair(String key, String value) {
-		this.key = key;
-		this.value = value;
+import javax.net.ssl.HttpsURLConnection;
+import java.net.URL;
+
+/**
+ * Lax HTTPS Connection
+ */
+public class LaxJdkHttpConnector extends JdkHttpConnector {
+
+	static {
+		// FIXME: Every HTTP connection opened after this static initializer is called will be "lazy".
+		HttpsURLConnection.setDefaultHostnameVerifier(new LaxHostnameVerifier());
+		HttpsURLConnection.setDefaultSSLSocketFactory(new LaxSSLSocketFactory());
 	}
 
-	public String getKey() {
-		return key;
+	public LaxJdkHttpConnector(URL targetURL, TokenGenerator tokenGenerator) {
+		super(targetURL, tokenGenerator);
 	}
 
-	public String getValue() {
-		return value;
-	}
 }

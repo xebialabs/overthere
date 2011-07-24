@@ -14,20 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm;
 
-import com.xebialabs.overthere.winrm.TokenGenerator;
+import org.dom4j.Document;
 
-import java.net.URL;
 
-/**
- * Default HTTPS connector
- * Need to import server certificates in the client's trust store.
- * http://blog.ippon.fr/2008/10/20/certificats-auto-signe-et-communication-ssl-en-java/
- */
-public class JdkHttpsConnector extends  JdkHttpConnector {
-
-	public JdkHttpsConnector(URL targetURL, TokenGenerator tokenGenerator) {
-		super(targetURL, tokenGenerator);
-	}
+public interface HttpConnector {
+	Document sendMessage(Document requestDocument, SoapAction soapAction);
 }

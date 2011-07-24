@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
 import org.dom4j.XPath;
 import org.jaxen.SimpleNamespaceContext;
 
-/**
- */
 public enum ResponseExtractor {
 
 	COMMAND_ID("CommandId"),
 	EXIT_CODE("ExitCode"),
-	SHELL_ID("Selector[@Name='ShellId']", WinRMURI.NS_WSMAN_DMTF),
+	SHELL_ID("Selector[@Name='ShellId']", Namespaces.NS_WSMAN_DMTF),
 	STDOUT("Stream[@Name='stdout']"),
 	STDERR("Stream[@Name='stderr']"),
 	STREAM_DONE("CommandState[@State='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done']");
@@ -37,7 +35,7 @@ public enum ResponseExtractor {
 	private final SimpleNamespaceContext namespaceContext;
 
 	ResponseExtractor(String expr) {
-		this(expr, WinRMURI.NS_WIN_SHELL);
+		this(expr, Namespaces.NS_WIN_SHELL);
 	}
 
 

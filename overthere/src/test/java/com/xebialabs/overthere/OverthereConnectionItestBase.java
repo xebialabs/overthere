@@ -114,7 +114,7 @@ public abstract class OverthereConnectionItestBase {
 	@SuppressWarnings("unchecked")
     @Test
 	public void shouldNotConnectWithIncorrectUsername() {
-		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs_telnet")), not(equalTo("cifs_winrm"))));
+		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs"))));
 
 		options.set("username", "an-incorrect-username");
 		try {
@@ -127,9 +127,8 @@ public abstract class OverthereConnectionItestBase {
 	@SuppressWarnings("unchecked")
     @Test
 	public void shouldNotConnectWithIncorrectPassword() {
-		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs_telnet")), not(equalTo("cifs_winrm"))));
-
-		assumeThat(options.get("password"), notNullValue());
+		assumeThat(type, allOf(not(equalTo("local")), not(equalTo("cifs"))));
+		assumeThat(options.getOptional("password"), notNullValue());
 
 		options.set("password", "an-incorrect-password");
 		try {
@@ -495,7 +494,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	protected String getUnixHomeDirPath() {
-		String sudoUsername = options.get(SUDO_USERNAME);
+		String sudoUsername = options.getOptional(SUDO_USERNAME);
 		if(sudoUsername != null) {
 			return "/home/" + sudoUsername;
 		} else {

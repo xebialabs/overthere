@@ -14,23 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm.exception;
 
-import java.net.URL;
+@SuppressWarnings("serial")
+public class BlankValueRuntimeException extends RuntimeException {
 
-import com.xebialabs.overthere.winrm.connector.JdkHttpConnector;
-import com.xebialabs.overthere.winrm.connector.LaxJdkHttpConnector;
-
-/**
- */
-public class HttpConnectorFactory {
-	public static HttpConnector newHttpConnector(Protocol p, URL targetURL, TokenGenerator tokenGenerator) {
-		switch (p) {
-			case HTTP:
-				return new JdkHttpConnector(targetURL, tokenGenerator);
-			case HTTPS:
-				return new LaxJdkHttpConnector(targetURL, tokenGenerator);
-		}
-		throw new IllegalArgumentException("Unsupported protocol " + p);
+	public BlankValueRuntimeException(String message) {
+		super(message);
 	}
 }

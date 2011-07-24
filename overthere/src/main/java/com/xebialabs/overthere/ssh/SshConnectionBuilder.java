@@ -1,7 +1,5 @@
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
@@ -14,8 +12,7 @@ import com.xebialabs.overthere.spi.Protocol;
 public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the {@link SshConnectionType SSH connection type} to use. Defaults to
-	 * {@link SshConnectionType#SFTP}.
+	 * Name of the {@link ConnectionOptions connection option} used to specify the {@link SshConnectionType SSH connection type} to use.
 	 */
 	public static final String CONNECTION_TYPE = "connectionType";
 
@@ -58,7 +55,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {
-		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE, SFTP);
+		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
+
 		switch (sshConnectionType) {
 		case SFTP:
 			connection = new SshSftpConnection(type, options);

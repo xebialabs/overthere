@@ -14,10 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
-/**
- */
-public enum AuthenticationMode {
-	BASIC
+public class KeyValuePair {
+
+	final String key;
+	final String value;
+
+	public KeyValuePair(String key, String value) {
+		this.key = key;
+		this.value = value;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public String getValue() {
+		return value;
+	}
 }

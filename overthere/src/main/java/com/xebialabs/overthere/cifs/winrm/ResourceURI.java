@@ -14,20 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.QName;
 
-public enum SoapAction {
+public enum ResourceURI {
 
-	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
+	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
 
-	private final String value;
+	private final String uri;
 
-	SoapAction(String value) {
-		this.value = value;
+	ResourceURI(String uri) {
+		this.uri = uri;
 	}
 
-	public String getValue() {
-		return value;
+	public Element getElement() {
+		return DocumentHelper.createElement(QName.get("ResourceURI", Namespaces.NS_WSMAN_DMTF)).addAttribute("mustUnderstand", "true").addText(uri);
 	}
 }
