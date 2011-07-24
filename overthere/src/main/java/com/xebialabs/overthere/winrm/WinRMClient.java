@@ -16,18 +16,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
-import com.google.common.io.Closeables;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
-import org.apache.commons.codec.binary.Base64;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.io.Closeables.closeQuietly;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -39,6 +28,19 @@ import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.codec.binary.Base64;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.QName;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.winrm.exception.WinRMRuntimeIOException;
 
 class WinRMClient {
 
@@ -82,11 +84,11 @@ class WinRMClient {
 	}
 
 	public void destroy() {
-		Closeables.closeQuietly(stderrPipe.sink());
-		Closeables.closeQuietly(stderrPipe.source());
+		closeQuietly(stderrPipe.sink());
+		closeQuietly(stderrPipe.source());
 
-		Closeables.closeQuietly(stdoutPipe.sink());
-		Closeables.closeQuietly(stdoutPipe.source());
+		closeQuietly(stdoutPipe.sink());
+		closeQuietly(stdoutPipe.source());
 	}
 
 
@@ -139,7 +141,7 @@ class WinRMClient {
 			e.printStackTrace();
 		}
 
-		for (; ; ) {
+		for (;;) {
 			Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
 			try {
 				stdSink.write(ByteBuffer.wrap(handleStream(responseDocument, ResponseExtractor.STDOUT).getBytes()));
