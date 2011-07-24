@@ -255,10 +255,10 @@ public abstract class OverthereConnection implements Closeable {
 					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
 					latch.countDown();
 					try {
-						int readInt = stdoutReader.read();
 						StringBuffer lineBuffer = new StringBuffer();
-						while (readInt > -1) {
-							char c = (char) readInt;
+						int cInt = stdoutReader.read();
+						while (cInt > -1) {
+							char c = (char) cInt;
 							handler.handleOutput(c);
 							if (c != '\r' && c != '\n') {
 								lineBuffer.append(c);
@@ -267,7 +267,7 @@ public abstract class OverthereConnection implements Closeable {
 								handler.handleOutputLine(lineBuffer.toString());
 								lineBuffer = new StringBuffer();
 							}
-							readInt = stdoutReader.read();
+							cInt = stdoutReader.read();
 						}
 					} catch (Exception exc) {
 						logger.error("An exception occured while reading from stdout", exc);
