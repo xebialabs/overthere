@@ -13,8 +13,8 @@ import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAUL
 import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.AUTHENTICATION;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.CONTEXT;
-import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTPS;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTP;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTPS;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.PROTOCOL;
 import static com.xebialabs.overthere.winrm.Protocol.HTTP;
@@ -32,13 +32,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.xebialabs.itest.ItestHost;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.cifs.CifsTelnetConnectionItest;
 
 @RunWith(Parameterized.class)
-public class WinRMConnectionOnWindowsItest extends WinRMItestBase {
+public class WinRMConnectionOnWindowsItest extends CifsTelnetConnectionItest {
 
 	private static final String DEFAULT_USERNAME = "overthere";
 	private static final String DEFAULT_PASSWORD = "Y6VLCyXi62";
-
 
 	protected static ItestHost host;
 

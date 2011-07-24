@@ -47,7 +47,6 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
@@ -72,7 +71,7 @@ public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 	}
 
 	@Override
-	protected void setTypeAndOptions() {
+	protected void setTypeAndOptions() throws Exception {
 		type = "cifs_telnet";
 		options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, WINDOWS);
@@ -95,23 +94,26 @@ public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldExecuteCommand() {
+	public void shouldExecuteSimpleCommand() {
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		OverthereProcessOutputHandler handler = multiHandler(loggingHandler(logger), capturingHandler);
-		int res = connection.execute(handler, CmdLine.build("ipconfig"));
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
 		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
+	}
+	
+	@Test
+	public void shouldExecuteCommandWithArgument() {
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/s"));
+		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), containsString("Total Files Listed"));
 	}
 
 	@Test
 	public void shoudNotExecuteIncorrectCommand() {
-		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		OverthereProcessOutputHandler handler = multiHandler(loggingHandler(logger), capturingHandler);
-		int res = connection.execute(handler, CmdLine.build("this-command-does-not-exist"));
+		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
 		assertThat(res, not(equalTo(0)));
 	}
-	
-	
 
 	private static Logger logger = LoggerFactory.getLogger(CifsTelnetConnectionItest.class);
 	
