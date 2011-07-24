@@ -2,7 +2,7 @@ package com.xebialabs.itest;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,7 +103,7 @@ public class ItestHostFactory {
     }
 
 	private static Map<Integer, Integer> parsePortsProperty(String ports) {
-		Map<Integer, Integer> portForwardMap = newHashMap();
+		Map<Integer, Integer> portForwardMap = newLinkedHashMap();
 		StringTokenizer toker = new StringTokenizer(ports, ",");
 		while(toker.hasMoreTokens()) {
 			String[] localAndRemotePort = toker.nextToken().split(":");
