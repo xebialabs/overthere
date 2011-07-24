@@ -1,7 +1,6 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -17,8 +16,6 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,43 +24,20 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
-import com.xebialabs.itest.ItestHost;
 
-@RunWith(Parameterized.class)
-public class OverthereOnUnixItest extends OverthereConnectionItestBase {
+public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBase {
 
-	protected static ItestHost host;
-
-	private final ConnectionOptions partialOptions;
-	
-	private final String expectedClass;
-
-	@BeforeClass
-	public static void setupHost() {
-		host = getItestHost("overthere-unix");
-		host.setup();
+	static {
+		itestHostLabel = "overthere-unix";
 	}
 
-	@AfterClass
-	public static void teardownHost() {
-		if(host != null) {
-			host.teardown();
-		}
-	}
-
-	public OverthereOnUnixItest(ConnectionOptions partialOptions, String expectedClass) {
-		this.partialOptions = partialOptions;
-		this.expectedClass = expectedClass;
-	}
+	public OverthereOnUnixItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName) {
+	    super(type, partialOptions, expectedConnectionClassName);
+    }
 
 	@Override
 	protected void setTypeAndOptions() throws Exception {
@@ -74,23 +48,19 @@ public class OverthereOnUnixItest extends OverthereConnectionItestBase {
 		options.set(PORT, host.getPort(22));
 	}
 	
-	@Test
-	public void connectionObjectShouldBeInstanceOfExpectedClass() {
-		assertThat(connection.getClass().getName(), equalTo(expectedClass));
-	}
-
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
-		lopco.add(new Object[] { createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
-		lopco.add(new Object[] { createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
-		lopco.add(new Object[] { createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
+		lopco.add(new Object[] { "ssh", createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
+		lopco.add(new Object[] { "ssh", createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
+		lopco.add(new Object[] { "ssh", createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
+		lopco.add(new Object[] { "ssh", createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
 		return lopco;
 	}
 
 	private static ConnectionOptions createSftpOptions() {
 		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SFTP);
 		options.set(USERNAME, "overthere");
 		options.set(PASSWORD, "overhere");
@@ -99,6 +69,7 @@ public class OverthereOnUnixItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createScpOptions() throws IOException {
 		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SCP);
 		options.set(USERNAME, "overthere");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(
@@ -126,6 +97,7 @@ public class OverthereOnUnixItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createSudoOptions() throws IOException {
 		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SUDO);
 		options.set(USERNAME, "trusted");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "MIIEpgIBAAKCAQEA65Jf19SCv8rZ/kLyfOw+OjHt5fQnxHVQR2B6UW0B0q6RhSSg\r\n"
@@ -152,6 +124,7 @@ public class OverthereOnUnixItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createInteractiveSudoOptions() {
 		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
 		options.set(USERNAME, "untrusted");
 		options.set(PASSWORD, "donttrustme");

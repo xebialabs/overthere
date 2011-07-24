@@ -38,6 +38,7 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 		type = "local";
 		options = new ConnectionOptions();
 		options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
+		expectedConnectionClassName = LocalConnection.class.getName();
 	}
 
 	@Test

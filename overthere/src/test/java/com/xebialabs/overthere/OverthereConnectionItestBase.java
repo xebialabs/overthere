@@ -63,6 +63,9 @@ import com.xebialabs.overthere.ssh.SshSudoTests;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
+/**
+ * Base class for all Overthere connection itests.
+ */
 public abstract class OverthereConnectionItestBase {
 
 	private static final int NR_OF_SMALL_FILES = 100;
@@ -74,6 +77,8 @@ public abstract class OverthereConnectionItestBase {
 	protected String type;
 
 	protected ConnectionOptions options;
+
+	protected String expectedConnectionClassName;
 
 	protected OverthereConnection connection;
 
@@ -99,6 +104,11 @@ public abstract class OverthereConnectionItestBase {
 				exc.printStackTrace(System.out);
 			}
 		}
+	}
+
+	@Test
+	public void connectionObjectShouldBeInstanceOfExpectedClass() {
+		assertThat(connection.getClass().getName(), equalTo(expectedConnectionClassName));
 	}
 
 	@SuppressWarnings("unchecked")
