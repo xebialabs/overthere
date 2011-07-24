@@ -66,10 +66,8 @@ import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 @RunWith(Parameterized.class)
 public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 
-	private static final String DEFAULT_USERNAME = "overthere";
-	// FIXME: ensure the test user contains some reserved characters such as ';', ':' or '@'
-	// previous password:  "hello@:;<>myfriend"
-	private static final String DEFAULT_PASSWORD = "Y6VLCyXi62";
+	private static final String ITEST_USERNAME = "overthere";
+	private static final String ITEST_PASSWORD = "wLitdMy@:;<>KY9";
 
 	protected static ItestHost host;
 
@@ -97,8 +95,8 @@ public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createCifsTelnetOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
-		partialOptions.set(USERNAME, DEFAULT_USERNAME);
-		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(USERNAME, ITEST_USERNAME);
+		partialOptions.set(PASSWORD, ITEST_PASSWORD);
 		partialOptions.set(PORT, TELNET_PORT_DEFAULT);
 		partialOptions.set(AUTHENTICATION, BASIC);
 	    return partialOptions;
@@ -106,8 +104,8 @@ public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createCifsWinRmHttpBasicOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
-		partialOptions.set(USERNAME, DEFAULT_USERNAME);
-		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(USERNAME, ITEST_USERNAME);
+		partialOptions.set(PASSWORD, ITEST_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		partialOptions.set(PROTOCOL, HTTP);
 		partialOptions.set(PORT, DEFAULT_PORT_HTTP);
@@ -117,8 +115,8 @@ public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 
 	private static ConnectionOptions createCifsWinRmHttpsBasicOptions() {
 		ConnectionOptions partialOptions = new ConnectionOptions();
-		partialOptions.set(USERNAME, DEFAULT_USERNAME);
-		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(USERNAME, ITEST_USERNAME);
+		partialOptions.set(PASSWORD, ITEST_PASSWORD);
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		partialOptions.set(PROTOCOL, HTTPS);
 		partialOptions.set(PORT, DEFAULT_PORT_HTTPS);
@@ -163,9 +161,9 @@ public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 	@Test
 	public void shouldExecuteCommandWithArgument() {
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/s"));
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/w"));
 		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), containsString("Total Files Listed"));
+		assertThat(capturingHandler.getOutput(), containsString("[..]"));
 	}
 
 	@Test
