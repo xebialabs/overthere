@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs;
+package com.xebialabs.overthere;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
@@ -25,35 +26,50 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsTelnetConnection.TELNET_PORT_DEFAULT;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static com.xebialabs.overthere.winrm.AuthenticationMode.BASIC;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.AUTHENTICATION;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.CONTEXT;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTP;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_PORT_HTTPS;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.DEFAULT_WINRM_CONTEXT;
+import static com.xebialabs.overthere.winrm.CifsWinRMConnectionBuilder.PROTOCOL;
+import static com.xebialabs.overthere.winrm.Protocol.HTTP;
+import static com.xebialabs.overthere.winrm.Protocol.HTTPS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.itest.ItestHost;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
-public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
+@RunWith(Parameterized.class)
+public class OverthereOnWindowsItest extends OverthereConnectionItestBase {
 
 	private static final String DEFAULT_USERNAME = "overthere";
+	// FIXME: ensure the test user contains some reserved characters such as ';', ':' or '@'
+	// previous password:  "hello@:;<>myfriend"
 	private static final String DEFAULT_PASSWORD = "Y6VLCyXi62";
-	
 
 	protected static ItestHost host;
 
@@ -70,18 +86,61 @@ public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 		}
 	}
 
+	@Parameters
+	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
+		List<Object[]> lopco = newArrayList();
+		lopco.add(new Object[] { "cifs_telnet", createCifsTelnetOptions() });
+		lopco.add(new Object[] { "cifs_winrm", createCifsWinRmHttpBasicOptions() });
+		lopco.add(new Object[] { "cifs_winrm", createCifsWinRmHttpsBasicOptions() });
+		return lopco;
+	}
+
+	private static ConnectionOptions createCifsTelnetOptions() {
+		ConnectionOptions partialOptions = new ConnectionOptions();
+		partialOptions.set(USERNAME, DEFAULT_USERNAME);
+		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(PORT, TELNET_PORT_DEFAULT);
+		partialOptions.set(AUTHENTICATION, BASIC);
+	    return partialOptions;
+    }
+
+	private static ConnectionOptions createCifsWinRmHttpBasicOptions() {
+		ConnectionOptions partialOptions = new ConnectionOptions();
+		partialOptions.set(USERNAME, DEFAULT_USERNAME);
+		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
+		partialOptions.set(PROTOCOL, HTTP);
+		partialOptions.set(PORT, DEFAULT_PORT_HTTP);
+		partialOptions.set(AUTHENTICATION, BASIC);
+	    return partialOptions;
+    }
+
+	private static ConnectionOptions createCifsWinRmHttpsBasicOptions() {
+		ConnectionOptions partialOptions = new ConnectionOptions();
+		partialOptions.set(USERNAME, DEFAULT_USERNAME);
+		partialOptions.set(PASSWORD, DEFAULT_PASSWORD);
+		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
+		partialOptions.set(PROTOCOL, HTTPS);
+		partialOptions.set(PORT, DEFAULT_PORT_HTTPS);
+		partialOptions.set(AUTHENTICATION, BASIC);
+		return partialOptions;
+	}
+
+	private final ConnectionOptions partialOptions;
+
+	public OverthereOnWindowsItest(String type, ConnectionOptions partialOptions) {
+		this.type = type;
+		this.partialOptions = partialOptions;
+	}
+
+
 	@Override
 	protected void setTypeAndOptions() throws Exception {
-		type = "cifs_telnet";
-		options = new ConnectionOptions();
+		options = new ConnectionOptions(partialOptions);
 		options.set(OPERATING_SYSTEM, WINDOWS);
 		options.set(ADDRESS, host.getHostName());
-		options.set(PORT, host.getPort(23));
+		options.set(PORT, host.getPort((Integer) partialOptions.get(PORT)));
 		options.set(CIFS_PORT, host.getPort(CIFS_PORT_DEFAULT));
-		options.set(USERNAME, DEFAULT_USERNAME);
-		// ensure the test user contains some reserved characters such as ';', ':' or '@'
-		// previous password:  "hello@:;<>myfriend"
-		options.set(PASSWORD, DEFAULT_PASSWORD);
 	}
 
 	@Test
@@ -115,6 +174,6 @@ public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
 		assertThat(res, not(equalTo(0)));
 	}
 
-	private static Logger logger = LoggerFactory.getLogger(CifsTelnetConnectionItest.class);
+	private static Logger logger = LoggerFactory.getLogger(OverthereOnWindowsItest.class);
 	
 }
