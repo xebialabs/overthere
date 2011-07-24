@@ -16,89 +16,103 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static com.xebialabs.itest.ItestHostFactory.getItestHost;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsTelnetConnection.CIFS_PORT_DEFAULT;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.io.ByteStreams;
+import com.xebialabs.itest.ItestHost;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 public class CifsTelnetConnectionItest extends OverthereConnectionItestBase {
+
+	private static final String DEFAULT_USERNAME = "overthere";
+	private static final String DEFAULT_PASSWORD = "Y6VLCyXi62";
+	
+
+	protected static ItestHost host;
+
+	@BeforeClass
+	public static void setupHost() {
+		host = getItestHost("overthere-windows");
+		host.setup();
+	}
+	
+	@AfterClass
+	public static void teardownHost() {
+		if(host != null) {
+			host.teardown();
+		}
+	}
 
 	@Override
 	protected void setTypeAndOptions() {
 		type = "cifs_telnet";
 		options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, WINDOWS);
-		options.set(ADDRESS, "wls-11g-win");
-		options.set(USERNAME, "itestuser");
+		options.set(ADDRESS, host.getHostName());
+		options.set(PORT, host.getPort(23));
+		options.set(CIFS_PORT, host.getPort(CIFS_PORT_DEFAULT));
+		options.set(USERNAME, DEFAULT_USERNAME);
 		// ensure the test user contains some reserved characters such as ';', ':' or '@'
-		options.set(PASSWORD, "hello@:;<>myfriend");
+		// previous password:  "hello@:;<>myfriend"
+		options.set(PASSWORD, DEFAULT_PASSWORD);
 	}
 
 	@Test
-	public void listC() throws IOException {
+	public void shouldListFilesInCDrive() throws IOException {
 		OverthereFile cDrive = connection.getFile("C:");
-		OverthereFile autoexecBat = cDrive.getFile("AUTOEXEC.BAT");
+		OverthereFile autoexecBat = cDrive.getFile("Program Files");
 		List<OverthereFile> filesInCDrive = cDrive.listFiles();
 
 		assertThat(filesInCDrive.contains(autoexecBat), equalTo(true));
 	}
 
 	@Test
-	public void readFile() throws IOException {
-		OverthereFile file = connection.getFile("C:\\itest\\itestfile.txt");
-		assertThat(file.getName(), equalTo("itestfile.txt"));
-		assertThat(file.length(), equalTo(27L));
-		InputStream inputStream = file.getInputStream();
-		ByteArrayOutputStream fileContents = new ByteArrayOutputStream();
-		try {
-			ByteStreams.copy(inputStream, fileContents);
-		} finally {
-			inputStream.close();
-		}
-		assertTrue(fileContents.toString().contains("And the mome raths outgrabe"));
-	}
-
-	@Test
-	public void executeDirCommand() {
-		CapturingOverthereProcessOutputHandler handler = capturingHandler();
-		int res = connection.execute(handler, CmdLine.build("dir", "C:\\itest"));
+	public void shouldExecuteCommand() {
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		OverthereProcessOutputHandler handler = multiHandler(loggingHandler(logger), capturingHandler);
+		int res = connection.execute(handler, CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
-		assertThat(handler.getOutput(), containsString("27 itestfile.txt"));
+		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
 	@Test
-	public void executeCmdCommand() {
-		CapturingOverthereProcessOutputHandler handler = capturingHandler();
-		int res = connection.execute(handler, CmdLine.build("C:\\itest\\itestecho.cmd"));
-		assertThat(res, equalTo(0));
-		assertThat(handler.getOutput(), containsString("All mimsy were the borogroves"));
+	public void shoudNotExecuteIncorrectCommand() {
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		OverthereProcessOutputHandler handler = multiHandler(loggingHandler(logger), capturingHandler);
+		int res = connection.execute(handler, CmdLine.build("this-command-does-not-exist"));
+		assertThat(res, not(equalTo(0)));
 	}
+	
+	
 
-	@Test
-	public void executeIncorrectCommand() {
-		CapturingOverthereProcessOutputHandler handler = capturingHandler();
-		int res = connection.execute(handler, CmdLine.build("C:\\NONEXISTANT.cmd"));
-		assertThat(res, equalTo(9009));
-	}
-
+	private static Logger logger = LoggerFactory.getLogger(CifsTelnetConnectionItest.class);
+	
 }
