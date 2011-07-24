@@ -1,12 +1,14 @@
 package com.xebialabs.itest;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -48,7 +50,7 @@ public class ItestHostFactory {
 	private static Properties itestProperties;
 
 	static {
-		itestProperties = readItestProperties();
+		loadItestProperties();
 	}
 
 	public static ItestHost getItestHostThatDoesNotRequiresTeardown(String hostLabel) {
@@ -60,22 +62,19 @@ public class ItestHostFactory {
 	}
 
 	private static ItestHost getItestHost(String hostLabel, boolean disableEc2) {
-		String hostname = getItestProperty(hostLabel + HOSTNAME_PROPERTY_SUFFIX);
-		String amiId = getItestProperty(hostLabel + AMI_ID_PROPERTY_SUFFIX);
-
-		checkState(hostname == null || amiId == null, "Both a hostname (" + hostname + ") and an AMI id (" + amiId + ") have been specified for host label " + hostLabel);
-
-		ItestHost ih = createItestHost(hostLabel, disableEc2, hostname, amiId);
+		ItestHost ih = createItestHost(hostLabel, disableEc2);
 		ih = wrapItestHost(hostLabel, ih);
 		return ih;
 	}
 
-	protected static ItestHost createItestHost(String hostLabel, boolean disableEc2, String hostname, String amiId) {
-	    if (hostname != null) {
+	protected static ItestHost createItestHost(String hostLabel, boolean disableEc2) {
+		String hostname = getItestProperty(hostLabel + HOSTNAME_PROPERTY_SUFFIX);
+		if (hostname != null) {
 			logger.info("Using existing host for integration tests on {}", hostLabel);
 			return new ExistingItestHost(hostLabel);
 		}
 
+		String amiId = getItestProperty(hostLabel + AMI_ID_PROPERTY_SUFFIX);
 		if (amiId != null) {
 			if (disableEc2) {
 				throw new IllegalStateException("Only an AMI ID (" + amiId + ") has been specified for host label " + hostLabel
@@ -119,25 +118,45 @@ public class ItestHostFactory {
 		return portForwardMap;
     }
 
-	private static Properties readItestProperties() {
+	private static void loadItestProperties() {
 		try {
-			Properties itestProperties = new Properties();
-			File itestPropertiesFile = new File("itest.properties");
-			if (itestPropertiesFile.exists()) {
-				FileInputStream in = new FileInputStream(itestPropertiesFile);
-				try {
-					itestProperties.load(in);
-				} finally {
-					in.close();
-				}
-			} else {
-				logger.warn("File itest.properties not found in the current directory, using system properties only");
-			}
-			return itestProperties;
+			itestProperties = new Properties();
+			loadItestPropertiesFromClasspath();
+			loadItestPropertiesFromFile();
 		} catch (IOException exc) {
-			throw new RuntimeException("Cannot read itest.properties", exc);
+			throw new RuntimeException("Cannot load itest.properties", exc);
 		}
 	}
+
+	private static void loadItestPropertiesFromClasspath() throws IOException {
+	    URL itestPropertiesResources = Thread.currentThread().getContextClassLoader().getResource("itest.properties");
+	    if(itestPropertiesResources != null) {
+	    	InputStream in = itestPropertiesResources.openStream();
+	    	try {
+	    		logger.info("Loading itest.properties from classpath");
+	    		itestProperties.load(in);
+	    	} finally {
+	    		in.close();
+	    	}
+	    } else {
+	    	logger.warn("File itest.properties not found on classpath.");
+	    }
+    }
+
+	private static void loadItestPropertiesFromFile() throws FileNotFoundException, IOException {
+	    File itestPropertiesFile = new File("itest.properties");
+	    if (itestPropertiesFile.exists()) {
+	    	FileInputStream in = new FileInputStream(itestPropertiesFile);
+	    	try {
+	    		logger.info("Loading itest.properties from current working directory");
+	    		itestProperties.load(in);
+	    	} finally {
+	    		in.close();
+	    	}
+	    } else {
+	    	logger.warn("File itest.properties not found in the current directory.");
+	    }
+    }
 
 	public static String getRequiredItestProperty(String key) {
 		String value = getItestProperty(key);

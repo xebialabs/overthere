@@ -9,3 +9,4 @@ bin/
 *.ipr
 *.iws
 itest.properties
+!overthere/src/test/resources/itest.properties
