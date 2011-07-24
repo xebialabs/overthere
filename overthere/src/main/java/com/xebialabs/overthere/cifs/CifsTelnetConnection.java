@@ -46,16 +46,23 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 public class CifsTelnetConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
 	/**
+	 * Default value for connection option that specifies the Telnet port to connect to.
+	 */
+	public static final int TELNET_PORT_DEFAULT = 23;
+
+	/**
 	 * Connection option that specifies the CIFS port to connect to.
 	 */
 	public static final String CIFS_PORT = "cifsPort";
 
 	/**
-	 * Default value for connection option that specifies the CIFS port to connect to.
+	 * Default value for {@link #CIFS_PORT connection option that specifies the CIFS port to connect to}.
 	 */
 	public static final int CIFS_PORT_DEFAULT = 445;
 
 	protected String address;
+	
+	protected int telnetPort;
 
 	protected int cifsPort;
 
@@ -80,6 +87,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.address = options.get(ADDRESS);
+		this.telnetPort = options.get(PORT, TELNET_PORT_DEFAULT);
 		this.cifsPort = options.get(CIFS_PORT, CIFS_PORT_DEFAULT);
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
@@ -131,7 +139,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 			tc.setConnectTimeout(connectionTimeoutMillis);
 			tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
 			logger.info("Connecting to telnet://{}@{}", username, address);
-			tc.connect(address);
+			tc.connect(address, telnetPort);
 			final InputStream stdout = tc.getInputStream();
 			final OutputStream stdin = tc.getOutputStream();
 			final PipedInputStream callersStdout = new PipedInputStream();
