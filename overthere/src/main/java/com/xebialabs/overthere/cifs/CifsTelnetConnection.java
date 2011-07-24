@@ -145,23 +145,6 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 			final PipedInputStream callersStdout = new PipedInputStream();
 			final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
 			
-			final StringBuilder outputBuf = new StringBuilder();
-
-			receive(stdout, outputBuf, toCallersStdout, "ogin:");
-			send(stdin, username);
-
-			receive(stdout, outputBuf, toCallersStdout, "assword:");
-			send(stdin, password);
-
-			receive(stdout, outputBuf, toCallersStdout, ">", "ogon failure");
-			send(stdin, "PROMPT " + DETECTABLE_WINDOWS_PROMPT);
-			// We must wait for the prompt twice; the first time is an echo of the PROMPT command,
-			// the second is the actual prompt
-			receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-			receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-
-			send(stdin, commandLineForExecution);
-
 			return new OverthereProcess() {
 				@Override
 				public OutputStream getStdin() {
@@ -182,6 +165,23 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 				public int waitFor() {
 					try {
 						try {
+							StringBuilder outputBuf = new StringBuilder();
+
+							receive(stdout, outputBuf, toCallersStdout, "ogin:");
+							send(stdin, username);
+
+							receive(stdout, outputBuf, toCallersStdout, "assword:");
+							send(stdin, password);
+
+							receive(stdout, outputBuf, toCallersStdout, ">", "ogon failure");
+							send(stdin, "PROMPT " + DETECTABLE_WINDOWS_PROMPT);
+							// We must wait for the prompt twice; the first time is an echo of the PROMPT command,
+							// the second is the actual prompt
+							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+
+							send(stdin, commandLineForExecution);
+
 							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
 
 							send(stdin, "ECHO \"" + ERRORLEVEL_PREAMBLE + "%errorlevel%" + ERRORLEVEL_POSTAMBLE);
@@ -242,19 +242,22 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 		boolean lastCharWasCr = false;
 		boolean lastCharWasEsc = false;
 		for (;;) {
-			int c = stdout.read();
-			if (c == -1) {
+			int cInt = stdout.read();
+			if (cInt == -1) {
 				throw new IOException("End of stream reached");
 			}
 
-			toCallersStdout.write(c);
-			switch ((char) c) {
+			toCallersStdout.write(cInt);
+			char c = (char) cInt;
+			switch (c) {
 			case '\r':
 				outputBuf.delete(0, outputBuf.length());
+				toCallersStdout.flush();
 				break;
 			case '\n':
 				if (!lastCharWasCr) {
 					outputBuf.delete(0, outputBuf.length());
+					toCallersStdout.flush();
 				}
 				break;
 			case '[':
@@ -263,7 +266,7 @@ public class CifsTelnetConnection extends OverthereConnection implements Overthe
 					        "VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).");
 				}
 			default:
-				outputBuf.append((char) c);
+				outputBuf.append(c);
 				break;
 			}
 			lastCharWasCr = (c == '\r');
