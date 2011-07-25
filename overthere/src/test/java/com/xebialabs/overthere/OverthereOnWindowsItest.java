@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
@@ -48,8 +49,9 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 	private static final String ITEST_USERNAME = "overthere";
 	private static final String ITEST_PASSWORD = "wLitdMy@:;<>KY9";
 
-	static {
-		itestHostLabel = "overthere-windows";
+	@BeforeClass
+	public static void setupItestHost() {
+		setupItestHost("overthere-windows");
 	}
 
 	public OverthereOnWindowsItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName) {
