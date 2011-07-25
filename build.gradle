@@ -48,7 +48,17 @@ subprojects {
 	task itest(type: Test) {
 		includes = ['**/*Itest.*']
 		testResultsDir = file("${buildDir}/itest-results")
-		systemProperties['itests'] = project.hasProperty('itests') ? project.getProperty('itests') : ''
+
+		copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
+		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
+		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
+		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
+	}
+}
+
+def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
+	if(project.hasProperty(name)) {
+		systemProperties[name] = project.getProperty(name)
 	}
 }
 
