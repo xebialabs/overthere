@@ -6,7 +6,7 @@ dependencies {
 	}
 	compile 'commons-codec:commons-codec:1.5'
 	compile 'com.google.guava:guava:r09'
-	compile 'net.schmizz:sshj:0.4.1'
+	compile 'net.schmizz:sshj:0.5.0'
 	compile 'org.slf4j:slf4j-api:1.6.1'
 
 	runtime 'org.slf4j:jcl-over-slf4j:1.6.1'
