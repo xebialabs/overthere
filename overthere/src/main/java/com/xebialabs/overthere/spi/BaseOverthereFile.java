@@ -30,6 +30,10 @@ public abstract class BaseOverthereFile<C extends OverthereConnection> implement
 
 	protected transient C connection;
 
+	protected BaseOverthereFile() {
+		this.connection = null;
+	}
+
 	protected BaseOverthereFile(C connection) {
 		this.connection = connection;
 	}

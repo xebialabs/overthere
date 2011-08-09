@@ -20,7 +20,14 @@ import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 
@@ -59,6 +66,20 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 		int res = connection.execute(handler, commandLine);
 		assertThat(res, equalTo(0));
 		assertThat(handler.getOutputLines().contains(tempFile.getName()), equalTo(true));
+	}
+
+	@Test
+	public void localFileIsSerializable() throws IOException, ClassNotFoundException {
+		OverthereFile tempFile = connection.getTempFile("afile");
+		
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		ObjectOutputStream objectsOut = new ObjectOutputStream(bytes);
+		objectsOut.writeObject(tempFile);
+		
+		ObjectInputStream objectsIn = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()));
+		Object read = objectsIn.readObject();
+		assertThat(read, instanceOf(LocalFile.class));
+		assertThat(((LocalFile) read).getPath(), equalTo(tempFile.getPath()));
 	}
 
 }
