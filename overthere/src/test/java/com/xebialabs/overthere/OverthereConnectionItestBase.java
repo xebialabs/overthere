@@ -200,7 +200,35 @@ public abstract class OverthereConnectionItestBase {
 		assertThat(res, equalTo(0));
 		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
 	}
+
+	@Test
+	public void shouldStartProcessSimpleCommandOnWindows() throws IOException, InterruptedException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+		assumeThat(connection.canStartProcess(), equalTo(true));
+
+		OverthereProcess p = connection.startProcess(CmdLine.build("ipconfig"));
+		try {
+			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
+			assertThat(p.waitFor(), equalTo(0));
+			assertThat(commandOutput, containsString("Windows IP Configuration"));
+		} finally {
+			p.destroy();
+		}
+	}
 	
+	@Test
+	public void shouldStartProcessSimpleCommandOnWindowsShouldThrowExceptionWhenNotSupported() throws IOException, InterruptedException {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+		assumeThat(connection.canStartProcess(), equalTo(false));
+
+		try {
+			connection.startProcess(CmdLine.build("ipconfig"));
+			fail("Expected UnsupportedOperationException to be thrown");
+		} catch(UnsupportedOperationException expected) {
+		}
+	}
+
+
 	@Test
 	public void shouldExecuteCommandWithArgumentOnWindows() {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));

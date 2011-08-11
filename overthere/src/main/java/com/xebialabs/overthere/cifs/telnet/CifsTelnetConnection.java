@@ -29,6 +29,7 @@ import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Closeables;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -64,13 +65,12 @@ public class CifsTelnetConnection extends CifsConnection {
 	 * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
-		super(type, options);
+		super(type, options, true);
 	}
 
 	@Override
 	public OverthereProcess startProcess(final CmdLine commandLine) {
 		final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
-		final String commandLineForLogging = commandLine.toCommandLine(getHostOperatingSystem(), true);
 
 		try {
 			final TelnetClient tc = new TelnetClient();
@@ -82,6 +82,57 @@ public class CifsTelnetConnection extends CifsConnection {
 			final OutputStream stdin = tc.getOutputStream();
 			final PipedInputStream callersStdout = new PipedInputStream();
 			final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
+			final StringBuilder outputBuf = new StringBuilder();
+			final int[] result = new int[1];
+			result[0] = EXITCODE_CANNOT_DETERMINE_ERRORLEVEL;
+
+			final Thread processOutputReaderThread = new Thread("Process handler reader for command " + commandLine) {
+				@Override
+				public void run() {
+					try {
+						receive(stdout, outputBuf, toCallersStdout, "ogin:");
+						send(stdin, username);
+	
+						receive(stdout, outputBuf, toCallersStdout, "assword:");
+						send(stdin, password);
+	
+						receive(stdout, outputBuf, toCallersStdout, ">", "ogon failure");
+						send(stdin, "PROMPT " + DETECTABLE_WINDOWS_PROMPT);
+						// We must wait for the prompt twice; the first time is an echo of the PROMPT command,
+						// the second is the actual prompt
+						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+	
+						send(stdin, commandLineForExecution);
+	
+						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+	
+						send(stdin, "ECHO \"" + ERRORLEVEL_PREAMBLE + "%errorlevel%" + ERRORLEVEL_POSTAMBLE);
+						receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
+						receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
+						int preamblePos = outputBuf.indexOf(ERRORLEVEL_PREAMBLE);
+						int postamblePos = outputBuf.indexOf(ERRORLEVEL_POSTAMBLE);
+						if (preamblePos >= 0 && postamblePos >= 0) {
+							String errorlevelString = outputBuf.substring(preamblePos + ERRORLEVEL_PREAMBLE.length(), postamblePos);
+							if (logger.isDebugEnabled())
+								logger.debug("Errorlevel string found: " + errorlevelString);
+	
+							try {
+								result[0] =  Integer.parseInt(errorlevelString);
+							} catch (NumberFormatException exc) {
+								logger.error("Cannot parse errorlevel in Windows output: " + outputBuf);
+							}
+						} else {
+							logger.error("Cannot find errorlevel in Windows output: " + outputBuf);
+						}
+					} catch(IOException exc) {
+						throw new RuntimeIOException("Cannot start process " + commandLine, exc);
+					} finally {
+						Closeables.closeQuietly(toCallersStdout);
+					}
+				}
+			};
+			processOutputReaderThread.start();
 			
 			return new OverthereProcess() {
 				@Override
@@ -103,50 +154,13 @@ public class CifsTelnetConnection extends CifsConnection {
 				public int waitFor() {
 					try {
 						try {
-							StringBuilder outputBuf = new StringBuilder();
-
-							receive(stdout, outputBuf, toCallersStdout, "ogin:");
-							send(stdin, username);
-
-							receive(stdout, outputBuf, toCallersStdout, "assword:");
-							send(stdin, password);
-
-							receive(stdout, outputBuf, toCallersStdout, ">", "ogon failure");
-							send(stdin, "PROMPT " + DETECTABLE_WINDOWS_PROMPT);
-							// We must wait for the prompt twice; the first time is an echo of the PROMPT command,
-							// the second is the actual prompt
-							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-
-							send(stdin, commandLineForExecution);
-
-							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-
-							send(stdin, "ECHO \"" + ERRORLEVEL_PREAMBLE + "%errorlevel%" + ERRORLEVEL_POSTAMBLE);
-							receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
-							receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
-							int preamblePos = outputBuf.indexOf(ERRORLEVEL_PREAMBLE);
-							int postamblePos = outputBuf.indexOf(ERRORLEVEL_POSTAMBLE);
-							if (preamblePos >= 0 && postamblePos >= 0) {
-								String errorlevelString = outputBuf.substring(preamblePos + ERRORLEVEL_PREAMBLE.length(), postamblePos);
-								if (logger.isDebugEnabled())
-									logger.debug("Errorlevel string found: " + errorlevelString);
-
-								try {
-									return Integer.parseInt(errorlevelString);
-								} catch (NumberFormatException exc) {
-									logger.error("Cannot parse errorlevel in Windows output: " + outputBuf);
-									return EXITCODE_CANNOT_DETERMINE_ERRORLEVEL;
-								}
-							} else {
-								logger.error("Cannot find errorlevel in Windows output: " + outputBuf);
-								return EXITCODE_CANNOT_DETERMINE_ERRORLEVEL;
-							}
+							processOutputReaderThread.join();
 						} finally {
 							destroy();
 						}
-					} catch (IOException exc) {
-						throw new RuntimeIOException("Cannot execute command " + commandLineForLogging + " on " + address, exc);
+						return result[0];
+					} catch (InterruptedException exc) {
+						throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + address, exc);
 					}
 				}
 
@@ -157,7 +171,7 @@ public class CifsTelnetConnection extends CifsConnection {
 							tc.disconnect();
 							logger.info("Disconnected from telnet://{}@{}", username, address);
 
-							toCallersStdout.close();
+							Closeables.closeQuietly(toCallersStdout);
 						} catch (IOException exc) {
 							throw new RuntimeIOException("Cannot disconnect from telnet://" + username + "@" + address, exc);
 						}
@@ -165,9 +179,9 @@ public class CifsTelnetConnection extends CifsConnection {
 				}
 			};
 		} catch (InvalidTelnetOptionException exc) {
-			throw new RuntimeIOException("Cannot execute command " + commandLineForLogging + " at telnet://" + username + "@" + address, exc);
+			throw new RuntimeIOException("Cannot execute command " + commandLine + " at telnet://" + username + "@" + address, exc);
 		} catch (IOException exc) {
-			throw new RuntimeIOException("Cannot execute command " + commandLineForLogging + " at telnet://" + username + "@" + address, exc);
+			throw new RuntimeIOException("Cannot execute command " + commandLine + " at telnet://" + username + "@" + address, exc);
 		}
 	}
 

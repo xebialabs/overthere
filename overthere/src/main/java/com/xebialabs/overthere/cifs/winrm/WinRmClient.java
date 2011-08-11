@@ -16,16 +16,11 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import static com.google.common.io.Closeables.closeQuietly;
-
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.Pipe;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,6 +34,7 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 
@@ -46,9 +42,6 @@ public class WinRmClient {
 
 	private final URL targetURL;
 	private final HttpConnector connector;
-
-	private final Pipe stdoutPipe;
-	private final Pipe stderrPipe;
 
 	private String timeout;
 	private int envelopSize;
@@ -63,43 +56,19 @@ public class WinRmClient {
 	public WinRmClient(HttpConnector connector, URL targetURL) {
 		this.connector = connector;
 		this.targetURL = targetURL;
-		try {
-			stdoutPipe = Pipe.open();
-			stderrPipe = Pipe.open();
-		} catch (IOException e) {
-			throw new RuntimeIOException(e);
-		}
 	}
 
-	public void runCmd(String command) {
+	public void runCmd(String command, OverthereProcessOutputHandler handler) {
 		try {
 			shellId = openShell();
 			commandId = runCommand(command);
-			getCommandOutput();
+			getCommandOutput(handler);
 		} finally {
 			cleanUp();
 			closeShell();
-			destroy();
 		}
 	}
 
-	public void destroy() {
-		closeQuietly(stderrPipe.sink());
-		closeQuietly(stderrPipe.source());
-
-		closeQuietly(stdoutPipe.sink());
-		closeQuietly(stdoutPipe.source());
-	}
-
-
-	public InputStream getStdoutStream() {
-		return new BufferedInputStream(Channels.newInputStream(stdoutPipe.source()));
-	}
-
-
-	public InputStream getStderrStream() {
-		return new BufferedInputStream(Channels.newInputStream(stderrPipe.source()));
-	}
 
 	private void closeShell() {
 		if (shellId == null)
@@ -122,37 +91,40 @@ public class WinRmClient {
 
 	}
 
-	private void getCommandOutput() {
+	private void getCommandOutput(OverthereProcessOutputHandler handler) {
 		logger.debug("getCommandOutput shellId {} commandId {} ", shellId, commandId);
 		final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", Namespaces.NS_WIN_SHELL));
 		bodyContent.addElement(QName.get("DesiredStream", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
 		final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
 
-		final Pipe.SinkChannel stdSink = stdoutPipe.sink();
-		try {
-			stdSink.write(ByteBuffer.wrap("-- Winrm Stdout --\n".getBytes()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		final Pipe.SinkChannel stdErrSink = stderrPipe.sink();
-		try {
-			stdErrSink.write(ByteBuffer.wrap("-- Winrm Stderr --\n".getBytes()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 		for (;;) {
 			Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
+			String stdout = handleStream(responseDocument, ResponseExtractor.STDOUT);
+			BufferedReader stdoutReader = new BufferedReader(new StringReader(stdout));
 			try {
-				stdSink.write(ByteBuffer.wrap(handleStream(responseDocument, ResponseExtractor.STDOUT).getBytes()));
-			} catch (IOException e) {
-				throw new RuntimeIOException("getCommandOutput: stdout Write fails", e);
+				for(;;) {
+					String line = stdoutReader.readLine();
+					if(line == null) {
+						break;
+					}
+					handler.handleOutputLine(line);
+				}
+			} catch(IOException exc) {
+				throw new RuntimeIOException("Unexpected I/O exception while reading stdout", exc);
 			}
 
+			String stderr = handleStream(responseDocument, ResponseExtractor.STDERR);
+			BufferedReader stderrReader = new BufferedReader(new StringReader(stderr));
 			try {
-				stdErrSink.write(ByteBuffer.wrap(handleStream(responseDocument, ResponseExtractor.STDERR).getBytes()));
-			} catch (IOException e) {
-				throw new RuntimeIOException("getCommandOutput: Stderr Write fails", e);
+				for(;;) {
+					String line = stderrReader.readLine();
+					if(line == null) {
+						break;
+					}
+					handler.handleErrorLine(line);
+				}
+			} catch(IOException exc) {
+				throw new RuntimeIOException("Unexpected I/O exception while reading stderr", exc);
 			}
 
 			if (chunk == 0) {

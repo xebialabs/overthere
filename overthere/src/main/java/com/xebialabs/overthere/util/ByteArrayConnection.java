@@ -1,15 +1,13 @@
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
 
 class ByteArrayConnection extends OverthereConnection {
 
 	protected ByteArrayConnection(String type, ConnectionOptions options) {
-	    super(type, options);
+	    super(type, options, false);
     }
 
 	@Override
@@ -29,11 +27,6 @@ class ByteArrayConnection extends OverthereConnection {
 
 	@Override
 	protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-		throw new UnsupportedOperationException("ByteArrayConnection has no functionality. Use only the created ByteArrayFile.");
-	}
-
-	@Override
-	public OverthereProcess startProcess(CmdLine commandLine) {
 		throw new UnsupportedOperationException("ByteArrayConnection has no functionality. Use only the created ByteArrayFile.");
 	}
 

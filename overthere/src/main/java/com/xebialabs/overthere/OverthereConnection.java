@@ -49,28 +49,30 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class OverthereConnection implements Closeable {
 
-	protected String type;
+	protected final String type;
 
-	protected OperatingSystemFamily os;
+	protected final OperatingSystemFamily os;
 
-	protected int connectionTimeoutMillis;
+	protected final int connectionTimeoutMillis;
 
-	protected String temporaryDirectoryPath;
+	protected final String temporaryDirectoryPath;
+
+	protected final boolean deleteTemporaryDirectoryOnDisconnect;
+	
+	protected final int temporaryFileCreationRetries;
+	
+	protected final boolean canStartProcess;
 
 	protected OverthereFile connectionTemporaryDirectory;
 
-	protected boolean deleteTemporaryDirectoryOnDisconnect;
-	
-	protected int temporaryFileCreationRetries;
-
-
-	protected OverthereConnection(String type, ConnectionOptions options) {
+	protected OverthereConnection(final String type, final ConnectionOptions options, final boolean canStartProcess) {
 		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
 		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
 		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
+		this.canStartProcess = canStartProcess;
 	}
 
 	/**
@@ -244,7 +246,7 @@ public abstract class OverthereConnection implements Closeable {
 	 *            the command line to execute.
 	 * @return the exit value of the executed command. Usually 0 on successful execution.
 	 */
-	public final int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
+	public int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
 		final OverthereProcess process = startProcess(commandLine);
 		Thread stdoutReaderThread = null;
 		Thread stderrReaderThread = null;
@@ -346,7 +348,18 @@ public abstract class OverthereConnection implements Closeable {
 	 *            the command line to execute.
 	 * @return an object representing the executing command or <tt>null</tt> if this is not supported by the host connection.
 	 */
-	public abstract OverthereProcess startProcess(CmdLine commandLine);
+	public OverthereProcess startProcess(CmdLine commandLine) {
+		throw new UnsupportedOperationException("Cannot start a process on " + this);
+	}
+
+	/**
+	 * Checks whether a process can be started on this connection.
+	 * 
+	 * @return <code>true</code> if a process can be started on this connection, <code>false</code> otherwise
+	 */
+	public final boolean canStartProcess() {
+		return canStartProcess;
+	}
 
 	/**
 	 * Subclasses MUST implement toString properly.

@@ -12,17 +12,13 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.winrm.connector.JdkHttpConnector;
@@ -48,7 +44,7 @@ public class CifsWinRmConnection extends CifsConnection {
 	 * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
 	public CifsWinRmConnection(String type, ConnectionOptions options) {
-		super(type, options);
+		super(type, options, false);
 
 		TokenGenerator tokenGenerator = getTokenGenerator(options);
 		URL targetURL = getTargetURL(options);
@@ -87,41 +83,10 @@ public class CifsWinRmConnection extends CifsConnection {
 	}
 
 	@Override
-	public OverthereProcess startProcess(CmdLine commandLine) {
+	public int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
 		final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
-		final String commandLineForLogging = commandLine.toCommandLine(getHostOperatingSystem(), true);
-		return new OverthereProcess() {
-
-			@Override
-			public OutputStream getStdin() {
-				return new ByteArrayOutputStream();
-			}
-
-			@Override
-			public InputStream getStdout() {
-				return winRmClient.getStdoutStream();
-			}
-
-			@Override
-			public InputStream getStderr() {
-				return winRmClient.getStderrStream();
-			}
-
-			@Override
-			public int waitFor() throws InterruptedException {
-				try {
-					winRmClient.runCmd(commandLineForExecution);
-					return winRmClient.getExitCode();
-				} catch (RuntimeException exc) {
-					throw new RuntimeIOException("Cannot execute command " + commandLineForLogging + " at " + winRmClient.getTargetURL(), exc);
-				}
-			}
-
-			@Override
-			public void destroy() {
-				winRmClient.destroy();
-			}
-		};
+		winRmClient.runCmd(commandLineForExecution, handler);
+		return winRmClient.getExitCode();
 	}
 
 }
