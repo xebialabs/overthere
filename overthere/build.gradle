@@ -1,0 +1,39 @@
+// build.gradle for the overthere project
+
+dependencies {
+	// General dependencies
+	compile 'com.google.guava:guava:r09'
+	compile 'nl.javadude.scannit:scannit:0.9'
+	compile 'org.slf4j:slf4j-api:1.6.1'
+
+	// SSH
+	compile 'net.schmizz:sshj:0.5.0'
+	runtime 'com.jcraft:jzlib:1.0.7'
+	runtime 'org.bouncycastle:bcprov-jdk16:1.45'
+
+	// CIFS
+	compile 'org.samba.jcifs:jcifs:1.3.3'
+
+	// Telnet 
+	compile 'commons-net:commons-net:2.0'
+
+	// WinRM
+	compile('dom4j:dom4j:1.6.1') {
+		exclude group: 'xml-apis', module: 'xml-apis'
+	}
+	compile('jaxen:jaxen:1.1.1') {
+		exclude group: 'xml-apis', module: 'xml-apis'
+		exclude group: 'xalan', module: 'xalan'
+		exclude group: 'xerces', module: 'xmlParserAPIs'
+		exclude group: 'xerces', module: 'xercesImpl'
+	}
+	compile 'org.apache.httpcomponents:httpclient:4.1.1'
+	compile 'commons-codec:commons-codec:1.5'
+
+	// Test dependencies
+	testCompile project(':itest-support')
+	testCompile 'junit:junit:4.8.1'
+	testCompile 'org.hamcrest:hamcrest-all:1.1'
+	testCompile 'org.mockito:mockito-all:1.8.5'
+	testRuntime 'ch.qos.logback:logback-classic:0.9.24'
+}
