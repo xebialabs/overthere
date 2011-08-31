@@ -198,6 +198,7 @@ public abstract class OverthereConnectionItestBase {
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), not(containsString("ipconfig")));
 		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
@@ -210,6 +211,7 @@ public abstract class OverthereConnectionItestBase {
 		try {
 			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
 			assertThat(p.waitFor(), equalTo(0));
+			assertThat(commandOutput, not(containsString("ipconfig")));
 			assertThat(commandOutput, containsString("Windows IP Configuration"));
 		} finally {
 			p.destroy();
