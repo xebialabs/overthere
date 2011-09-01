@@ -17,7 +17,6 @@
 package com.xebialabs.overthere.cifs.telnet;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,7 +82,7 @@ public class CifsTelnetConnection extends CifsConnection {
 			final OutputStream stdin = tc.getOutputStream();
 			final PipedInputStream callersStdout = new PipedInputStream();
 			final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
-			final ByteArrayOutputStream outputBuf = new  ByteArrayOutputStream();
+			final StringBuilder outputBuf = new StringBuilder();
 			final int[] result = new int[1];
 			result[0] = EXITCODE_CANNOT_DETERMINE_ERRORLEVEL;
 
@@ -111,11 +110,10 @@ public class CifsTelnetConnection extends CifsConnection {
 						send(stdin, "ECHO \"" + ERRORLEVEL_PREAMBLE + "%errorlevel%" + ERRORLEVEL_POSTAMBLE);
 						receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
 						receive(stdout, outputBuf, toCallersStdout, ERRORLEVEL_POSTAMBLE);
-						String outputBufStr = outputBuf.toString();
-						int preamblePos = outputBufStr.indexOf(ERRORLEVEL_PREAMBLE);
-						int postamblePos = outputBufStr.indexOf(ERRORLEVEL_POSTAMBLE);
+						int preamblePos = outputBuf.indexOf(ERRORLEVEL_PREAMBLE);
+						int postamblePos = outputBuf.indexOf(ERRORLEVEL_POSTAMBLE);
 						if (preamblePos >= 0 && postamblePos >= 0) {
-							String errorlevelString = outputBufStr.substring(preamblePos + ERRORLEVEL_PREAMBLE.length(), postamblePos);
+							String errorlevelString = outputBuf.substring(preamblePos + ERRORLEVEL_PREAMBLE.length(), postamblePos);
 							if (logger.isDebugEnabled())
 								logger.debug("Errorlevel string found: " + errorlevelString);
 	
@@ -187,11 +185,12 @@ public class CifsTelnetConnection extends CifsConnection {
 		}
 	}
 
-	private void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout, final String expectedString) throws IOException {
+	private void receive(final InputStream stdout, final StringBuilder outputBuf, final PipedOutputStream toCallersStdout, final String expectedString) throws IOException {
 		receive(stdout, outputBuf, toCallersStdout, expectedString, null);
 	}
 
-	private void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout, final String expectedString, final String unexpectedString) throws IOException {
+	private void receive(final InputStream stdout, final StringBuilder outputBuf, final PipedOutputStream toCallersStdout, final String expectedString,
+	        final String unexpectedString) throws IOException {
 		boolean lastCharWasCr = false;
 		boolean lastCharWasEsc = false;
 		for (;;) {
@@ -200,16 +199,17 @@ public class CifsTelnetConnection extends CifsConnection {
 				throw new IOException("End of stream reached");
 			}
 
-			outputBuf.write(cInt);
-			final String outputBufStr = outputBuf.toString();
+			toCallersStdout.write(cInt);
 			char c = (char) cInt;
 			switch (c) {
 			case '\r':
-				handleReceivedLine(outputBuf, outputBufStr, toCallersStdout);
+				outputBuf.delete(0, outputBuf.length());
+				toCallersStdout.flush();
 				break;
 			case '\n':
 				if (!lastCharWasCr) {
-					handleReceivedLine(outputBuf, outputBufStr, toCallersStdout);
+					outputBuf.delete(0, outputBuf.length());
+					toCallersStdout.flush();
 				}
 				break;
 			case '[':
@@ -217,12 +217,15 @@ public class CifsTelnetConnection extends CifsConnection {
 					throw new RuntimeIOException(
 					        "VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).");
 				}
+			default:
+				outputBuf.append(c);
+				break;
 			}
 			lastCharWasCr = (c == '\r');
 			lastCharWasEsc = (c == 27);
 
-			if (unexpectedString != null && outputBufStr.length() >= unexpectedString.length()) {
-				String s = outputBufStr.substring(outputBufStr.length() - unexpectedString.length(), outputBufStr.length());
+			if (unexpectedString != null && outputBuf.length() >= unexpectedString.length()) {
+				String s = outputBuf.substring(outputBuf.length() - unexpectedString.length(), outputBuf.length());
 				if (s.equals(unexpectedString)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Unexpected string \"" + unexpectedString + "\" found in Windows Telnet output");
@@ -231,8 +234,8 @@ public class CifsTelnetConnection extends CifsConnection {
 				}
 			}
 
-			if (outputBufStr.length() >= expectedString.length()) {
-				String s = outputBufStr.substring(outputBufStr.length() - expectedString.length(), outputBufStr.length());
+			if (outputBuf.length() >= expectedString.length()) {
+				String s = outputBuf.substring(outputBuf.length() - expectedString.length(), outputBuf.length());
 				if (s.equals(expectedString)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Expected string \"" + expectedString + "\" found in Windows Telnet output");
@@ -243,15 +246,7 @@ public class CifsTelnetConnection extends CifsConnection {
 		}
 	}
 
-	private void handleReceivedLine(final ByteArrayOutputStream outputBuf, final String outputBufStr, final PipedOutputStream toCallersStdout) throws IOException {
-		if(!outputBufStr.contains(DETECTABLE_WINDOWS_PROMPT)) {
-			toCallersStdout.write(outputBuf.toByteArray());
-		    toCallersStdout.flush();
-		}
-		outputBuf.reset();
-    }
-
-	private void send(final OutputStream stdin, final String lineToSend) throws IOException {
+	private void send(OutputStream stdin, String lineToSend) throws IOException {
 		byte[] bytesToSend = (lineToSend + "\r\n").getBytes();
 		stdin.write(bytesToSend);
 		stdin.flush();
