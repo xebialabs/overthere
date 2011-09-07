@@ -19,16 +19,17 @@ package com.xebialabs.overthere.local;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.OutputSupplier;
 import org.junit.Test;
 
 import com.xebialabs.overthere.CmdLine;
@@ -82,4 +83,34 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 		assertThat(((LocalFile) read).getPath(), equalTo(tempFile.getPath()));
 	}
 
+	@Test
+	public void shouldTruncateExistingTargetFileOnCopy() throws Exception {
+		final OverthereFile existingDestination = connection.getTempFile("existing");
+		writeData(existingDestination, "**********\n**********\n**********\n**********\n**********\n".getBytes());
+		final OverthereFile newSource = connection.getTempFile("newContents");
+		writeData(newSource, "++++++++++".getBytes());
+		newSource.copyTo(existingDestination);
+
+		byte[] read = new byte[1024];
+		ByteArrayOutputStream to = new ByteArrayOutputStream();
+		ByteStreams.copy(new InputSupplier<InputStream>() {
+			@Override
+			public InputStream getInput() throws IOException {
+				return existingDestination.getInputStream();
+			}
+		}, to);
+		byte[] bytes = to.toByteArray();
+		assertThat(bytes.length, equalTo(10));
+		assertThat(bytes, equalTo("++++++++++".getBytes()));
+	}
+
+	private void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
+		ByteStreams.write(data, new OutputSupplier<OutputStream>() {
+			@Override
+			public OutputStream getOutput() throws IOException {
+				return tempFile.getOutputStream();
+			}
+		});
+	}
 }
+
