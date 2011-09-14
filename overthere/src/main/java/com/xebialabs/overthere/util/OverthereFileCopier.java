@@ -1,8 +1,7 @@
 package com.xebialabs.overthere.util;
 
-import static com.google.common.io.Closeables.closeQuietly;
-
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Stack;
 
@@ -10,9 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.util.OverthereFileInputStreamTransformer.TransformedInputStream;
 
 /**
  * OverthereFile copy utility that uses only the input and output streams exposed by the OverthereFile to perform the copying action.
@@ -26,13 +26,11 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
 	private Stack<OverthereFile> dstDirStack = new Stack<OverthereFile>();
 	private OverthereFile srcDir;
-	private OverthereFileInputStreamTransformer transformer;
 
-	private OverthereFileCopier(OverthereFile srcDir, OverthereFile dstDir, OverthereFileInputStreamTransformer transformer) {
+	private OverthereFileCopier(OverthereFile srcDir, OverthereFile dstDir) {
 		dstDirStack.push(dstDir);
 		this.srcDir = srcDir;
 		OverthereFileCopier.checkDirectoryExists(srcDir, SOURCE);
-		this.transformer = transformer;
 	}
 
 	protected void handleDirectoryStart(OverthereFile scrDir, int depth) throws IOException {
@@ -68,7 +66,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
 	protected void handleFile(OverthereFile srcFile, int depth) throws IOException {
 		OverthereFile dstFile = getCurrentDestinationDir().getFile(srcFile.getName());
-		OverthereFileCopier.copyFile(srcFile, dstFile, transformer);
+		OverthereFileCopier.copyFile(srcFile, dstFile);
 	}
 
 	protected void handleDirectoryEnd(OverthereFile directory, int depth) throws IOException {
@@ -84,16 +82,14 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 *            the source file or directory.
 	 * @param dst
 	 *            the destination file or directory. If it exists it must be of the same type as the source. Its parent directory must exist.
-	 * @param transformer
-	 *            Transforms the inputstream of the sourcefile, can supply null
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurred
 	 */
-	public static void copy(OverthereFile src, OverthereFile dst, OverthereFileInputStreamTransformer transformer) {
+	public static void copy(OverthereFile src, OverthereFile dst) {
 		if (src.isDirectory()) {
-			copyDirectory(src, dst, transformer);
+			copyDirectory(src, dst);
 		} else {
-			copyFile(src, dst, transformer);
+			copyFile(src, dst);
 		}
 	}
 
@@ -104,13 +100,11 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 *            the source directory. Must exist and must not be a directory.
 	 * @param dstDir
 	 *            the destination directory. May exists but must a directory. Its parent directory must exist.
-	 * @param transformer
-	 *            Transforms the inputstream of the sourcefile, can be null
 	 * @throws RuntimeIOException
 	 *             if an I/O error occurred
 	 */
-	public static void copyDirectory(OverthereFile srcDir, OverthereFile dstDir, OverthereFileInputStreamTransformer transformer) throws RuntimeIOException {
-		OverthereFileCopier dirCopier = new OverthereFileCopier(srcDir, dstDir, transformer);
+	private static void copyDirectory(OverthereFile srcDir, OverthereFile dstDir) throws RuntimeIOException {
+		OverthereFileCopier dirCopier = new OverthereFileCopier(srcDir, dstDir);
 		dirCopier.startCopy();
 	}
 
@@ -121,56 +115,32 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 *            the source file. Must exists and must not be a directory.
 	 * @param dstFile
 	 *            the destination file. May exists but must not be a directory. Its parent directory must exist.
-	 * @param transformer
-	 *            Transforms the inputstream of the sourcefile, can be null
 	 * @throws com.xebialabs.deployit.exception.RuntimeIOException
 	 *             if an I/O error occurred
 	 */
-	public static void copyFile(OverthereFile srcFile, OverthereFile dstFile, OverthereFileInputStreamTransformer transformer) throws RuntimeIOException {
+	private static void copyFile(final OverthereFile srcFile, final OverthereFile dstFile) throws RuntimeIOException {
 		checkFileExists(srcFile, SOURCE);
 		checkReallyIsAFile(dstFile, DESTINATION);
 
 		if (logger.isDebugEnabled()) {
 			if (dstFile.exists())
 				logger.debug("About to overwrite existing file " + dstFile);
-			logger.debug("Copying contents of file " + srcFile + " to " + dstFile);
+			logger.debug("Copying file " + srcFile + " to " + dstFile);
 		}
 
-		copyStreamToFile(transform(srcFile, transformer), dstFile);
-	}
-
-	private static void copyStreamToFile(TransformedInputStream in, OverthereFile dstFile) {
 		try {
-			OutputStream out = dstFile.getOutputStream();
-			try {
-				try {
-					ByteStreams.copy(in, out);
-				} catch (IOException exc) {
-					throw new RuntimeIOException("Cannot copy stream to file", exc);
-				}
-			} finally {
-				closeQuietly(out);
-			}
-		} finally {
-			closeQuietly(in);
-		}
-	}
-
-	/**
-	 * Applies the specified transformer to the source file. If the transformer is null, the inputstream from the source file is used directly.
-	 * 
-	 * @param file
-	 *            that must be transformed. Must exists.
-	 * @param transformer
-	 *            transformer Transforms the inputstream of the sourcefile, can be null
-	 * @return TransformedInputStream as determined by the transformer.
-	 */
-	public static TransformedInputStream transform(OverthereFile file, OverthereFileInputStreamTransformer transformer) {
-		if (transformer == null) {
-			return new TransformedInputStream(file.getInputStream(), file.length());
-		} else {
-			return transformer.transform(file);
-		}
+	        ByteStreams.copy(new InputSupplier<InputStream>() {
+	            public InputStream getInput() throws IOException {
+	                return srcFile.getInputStream();
+	            }
+	        }, new OutputSupplier<OutputStream>() {
+	            public OutputStream getOutput() throws IOException {
+	                return dstFile.getOutputStream();
+	            }
+	        });
+        } catch (IOException exc) {
+        	throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc);
+        }
 	}
 
 	/**
@@ -183,7 +153,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 * @throws RuntimeIOException
 	 *             if file does not exist or is a directory.
 	 */
-	public static void checkFileExists(OverthereFile file, String sourceDescription) {
+	private static void checkFileExists(OverthereFile file, String sourceDescription) {
 		if (!file.exists()) {
 			throw new RuntimeIOException(sourceDescription + " file " + file + " does not exist");
 		}
@@ -200,7 +170,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 * @throws RuntimeIOException
 	 *             if file is a directory.
 	 */
-	public static void checkReallyIsAFile(OverthereFile file, String fileDescription) {
+	private static void checkReallyIsAFile(OverthereFile file, String fileDescription) {
 		if (file.exists() && file.isDirectory()) {
 			throw new RuntimeIOException(fileDescription + " file " + file + " exists but is a directory");
 		}
@@ -216,7 +186,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 * @throws RuntimeIOException
 	 *             if directory does not exist or if it a flat file.
 	 */
-	public static void checkDirectoryExists(OverthereFile dir, String dirDescription) {
+	private static void checkDirectoryExists(OverthereFile dir, String dirDescription) {
 		if (!dir.exists()) {
 			throw new RuntimeIOException(dirDescription + " directory " + dir + " does not exist");
 		}
@@ -233,7 +203,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 	 * @throws RuntimeIOException
 	 *             if file is not a directory.
 	 */
-	public static void checkReallyIsADirectory(OverthereFile dir, String dirDescription) {
+	private static void checkReallyIsADirectory(OverthereFile dir, String dirDescription) {
 		if (dir.exists() && !dir.isDirectory()) {
 			throw new RuntimeIOException(dirDescription + " directory " + dir + " exists but is not a directory");
 		}
