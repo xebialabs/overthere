@@ -166,7 +166,7 @@ public abstract class OverthereConnectionItestBase {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
 
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
-		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("echo", "-n", "line that does not end in a newline"));
+		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("echo", "-n", "line", "that", "does", "not", "end", "in", "a", "newline"));
 		assertThat(res, equalTo(0));
 		if (captured.getOutputLines().size() == 2) {
 			// When using ssh_interactive_sudo, the first line may contain a password prompt.
