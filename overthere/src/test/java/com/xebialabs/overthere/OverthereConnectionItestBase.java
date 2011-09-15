@@ -566,7 +566,6 @@ public abstract class OverthereConnectionItestBase {
 		writeData(newSource, "++++++++++".getBytes());
 		newSource.copyTo(existingDestination);
 
-		byte[] read = new byte[1024];
 		ByteArrayOutputStream to = new ByteArrayOutputStream();
 		ByteStreams.copy(new InputSupplier<InputStream>() {
 			@Override
