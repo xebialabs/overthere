@@ -37,16 +37,11 @@ import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeThat;
 import static org.junit.matchers.JUnitMatchers.containsString;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Random;
 
+import com.google.common.io.InputSupplier;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -167,6 +162,23 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	public void shouldCaptureLastLineOfSimpleCommandOnUnix() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("echo", "-n", "line", "that", "does", "not", "end", "in", "a", "newline"));
+		assertThat(res, equalTo(0));
+		if (captured.getOutputLines().size() == 2) {
+			// When using ssh_interactive_sudo, the first line may contain a password prompt.
+			assertThat(captured.getOutputLines().get(0), containsString("assword"));
+			assertThat(captured.getOutputLines().get(1), containsString("line that does not end in a newline"));
+		} else {
+			assertThat(captured.getOutputLines().size(), equalTo(1));
+			assertThat(captured.getOutput(), containsString("line that does not end in a newline"));
+		}
+	}
+
+	@Test
 	public void shouldStartProcessSimpleCommandOnUnix() throws IOException, InterruptedException {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
 
@@ -198,6 +210,7 @@ public abstract class OverthereConnectionItestBase {
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), not(containsString("ipconfig")));
 		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
@@ -210,6 +223,7 @@ public abstract class OverthereConnectionItestBase {
 		try {
 			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
 			assertThat(p.waitFor(), equalTo(0));
+			assertThat(commandOutput, not(containsString("ipconfig")));
 			assertThat(commandOutput, containsString("Windows IP Configuration"));
 		} finally {
 			p.destroy();
@@ -543,6 +557,36 @@ public abstract class OverthereConnectionItestBase {
 		remoteFile.setExecutable(false);
 		assertThat(remoteFile.canExecute(), equalTo(false));
 	}
+
+	@Test
+	public void shouldTruncateExistingTargetFileOnCopy() throws Exception {
+		final OverthereFile existingDestination = connection.getTempFile("existing");
+		writeData(existingDestination, "**********\n**********\n**********\n**********\n**********\n".getBytes());
+		final OverthereFile newSource = connection.getTempFile("newContents");
+		writeData(newSource, "++++++++++".getBytes());
+		newSource.copyTo(existingDestination);
+
+		ByteArrayOutputStream to = new ByteArrayOutputStream();
+		ByteStreams.copy(new InputSupplier<InputStream>() {
+			@Override
+			public InputStream getInput() throws IOException {
+				return existingDestination.getInputStream();
+			}
+		}, to);
+		byte[] bytes = to.toByteArray();
+		assertThat(bytes.length, equalTo(10));
+		assertThat(bytes, equalTo("++++++++++".getBytes()));
+	}
+
+	private void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
+		ByteStreams.write(data, new OutputSupplier<OutputStream>() {
+			@Override
+			public OutputStream getOutput() throws IOException {
+				return tempFile.getOutputStream();
+			}
+		});
+	}
+
 
 	protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
 		byte[] randomBytes = generateRandomBytes(size);

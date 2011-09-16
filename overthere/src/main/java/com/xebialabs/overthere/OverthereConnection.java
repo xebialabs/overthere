@@ -254,10 +254,10 @@ public abstract class OverthereConnection implements Closeable {
 		try {
 			stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
 				public void run() {
+					StringBuilder lineBuffer = new StringBuilder();
 					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
 					latch.countDown();
 					try {
-						StringBuffer lineBuffer = new StringBuffer();
 						int cInt = stdoutReader.read();
 						while (cInt > -1) {
 							char c = (char) cInt;
@@ -267,7 +267,7 @@ public abstract class OverthereConnection implements Closeable {
 							}
 							if (c == '\n') {
 								handler.handleOutputLine(lineBuffer.toString());
-								lineBuffer = new StringBuffer();
+								lineBuffer.setLength(0);
 							}
 							cInt = stdoutReader.read();
 						}
@@ -275,6 +275,9 @@ public abstract class OverthereConnection implements Closeable {
 						logger.error("An exception occured while reading from stdout", exc);
 					} finally {
 						closeQuietly(stdoutReader);
+						if(lineBuffer.length() > 0) {
+							handler.handleOutputLine(lineBuffer.toString());
+						}
 					}
 				}
 			};
@@ -282,11 +285,11 @@ public abstract class OverthereConnection implements Closeable {
 
 			stderrReaderThread = new Thread("Stderr reader thread for command " + commandLine + " on " + this) {
 				public void run() {
+					StringBuilder lineBuffer = new StringBuilder();
 					InputStreamReader stderrReader = new InputStreamReader(process.getStderr());
 					latch.countDown();
 					try {
 						int readInt = stderrReader.read();
-						StringBuffer lineBuffer = new StringBuffer();
 						while (readInt > -1) {
 							char c = (char) readInt;
 							if (c != '\r' && c != '\n') {
@@ -294,7 +297,7 @@ public abstract class OverthereConnection implements Closeable {
 							}
 							if (c == '\n') {
 								handler.handleErrorLine(lineBuffer.toString());
-								lineBuffer = new StringBuffer();
+								lineBuffer.setLength(0);
 							}
 							readInt = stderrReader.read();
 						}
@@ -302,6 +305,9 @@ public abstract class OverthereConnection implements Closeable {
 						logger.error("An exception occured while reading from stderr", exc);
 					} finally {
 						closeQuietly(stderrReader);
+						if(lineBuffer.length() > 0) {
+							handler.handleErrorLine(lineBuffer.toString());
+						}
 					}
 				}
 			};

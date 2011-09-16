@@ -67,7 +67,7 @@ public abstract class BaseOverthereFile<C extends OverthereConnection> implement
 	}
 
 	protected void copyFrom(OverthereFile source) {
-		OverthereFileCopier.copy(source, this, null);
+		OverthereFileCopier.copy(source, this);
 	}
 
 	/**

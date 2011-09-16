@@ -275,7 +275,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
         try {
-	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE));
+	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
 	        final OutputStream wrapped = remoteFile.getOutputStream();
 
 	        return new OutputStream() {
