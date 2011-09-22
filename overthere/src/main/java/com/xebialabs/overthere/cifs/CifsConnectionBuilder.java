@@ -4,6 +4,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
+import com.xebialabs.overthere.cifs.winrs.CifsWinRsConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -75,6 +76,10 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 		case WINRM_HTTP:
 		case WINRM_HTTPS:
 			connection = new CifsWinRmConnection(type, options);
+			break;
+        case WINRS_HTTP:
+		case WINRS_HTTPS:
+			connection = new CifsWinRsConnection(type, options);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
