@@ -24,16 +24,8 @@ public class CifsWinRsConnection extends CifsConnection {
     private CifsConnectionType winrsConnectionType;
     private URL targetURL;
 
-    // Dirty hack to make super-class constructor happy with the value of CONNECTION_TYPE property
-    // TODO : refactor to make this hack unnecessary
-    private static ConnectionOptions workAroundConnectionTypeClash(ConnectionOptions options) {
-        ConnectionOptions newOptions = new ConnectionOptions(options);
-        newOptions.set(CONNECTION_TYPE, CifsConnectionType.WINRM_HTTP); // super class constructor needs a CifsConnectionType value
-        return newOptions;
-    }
-
     public CifsWinRsConnection(String type, ConnectionOptions options) {
-        super(type, workAroundConnectionTypeClash(options), false);
+        super(type, options, false);
         this.winrsConnectionType = options.get(CONNECTION_TYPE);
         this.port = options.get(PORT, getDefaultPort());
         this.targetURL = getTargetURL(options);
