@@ -1,33 +1,33 @@
 package com.xebialabs.overthere.cifs.winrs;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
-import com.xebialabs.overthere.cifs.CifsConnectionType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.collect.Iterables.transform;
+import static java.lang.String.format;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static java.lang.String.format;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
 
 public class CifsWinRsConnection extends CifsConnection {
 
     private String winrsExecFile = "C:\\WINDOWS\\system32\\winrs.exe";
-    private CifsConnectionType winrsConnectionType;
     private URL targetURL;
 
     public CifsWinRsConnection(String type, ConnectionOptions options) {
         super(type, options, false);
-        this.winrsConnectionType = options.get(CONNECTION_TYPE);
-        this.port = options.get(PORT, getDefaultPort());
         this.targetURL = getTargetURL(options);
     }
 
@@ -55,19 +55,20 @@ public class CifsWinRsConnection extends CifsConnection {
         return new WinrsOverthereProcess(fullCommandLine);
     }
 
-    private Integer getDefaultPort() {
-        switch (winrsConnectionType) {
+    @Override
+    protected Integer getDefaultPort() {
+        switch (cifsConnectionType) {
             case WINRS_HTTP:
                 return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
             case WINRS_HTTPS:
                 return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
             default:
-                throw new IllegalArgumentException("Unknown Winrs connection type " + winrsConnectionType);
+                throw new IllegalArgumentException("Unknown Winrs connection type " + cifsConnectionType);
         }
     }
 
     private URL getTargetURL(ConnectionOptions options) {
-        String scheme = winrsConnectionType == CifsConnectionType.WINRS_HTTP ? "http" : "https";
+        String scheme = cifsConnectionType == CifsConnectionType.WINRS_HTTP ? "http" : "https";
         try {
             return new URL(scheme, address, port, "");
         } catch (MalformedURLException e) {
@@ -77,7 +78,7 @@ public class CifsWinRsConnection extends CifsConnection {
 
     @Override
     public String toString() {
-        return "winrs:" + winrsConnectionType + "://" + username + "@" + address + ":" + port;
+        return "winrs:" + cifsConnectionType + "://" + username + "@" + address + ":" + port;
     }
 
     private static Logger logger = LoggerFactory.getLogger(CifsConnection.class);
