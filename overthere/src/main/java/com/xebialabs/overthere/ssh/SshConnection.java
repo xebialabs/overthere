@@ -92,12 +92,10 @@ abstract class SshConnection extends OverthereConnection {
                 throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
             }
             
-            if (password != null) {
-            	client.authPassword(username, password);
-            	if (privateKeyFile != null) {
-            		logger.warn("Both password and private key have been set for SSH connection {}. Using the password and ignoring the private key.", this);
-            	}
-            } else if (privateKeyFile != null) {
+            if (privateKeyFile != null) {
+                if (password != null) {
+                    logger.warn("Both password and private key have been set for SSH connection {}. Using the private key and ignoring the password.", this);
+                }
             	KeyProvider keys;
             	try {
             		if (passphrase == null) {
@@ -109,6 +107,8 @@ abstract class SshConnection extends OverthereConnection {
             		throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
             	}
             	client.authPublickey(username, keys);
+            } else if (password != null) {
+                client.authPassword(username, password);
             }
 			sshClient = client;
         } catch (SSHException e) {
