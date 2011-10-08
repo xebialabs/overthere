@@ -50,9 +50,9 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 abstract class SshConnection extends OverthereConnection {
 
-	protected final SshConnectionType sshConnectionType;
+    protected final SshConnectionType sshConnectionType;
 
-	protected final String host;
+    protected final String host;
 
     protected final int port;
 
@@ -60,61 +60,61 @@ abstract class SshConnection extends OverthereConnection {
 
     protected final String password;
 
-	protected final String privateKeyFile;
+    protected final String privateKeyFile;
 
-	protected final String passphrase;
+    protected final String passphrase;
 
-	protected final boolean allocateDefaultPty;
+    protected final boolean allocateDefaultPty;
 
-	protected SSHClient sshClient;
+    protected SSHClient sshClient;
 
-	public SshConnection(final String type, final ConnectionOptions options) {
+    public SshConnection(final String type, final ConnectionOptions options) {
         super(type, options, true);
-		this.sshConnectionType = options.get(CONNECTION_TYPE);
+        this.sshConnectionType = options.get(CONNECTION_TYPE);
         this.host = options.get(ADDRESS);
         this.port = options.get(PORT, 22);
         this.username = options.get(USERNAME);
         this.password = options.getOptional(PASSWORD);
-		this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
-		this.passphrase = options.getOptional(PASSPHRASE);
-		this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
+        this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
+        this.passphrase = options.getOptional(PASSPHRASE);
+        this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
     }
 
-	protected void connect() {
+    protected void connect() {
         try {
             SSHClient client = new SSHClient();
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new LaxKeyVerifier());
-            
+
             try {
                 client.connect(host, port);
             } catch (IOException e) {
                 throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
             }
-            
+
             if (privateKeyFile != null) {
                 if (password != null) {
                     logger.warn("Both password and private key have been set for SSH connection {}. Using the private key and ignoring the password.", this);
                 }
-            	KeyProvider keys;
-            	try {
-            		if (passphrase == null) {
-            			keys = client.loadKeys(privateKeyFile);
-            		} else {
-            			keys = client.loadKeys(privateKeyFile, passphrase);
-            		}
-            	} catch (IOException e) {
-            		throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
-            	}
-            	client.authPublickey(username, keys);
+                KeyProvider keys;
+                try {
+                    if (passphrase == null) {
+                        keys = client.loadKeys(privateKeyFile);
+                    } else {
+                        keys = client.loadKeys(privateKeyFile, passphrase);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
+                }
+                client.authPublickey(username, keys);
             } else if (password != null) {
                 client.authPassword(username, password);
             }
-			sshClient = client;
+            sshClient = client;
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot connect to " + this, e);
-        }		
-	}
+        }
+    }
 
     @Override
     public void doClose() {
