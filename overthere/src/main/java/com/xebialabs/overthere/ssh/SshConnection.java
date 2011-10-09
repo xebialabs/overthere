@@ -29,6 +29,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import java.io.IOException;
 
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
@@ -38,6 +39,7 @@ import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
@@ -67,6 +69,14 @@ abstract class SshConnection extends OverthereConnection {
     protected final boolean allocateDefaultPty;
 
     protected SSHClient sshClient;
+    
+    @VisibleForTesting
+    protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
+        @Override
+        public SSHClient create() {
+            return new SSHClient();
+        }
+    };
 
     public SshConnection(final String type, final ConnectionOptions options) {
         super(type, options, true);
@@ -82,7 +92,7 @@ abstract class SshConnection extends OverthereConnection {
 
     protected void connect() {
         try {
-            SSHClient client = new SSHClient();
+            SSHClient client = sshClientFactory.create();
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new LaxKeyVerifier());
 
