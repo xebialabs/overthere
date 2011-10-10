@@ -24,7 +24,7 @@ public class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
 	private byte[] contents;
 
-	ByteArrayFile(String path, byte[] contents) {
+	public ByteArrayFile(String path, byte[] contents) {
 		super(createConnection());
 		this.path = path;
 		this.contents = contents;
