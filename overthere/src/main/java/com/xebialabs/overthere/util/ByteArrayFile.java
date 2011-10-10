@@ -15,7 +15,10 @@ import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
+/**
+ * OverthereFile backed by a byte array.
+ */
+public class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
 	private String path;
 
