@@ -30,6 +30,8 @@ public class ItestHostFactory {
 
 	public static final String AWS_SECRET_KEY_PROPERTY = "aws.secretKey";
 
+	public static final String AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX = ".amiAvailabilityZone";
+	
 	public static final String AMI_INSTANCE_TYPE_PROPERTY_SUFFIX = ".amiInstanceType";
 
 	public static final String AMI_SECURITY_GROUP_PROPERTY_SUFFIX = ".amiSecurityGroup";

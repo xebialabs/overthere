@@ -1,6 +1,7 @@
 package com.xebialabs.itest;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.itest.ItestHostFactory.AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX;
 import static com.xebialabs.itest.ItestHostFactory.AMI_BOOT_SECONDS_PROPERTY_SUFFIX;
 import static com.xebialabs.itest.ItestHostFactory.AMI_INSTANCE_TYPE_PROPERTY_SUFFIX;
 import static com.xebialabs.itest.ItestHostFactory.AMI_KEY_NAME_PROPERTY_SUFFIX;
@@ -22,6 +23,7 @@ import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
 import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Placement;
 import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
@@ -34,6 +36,7 @@ class Ec2ItestHost implements ItestHost {
 	private final String awsEndpointURL;
 	private final String awsAccessKey;
 	private final String awsSecretKey;
+	private final String amiAvailabilityZone;
 	private final String amiInstanceType;
 	private final String amiSecurityGroup;
 	private final String amiKeyName;
@@ -49,6 +52,7 @@ class Ec2ItestHost implements ItestHost {
 		this.awsEndpointURL = getItestProperty(AWS_ENDPOINT_PROPERTY, AWS_ENDPOINT_DEFAULT);
 		this.awsAccessKey = getRequiredItestProperty(AWS_ACCESS_KEY_PROPERTY);
 		this.awsSecretKey = getRequiredItestProperty(AWS_SECRET_KEY_PROPERTY);
+		this.amiAvailabilityZone = getItestProperty(AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX, null);
 		this.amiInstanceType = getRequiredItestProperty(hostLabel + AMI_INSTANCE_TYPE_PROPERTY_SUFFIX);
 		this.amiSecurityGroup = getRequiredItestProperty(hostLabel + AMI_SECURITY_GROUP_PROPERTY_SUFFIX);
 		this.amiKeyName = getRequiredItestProperty(hostLabel + AMI_KEY_NAME_PROPERTY_SUFFIX);
@@ -95,6 +99,9 @@ class Ec2ItestHost implements ItestHost {
 		}
 		if (amiKeyName != null) {
 			run.withKeyName(amiKeyName);
+		}
+		if (amiAvailabilityZone != null) {
+			run.withPlacement(new Placement(amiAvailabilityZone));
 		}
 		RunInstancesResult result = ec2.runInstances(run);
 		return result.getReservation().getInstances().get(0).getInstanceId();
