@@ -2,9 +2,9 @@
 
 dependencies {
 	// General dependencies
-	compile 'com.google.guava:guava:r09'
-	compile 'nl.javadude.scannit:scannit:0.12'
-	compile 'org.slf4j:slf4j-api:1.6.1'
+	compile 'com.google.guava:guava:10.0.1'
+	compile 'nl.javadude.scannit:scannit:0.13'
+	compile 'org.slf4j:slf4j-api:1.6.3'
 
 	// SSH
 	compile 'net.schmizz:sshj:0.6.1'
@@ -32,8 +32,9 @@ dependencies {
 
 	// Test dependencies
 	testCompile project(':itest-support')
-	testCompile 'junit:junit:4.8.1'
-	testCompile 'org.hamcrest:hamcrest-all:1.1'
+	testCompile 'junit:junit:4.10'
+	testCompile 'org.hamcrest:hamcrest-core:1.2.1'
+	testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 	testCompile 'org.mockito:mockito-all:1.8.5'
-	testRuntime 'ch.qos.logback:logback-classic:0.9.24'
+	testRuntime 'ch.qos.logback:logback-classic:0.9.30'
 }

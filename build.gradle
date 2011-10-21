@@ -16,6 +16,7 @@ subprojects {
 		mavenLocal()
 		mavenCentral()
 		mavenRepo urls: 'http://download.java.net/maven/2/'
+		mavenRepo urls: 'https://oss.sonatype.org/service/local/repositories/nljavadude-593/content/'
 	}
 
 	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
