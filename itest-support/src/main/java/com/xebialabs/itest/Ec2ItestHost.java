@@ -131,7 +131,7 @@ class Ec2ItestHost implements ItestHost {
 
 	protected void waitForAmiBoot() {
 		try {
-			logger.info("Waiting {} for the image to finish booting", amiBootSeconds);
+			logger.info("Waiting {} seconds for the image to finish booting", amiBootSeconds);
 			Thread.sleep(amiBootSeconds * 1000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
