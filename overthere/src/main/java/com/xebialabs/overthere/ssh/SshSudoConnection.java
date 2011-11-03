@@ -16,8 +16,6 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 
 import org.slf4j.Logger;
@@ -27,7 +25,6 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 
@@ -48,27 +45,21 @@ class SshSudoConnection extends SshScpConnection {
 	}
 
 	@Override
-	public OverthereProcess startProcess(CmdLine commandLine) {
-		checkNotNull(commandLine, "Cannot execute null command line");
-		checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
-		return super.startProcess(processCommandLine(commandLine));
-	}
-
-	protected CmdLine processCommandLine(CmdLine commandLine) {
+	protected CmdLine processCommandLine(final CmdLine commandLine) {
+		CmdLine cmd;
 		if (commandLine.getArguments().get(0).toString(false).equals(NOSUDO_PSEUDO_COMMAND)) {
-			return stripNosudoCommand(commandLine);
+			cmd = stripNosudoCommand(commandLine);
 		} else {
-			return prefixWithSudoCommand(commandLine);
+			cmd = prefixWithSudoCommand(commandLine);
 		}
+		return super.processCommandLine(cmd);
 	}
 
-	protected CmdLine stripNosudoCommand(CmdLine commandLine) {
-		CmdLine commandLineWithSudo;
-		commandLineWithSudo = new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
-		return commandLineWithSudo;
+	protected CmdLine stripNosudoCommand(final CmdLine commandLine) {
+		return new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
 	}
 
-	protected CmdLine prefixWithSudoCommand(CmdLine commandLine) {
+	protected CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
 		CmdLine commandLineWithSudo = new CmdLine();
 		addSudoStatement(commandLineWithSudo);
 		for (CmdLineArgument a : commandLine.getArguments()) {

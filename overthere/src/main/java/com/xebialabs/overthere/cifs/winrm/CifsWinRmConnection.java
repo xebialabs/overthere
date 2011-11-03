@@ -84,8 +84,11 @@ public class CifsWinRmConnection extends CifsConnection {
 
 	@Override
 	public int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
-		final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
-		winRmClient.runCmd(commandLineForExecution, handler);
+		String cmd = commandLine.toCommandLine(getHostOperatingSystem(), false);
+		if(workingDirectory != null) {
+			cmd = "CD " + workingDirectory.getPath() + " & " + cmd;
+		}
+		winRmClient.runCmd(cmd, handler);
 		return winRmClient.getExitCode();
 	}
 

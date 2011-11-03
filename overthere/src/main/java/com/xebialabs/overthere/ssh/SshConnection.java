@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
@@ -170,21 +173,40 @@ abstract class SshConnection extends OverthereConnection {
     }
 
     public OverthereProcess startProcess(final CmdLine commandLine) {
-    	logger.info("Executing command {} on {}", commandLine, this);
+		checkNotNull(commandLine, "Cannot execute null command line");
+		checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
+
+		CmdLine cmd = processCommandLine(commandLine);
+		logger.info("Executing command {} on {}", cmd, this);
         try {
         	Session session = getSshClient().startSession();
         	if(allocateDefaultPty) {
         		logger.debug("Allocating default PTY");
         		session.allocateDefaultPTY();
         	}
-			return createProcess(session, commandLine);
+			return createProcess(session, cmd);
         } catch (SSHException e) {
-            throw new RuntimeIOException("Cannot execute remote command \"" + commandLine.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
+            throw new RuntimeIOException("Cannot execute remote command \"" + cmd.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
         }
 
     }
 
-    protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
+    protected CmdLine processCommandLine(final CmdLine commandLine) {
+        if(getWorkingDirectory() != null) {
+    		CmdLine commandLineWithCd = new CmdLine();
+    		commandLineWithCd.addArgument("cd");
+    		commandLineWithCd.addArgument(workingDirectory.getPath());
+    		commandLineWithCd.addRaw(";");
+    		for (CmdLineArgument a : commandLine.getArguments()) {
+    			commandLineWithCd.add(a);
+    		}
+    		return commandLineWithCd;
+        } else {
+        	return commandLine;
+        }
+    }
+
+	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
     	return new SshProcess(this, session, commandLine);
     }
 

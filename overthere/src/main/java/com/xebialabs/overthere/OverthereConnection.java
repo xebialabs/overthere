@@ -64,6 +64,8 @@ public abstract class OverthereConnection implements Closeable {
 	protected final boolean canStartProcess;
 
 	protected OverthereFile connectionTemporaryDirectory;
+	
+	protected OverthereFile workingDirectory;
 
 	protected OverthereConnection(final String type, final ConnectionOptions options, final boolean canStartProcess) {
 		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
@@ -237,7 +239,27 @@ public abstract class OverthereConnection implements Closeable {
 	 */
     protected abstract OverthereFile getFileForTempFile(OverthereFile parent, String name);
 
+    /**
+     * Returns the working directory.
+     * 
+     * @return the working directory, may be <code>null</code>.
+     */
+    public OverthereFile getWorkingDirectory() {
+	    return workingDirectory;
+    }
+
 	/**
+	 * Sets the working directory in which commands are executed. If set to <code>null</code>, the working directory that is used depends on the connection
+	 * implementation.
+	 * 
+	 * @param workingDirectory
+	 *            the working directory, may be <code>null</code>.
+	 */
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+    	this.workingDirectory = workingDirectory;
+    }
+
+    /**
 	 * Executes a command with its arguments.
 	 * 
 	 * @param handler

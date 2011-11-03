@@ -143,7 +143,6 @@ public abstract class OverthereConnectionItestBase {
 		SshSudoTests.commandWithSemiColonShouldHaveTwoSudoSections(connection);
 	}
 
-
 	@Test
 	public void shouldExecuteSimpleCommandOnUnix() {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
@@ -159,6 +158,18 @@ public abstract class OverthereConnectionItestBase {
 			assertThat(captured.getOutputLines().size(), equalTo(1));
 			assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
 		}
+	}
+
+
+	@Test
+	public void shouldExecuteSimpleCommandInWorkingDirectoryOnUnix() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
+
+		connection.setWorkingDirectory(connection.getFile("/etc"));
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("pwd"));
+		assertThat(res, equalTo(0));
+		assertThat(captured.getOutput(), containsString("/etc"));
 	}
 
 	@Test
@@ -207,11 +218,22 @@ public abstract class OverthereConnectionItestBase {
 	public void shouldExecuteSimpleCommandOnWindows() {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
 
-		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig"));
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), not(containsString("ipconfig")));
-		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
+		assertThat(captured.getOutput(), not(containsString("ipconfig")));
+		assertThat(captured.getOutput(), containsString("Windows IP Configuration"));
+	}
+
+	@Test
+	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindows() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+
+		connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("cd"));
+		assertThat(res, equalTo(0));
+		assertThat(captured.getOutput().toUpperCase(), containsString("C:\\WINDOWS"));
 	}
 
 	@Test

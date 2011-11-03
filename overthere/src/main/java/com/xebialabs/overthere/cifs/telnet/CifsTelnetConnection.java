@@ -103,7 +103,12 @@ public class CifsTelnetConnection extends CifsConnection {
 						// the second is the actual prompt
 						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
 						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
-	
+
+						if(workingDirectory != null) {
+							send(stdin, "CD " + workingDirectory.getPath());
+							receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
+						}
+
 						send(stdin, commandLineForExecution);
 	
 						receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
