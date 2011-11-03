@@ -30,14 +30,13 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.*;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import com.xebialabs.overthere.cifs.winrs.CifsWinRsConnection;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -64,6 +63,7 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		lopco.add(new Object[] { "cifs", createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
 		lopco.add(new Object[] { "cifs", createCifsWinRmHttpOptions(), CifsWinRmConnection.class.getName() });
 		lopco.add(new Object[] { "cifs", createCifsWinRmHttpsOptions(), CifsWinRmConnection.class.getName() });
+        lopco.add(new Object[] { "cifs", createCifsWinRsHttpOptions(), CifsWinRsConnection.class.getName() });
 		return lopco;
 	}
 
@@ -101,5 +101,17 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
 		return partialOptions;
 	}
+
+    private static ConnectionOptions createCifsWinRsHttpOptions() {
+		ConnectionOptions partialOptions = new ConnectionOptions();
+		partialOptions.set(OPERATING_SYSTEM, WINDOWS);
+		partialOptions.set(CONNECTION_TYPE, WINRS_HTTP);
+		partialOptions.set(USERNAME, ITEST_USERNAME);
+		partialOptions.set(PASSWORD, ITEST_PASSWORD);
+		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
+		partialOptions.set(PORT, DEFAULT_WINRM_HTTP_PORT);
+		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+	    return partialOptions;
+    }
 
 }

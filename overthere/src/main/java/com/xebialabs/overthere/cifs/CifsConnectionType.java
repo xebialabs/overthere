@@ -18,6 +18,17 @@ public enum CifsConnectionType {
 	/**
 	 * A CIFS connection that uses WinRM over HTTPS to execute commands.
 	 */
-	WINRM_HTTPS
+	WINRM_HTTPS,
+
+    /**
+	 * A CIFS connection that uses WinRS client over HTTP to execute commands.
+	 */
+	WINRS_HTTP,
+
+	/**
+	 * A CIFS connection that uses WinRS client over HTTPS to execute commands.
+	 */
+	WINRS_HTTPS
 
 }
+

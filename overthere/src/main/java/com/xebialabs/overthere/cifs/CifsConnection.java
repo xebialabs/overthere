@@ -75,7 +75,7 @@ public abstract class CifsConnection extends OverthereConnection {
 		this.cifsPort = options.get(CIFS_PORT, DEFAULT_CIFS_PORT);
 	}
 
-	private Integer getDefaultPort() {
+	protected Integer getDefaultPort() {
 		switch(cifsConnectionType) {
 		case TELNET:
 			return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
