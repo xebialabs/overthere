@@ -112,6 +112,9 @@ class Ec2ItestHost implements ItestHost {
 	}
 
 	public String waitUntilRunningAndGetPublicDnsName() {
+		// Give Amazon some time to settle before we ask it for information
+		sleep(5);
+
 		for (;;) {
 			DescribeInstancesRequest describe = new DescribeInstancesRequest().withInstanceIds(newArrayList(instanceId));
 			Instance instance = ec2.describeInstances(describe).getReservations().get(0).getInstances().get(0);
@@ -120,23 +123,23 @@ class Ec2ItestHost implements ItestHost {
 			}
 
 			logger.info("Instance {} is still {}. Waiting...", instanceId, instance.getState().getName());
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
+			sleep(1);
 		}
 
 	}
 
 	protected void waitForAmiBoot() {
-		try {
-			logger.info("Waiting {} seconds for the image to finish booting", amiBootSeconds);
-			Thread.sleep(amiBootSeconds * 1000);
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
+		logger.info("Waiting {} seconds for the image to finish booting", amiBootSeconds);
+		sleep(amiBootSeconds);
 	}
+
+	private void sleep(final int seconds) {
+	    try {
+	    	Thread.sleep(seconds * 1000);
+	    } catch (InterruptedException e) {
+	    	Thread.currentThread().interrupt();
+	    }
+    }
 
 	private static final Logger logger = LoggerFactory.getLogger(Ec2ItestHost.class);
 
