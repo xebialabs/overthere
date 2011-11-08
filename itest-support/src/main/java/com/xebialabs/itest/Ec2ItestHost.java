@@ -52,7 +52,7 @@ class Ec2ItestHost implements ItestHost {
 		this.awsEndpointURL = getItestProperty(AWS_ENDPOINT_PROPERTY, AWS_ENDPOINT_DEFAULT);
 		this.awsAccessKey = getRequiredItestProperty(AWS_ACCESS_KEY_PROPERTY);
 		this.awsSecretKey = getRequiredItestProperty(AWS_SECRET_KEY_PROPERTY);
-		this.amiAvailabilityZone = getItestProperty(AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX, null);
+		this.amiAvailabilityZone = getItestProperty(hostLabel + AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX, null);
 		this.amiInstanceType = getRequiredItestProperty(hostLabel + AMI_INSTANCE_TYPE_PROPERTY_SUFFIX);
 		this.amiSecurityGroup = getRequiredItestProperty(hostLabel + AMI_SECURITY_GROUP_PROPERTY_SUFFIX);
 		this.amiKeyName = getRequiredItestProperty(hostLabel + AMI_KEY_NAME_PROPERTY_SUFFIX);
