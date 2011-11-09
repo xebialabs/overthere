@@ -111,7 +111,7 @@ class SshSudoConnection extends SshScpConnection {
 
 	@Override
 	public String toString() {
-		return type + "://" + username + "/" + sudoUsername + "@" + host + ":" + port;
+		return type + "://" + username + "@" + host + ":" + port + " (sudo to " + sudoUsername + ")";
 	}
 
 	private Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
