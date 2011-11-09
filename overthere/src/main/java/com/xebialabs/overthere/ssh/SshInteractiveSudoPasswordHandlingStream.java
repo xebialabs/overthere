@@ -25,6 +25,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
 
+/**
+ * Detects password prompts in the output stream and sends the password in response.
+ */
 class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 	private final OutputStream remoteStdin;
 	private final byte[] passwordBytes;

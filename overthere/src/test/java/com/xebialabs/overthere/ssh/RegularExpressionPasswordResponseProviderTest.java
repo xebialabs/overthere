@@ -1,15 +1,14 @@
 package com.xebialabs.overthere.ssh;
 
-import net.schmizz.sshj.userauth.method.PasswordResponseProvider;
-import net.schmizz.sshj.userauth.password.PasswordFinder;
-import net.schmizz.sshj.userauth.password.Resource;
-import org.junit.Before;
-import org.junit.Test;
-
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
+import net.schmizz.sshj.userauth.password.PasswordFinder;
+import net.schmizz.sshj.userauth.password.Resource;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class RegularExpressionPasswordResponseProviderTest {
 
@@ -41,4 +40,5 @@ public class RegularExpressionPasswordResponseProviderTest {
 	public void shouldResponseWithPasswordToNonDefaultPrompt() {
 		assertThat(provider.getResponse("user's Password: ", false), equalTo(SECRET_PASSWORD));
 	}
+
 }

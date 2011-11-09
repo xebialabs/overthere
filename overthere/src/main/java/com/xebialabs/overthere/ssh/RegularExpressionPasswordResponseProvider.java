@@ -10,10 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class RegularExpressionPasswordResponseProvider implements ChallengeResponseProvider {
+/**
+ * Sends passwords in response to an keyboard-interactive challenge.
+ */
+class RegularExpressionPasswordResponseProvider implements ChallengeResponseProvider {
 	private static final char[] EMPTY_RESPONSE = new char[0];
 	private final Pattern passwordPromptRegex;
-	private Resource resource;
+	private Resource<?> resource;
 	private PasswordFinder passwordFinder;
 	private boolean gaveAlready;
 
@@ -27,7 +30,8 @@ public class RegularExpressionPasswordResponseProvider implements ChallengeRespo
 	    return Collections.emptyList();
 	}
 
-	@Override
+	@SuppressWarnings("rawtypes")
+    @Override
 	public void init(Resource resource, String name, String instruction) {
 	    this.resource = resource;
 	    logger.debug("Challenge - name=`{}`; instruction=`{}`", name, instruction);
