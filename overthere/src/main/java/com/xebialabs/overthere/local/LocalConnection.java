@@ -100,7 +100,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	public OverthereProcess startProcess(CmdLine commandLine) {
 		logger.info("Executing command {} on {}", commandLine, this);
 		try {
-			final ProcessBuilder pb = new ProcessBuilder(commandLine.toCommandArray(false));
+			final ProcessBuilder pb = new ProcessBuilder(commandLine.toCommandArray(os, false));
 			if(workingDirectory != null) {
 				pb.directory(((LocalFile) workingDirectory).getFile());
 			}

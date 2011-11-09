@@ -16,7 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
+
+import java.text.MessageFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,16 +44,22 @@ class SshSudoConnection extends SshScpConnection {
 	public static final String NOSUDO_PSEUDO_COMMAND = "nosudo";
 
 	protected String sudoUsername;
+	
+	protected String sudoCommandPrefix;
+
+	protected boolean sudoQuoteCommand;
 
 	public SshSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.sudoUsername = options.get(SUDO_USERNAME);
+		this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
+		this.sudoQuoteCommand = options.get(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
 	}
 
 	@Override
 	protected CmdLine processCommandLine(final CmdLine commandLine) {
 		CmdLine cmd;
-		if (commandLine.getArguments().get(0).toString(false).equals(NOSUDO_PSEUDO_COMMAND)) {
+		if (commandLine.getArguments().get(0).toString(os, false).equals(NOSUDO_PSEUDO_COMMAND)) {
 			cmd = stripNosudoCommand(commandLine);
 		} else {
 			cmd = prefixWithSudoCommand(commandLine);
@@ -62,19 +74,24 @@ class SshSudoConnection extends SshScpConnection {
 	protected CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
 		CmdLine commandLineWithSudo = new CmdLine();
 		addSudoStatement(commandLineWithSudo);
-		for (CmdLineArgument a : commandLine.getArguments()) {
-			commandLineWithSudo.add(a);
-			if (a.toString(false).equals("|") || a.toString(false).equals(";")) {
-				addSudoStatement(commandLineWithSudo);
+		if (sudoQuoteCommand) {
+			commandLineWithSudo.addNested(commandLine);
+		} else {
+			for (CmdLineArgument a : commandLine.getArguments()) {
+				commandLineWithSudo.add(a);
+				if (a.toString(os, false).equals("|") || a.toString(os, false).equals("\\;")) {
+					addSudoStatement(commandLineWithSudo);
+				}
 			}
 		}
 		return commandLineWithSudo;
 	}
 
 	protected void addSudoStatement(CmdLine sudoCommandLine) {
-		sudoCommandLine.addArgument("sudo");
-		sudoCommandLine.addArgument("-u");
-		sudoCommandLine.addArgument(sudoUsername);
+		String prefix = MessageFormat.format(sudoCommandPrefix, sudoUsername);
+		for(String arg : prefix.split("\\s+")) {
+			sudoCommandLine.addArgument(arg);
+		}
 	}
 
 	protected int noSudoExecute(OverthereProcessOutputHandler handler, CmdLine commandLine) {

@@ -35,12 +35,6 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String PASSPHRASE = "passphrase";
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
-	 * {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH connections.
-	 */	
-	public static final String SUDO_USERNAME = "sudoUsername";
-
-	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty should be allocated when executing a command. All sudo
 	 * implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash
 	 * when it is allocated. Defaults to true.
@@ -48,13 +42,40 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify which expression to look for in interactive sudo before sending the password.
+	 * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
+	 * {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH connections.
+	 */	
+	public static final String SUDO_USERNAME = "sudoUsername";
+	
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify the sudo command to prefix. The placeholder {0} is replaced with the value of {@link #SUDO_USERNAME}.
+	 */
+	public static final String SUDO_COMMAND_PREFIX = "sudoCommandPrefix";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify the sudo command to prefix.
+	 */
+	public static final String SUDO_COMMAND_PREFIX_DEFAULT = "sudo -u {0}";
+
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify whether or not to quote the original command when it is prefixed with {@link #SUDO_COMMAND_PREFIX}.
+	 */
+	public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to quote the original command.
+	 */
+	public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
+
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in interactive sudo before sending the
+	 * password.
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
 	
 	/**
-	 * Default value of the {@link ConnectionOptions connection option} used to specify which expression to look for in interactive sudo before sending the
-	 * password.
+	 * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in interactive sudo before sending
+	 * the password.
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 

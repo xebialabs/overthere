@@ -5,10 +5,10 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static com.xebialabs.overthere.CmdLineArgument.arg;
+import static com.xebialabs.overthere.CmdLineArgument.nested;
 import static com.xebialabs.overthere.CmdLineArgument.password;
 import static com.xebialabs.overthere.CmdLineArgument.raw;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static java.util.Collections.unmodifiableList;
 
 import java.io.Serializable;
@@ -21,11 +21,6 @@ import com.google.common.base.Function;
  */
 @SuppressWarnings("serial")
 public class CmdLine implements Serializable {
-
-	/**
-	 * String containing special characters that require quoting or escaping.
-	 */
-	private static final String SPECIAL_CHARS = " '\"\\;()${}*?";
 
 	List<CmdLineArgument> arguments = newArrayList();
 
@@ -66,6 +61,18 @@ public class CmdLine implements Serializable {
 	}
 
 	/**
+	 * Adds {@link CmdLineArgument#nested(CmdLine) a nested command line} to the command line.
+	 * 
+	 * @param commandLine
+	 *            the command line to add.
+	 * @return this.
+	 */
+	public CmdLine addNested(CmdLine commandLine) {
+		arguments.add(nested(commandLine));
+	    return this;
+    }
+
+	/**
 	 * Adds an {@link CmdLineArgument argument}.
 	 * 
 	 * @param arg
@@ -104,16 +111,18 @@ public class CmdLine implements Serializable {
 	 * Converts this command line to a string array. All arguments are {@link CmdLineArgument#toString(boolean) converted to their string representation} and
 	 * then returned as an array.
 	 * 
+	 * @param os
+	 *            the operating system on which the result will be executed.
 	 * @param forLogging
 	 *            <code>true</code> if these string representations will be used for logging.
 	 * @return an array with the string representations of the command line arguments.
 	 */
-	public String[] toCommandArray(final boolean forLogging) {
+	public String[] toCommandArray(final OperatingSystemFamily os, final boolean forLogging) {
 		checkState(arguments.size() > 0, "Cannot encode empty command line");
 		return transform(arguments, new Function<CmdLineArgument, String>() {
 			@Override
 			public String apply(CmdLineArgument from) {
-				return from.toString(forLogging);
+				return from.toString(os, forLogging);
 			}
 		}).toArray(new String[arguments.size()]);
 	}
@@ -127,79 +136,17 @@ public class CmdLine implements Serializable {
 	 *            <code>true</code> if the created command line will be used for logging.
 	 * @return the command line as a single string
 	 */
-	public String toCommandLine(OperatingSystemFamily os, final boolean forLogging) {
+	public String toCommandLine(final OperatingSystemFamily os, final boolean forLogging) {
 		checkState(arguments.size() > 0, "Cannot encode empty command line");
 		StringBuilder sb = new StringBuilder();
 		for (CmdLineArgument a : arguments) {
 			if (sb.length() > 0) {
 				sb.append(' ');
 			}
-
-			if (forLogging && a.isPassword()) {
-				encodePasswordArgument(a.toString(), sb);
-			} else {
-				encodeArgument(a.toString(forLogging), a.isRaw(), os, sb);
-			}
+			a.buildString(os, forLogging, sb);
 		}
 
 		return sb.toString();
-	}
-
-	private void encodePasswordArgument(String argument, StringBuilder collector) {
-		collector.append("********");
-	}
-
-	private void encodeArgument(String argument, boolean isRaw, OperatingSystemFamily os, StringBuilder collector) {
-		if (argument.length() == 0) {
-			encodeEmptyArgument(collector);
-		} else if (isRaw || !containsAny(argument, SPECIAL_CHARS)) {
-			doNotEncodeArgument(argument, collector);
-		} else {
-			if (os == WINDOWS) {
-				encodeArgumentWithSpecialCharactersForWindows(argument, collector);
-			} else {
-				encodeArgumentWithSpecialCharactersForNonWindows(argument, collector);
-			}
-		}
-	}
-
-	private boolean containsAny(String str, String chars) {
-		for (char c : chars.toCharArray()) {
-			if (str.indexOf(c) >= 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private void encodeEmptyArgument(StringBuilder collector) {
-		collector.append("\"\"");
-	}
-
-	private void doNotEncodeArgument(String argument, StringBuilder collector) {
-		collector.append(argument);
-	}
-
-	private void encodeArgumentWithSpecialCharactersForWindows(String argument, StringBuilder collector) {
-		collector.append("\"");
-		for (int j = 0; j < argument.length(); j++) {
-			char c = argument.charAt(j);
-			if (c == '\"') {
-				collector.append(c);
-			}
-			collector.append(c);
-		}
-		collector.append("\"");
-	}
-
-	private void encodeArgumentWithSpecialCharactersForNonWindows(String argument, StringBuilder collector) {
-		for (int j = 0; j < argument.length(); j++) {
-			char c = argument.charAt(j);
-			if (SPECIAL_CHARS.indexOf(c) != -1) {
-				collector.append('\\');
-			}
-			collector.append(c);
-		}
 	}
 
 	/**

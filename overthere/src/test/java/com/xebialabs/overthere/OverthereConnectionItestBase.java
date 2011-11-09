@@ -63,7 +63,6 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.ssh.SshSudoTests;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
@@ -140,16 +139,6 @@ public abstract class OverthereConnectionItestBase {
 			fail("Expected not to be able to connect with an incorrect password");
 		} catch (RuntimeIOException expected) {
 		}
-	}
-
-	@Test
-	public void commandWithPipeShouldHaveTwoSudoSections() {
-		SshSudoTests.commandWithPipeShouldHaveTwoSudoSections(connection);
-	}
-
-	@Test
-	public void commandWithSemiColonShouldHaveTwoSudoSections() {
-		SshSudoTests.commandWithSemiColonShouldHaveTwoSudoSections(connection);
 	}
 
 	@Test

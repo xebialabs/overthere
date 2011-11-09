@@ -51,7 +51,7 @@ public class CmdLineTest {
 	@Test(expected = IllegalStateException.class)
 	public void shouldThrowIllegalStateExceptionWhenEncodingEmptyCmdLineAsArray() {
 		CmdLine commandLine = new CmdLine();
-		commandLine.toCommandArray(false);
+		commandLine.toCommandArray(UNIX, false);
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -102,6 +102,32 @@ public class CmdLineTest {
 		CmdLine commandLine = new CmdLine().addArgument("rm").addArgument("-rf").addRaw("*");
 		String actualEncodedCommandLine = commandLine.toCommandLine(UNIX, false);
 		assertThat(actualEncodedCommandLine, equalTo("rm -rf *"));
+	}
+
+	@Test
+	public void shouldEncodeNestedArgument() {
+		CmdLine nestedCommandLine = new CmdLine().addArgument("rm").addPassword("a file");
+		assertThat(nestedCommandLine.toCommandLine(UNIX, false), equalTo("rm a\\ file"));
+
+		CmdLine commandLine = new CmdLine().addArgument("sudo").addNested(nestedCommandLine);
+		assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo rm\\ a\\\\\\ file"));
+	}
+
+	@Test
+	public void shouldEncodeNestedPassword() {
+		CmdLine nestedCommandLine = new CmdLine().addArgument("login").addPassword("secret");
+		CmdLine commandLine = new CmdLine().addArgument("wrap").addNested(nestedCommandLine);
+		assertThat(commandLine.toCommandLine(UNIX, false), equalTo("wrap login\\ secret"));
+		assertThat(commandLine.toCommandLine(UNIX, true), equalTo("wrap login\\ \\*\\*\\*\\*\\*\\*\\*\\*"));
+	}
+
+	@Test
+	public void shouldEncodeNestedRaw() {
+		CmdLine nestedCommandLine = new CmdLine().addArgument("rm").addRaw("*");
+		assertThat(nestedCommandLine.toCommandLine(UNIX, false), equalTo("rm *"));
+
+		CmdLine commandLine = new CmdLine().addArgument("sudo").addNested(nestedCommandLine);
+		assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo rm\\ \\*"));
 	}
 
 }
