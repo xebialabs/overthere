@@ -119,7 +119,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 			results.exists = true;
 			if (capturedOutput.getOutputLines().size() > 0) {
 				// parse ls results
-				String outputLine = capturedOutput.getOutputLines().get(0);
+				String outputLine = capturedOutput.getOutputLines().get(capturedOutput.getOutputLines().size() - 1);
 				if (logger.isDebugEnabled())
 					logger.debug("ls output = " + outputLine);
 				StringTokenizer outputTokens = new StringTokenizer(outputLine);
