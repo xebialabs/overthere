@@ -88,12 +88,12 @@ abstract class SshConnection extends OverthereConnection {
         super(type, options, true);
         this.sshConnectionType = options.get(CONNECTION_TYPE);
         this.host = options.get(ADDRESS);
-        this.port = options.get(PORT, 22);
+        this.port = options.get(PORT, SSH_PORT_DEFAULT);
         this.username = options.get(USERNAME);
         this.password = options.getOptional(PASSWORD);
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
-        this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
+        this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
 	    this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
     }
 

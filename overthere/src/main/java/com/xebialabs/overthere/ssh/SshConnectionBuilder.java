@@ -24,6 +24,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String CONNECTION_TYPE = "connectionType";
 
 	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify the port to connect to.
+	 */
+	public static final int SSH_PORT_DEFAULT = 22;
+
+	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the private key file to use. <b>N.B.:</b> Private keys cannot be used when the
 	 * SSH connection type is {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} because the password is needed for the password prompts.
 	 */
@@ -40,6 +45,13 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 * when it is allocated. Defaults to true.
 	 */
 	public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify whether a default pty should be allocated when executing a command. All sudo
+	 * implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash
+	 * when it is allocated.
+	 */
+	public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = true;
 
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
@@ -79,8 +91,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending the
+	 * password.
+	 */
 	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
 
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending
+	 * the password.
+	 */
 	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
 
 	private SshConnection connection;
