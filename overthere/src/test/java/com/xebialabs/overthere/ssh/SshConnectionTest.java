@@ -27,6 +27,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -39,6 +40,7 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
+import net.schmizz.sshj.userauth.method.AuthMethod;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -69,7 +71,7 @@ public class SshConnectionTest {
         connectionOptions.set(PASSWORD, password);
         newConnectionWithClient(client).connect();
         
-        verify(client).authPassword("some-user", password);
+        verify(client).auth(eq("some-user"), isA(AuthMethod.class), isA(AuthMethod.class));
     }
 
     @Test
