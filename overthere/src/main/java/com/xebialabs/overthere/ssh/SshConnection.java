@@ -23,10 +23,7 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 
 import java.io.IOException;
 
@@ -38,6 +35,10 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 
+import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
+import net.schmizz.sshj.userauth.method.AuthPassword;
+import net.schmizz.sshj.userauth.password.PasswordFinder;
+import net.schmizz.sshj.userauth.password.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +73,10 @@ abstract class SshConnection extends OverthereConnection {
     protected final boolean allocateDefaultPty;
 
     protected SSHClient sshClient;
-    
-    @VisibleForTesting
+
+	private String interactiveKeyboardAuthPromptRegex;
+
+	@VisibleForTesting
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
         public SSHClient create() {
@@ -81,7 +84,7 @@ abstract class SshConnection extends OverthereConnection {
         }
     };
 
-    public SshConnection(final String type, final ConnectionOptions options) {
+	public SshConnection(final String type, final ConnectionOptions options) {
         super(type, options, true);
         this.sshConnectionType = options.get(CONNECTION_TYPE);
         this.host = options.get(ADDRESS);
@@ -91,6 +94,7 @@ abstract class SshConnection extends OverthereConnection {
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
         this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, true);
+	    this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
     }
 
     protected void connect() {
@@ -121,7 +125,9 @@ abstract class SshConnection extends OverthereConnection {
                 }
                 client.authPublickey(username, keys);
             } else if (password != null) {
-                client.authPassword(username, password);
+	            PasswordFinder passwordFinder = getPasswordFinder();
+	            client.auth(username, new AuthPassword(passwordFinder),
+			            new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
             }
             sshClient = client;
         } catch (SSHException e) {
@@ -129,7 +135,20 @@ abstract class SshConnection extends OverthereConnection {
         }
     }
 
-    @Override
+	private PasswordFinder getPasswordFinder() {
+		return new PasswordFinder() {
+
+			public char[] reqPassword(Resource<?> resource) {
+				return password.toCharArray();
+			}
+
+			public boolean shouldRetry(Resource<?> resource) {
+				return false;
+			}
+		};
+	}
+
+	@Override
     public void doClose() {
     	checkState(sshClient != null, "Already disconnected");
         try {

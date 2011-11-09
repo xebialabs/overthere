@@ -79,6 +79,10 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
+	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
+
+	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
+
 	private SshConnection connection;
 
 
