@@ -41,15 +41,6 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 	    super(type, partialOptions, expectedConnectionClassName);
     }
 
-	@Override
-	protected void setTypeAndOptions() throws Exception {
-		type = "ssh";
-		options = new ConnectionOptions(partialOptions);
-		options.set(OPERATING_SYSTEM, UNIX);
-		options.set(ADDRESS, host.getHostName());
-		options.set(PORT, host.getPort(22));
-	}
-
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
@@ -64,6 +55,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		ConnectionOptions options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SFTP);
+		options.set(PORT, 22);
 		options.set(USERNAME, "overthere");
 		options.set(PASSWORD, "overhere");
 		return options;
@@ -73,6 +65,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		ConnectionOptions options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SCP);
+		options.set(PORT, 22);
 		options.set(USERNAME, "overthere");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(
 		        "-----BEGIN RSA PRIVATE KEY-----\r\n" + "Proc-Type: 4,ENCRYPTED\r\n" + "DEK-Info: AES-128-CBC,EB6F3B5C2F847A0F47AC9C8C757E0AD8\r\n"
@@ -101,6 +94,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		ConnectionOptions options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, SUDO);
+		options.set(PORT, 22);
 		options.set(USERNAME, "trusted");
 		options.set(PRIVATE_KEY_FILE, createPrivateKeyFile("-----BEGIN RSA PRIVATE KEY-----\r\n" + "MIIEpgIBAAKCAQEA65Jf19SCv8rZ/kLyfOw+OjHt5fQnxHVQR2B6UW0B0q6RhSSg\r\n"
 		        + "YA2gOUEPJph7+O5605jjrMlblScsXO7VnFJtBTMRFoQjBlOP8VFuEg0MoaN5RPQU\r\n" + "ZVYoFKP9V6ycEKpmfeSmVhpEipUdgL+fUjb1nsw+Cpx8WNLXf3Cvqrk4d1xZ0f0i\r\n"
@@ -128,9 +122,10 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		ConnectionOptions options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, UNIX);
 		options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
+		options.set(PORT, 22);
 		options.set(USERNAME, "untrusted");
 		options.set(PASSWORD, "donttrustme");
-		options.set("sudoUsername", "overthere");
+		options.set(SUDO_USERNAME, "overthere");
 		options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
 		return options;
     }
