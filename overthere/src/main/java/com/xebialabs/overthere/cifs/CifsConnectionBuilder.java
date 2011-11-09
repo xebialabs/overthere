@@ -1,5 +1,7 @@
 package com.xebialabs.overthere.cifs;
 
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
@@ -10,9 +12,14 @@ import com.xebialabs.overthere.spi.Protocol;
 /**
  * Builds CIFS connections.
  */
-@Protocol(name = "cifs")
+@Protocol(name = CIFS_PROTOCOL)
 public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 
+	/**
+	 * Name of the protocol handled by this connection builder, i.e. "cifs".
+	 */
+	public static final String CIFS_PROTOCOL = "cifs";
+	
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the {@link CifsConnectionType CIFS connection type} to use.
 	 */

@@ -1,5 +1,7 @@
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
@@ -8,9 +10,14 @@ import com.xebialabs.overthere.spi.Protocol;
 /**
  * Builds SSH connections.
  */
-@Protocol(name = "ssh")
+@Protocol(name = SSH_PROTOCOL)
 public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
+	/**
+	 * Name of the protocol handled by this connection builder, i.e. "ssh".
+	 */
+	public static final String SSH_PROTOCOL = "ssh";
+	
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the {@link SshConnectionType SSH connection type} to use.
 	 */

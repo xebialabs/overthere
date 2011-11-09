@@ -17,6 +17,7 @@
 package com.xebialabs.overthere.local;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -207,7 +208,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
 	private static LocalConnection createConnection() {
 	    // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from appearing
-		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection("local", new ConnectionOptions());
+		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
 	    return localConnectionThatWillNeverBeDisconnected;
     }
 

@@ -23,6 +23,7 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -105,7 +106,7 @@ public class SshConnectionTest {
     private static class PresetClientSshConnection extends SshConnection {
 
         public PresetClientSshConnection(ConnectionOptions options, final SSHClient clientToReturn) {
-            super("ssh", options);
+            super(SSH_PROTOCOL, options);
             sshClientFactory = new Factory<SSHClient>() {
                 @Override
                 public SSHClient create() {

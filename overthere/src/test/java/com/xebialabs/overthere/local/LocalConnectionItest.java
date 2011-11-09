@@ -18,6 +18,7 @@ package com.xebialabs.overthere.local;
 
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -42,7 +43,7 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {
-		type = "local";
+		type = LOCAL_PROTOCOL;
 		options = new ConnectionOptions();
 		options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
 		expectedConnectionClassName = LocalConnection.class.getName();

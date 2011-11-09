@@ -23,6 +23,7 @@ import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
@@ -61,9 +62,9 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { "cifs", createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
-		lopco.add(new Object[] { "cifs", createCifsWinRmHttpOptions(), CifsWinRmConnection.class.getName() });
-		lopco.add(new Object[] { "cifs", createCifsWinRmHttpsOptions(), CifsWinRmConnection.class.getName() });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpOptions(), CifsWinRmConnection.class.getName() });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpsOptions(), CifsWinRmConnection.class.getName() });
 		return lopco;
 	}
 

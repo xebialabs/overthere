@@ -19,11 +19,15 @@ package com.xebialabs.overthere.local;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -34,15 +38,18 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A connection to the local host.
  */
-@Protocol(name = "local")
+@Protocol(name = LOCAL_PROTOCOL)
 public class LocalConnection extends OverthereConnection implements OverthereConnectionBuilder {
 
+	/**
+	 * Name of the protocol handled by this connection builder, i.e. "local".
+	 */
+	public static final String LOCAL_PROTOCOL = "local";
+	
 	/**
 	 * Constructs a connection to the local host.
 	 */

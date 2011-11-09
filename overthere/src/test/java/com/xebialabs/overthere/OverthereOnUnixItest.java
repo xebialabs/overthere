@@ -1,7 +1,6 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -10,6 +9,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
@@ -53,10 +53,10 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { "ssh", createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
-		lopco.add(new Object[] { "ssh", createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
-		lopco.add(new Object[] { "ssh", createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
-		lopco.add(new Object[] { "ssh", createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
 		return lopco;
 	}
 
