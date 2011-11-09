@@ -124,7 +124,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 					logger.debug("ls output = " + outputLine);
 				StringTokenizer outputTokens = new StringTokenizer(outputLine);
 				if (outputTokens.countTokens() < 5) {
-					throw new RuntimeIOException("ls -ld " + getPath() + " returned output that contains less than the expected 5 tokens");
+					throw new RuntimeIOException("ls -ld " + getPath() + " returned output that contains less than the expected 5 tokens: " + outputLine);
 				}
 				String permissions = outputTokens.nextToken();
 				@SuppressWarnings("unused")
