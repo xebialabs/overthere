@@ -50,7 +50,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
- * Unit tests for {@linkn SshConnection}
+ * Unit tests for {@link SshConnection}
  */
 public class SshConnectionTest {
     private ConnectionOptions connectionOptions;
