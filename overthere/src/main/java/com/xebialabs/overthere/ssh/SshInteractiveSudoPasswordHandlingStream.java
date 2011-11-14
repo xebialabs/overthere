@@ -69,6 +69,7 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 
 	private void handleChar(char c) {
 		if (onFirstLine) {
+			logger.trace("Received: {}", c);
 			if (c == '\n') {
 				onFirstLine = false;
 			} else {
