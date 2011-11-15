@@ -52,10 +52,14 @@ class SshProcess implements OverthereProcess {
     public int waitFor() {
         try {
             command.join();
-            int res = command.getExitStatus();
-            logger.info("Command {} on {} returned {}", new Object[] { commandLine, connection, res });
+            Integer exitStatus = command.getExitStatus();
+            logger.info("Command {} on {} returned {}", new Object[] { commandLine, connection, exitStatus });
 	        closeSession();
-            return res;
+	        if(exitStatus == null) {
+	        	return -1;
+	        } else {
+	        	return exitStatus;
+	        }
         } catch (ConnectionException e) {
             throw new RuntimeIOException("Caught exception while awaiting end of process", e);
         }
