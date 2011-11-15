@@ -84,8 +84,8 @@ abstract class SshConnection extends OverthereConnection {
         }
     };
 
-	public SshConnection(final String type, final ConnectionOptions options) {
-        super(type, options, true);
+	public SshConnection(final String protocol, final ConnectionOptions options) {
+        super(protocol, options, true);
         this.sshConnectionType = options.get(CONNECTION_TYPE);
         this.host = options.get(ADDRESS);
         this.port = options.get(PORT, SSH_PORT_DEFAULT);

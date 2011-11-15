@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class OverthereConnection implements Closeable {
 
-	protected final String type;
+	protected final String protocol;
 
 	protected final OperatingSystemFamily os;
 
@@ -67,8 +67,8 @@ public abstract class OverthereConnection implements Closeable {
 	
 	protected OverthereFile workingDirectory;
 
-	protected OverthereConnection(final String type, final ConnectionOptions options, final boolean canStartProcess) {
-		this.type = checkNotNull(type, "Cannot create HostConnection with null type");
+	protected OverthereConnection(final String protocol, final ConnectionOptions options, final boolean canStartProcess) {
+		this.protocol = checkNotNull(protocol, "Cannot create HostConnection with null protocol");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
 		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());

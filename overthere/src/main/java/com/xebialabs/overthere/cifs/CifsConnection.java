@@ -65,8 +65,8 @@ public abstract class CifsConnection extends OverthereConnection {
 	/**
 	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
-	public CifsConnection(String type, ConnectionOptions options, boolean canStartProcess) {
-		super(type, options, canStartProcess);
+	public CifsConnection(String protocol, ConnectionOptions options, boolean canStartProcess) {
+		super(protocol, options, canStartProcess);
 		this.cifsConnectionType = options.get(CONNECTION_TYPE);
 		this.address = options.get(ADDRESS);
 		this.port = options.get(PORT, getDefaultPort());

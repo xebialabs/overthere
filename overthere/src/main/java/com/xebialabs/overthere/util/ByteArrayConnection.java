@@ -6,8 +6,8 @@ import com.xebialabs.overthere.OverthereFile;
 
 class ByteArrayConnection extends OverthereConnection {
 
-	protected ByteArrayConnection(String type, ConnectionOptions options) {
-	    super(type, options, false);
+	protected ByteArrayConnection(String protocol, ConnectionOptions options) {
+	    super(protocol, options, false);
     }
 
 	@Override

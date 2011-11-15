@@ -53,8 +53,8 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	/**
 	 * Constructs a connection to the local host.
 	 */
-	public LocalConnection(String type, ConnectionOptions options) {
-		super(type, fixOptions(options), true);
+	public LocalConnection(String protocol, ConnectionOptions options) {
+		super(protocol, fixOptions(options), true);
 	}
 
 	private static ConnectionOptions fixOptions(ConnectionOptions options) {
