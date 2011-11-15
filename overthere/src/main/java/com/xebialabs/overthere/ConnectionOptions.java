@@ -19,6 +19,7 @@ package com.xebialabs.overthere;
 import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
@@ -166,6 +167,15 @@ public class ConnectionOptions {
 		} else {
 			return defaultValue;
 		}
+	}
+
+	/**
+	 * Returns the keys of all connection options set.
+	 *
+	 * @return a {@link Set} containing the keys.
+	 */
+	public Set<String> keys() {
+		return options.keySet();
 	}
 
 }

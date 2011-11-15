@@ -71,12 +71,27 @@ public class Overthere {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
+		if (logger.isTraceEnabled()) {
+			logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
+			for (String k : options.keys()) {
+				Object v = options.get(k);
+				if(v == null) {
+					logger.trace("{} is null", k);
+				} else {
+					logger.trace("{}={}", k, v);
+				}
+			}
+		}
+
 		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
 			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class);
 			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options);
 			logger.info("Connecting to {}", connectionBuilder);
 			OverthereConnection connection = connectionBuilder.connect();
+			if(logger.isTraceEnabled()) {
+				logger.trace("Connected to {}", connection);
+			}
 			return connection;
 		} catch (NoSuchMethodException exc) {
 			throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
