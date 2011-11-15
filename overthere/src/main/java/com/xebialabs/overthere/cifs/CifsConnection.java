@@ -164,7 +164,7 @@ public abstract class CifsConnection extends OverthereConnection {
 
     @Override
     public String toString() {
-        return "cifs:" + cifsConnectionType + "://" + username + "@" + address + ":" + port;
+        return "cifs:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + address + ":" + cifsPort + ":" + port;
     }
 
 	private static Logger logger = LoggerFactory.getLogger(CifsConnection.class);

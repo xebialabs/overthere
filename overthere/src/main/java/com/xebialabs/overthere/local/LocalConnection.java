@@ -139,7 +139,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 
 	@Override
 	public String toString() {
-		return "localhost";
+		return LOCAL_PROTOCOL + "://";
 	}
 
 	/**

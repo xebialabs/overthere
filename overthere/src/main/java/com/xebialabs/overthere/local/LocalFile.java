@@ -199,7 +199,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
 	@Override
 	public String toString() {
-		return file.toString();
+		return connection + file.toString();
 	}
 
 	public static OverthereFile valueOf(File f) {

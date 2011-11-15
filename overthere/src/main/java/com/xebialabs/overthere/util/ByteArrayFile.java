@@ -150,7 +150,7 @@ public class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
 	@Override
 	public String toString() {
-		return "byte-array file for path " + path;
+		return "byte_array://" + path;
 	}
 
 }

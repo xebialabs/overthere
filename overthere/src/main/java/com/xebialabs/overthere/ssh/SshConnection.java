@@ -231,7 +231,7 @@ abstract class SshConnection extends OverthereConnection {
 
     @Override
     public String toString() {
-        return "ssh:" + sshConnectionType + "://" + username + "@" + host + ":" + port;
+        return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + "@" + host + ":" + port;
     }
 
     private static Logger logger = LoggerFactory.getLogger(SshConnection.class);
