@@ -174,11 +174,17 @@ public class ItestHostFactory {
 
 	public static String getItestProperty(String key, String defaultValue) {
 		String value = System.getProperty(key);
-		if (value != null) {
-			return value;
-		} else {
-			return itestProperties.getProperty(key, defaultValue);
+		if (value == null) {
+			value = itestProperties.getProperty(key, defaultValue);
 		}
+		if(logger.isTraceEnabled()) {
+			if(value == null) {
+				logger.trace("Itest property {} is null", key);
+			} else {
+				logger.trace("Itest property {}={}", key, value);
+			}
+		}
+		return value;
 	}
 
 }
