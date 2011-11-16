@@ -63,7 +63,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 * implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash
 	 * when it is allocated.
 	 */
-	public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = true;
+	public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
 
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
