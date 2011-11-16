@@ -78,7 +78,14 @@ public class JdkHttpConnector implements HttpConnector {
 			bw.flush();
 			bw.close();
 
-			InputStream is = urlConnection.getInputStream();
+			InputStream is;
+			if (con.getResponseCode() >= 400) {
+			     /* Read error response */
+			    is = httpConn.getErrorStream();
+			} else {
+			    is = httpConn.getInputStream();
+			}
+			
 			Writer writer = new StringWriter();
 			try {
 				int n;
