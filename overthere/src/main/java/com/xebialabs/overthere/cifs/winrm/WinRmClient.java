@@ -187,10 +187,7 @@ public class WinRmClient {
 		final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", Namespaces.NS_WIN_SHELL));
 
 		String encoded = command;
-		if (!command.startsWith("\""))
-			encoded = "\"" + encoded;
-		if (!command.endsWith("\""))
-			encoded = encoded + "\"";
+		encoded = "\"" + encoded + "\"";
 
 
 		logger.info("Encoded command is {}", encoded);
