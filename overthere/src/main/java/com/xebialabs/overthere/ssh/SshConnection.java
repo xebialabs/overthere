@@ -66,6 +66,8 @@ abstract class SshConnection extends OverthereConnection {
 
     protected final String password;
 
+    protected String interactiveKeyboardAuthPromptRegex;
+
     protected final String privateKeyFile;
 
     protected final String passphrase;
@@ -73,8 +75,6 @@ abstract class SshConnection extends OverthereConnection {
     protected final boolean allocateDefaultPty;
 
     protected SSHClient sshClient;
-
-	private String interactiveKeyboardAuthPromptRegex;
 
 	@VisibleForTesting
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
@@ -91,10 +91,10 @@ abstract class SshConnection extends OverthereConnection {
         this.port = options.get(PORT, SSH_PORT_DEFAULT);
         this.username = options.get(USERNAME);
         this.password = options.getOptional(PASSWORD);
+        this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
         this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
-	    this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
     }
 
     protected void connect() {
