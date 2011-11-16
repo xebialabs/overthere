@@ -29,6 +29,18 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final int SSH_PORT_DEFAULT = 22;
 
 	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending the
+	 * password.
+	 */
+	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending
+	 * the password.
+	 */
+	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
+
+	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the private key file to use. <b>N.B.:</b> Private keys cannot be used when the
 	 * SSH connection type is {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} because the password is needed for the password prompts.
 	 */
@@ -91,20 +103,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
-	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending the
-	 * password.
-	 */
-	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
-
-	/**
-	 * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in keyboard-interactive authentication before sending
-	 * the password.
-	 */
-	public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
-
-	private SshConnection connection;
-
+	protected SshConnection connection;
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {
 		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
