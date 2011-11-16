@@ -1,6 +1,8 @@
 // build.gradle for overthere repository containing the overthere and itest-support projects
 defaultTasks 'build'
 
+commonBuildPath = hasProperty("localCommonBuildRepo") ? file(localCommonBuildRepo).toURL().toString() : 'https://raw.github.com/xebialabs/deployit-common-build/master'
+
 allprojects {
 	version = '1.0.8-SNAPSHOT'
 	group = 'com.xebialabs.overthere'
@@ -19,8 +21,8 @@ subprojects {
 		mavenRepo urls: 'https://oss.sonatype.org/service/local/repositories/nljavadude-593/content/'
 	}
 
-	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/releaseable.gradle'
-	apply from: 'https://github.com/xebialabs/deployit-common-build/raw/master/artifacts.gradle'
+	apply from: "$commonBuildPath/releaseable.gradle"
+	apply from: "$commonBuildPath/artifacts.gradle"
 
 	sourceCompatibility = 1.6
 	targetCompatibility = 1.6
