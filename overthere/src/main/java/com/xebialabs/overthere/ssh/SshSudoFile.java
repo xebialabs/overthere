@@ -173,7 +173,7 @@ class SshSudoFile extends SshScpFile {
         CmdLine cmdLine = CmdLine.build("cp", "-pr");
         String sourcePath = tempFile.getPath();
         if (this.exists() && tempFile.isDirectory()) {
-            sourcePath += "/*";
+            sourcePath += "/*"; // FIXME: This will not copy hidden files!
         }
         cmdLine.addRaw(sourcePath);
         cmdLine.addArgument(this.getPath());
