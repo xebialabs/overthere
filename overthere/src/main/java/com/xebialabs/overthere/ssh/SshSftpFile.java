@@ -54,7 +54,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
     }
 
 	public boolean exists() {
-		logger.debug("Checking file " + getPath() + " for existence");
+		logger.debug("Checking file " + this + " for existence");
 
 		try {
             return connection.getSharedSftpClient().statExistence(getPath()) != null;
@@ -133,7 +133,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		try {
             connection.getSharedSftpClient().mkdir(getPath());
 		} catch (IOException e) {
-            throw new RuntimeIOException("Cannot create directory " + getPath(), e);
+            throw new RuntimeIOException("Cannot create directory " + this, e);
         }
     }
 
@@ -143,7 +143,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
         try {
             connection.getSharedSftpClient().mkdirs(getPath());
         } catch (IOException e) {
-            throw new RuntimeIOException("Cannot create directories " + getPath(), e);
+            throw new RuntimeIOException("Cannot create directories " + this, e);
         }
 	}
 
@@ -160,11 +160,12 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                     throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest, e);
                 }
             } else {
-				throw new RuntimeIOException("Cannot move/rename SSH/SFTP file/directory " + this + " to SSH/SFTP file/directory " + dest
-				        + " because it is in a different connection");
+				throw new RuntimeIOException("Cannot move/rename ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this + " to file/directory "
+				        + dest + " because it is in a different connection");
 			}
 		} else {
-			throw new RuntimeIOException("Cannot move/rename SSH/SFTP file/directory " + this + " to non-SSH/SFTP file/directory " + dest);
+			throw new RuntimeIOException("Cannot move/rename ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this + " to non-ssh:"
+			        + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + dest);
 		}
 	}
 
@@ -266,7 +267,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		        }
 	        };
         } catch (IOException e) {
-            throw new RuntimeIOException("Cannot read from file " + getPath(), e);
+            throw new RuntimeIOException("Cannot read from file " + this, e);
         }
 	}
 
@@ -310,7 +311,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		        }
 	        };
         } catch (IOException e) {
-            throw new RuntimeIOException("Cannot write to file " + getPath(), e);
+            throw new RuntimeIOException("Cannot write to file " + this, e);
         }
 	}
 
