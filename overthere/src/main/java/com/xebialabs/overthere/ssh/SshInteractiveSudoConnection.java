@@ -39,9 +39,9 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
 	public SshInteractiveSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
-		checkArgument(!passwordPromptRegex.endsWith("*"), "Interactive SUDO password prompt regex should not end in a wildcard");
-		checkArgument(!passwordPromptRegex.endsWith("?"), "Interactive SUDO password prompt regex should not end in a wildcard");
-		checkArgument(password != null, "Cannot start an interactive SSH SUDO connection without a password");
+		checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
+		checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
+		checkArgument(password != null, "Cannot start a ssh:" + sshConnectionType.toString().toLowerCase() + ": connection without a password");
 	}
 
     @Override

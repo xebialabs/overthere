@@ -128,7 +128,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 				}
 				String permissions = outputTokens.nextToken();
 				@SuppressWarnings("unused")
-				String inodelinkes = outputTokens.nextToken();
+				String inodelinks = outputTokens.nextToken();
 				@SuppressWarnings("unused")
 				String owner = outputTokens.nextToken();
 				@SuppressWarnings("unused")
@@ -172,7 +172,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {
-        logger.debug("Opening SCP input stream to read from file {}", this);
+        logger.debug("Opening ssh:scp: input stream to read from file {}", this);
 
         try {
             final File tempFile = File.createTempFile("scp_download", ".tmp");
@@ -190,13 +190,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 }
             };
         } catch (IOException e) {
-            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+            throw new RuntimeIOException("Cannot open " + this + " for reading: " + e.toString(), e);
         }
 	}
 
 	@Override
 	public OutputStream getOutputStream() throws RuntimeIOException {
-		logger.debug("Opening SCP output stream to write to file {}", this);
+		logger.debug("Opening ssh:scp: output stream to write to file {}", this);
 
         try {
             final File tempFile = File.createTempFile("scp_upload", ".tmp");
@@ -220,7 +220,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 }
             };
         } catch (IOException e) {
-            throw new RuntimeIOException("Could not open " + this + " for reading", e);
+            throw new RuntimeIOException("Cannot open " + this + " for reading: " + e.toString(), e);
         }
 	}
 
@@ -287,10 +287,12 @@ class SshScpFile extends SshFile<SshScpConnection> {
 					throw new RuntimeIOException("Cannot rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 				}
 			} else {
-				throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to ssh_scp file/directory " + dest + " because it is in a different connection");
+				throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this + " to file/directory "
+				        + dest + " because it is in a different connection");
 			}
 		} else {
-			throw new RuntimeIOException("Cannot rename ssh_scp file/directory " + this + " to non-ssh_scp file/directory " + dest);
+			throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this + " to non-:ssh:"
+			        + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + dest);
 		}
 	}
 
@@ -353,7 +355,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 uploadClient.copy(new OverthereFileLocalSourceFile(source), getPath());
             }
         } catch (IOException e) {
-        	throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
+        	throw new RuntimeIOException("Cannot copy " + source + " to " + this + ": " + e.toString(), e);
         }
     }
 

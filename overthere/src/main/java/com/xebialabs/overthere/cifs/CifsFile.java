@@ -192,7 +192,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 				throw new RuntimeIOException("Cannot move/rename " + this + " to " + dest + ": " + exc.toString(), exc);
 			}
 		} else {
-			throw new RuntimeIOException("Cannot move/rename cifs_telnet file/directory " + this + " to non-cifs_telnet file/directory " + dest);
+			throw new RuntimeIOException("Cannot move/rename cifs:" + connection.cifsConnectionType.toString().toLowerCase() + ": file/directory " + this + " to non-cifs:" + connection.cifsConnectionType.toString().toLowerCase() + ": file/directory " + dest);
 		}
 	}
 

@@ -111,7 +111,7 @@ abstract class SshConnection extends OverthereConnection {
 
             if (privateKeyFile != null) {
                 if (password != null) {
-                    logger.warn("Both password and private key have been set for SSH connection {}. Using the private key and ignoring the password.", this);
+                    logger.warn("Both password and private key have been set for an ssh:" + sshConnectionType.toString().toLowerCase() + ": connection {}. Using the private key and ignoring the password.", this);
                 }
                 KeyProvider keys;
                 try {
