@@ -26,11 +26,7 @@ class SshProcess implements OverthereProcess {
         this.connection = connection;
         this.session = session;
         this.commandLine = commandLine;
-        this.command = startCommand();
-    }
-
-    protected Session.Command startCommand() throws TransportException, ConnectionException {
-        return session.exec(commandLine.toCommandLine(connection.getHostOperatingSystem(), false));
+        this.command = session.exec(commandLine.toCommandLine(connection.getHostOperatingSystem(), false));
     }
 
     @Override
