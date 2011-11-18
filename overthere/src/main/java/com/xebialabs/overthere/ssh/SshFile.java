@@ -22,10 +22,12 @@ import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
+import java.io.Serializable;
+
 /**
  * A file on a host connected through SSH.
  */
-abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
+abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> implements Serializable {
 
 	protected String path;
 
