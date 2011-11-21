@@ -6,10 +6,12 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
@@ -129,6 +131,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 		options.set(SUDO_USERNAME, "overthere");
 		options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
 		options.set(ALLOCATE_DEFAULT_PTY, true);
+		options.set(SUDO_OVERRIDE_UMASK, true);
 		return options;
     }
 

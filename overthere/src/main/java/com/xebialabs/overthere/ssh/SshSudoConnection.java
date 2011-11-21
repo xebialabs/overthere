@@ -18,6 +18,8 @@ package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
@@ -48,12 +50,15 @@ class SshSudoConnection extends SshScpConnection {
 	protected String sudoCommandPrefix;
 
 	protected boolean sudoQuoteCommand;
+	
+	protected boolean sudoOverrideUmask;
 
 	public SshSudoConnection(String type, ConnectionOptions options) {
 		super(type, options);
 		this.sudoUsername = options.get(SUDO_USERNAME);
 		this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
 		this.sudoQuoteCommand = options.get(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
+		this.sudoOverrideUmask = options.get(SUDO_OVERRIDE_UMASK, SUDO_OVERRIDE_UMASK_DEFAULT);
 	}
 
 	@Override
