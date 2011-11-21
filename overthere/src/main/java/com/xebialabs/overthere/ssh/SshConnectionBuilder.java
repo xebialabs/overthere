@@ -101,6 +101,18 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the permissions with go+rX after uploading a
+	 * file with scp.
+	 */
+	public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the permissions with go+rX after
+	 * uploading a file with scp.
+	 */
+	public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = false;
+
 	protected SshConnection connection;
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {
