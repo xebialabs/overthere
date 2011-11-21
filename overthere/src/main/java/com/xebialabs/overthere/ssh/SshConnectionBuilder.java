@@ -102,8 +102,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the permissions with go+rX after uploading a
-	 * file with scp.
+	 * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the permissions with chmod -R go+rX after uploading a
+	 * file or directory with scp.
 	 */
 	public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
 
