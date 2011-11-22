@@ -116,7 +116,7 @@ public enum OperatingSystemFamily {
 		if (this == WINDOWS) {
 			return "&&";
 		} else {
-			return ":";
+			return ";";
 		}
 	}
 
