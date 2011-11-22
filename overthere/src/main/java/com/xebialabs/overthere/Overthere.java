@@ -75,11 +75,7 @@ public class Overthere {
 			logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
 			for (String k : options.keys()) {
 				Object v = options.get(k);
-				if(v == null) {
-					logger.trace("{} is null", k);
-				} else {
-					logger.trace("{}={}", k, v);
-				}
+				logger.trace("{}={}", k, v);
 			}
 		}
 
@@ -89,9 +85,7 @@ public class Overthere {
 			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options);
 			logger.info("Connecting to {}", connectionBuilder);
 			OverthereConnection connection = connectionBuilder.connect();
-			if(logger.isTraceEnabled()) {
-				logger.trace("Connected to {}", connection);
-			}
+			logger.trace("Connected to {}", connection);
 			return connection;
 		} catch (NoSuchMethodException exc) {
 			throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
