@@ -28,7 +28,7 @@ import com.xebialabs.overthere.util.OverthereFileCopier;
  */
 public abstract class BaseOverthereFile<C extends OverthereConnection> implements OverthereFile {
 
-	protected transient C connection;
+	protected C connection;
 
 	protected BaseOverthereFile() {
 		this.connection = null;

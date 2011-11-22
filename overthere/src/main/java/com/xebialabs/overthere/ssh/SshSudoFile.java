@@ -129,28 +129,29 @@ class SshSudoFile extends SshScpFile {
 	}
 
 	@Override
-    protected void copyFrom(OverthereFile source) {
-		if(isTempFile) {
+	protected void copyFrom(OverthereFile source) {
+		if (isTempFile) {
 			super.copyFrom(source);
 			overrideUmask(this);
 		} else {
 			logger.debug("Copying file or directory {} to {}", source, this);
 			OverthereFile tempFile = getConnection().getTempFile(getName());
 			try {
-		        connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), tempFile.getPath());
-	        } catch (IOException e) {
-	        	throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
-	        }
+				connection.getSshClient().newSCPFileTransfer().newSCPUploadClient().copy(new OverthereFileLocalSourceFile(source), tempFile.getPath());
+			} catch (IOException e) {
+				throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
+			}
 			overrideUmask(tempFile);
-	        copyfromTempFile(tempFile);
+			copyfromTempFile(tempFile);
 		}
-    }
-	
+	}
+
 	private void overrideUmask(OverthereFile remoteFile) {
-		if(((SshSudoConnection) connection).sudoOverrideUmask) {
+		if (((SshSudoConnection) connection).sudoOverrideUmask) {
 			logger.debug("Overriding umask by recursively setting permissions on files and/or directories copied with scp to be readable and executable (if needed) by group and other");
 			CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-			int errno = ((SshSudoConnection) connection).noSudoExecute(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("chmod", "-R", "go+rX", remoteFile.getPath()));
+			int errno = ((SshSudoConnection) connection).noSudoExecute(multiHandler(loggingHandler(logger), capturedOutput),
+			        CmdLine.build("chmod", "-R", "go+rX", remoteFile.getPath()));
 			if (errno != 0) {
 				throw new RuntimeIOException("Cannot set permissions on file " + this + " to go+rX: " + capturedOutput.getError() + " (errno=" + errno + ")");
 			}
