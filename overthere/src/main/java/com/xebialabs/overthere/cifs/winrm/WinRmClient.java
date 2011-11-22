@@ -16,14 +16,9 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import org.apache.commons.codec.binary.Base64;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -34,9 +29,13 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 public class WinRmClient {
 

@@ -95,8 +95,7 @@ class SshSudoFile extends SshScpFile {
 			return super.getOutputStream();
 		} else {
 			logger.debug("Opening ssh:sudo: output stream to write to file {}", this);
-			SshSudoOutputStream out = new SshSudoOutputStream(this, connection.getTempFile(getName()));
-			return out;
+            return new SshSudoOutputStream(this, connection.getTempFile(getName()));
 		}
 	}
 

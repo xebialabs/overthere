@@ -16,18 +16,17 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
-
-import java.io.InputStream;
-
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
+import java.io.InputStream;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
 
 /**
  * A connection to a remote Unix host using SSH w/ interactive SUDO.

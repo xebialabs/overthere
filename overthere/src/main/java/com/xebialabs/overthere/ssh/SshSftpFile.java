@@ -16,23 +16,21 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import net.schmizz.sshj.sftp.*;
+import net.schmizz.sshj.xfer.FilePermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.google.common.io.Closeables;
-import net.schmizz.sshj.sftp.*;
-import net.schmizz.sshj.xfer.FilePermission;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * A file on a host connected through SSH that is accessed using SFTP.

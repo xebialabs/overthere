@@ -1,23 +1,5 @@
 package com.xebialabs.overthere.cifs.winrm;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TIMEOUT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -28,6 +10,16 @@ import com.xebialabs.overthere.cifs.winrm.connector.JdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.connector.LaxJdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.tokengenerator.BasicTokenGenerator;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 
 /**
  * A connection to a remote host using CIFS and WinRM.

@@ -16,10 +16,9 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
+import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
-import javax.net.ssl.X509TrustManager;
 
 class LaxTrustManager implements X509TrustManager {
 

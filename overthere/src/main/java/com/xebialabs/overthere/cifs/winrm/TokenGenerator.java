@@ -18,5 +18,5 @@ package com.xebialabs.overthere.cifs.winrm;
 
 public interface TokenGenerator {
 
-	public String generateToken();
+	String generateToken();
 }

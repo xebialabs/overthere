@@ -1,13 +1,13 @@
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
  * Builds CIFS connections.

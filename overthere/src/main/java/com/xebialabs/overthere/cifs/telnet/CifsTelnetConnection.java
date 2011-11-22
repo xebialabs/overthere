@@ -16,31 +16,20 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.cifs.CifsConnection;
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Closeables;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.cifs.CifsConnection;
+import java.io.*;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
  * A connection to a remote host using CIFS and Telnet.

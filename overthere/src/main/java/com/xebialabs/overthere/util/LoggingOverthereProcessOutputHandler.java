@@ -1,8 +1,7 @@
 package com.xebialabs.overthere.util;
 
-import org.slf4j.Logger;
-
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import org.slf4j.Logger;
 
 /**
  * Implementation of the {@link OverthereProcessOutputHandler} interface that sends the output to the specified logger. Regular output will be logged at the

@@ -1,10 +1,10 @@
 package com.xebialabs.overthere;
 
+import java.io.Serializable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-
-import java.io.Serializable;
 
 /**
  * Represents a single command line argument.
@@ -148,7 +148,7 @@ public abstract class CmdLineArgument implements Serializable {
 		}
 	}
 
-	private static abstract class Single extends CmdLineArgument {
+	private abstract static class Single extends CmdLineArgument {
 		protected String arg;
 
 		private Single(String arg) {

@@ -16,10 +16,10 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.OverthereFile;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
-import com.xebialabs.overthere.OverthereFile;
 
 /**
  * An output stream to a file on a host connected through SSH w/ SUDO.

@@ -16,15 +16,17 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.security.SecureRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.security.SecureRandom;
 
 class LaxSSLSocketFactory extends SSLSocketFactory {
 
@@ -36,7 +38,7 @@ class LaxSSLSocketFactory extends SSLSocketFactory {
 			sslcontext.init(null, new TrustManager[] { new LaxTrustManager() }, new SecureRandom());
 			factory = sslcontext.getSocketFactory();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error("Couldn't setup lax SSL context", ex);
 		}
 	}
 
@@ -79,5 +81,5 @@ class LaxSSLSocketFactory extends SSLSocketFactory {
 		return factory.getSupportedCipherSuites();
 	}
 
-
+    private static final Logger logger = LoggerFactory.getLogger(LaxSSLSocketFactory.class);
 }

@@ -16,25 +16,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-
-import java.text.MessageFormat;
-
+import com.xebialabs.overthere.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
+import java.text.MessageFormat;
+
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 
 /**
  * A connection to a remote Unix host using SSH w/ SUDO.

@@ -1,11 +1,11 @@
 package com.xebialabs.overthere.util;
 
 
-import java.io.IOException;
-import java.util.List;
-
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+
+import java.io.IOException;
+import java.util.List;
 /**
  * Abstract class that walks through a directory hierarchy and provides
  * subclasses with convenient hooks to add specific behaviour.

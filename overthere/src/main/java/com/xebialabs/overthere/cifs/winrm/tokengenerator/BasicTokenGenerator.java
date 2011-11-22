@@ -1,8 +1,7 @@
 package com.xebialabs.overthere.cifs.winrm.tokengenerator;
 
-import org.apache.commons.codec.binary.Base64;
-
 import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
+import org.apache.commons.codec.binary.Base64;
 
 public class BasicTokenGenerator implements TokenGenerator {
 

@@ -16,17 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
-
-import java.io.IOException;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.xebialabs.overthere.*;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -34,7 +25,6 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
@@ -42,14 +32,11 @@ import net.schmizz.sshj.userauth.password.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
+import java.io.IOException;
+
+import static com.google.common.base.Preconditions.*;
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 
 /**
  * Base class for host connections using SSH.
