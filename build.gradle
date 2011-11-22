@@ -1,7 +1,17 @@
 // build.gradle for overthere repository containing the overthere and itest-support projects
-defaultTasks 'build'
 
-commonBuildPath = hasProperty("localCommonBuildRepo") ? file(localCommonBuildRepo).toURL().toString() : 'https://raw.github.com/xebialabs/deployit-common-build/master'
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/'
+	}
+	dependencies {
+		classpath 'de.huxhorn.gradle:de.huxhorn.gradle.pgp-plugin:0.0.3'
+	}
+}
+
+defaultTasks 'build'
 
 allprojects {
 	version = '1.0.8-SNAPSHOT'
@@ -13,24 +23,36 @@ allprojects {
 subprojects {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
+	apply plugin: 'maven'
+	apply plugin: de.huxhorn.gradle.pgp.PgpPlugin
 
 	repositories {
 		mavenLocal()
 		mavenCentral()
 		mavenRepo urls: 'http://download.java.net/maven/2/'
-		mavenRepo urls: 'https://oss.sonatype.org/service/local/repositories/nljavadude-593/content/'
 	}
-
-	apply from: "$commonBuildPath/releaseable.gradle"
-	apply from: "$commonBuildPath/artifacts.gradle"
 
 	sourceCompatibility = 1.6
 	targetCompatibility = 1.6
 
 	configurations {
 	    compile {
-	        transitive = false
+		transitive = false
 	    }
+	}
+
+	task sourcesJar(type: Jar) {
+		from sourceSets.main.allSource
+		classifier = 'sources'
+	}
+
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		classifier = "javadoc"
+		from javadoc.destinationDir
+	}
+
+	artifacts {
+		archives sourcesJar, javadocJar
 	}
 
 	test {
@@ -46,6 +68,62 @@ subprojects {
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
 	}
+
+	pgp {
+		secretKeyRingFile = new File("${System.properties['user.home']}/.gnupg/secring.gpg")
+	}
+
+	uploadArchives {
+		repositories.mavenDeployer {
+			configuration = configurations.archives
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+
+			pom.project {
+				packaging "jar"
+				url "https://github.com/xebialabs/overthere"
+				inceptionYear "2011"
+
+				scm {
+					url "https://github.com/xebialabs/overthere"
+				}
+
+				licenses {
+					license {
+						name "The Apache Software License, Version 2.0"
+						url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						distribution "repo"
+					}
+				}
+
+				developers {
+					developer {
+						id "vpartington"
+						name "Vincent Partington"
+						url "http://www.xebialabs.com/"
+						email "vpartington@xebialabs.com"
+						roles {
+							role "Developer"
+						}
+					}
+					developer {
+						id "hierynomus"
+						name "Jeroen van Erp"
+						url "http://www.xebialabs.com/"
+						email "jvanerp@xebialabs.com"
+						roles {
+							role "Developer"
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
@@ -53,4 +131,3 @@ def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
 		systemProperties[name] = project.getProperty(name)
 	}
 }
-
