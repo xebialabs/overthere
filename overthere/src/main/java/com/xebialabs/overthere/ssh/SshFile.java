@@ -114,7 +114,12 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
 	@Override
 	public String toString() {
-		return connection + path;
+		String p = getPath();
+		if(p.length() >= 1 && p.charAt(0) == '/') {
+			return getConnection() + p;
+		} else {
+			return getConnection() + "/" + p;
+		}
 	}
 
 }

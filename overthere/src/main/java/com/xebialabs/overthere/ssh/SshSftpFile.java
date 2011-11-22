@@ -43,21 +43,15 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		super(connection, path);
 	}
 
-	protected FileAttributes stat() {
-		logger.debug("Statting file " + this);
-
-		try {
-            return connection.getSharedSftpClient().stat(getPath());
-		} catch (IOException e) {
-            throw new RuntimeIOException("Cannot stat file " + this, e);
-        }
-    }
+	protected String getSftpPath() {
+		return connection.pathToSftpPath(getPath());
+	}
 
 	public boolean exists() {
 		logger.debug("Checking file " + this + " for existence");
 
 		try {
-            return connection.getSharedSftpClient().statExistence(getPath()) != null;
+            return connection.getSharedSftpClient().statExistence(getSftpPath()) != null;
         } catch (IOException e) {
 			throw new RuntimeIOException("Cannot check existence of file " + getPath(), e);
 		}
@@ -102,13 +96,23 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
         return stat().getPermissions().contains(perm);
     }
 
+	protected FileAttributes stat() {
+		logger.debug("Statting file " + this);
+
+		try {
+            return connection.getSharedSftpClient().stat(getSftpPath());
+		} catch (IOException e) {
+            throw new RuntimeIOException("Cannot stat file " + this, e);
+        }
+    }
+
 	@Override
 	public List<OverthereFile> listFiles() {
 		logger.debug("Listing files in {}", this);
 
 		try {
 			// read files from host
-            List<RemoteResourceInfo> ls = connection.getSharedSftpClient().ls(getPath());
+            List<RemoteResourceInfo> ls = connection.getSharedSftpClient().ls(getSftpPath());
 
             // copy files to list, skipping . and ..
 			List<OverthereFile> files = newArrayList();
@@ -131,7 +135,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Creating directory " + this);
 
 		try {
-            connection.getSharedSftpClient().mkdir(getPath());
+            connection.getSharedSftpClient().mkdir(getSftpPath());
 		} catch (IOException e) {
             throw new RuntimeIOException("Cannot create directory " + this, e);
         }
@@ -141,7 +145,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 	public void mkdirs() {
 		logger.debug("Creating directories {}", this);
         try {
-            connection.getSharedSftpClient().mkdirs(getPath());
+            connection.getSharedSftpClient().mkdirs(getSftpPath());
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot create directories " + this, e);
         }
@@ -155,7 +159,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 			SshSftpFile sftpDest = (SshSftpFile) dest;
 			if (sftpDest.getConnection() == getConnection()) {
 				try {
-					connection.getSharedSftpClient().rename(getPath(), sftpDest.getPath());
+					connection.getSharedSftpClient().rename(getSftpPath(), sftpDest.getSftpPath());
 				} catch (IOException e) {
                     throw new RuntimeIOException("Cannot move/rename file/directory " + this + " to " + dest, e);
                 }
@@ -174,7 +178,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Setting execute permission on {} to {}", this, executable);
 
 		try {
-			int permissionsMask = connection.getSharedSftpClient().stat(path).getMode().getPermissionsMask();
+			int permissionsMask = connection.getSharedSftpClient().stat(getSftpPath()).getMode().getPermissionsMask();
 			if(executable) {
 				permissionsMask |= 0111;
 			} else {
@@ -191,7 +195,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Removing file {}", this);
 
 		try {
-            connection.getSharedSftpClient().rm(path);
+            connection.getSharedSftpClient().rm(getSftpPath());
 		} catch (IOException e) {
             throw new RuntimeIOException("Cannot delete file " + this, e);
         }
@@ -202,7 +206,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Removing directory {}", this);
 
 		try {
-            connection.getSharedSftpClient().rmdir(getPath());
+            connection.getSharedSftpClient().rmdir(getSftpPath());
 		} catch (IOException e) {
             throw new RuntimeIOException("Cannot delete directory " + this, e);
         }
@@ -213,7 +217,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Opening SFTP input stream to read from file {}", this);
 
         try {
-	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.READ));
+	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.READ));
 	        final RemoteFile.RemoteFileInputStream stream = remoteFile.getInputStream();
 	        return new InputStream() {
 
@@ -276,7 +280,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 		logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
         try {
-	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
+	        final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
 	        final OutputStream wrapped = remoteFile.getOutputStream();
 
 	        return new OutputStream() {

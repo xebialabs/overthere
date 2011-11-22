@@ -37,7 +37,7 @@ import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
- * A connection to a remote host using SSH w/ SUDO.
+ * A connection to a remote Unix host using SSH w/ SUDO.
  */
 class SshSudoConnection extends SshScpConnection {
 

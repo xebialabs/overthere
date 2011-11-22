@@ -224,14 +224,28 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindows() {
+	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsNotWithSftpCygwin() {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+		assumeThat(connection.getClass().getName(), not(equalTo("com.xebialabs.overthere.ssh.SshSftpCygwinConnection")));
 
 		connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("cd"));
 		assertThat(res, equalTo(0));
 		assertThat(captured.getOutput().toUpperCase(), containsString("C:\\WINDOWS"));
+	}
+
+
+	@Test
+	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsWithSftpCygwin() {
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+		assumeThat(connection.getClass().getName(), equalTo("com.xebialabs.overthere.ssh.SshSftpCygwinConnection"));
+
+		connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
+		CapturingOverthereProcessOutputHandler captured = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("pwd"));
+		assertThat(res, equalTo(0));
+		assertThat(captured.getOutput().toLowerCase(), containsString("/cygdrive/c/windows"));
 	}
 
 	@Test
@@ -268,9 +282,9 @@ public abstract class OverthereConnectionItestBase {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
 
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("dir", "/w"));
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig", "/all"));
 		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), containsString("[..]"));
+		assertThat(capturingHandler.getOutput(), containsString("DHCP Server"));
 	}
 
 	@Test

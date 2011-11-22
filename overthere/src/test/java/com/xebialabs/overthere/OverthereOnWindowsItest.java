@@ -34,6 +34,8 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_H
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,9 +43,6 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
-
-import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 
 public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItestBase {
 
@@ -62,9 +61,10 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsTelnetOptions(), CifsTelnetConnection.class.getName() });
-		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpOptions(), CifsWinRmConnection.class.getName() });
-		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpsOptions(), CifsWinRmConnection.class.getName() });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsTelnetOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection" });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection" });
+		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpsOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSftpCygwinOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection" });
 		return lopco;
 	}
 
@@ -101,6 +101,16 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		partialOptions.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
 		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
 		return partialOptions;
+	}
+
+	private static ConnectionOptions createSftpCygwinOptions() {
+		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, WINDOWS);
+		options.set(CONNECTION_TYPE, SFTP_CYGWIN);
+		options.set(PORT, 22);
+		options.set(USERNAME, ITEST_USERNAME);
+		options.set(PASSWORD, ITEST_PASSWORD);
+		return options;
 	}
 
 }

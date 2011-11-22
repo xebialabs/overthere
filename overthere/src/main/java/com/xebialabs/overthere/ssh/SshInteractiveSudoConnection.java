@@ -30,7 +30,7 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 
 /**
- * A connection to a remote host using SSH w/ interactive SUDO.
+ * A connection to a remote Unix host using SSH w/ interactive SUDO.
  */
 class SshInteractiveSudoConnection extends SshSudoConnection {
 
