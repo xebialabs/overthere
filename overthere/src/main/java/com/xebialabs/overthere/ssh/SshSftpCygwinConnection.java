@@ -10,7 +10,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
- * A connection to a remote Windows host running OpenSSH on Cygwin using SSH w/ SFTP.
+ * A connection to a Windows host running OpenSSH on Cygwin using SSH w/ SFTP.
  */
 class SshSftpCygwinConnection extends SshSftpConnection {
 

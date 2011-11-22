@@ -25,7 +25,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
- * A connection to a remote Unix host using SSH w/ SCP.
+ * A connection to a Unix host using SSH w/ SCP.
  */
 class SshScpConnection extends SshConnection {
 

@@ -29,7 +29,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PRO
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
 
 /**
- * A connection to a remote Unix host using SSH w/ interactive SUDO.
+ * A connection to a Unix host using SSH w/ interactive SUDO.
  */
 class SshInteractiveSudoConnection extends SshSudoConnection {
 

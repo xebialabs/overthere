@@ -7,7 +7,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
- * A connection to a remote Unix host using SSH w/ SFTP.
+ * A connection to a Unix host using SSH w/ SFTP.
  */
 class SshSftpUnixConnection extends SshSftpConnection {
 

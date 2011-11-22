@@ -22,7 +22,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 
 /**
- * A connection to a remote host using CIFS and WinRM.
+ * A connection to a Windows host using CIFS and WinRM.
  * 
  * Limitations:
  * <ul>
