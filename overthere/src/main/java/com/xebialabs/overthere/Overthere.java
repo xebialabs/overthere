@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Factory object to create {@link OverthereConnection connections}.
  */
+@SuppressWarnings("unchecked")
 public class Overthere {
 	// The "logger" field has to be declared and defined at the top so that the static initializer below can access it
 	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
