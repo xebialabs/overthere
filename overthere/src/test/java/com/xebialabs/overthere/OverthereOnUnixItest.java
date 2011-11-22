@@ -46,7 +46,7 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 	@Parameters
 	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
 		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection" });
 		lopco.add(new Object[] { SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
 		lopco.add(new Object[] { SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
 		lopco.add(new Object[] { SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
