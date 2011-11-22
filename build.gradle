@@ -74,50 +74,52 @@ subprojects {
 	}
 
 	uploadArchives {
-		repositories.mavenDeployer {
-			configuration = configurations.archives
+		if(hasProperty('sonatypeUsername') && hasProperty('sonatypePassword')) {
+			repositories.mavenDeployer {
+				configuration = configurations.archives
 
-			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-				authentication(userName: sonatypeUsername, password: sonatypePassword)
-			}
-			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-				authentication(userName: sonatypeUsername, password: sonatypePassword)
-			}
+				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+					authentication(userName: sonatypeUsername, password: sonatypePassword)
+				}
+				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+					authentication(userName: sonatypeUsername, password: sonatypePassword)
+				}
 
-			pom.project {
-				packaging "jar"
-				url "https://github.com/xebialabs/overthere"
-				inceptionYear "2011"
-
-				scm {
+				pom.project {
+					packaging "jar"
 					url "https://github.com/xebialabs/overthere"
-				}
+					inceptionYear "2011"
 
-				licenses {
-					license {
-						name "The Apache Software License, Version 2.0"
-						url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-						distribution "repo"
+					scm {
+						url "https://github.com/xebialabs/overthere"
 					}
-				}
 
-				developers {
-					developer {
-						id "vpartington"
-						name "Vincent Partington"
-						url "http://www.xebialabs.com/"
-						email "vpartington@xebialabs.com"
-						roles {
-							role "Developer"
+					licenses {
+						license {
+							name "The Apache Software License, Version 2.0"
+							url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+							distribution "repo"
 						}
 					}
-					developer {
-						id "hierynomus"
-						name "Jeroen van Erp"
-						url "http://www.xebialabs.com/"
-						email "jvanerp@xebialabs.com"
-						roles {
-							role "Developer"
+
+					developers {
+						developer {
+							id "vpartington"
+							name "Vincent Partington"
+							url "http://www.xebialabs.com/"
+							email "vpartington@xebialabs.com"
+							roles {
+								role "Developer"
+							}
+						}
+						developer {
+							id "hierynomus"
+							name "Jeroen van Erp"
+							url "http://www.xebialabs.com/"
+							email "jvanerp@xebialabs.com"
+							roles {
+								role "Developer"
+							}
 						}
 					}
 				}
