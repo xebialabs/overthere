@@ -108,6 +108,19 @@ public enum OperatingSystemFamily {
 	}
 
 	/**
+	 * Returns the character used by the operating system family to separate commands in a command line, e.g. <tt>&&</tt> or <tt>;<tt>.
+	 * 
+	 * @return the command separator.
+	 */
+	public String getCommandSeparator() {
+		if (this == WINDOWS) {
+			return "&&";
+		} else {
+			return ":";
+		}
+	}
+
+	/**
 	 * Converts a text to use the {@link #getLineSeparator() line separator} of this operating system family.
 	 * 
 	 * @param text
