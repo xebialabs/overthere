@@ -1,14 +1,13 @@
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.RuntimeIOException;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
  * A connection to a remote Windows host running OpenSSH on Cygwin using SSH w/ SFTP.

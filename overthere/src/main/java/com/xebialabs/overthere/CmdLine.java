@@ -1,20 +1,17 @@
 package com.xebialabs.overthere;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
-import static com.xebialabs.overthere.CmdLineArgument.arg;
-import static com.xebialabs.overthere.CmdLineArgument.nested;
-import static com.xebialabs.overthere.CmdLineArgument.password;
-import static com.xebialabs.overthere.CmdLineArgument.raw;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static java.util.Collections.unmodifiableList;
+import com.google.common.base.Function;
 
 import java.io.Serializable;
 import java.util.List;
 
-import com.google.common.base.Function;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.xebialabs.overthere.CmdLineArgument.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * Represents a command line.

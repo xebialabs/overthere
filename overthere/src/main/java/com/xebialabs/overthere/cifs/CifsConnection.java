@@ -16,28 +16,17 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import com.xebialabs.overthere.*;
+import jcifs.smb.SmbFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import jcifs.smb.SmbFile;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 
 /**
  * Base class for connections to a remote host using CIFS.

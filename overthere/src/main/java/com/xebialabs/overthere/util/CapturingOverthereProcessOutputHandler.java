@@ -16,13 +16,13 @@
  */
 package com.xebialabs.overthere.util;
 
-import static com.google.common.base.Joiner.on;
-import static java.util.Collections.unmodifiableList;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import static com.google.common.base.Joiner.on;
+import static java.util.Collections.unmodifiableList;
 
 /**
  * An implementation of the {@link OverthereProcessOutputHandler} that captures the output in variables.

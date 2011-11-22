@@ -23,7 +23,6 @@ import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
 import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
 import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
@@ -88,14 +87,15 @@ public class JdkHttpConnector implements HttpConnector {
 			}
 			
 			Writer writer = new StringWriter();
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			try {
 				int n;
 				char[] buffer = new char[1024];
-				Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 				while ((n = reader.read(buffer)) != -1) {
 					writer.write(buffer, 0, n);
 				}
 			} finally {
+                Closeables.closeQuietly(reader);
 				Closeables.closeQuietly(is);
 			}
 

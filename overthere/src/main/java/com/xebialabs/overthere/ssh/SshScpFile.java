@@ -16,33 +16,26 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.CmdLine.build;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import net.schmizz.sshj.xfer.LocalFileFilter;
-import net.schmizz.sshj.xfer.LocalSourceFile;
-
-import net.schmizz.sshj.xfer.scp.SCPUploadClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Joiner;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import net.schmizz.sshj.xfer.LocalFileFilter;
+import net.schmizz.sshj.xfer.LocalSourceFile;
+import net.schmizz.sshj.xfer.scp.SCPUploadClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
 /**
  * A file on a host connected through SSH w/ SCP.

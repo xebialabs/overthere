@@ -16,10 +16,10 @@
  */
 package com.xebialabs.overthere.spi;
 
+import com.xebialabs.overthere.ConnectionOptions;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import com.xebialabs.overthere.ConnectionOptions;
 
 /**
  * Annotation used to specify that a class is an Overthere protocol. It will be registered on startup of the application and will register under the provided

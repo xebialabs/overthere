@@ -1,9 +1,9 @@
 package com.xebialabs.overthere.util;
 
-import java.io.UnsupportedEncodingException;
-
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Contains a number of static helper methods.

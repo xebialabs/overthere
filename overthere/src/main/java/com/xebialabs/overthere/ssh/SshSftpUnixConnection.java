@@ -1,10 +1,10 @@
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.ConnectionOptions;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-
-import com.xebialabs.overthere.ConnectionOptions;
 
 /**
  * A connection to a remote Unix host using SSH w/ SFTP.

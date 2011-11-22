@@ -16,10 +16,10 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
