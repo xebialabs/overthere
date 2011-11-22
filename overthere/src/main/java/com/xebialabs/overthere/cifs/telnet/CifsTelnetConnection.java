@@ -16,6 +16,10 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,6 +71,7 @@ public class CifsTelnetConnection extends CifsConnection {
 	 */
 	public CifsTelnetConnection(String type, ConnectionOptions options) {
 		super(type, options, true);
+		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 	}
 
 	@Override

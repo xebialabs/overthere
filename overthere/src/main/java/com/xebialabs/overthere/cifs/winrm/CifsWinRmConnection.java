@@ -1,7 +1,10 @@
 package com.xebialabs.overthere.cifs.winrm;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
@@ -45,6 +48,7 @@ public class CifsWinRmConnection extends CifsConnection {
 	 */
 	public CifsWinRmConnection(String type, ConnectionOptions options) {
 		super(type, options, false);
+		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 
 		TokenGenerator tokenGenerator = getTokenGenerator(options);
 		URL targetURL = getTargetURL(options);

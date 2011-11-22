@@ -30,9 +30,9 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
- * A connection to a remote host using SSH w/ SFTP.
+ * Base class for connections to a remote host using SSH w/ SFTP.
  */
-class SshSftpConnection extends SshConnection {
+abstract class SshSftpConnection extends SshConnection {
 
 	private SFTPClient sharedSftpClient;
 
@@ -75,6 +75,8 @@ class SshSftpConnection extends SshConnection {
 	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		return new SshSftpFile(this, hostPath);
 	}
+
+	protected abstract String pathToSftpPath(String path);
 
     private Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);
 

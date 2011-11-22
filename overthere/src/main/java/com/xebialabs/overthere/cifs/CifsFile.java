@@ -277,7 +277,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 	}
 
 	public String toString() {
-		return connection + "/" + getPath();
+		return getConnection() + "/" + getPath();
 	}
 
 }

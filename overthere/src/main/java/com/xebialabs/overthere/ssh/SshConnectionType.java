@@ -11,6 +11,11 @@ public enum SshConnectionType {
 	SFTP,
 
 	/**
+	 * An SSH connection that uses SFTP to transfer files, to an OpenSSH server in Cygwin on Windows.
+	 */
+	SFTP_CYGWIN,
+
+	/**
 	 * An SSH connection that uses SCP to transfer files.
 	 */
 	SCP,

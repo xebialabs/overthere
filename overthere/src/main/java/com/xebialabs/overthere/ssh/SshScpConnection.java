@@ -16,17 +16,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
- * A connection to a remote host using SSH w/ SCP.
+ * A connection to a remote Unix host using SSH w/ SCP.
  */
 class SshScpConnection extends SshConnection {
 
 	public SshScpConnection(String type, ConnectionOptions options) {
 		super(type, options);
+		checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
 	}
 
 	@Override
