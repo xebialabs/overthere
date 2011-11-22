@@ -16,8 +16,24 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.xebialabs.overthere.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
+
+import java.io.IOException;
+
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -29,14 +45,18 @@ import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
-import static com.google.common.base.Preconditions.*;
-import static com.xebialabs.overthere.ConnectionOptions.*;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import com.google.common.annotations.VisibleForTesting;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Base class for host connections using SSH.
@@ -202,7 +222,7 @@ abstract class SshConnection extends OverthereConnection {
     		CmdLine commandLineWithCd = new CmdLine();
     		commandLineWithCd.addArgument("cd");
     		commandLineWithCd.addArgument(workingDirectory.getPath());
-    		commandLineWithCd.addRaw(";");
+    		addCommandSeparator(commandLineWithCd);
     		for (CmdLineArgument a : commandLine.getArguments()) {
     			commandLineWithCd.add(a);
     		}
@@ -210,6 +230,10 @@ abstract class SshConnection extends OverthereConnection {
         } else {
         	return commandLine;
         }
+    }
+
+	protected void addCommandSeparator(CmdLine commandLine) {
+	    commandLine.addRaw(os.getCommandSeparator());
     }
 
 	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {

@@ -36,6 +36,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -64,7 +65,8 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsTelnetOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection" });
 		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection" });
 		lopco.add(new Object[] { CIFS_PROTOCOL, createCifsWinRmHttpsOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection" });
-		lopco.add(new Object[] { SSH_PROTOCOL, createSftpCygwinOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSshSftpCygwinOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection" });
+		lopco.add(new Object[] { SSH_PROTOCOL, createSshSftpWinSshdOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection" });
 		return lopco;
 	}
 
@@ -103,11 +105,21 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		return partialOptions;
 	}
 
-	private static ConnectionOptions createSftpCygwinOptions() {
+	private static ConnectionOptions createSshSftpCygwinOptions() {
 		ConnectionOptions options = new ConnectionOptions();
 		options.set(OPERATING_SYSTEM, WINDOWS);
 		options.set(CONNECTION_TYPE, SFTP_CYGWIN);
 		options.set(PORT, 22);
+		options.set(USERNAME, ITEST_USERNAME);
+		options.set(PASSWORD, ITEST_PASSWORD);
+		return options;
+	}
+
+	private static ConnectionOptions createSshSftpWinSshdOptions() {
+		ConnectionOptions options = new ConnectionOptions();
+		options.set(OPERATING_SYSTEM, WINDOWS);
+		options.set(CONNECTION_TYPE, SFTP_WINSSHD);
+		options.set(PORT, 2222);
 		options.set(USERNAME, ITEST_USERNAME);
 		options.set(PASSWORD, ITEST_PASSWORD);
 		return options;

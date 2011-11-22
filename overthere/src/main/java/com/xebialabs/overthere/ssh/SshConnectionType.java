@@ -16,6 +16,11 @@ public enum SshConnectionType {
 	SFTP_CYGWIN,
 
 	/**
+	 * An SSH connection that uses SFTP to transfer files, to a Windows host running WinSSHD.
+	 */
+	SFTP_WINSSHD,
+
+	/**
 	 * An SSH connection that uses SCP to transfer files, to a Unix host.
 	 */
 	SCP,
