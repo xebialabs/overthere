@@ -55,6 +55,13 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 		return connection;
 	}
 
+	private static LocalConnection createConnection() {
+	    // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from appearing
+		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
+		// FIXME: Creating a LocalConnection on the fly does not honour the original TEMPORARY_DIRECTORY_PATH (tmp) setting
+	    return localConnectionThatWillNeverBeDisconnected;
+    }
+
 	public File getFile() {
 		return file;
 	}
@@ -199,17 +206,11 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
 	@Override
 	public String toString() {
-		return connection + file.toString();
+		return LOCAL_PROTOCOL + ":" + file;
 	}
 
 	public static OverthereFile valueOf(File f) {
 		return new LocalFile(createConnection(), f);
 	}
-
-	private static LocalConnection createConnection() {
-	    // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from appearing
-		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
-	    return localConnectionThatWillNeverBeDisconnected;
-    }
 
 }

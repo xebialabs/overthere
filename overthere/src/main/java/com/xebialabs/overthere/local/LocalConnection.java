@@ -139,7 +139,7 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 
 	@Override
 	public String toString() {
-		return LOCAL_PROTOCOL + "://";
+		return LOCAL_PROTOCOL + ":";
 	}
 
 	/**
@@ -150,4 +150,5 @@ public class LocalConnection extends OverthereConnection implements OverthereCon
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
+
 }

@@ -70,7 +70,7 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void localFileIsSerializable() throws IOException, ClassNotFoundException {
+	public void localFileShouldBeSerializable() throws IOException, ClassNotFoundException {
 		OverthereFile tempFile = connection.getTempFile("afile");
 		
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
