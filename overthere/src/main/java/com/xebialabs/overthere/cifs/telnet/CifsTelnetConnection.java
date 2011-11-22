@@ -32,7 +32,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
- * A connection to a remote host using CIFS and Telnet.
+ * A connection to a Windows host using CIFS and Telnet.
  * 
  * Limitations:
  * <ul>

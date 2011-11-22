@@ -25,7 +25,7 @@ import java.text.MessageFormat;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 
 /**
- * A connection to a remote Unix host using SSH w/ SUDO.
+ * A connection to a Unix host using SSH w/ SUDO.
  */
 class SshSudoConnection extends SshScpConnection {
 

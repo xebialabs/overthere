@@ -29,7 +29,7 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 
 /**
- * Base class for connections to a remote host using CIFS.
+ * Base class for connections to a Windows host using CIFS.
  * 
  * Limitations:
  * <ul>
