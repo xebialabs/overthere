@@ -86,6 +86,8 @@ subprojects {
 				}
 
 				pom.project {
+					name "Overthere"
+					description "Remote file manipulation and process execution framework for Java"
 					packaging "jar"
 					url "https://github.com/xebialabs/overthere"
 					inceptionYear "2011"
