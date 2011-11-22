@@ -105,8 +105,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	/**
 	 * Gets information about the file by executing "ls -ld" on it.
 	 * 
-	 * @param file
-	 *            the file
 	 * @return the information about the file, never <code>null</code>.
 	 * @throws RuntimeIOException
 	 *             if an I/O exception occurs
@@ -127,12 +125,9 @@ class SshScpFile extends SshFile<SshScpConnection> {
 					throw new RuntimeIOException("ls -ld " + getPath() + " returned output that contains less than the expected 5 tokens: " + outputLine);
 				}
 				String permissions = outputTokens.nextToken();
-				@SuppressWarnings("unused")
-				String inodelinks = outputTokens.nextToken();
-				@SuppressWarnings("unused")
-				String owner = outputTokens.nextToken();
-				@SuppressWarnings("unused")
-				String group = outputTokens.nextToken();
+				outputTokens.nextToken(); // inodelinks
+				outputTokens.nextToken(); // owner
+				outputTokens.nextToken(); // group
 				String size = outputTokens.nextToken();
 
 				results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';

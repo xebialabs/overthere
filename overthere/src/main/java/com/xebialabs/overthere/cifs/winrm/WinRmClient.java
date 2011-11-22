@@ -75,8 +75,7 @@ public class WinRmClient {
 			return;
 		logger.debug("closeShell shellId {}", shellId);
 		final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, shellId, null);
-		@SuppressWarnings("unused")
-        Document responseDocument = sendMessage(requestDocument, null);
+        sendMessage(requestDocument, null);
 	}
 
 	private void cleanUp() {
@@ -86,9 +85,7 @@ public class WinRmClient {
 		final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId);
 		bodyContent.addElement(QName.get("Code", Namespaces.NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
 		final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
-		@SuppressWarnings("unused")
-        Document responseDocument = sendMessage(requestDocument, SoapAction.SIGNAL);
-
+        sendMessage(requestDocument, SoapAction.SIGNAL);
 	}
 
 	private void getCommandOutput(OverthereProcessOutputHandler handler) {

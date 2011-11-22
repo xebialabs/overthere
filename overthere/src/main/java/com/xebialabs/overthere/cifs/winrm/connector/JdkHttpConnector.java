@@ -51,7 +51,6 @@ public class JdkHttpConnector implements HttpConnector {
 
 	@Override
 	public Document sendMessage(Document requestDocument, SoapAction soapAction) {
-		Document responseDocument = null;
 		try {
 			final URLConnection urlConnection = targetURL.openConnection();
 			HttpURLConnection con = (HttpURLConnection) urlConnection;
@@ -74,9 +73,11 @@ public class JdkHttpConnector implements HttpConnector {
 			BufferedWriter bw = new BufferedWriter(
 					new OutputStreamWriter(
 							con.getOutputStream()));
-			bw.write(requestDocAsString, 0, requestDocAsString.length());
-			bw.flush();
-			bw.close();
+            try {
+			    bw.write(requestDocAsString, 0, requestDocAsString.length());
+            } finally {
+                Closeables.closeQuietly(bw);
+            }
 
 			InputStream is;
 			if (con.getResponseCode() >= 400) {
@@ -106,15 +107,15 @@ public class JdkHttpConnector implements HttpConnector {
 
 			final String text = writer.toString();
 			logger.debug("send message:response {}", text);
-			responseDocument = DocumentHelper.parseText(text);
-			return responseDocument;
+
+			return DocumentHelper.parseText(text);
 
 		} catch (BlankValueRuntimeException bvrte) {
 			throw bvrte;
 		} catch (InvalidFilePathRuntimeException ifprte) {
 			throw ifprte;
 		} catch (Exception e) {
-			throw new WinRMRuntimeIOException("send message on " + targetURL + " error ", requestDocument, responseDocument, e);
+			throw new WinRMRuntimeIOException("send message on " + targetURL + " error ", requestDocument, null, e);
 		}
 	}
 
