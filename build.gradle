@@ -74,7 +74,7 @@ subprojects {
 	}
 
 	uploadArchives {
-		if(hasProperty('sonatypeUsername') && hasProperty('sonatypePassword')) {
+		if(project.hasProperty('sonatypeUsername')) {
 			repositories.mavenDeployer {
 				configuration = configurations.archives
 
