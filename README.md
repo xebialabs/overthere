@@ -4,6 +4,8 @@ Overthere is a Java library to manipulate files and execute processes on remote 
 
 For a more thorough introducion to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands. Don't worry, the presentation is in English. :-)
 
+Overthere is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
 # Getting Overthere
 
 To get Overthere, you have two options:
