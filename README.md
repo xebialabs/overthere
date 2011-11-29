@@ -47,9 +47,9 @@ The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS,
 
 Overthere supports a number of protocols to connect to remote hosts:
 
-* __local__ - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
-* __ssh__ - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
-* __cifs__ - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. This protocol is only supported for Windows hosts.
+* [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
+* [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
+* [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. This protocol is only supported for Windows hosts.
 
 ## Connection options
 
@@ -95,10 +95,12 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </table>
 Apart from these common connection options, some protocol define additional protocol-specific connection options. These are documented below, with the protocol.
 
+<a name="local"/>
 ## LOCAL
 
 The local protocol implementation uses the local file manipulation and local process execution capabilities built-in to Java. The __os__ connection property is hardcoded to the operating system of the local host and the `tmp` property defaults to the system temporary directory as specified by the `java.io.tmpdir` [system property](http://docs.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()). There are no protocol-specific connection properties.
 
+<a name="ssh" />
 ## SSH
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overther (see below).
@@ -113,7 +115,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<td>Specifies how the SSH protocol is used. One of the following values must be set:
 <ul>
 <li><strong>SFTP</strong> - uses SFTP to transfer files, to a Unix host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix hosts.</li>
-<li><strong>SFTP__CYGWIN</strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
+<li><strong>SFTP_CYGWIN</strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
 <li><strong>SFTP_WINSSHD</strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
 <li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
 <li><strong>SUDO</strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection property is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
@@ -162,10 +164,13 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 ### Host setup
 
 To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms, two SSH servers are supported:
-    * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [copSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
+    * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
     * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
 
+* The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+
 * To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
+
 * To use the __SUDO__ connection type, the `/etc/sudoers` coniguration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
     * `ls`
     * `cp`
@@ -178,7 +183,11 @@ To connect to a remote host using the SSH protocol, you will need to install an 
     
 * To use the __SUDO__ connection type, the commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, the first line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent. <br/>If the __sudoPasswordPromptRegex__ was set incorrectly, the most common symptom is for the command to appear to hang. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 
+* To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use. __N.B.:__ Overthere will take care of the translation from Windows style paths (e.g. `C:\Program Files\IBM\WebSphere\AppServer`) to Cygwin-style paths (e.g. '/cygdrive/C/Program Files/IBM/WebSphere/AppServer') so that your code can just use Windows style paths.
 
+* To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect t and check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts. __N.B.:__ Overthere will take care of the translation from Windows style paths (e.g. `C:\Program Files\IBM\WebSphere\AppServer`) to WinSSHD-style paths (e.g. '/C/Program Files/IBM/WebSphere/AppServer') so that your code can just use Windows style paths.
+ 
+<a name="cifs" />
 ## WinRM
 
 Please refer to [README document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/README.md) and the [WinRM setup document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/WinRM.md).
