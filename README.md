@@ -104,7 +104,9 @@ The local protocol implementation uses the local file manipulation and local pro
 <a name="ssh" />
 ## SSH
 
-The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overther (see below).
+The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
+
+See the [section on the host setup](#ssh_host_setup) for more information on how to setup the remote hosts.
 
 <a name="ssh_connection_options" />
 ### Connection options
@@ -162,9 +164,10 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 </table>
 
+<a name="ssh_host_setup" />
 ### Host setup
 
-To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms, two SSH servers are supported:
+To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms two SSH servers are supported:
     * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
     * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
 
@@ -184,14 +187,20 @@ To connect to a remote host using the SSH protocol, you will need to install an 
     
 * To use the __SUDO__ connection type, the commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, the first line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent. <br/>If the __sudoPasswordPromptRegex__ was set incorrectly, the most common symptom is for the command to appear to hang. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 
-* To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use. __N.B.:__ Overthere will take care of the translation from Windows style paths (e.g. `C:\Program Files\IBM\WebSphere\AppServer`) to Cygwin-style paths (e.g. '/cygdrive/C/Program Files/IBM/WebSphere/AppServer') so that your code can just use Windows style paths.
+* To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to Cygwin-style paths, e.g. `/cygdrive/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
 
-* To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect t and check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts. __N.B.:__ Overthere will take care of the translation from Windows style paths (e.g. `C:\Program Files\IBM\WebSphere\AppServer`) to WinSSHD-style paths (e.g. '/C/Program Files/IBM/WebSphere/AppServer') so that your code can just use Windows style paths.
+* To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
  
 <a name="cifs" />
 ## CIFS
 
-The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. The built-in file sharing capabilities of Windows are based on CIFS and a Telnet server is available on all Windows Server platform although it might not be enabled. [WinRM](http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx) is available on Windows Server 2008 and up. It is not installed by default on Windows Server 2003 R2 but it is available as the Hardware Management feature through the __Add/Remove System Components__ feature in __Control Panel__ under Management and Monitoring Tools.
+The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
+
+* The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
+* A Telnet Server is available on all Windows Server versions although it might not be enabled.
+* WinRM is available on Windows Server 2008 and up. It is not installed by default on Windows Server 2003 R2 but it is available as the Hardware Management feature through the __Add/Remove System Components__ feature in __Control Panel__ under Management and Monitoring Tools. The Windows Dev Center has <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">more information on WinRM</a>.
+
+See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
 <a name="cifs_connection_options" />
 ### Connection options
@@ -230,8 +239,11 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 </table>
 
+<a name="cifs_host_setup" />
+### Host setup
 
-## WinRM
+To connect to a remote host using the __CIFS__ protocol, make sure the host is reachable on port 445 and add the __username__ you are using to connect to the __Administrators__ group so that that user can access the [__administrative shares__](http://en.wikipedia.org/wiki/Administrative_share).<br/>__N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. <code>smb://<strong>username</strong>:<strong>password</strong>@<strong>hostname</strong>/C$/Program%20Files/IBM/WebSphere/AppServer</code> (which corresponds to the UNC path <code>\\<strong>hostname</strong>\C$\Program Files\IBM\WebSphere\AppServer</code>), so that your code can use Windows style paths. 
 
-Please refer to [README document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/README.md) and the [WinRM setup document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/WinRM.md).
+* The use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
 
+* To use the __WINRM_HTTP__ or __WINRM_HTTPS__ connection type, please refer to [README document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/README.md) and the [WinRM setup document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/WinRM.md).
