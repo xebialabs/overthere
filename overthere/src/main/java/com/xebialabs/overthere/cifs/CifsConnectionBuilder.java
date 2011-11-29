@@ -79,7 +79,6 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 
 	public static final String TIMEMOUT = "winrmTimeout";
 	public static final String DEFAULT_TIMEOUT = "PT60.000S";
-	// FIXME: Figure out what format this is
 
 	public static final String ENVELOP_SIZE = "winrmEnvelopSize";
 	public static final int DEFAULT_ENVELOP_SIZE = 153600;
