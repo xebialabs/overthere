@@ -79,11 +79,11 @@ public class JdkHttpConnector implements HttpConnector {
                 Closeables.closeQuietly(bw);
             }
 
-			InputStream is;
+			InputStream is = null;
 			if (con.getResponseCode() >= 400) {
-			     /* Read error response */
 			    is = con.getErrorStream();
-			} else {
+			}
+			if(is == null) {
 			    is = con.getInputStream();
 			}
 			
@@ -110,7 +110,6 @@ public class JdkHttpConnector implements HttpConnector {
 			logger.trace("Response body: {}", text);
 
 			return DocumentHelper.parseText(text);
-
 		} catch (BlankValueRuntimeException bvrte) {
 			throw bvrte;
 		} catch (InvalidFilePathRuntimeException ifprte) {
