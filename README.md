@@ -67,7 +67,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top">address</th>
-	<td>The address of the remote host.</td>
+	<td>The address of the remote host, either an IP address or a DNS name.</td>
 </tr>
 <tr>
 	<th align="left" valign="top">port</th>
@@ -218,7 +218,9 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 
 * The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
-* WinRM is available on Windows Server 2008 and up. It is not installed by default on Windows Server 2003 R2 but it is available as the Hardware Management feature through the __Add/Remove System Components__ feature in __Control Panel__ under Management and Monitoring Tools. The Windows Dev Center has <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">more information on WinRM</a>.
+* WinRM is available on Windows Server 2008 and up. 
+
+
 
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
@@ -275,4 +277,72 @@ To use the __TELNET__ connection type, enable the Telnet Server Service accordin
 <a name="cifs_host_setup_winrm_https" />
 #### WINRP_HTTP and WINRM_HTTPS
 
-To use the __WINRM_HTTP__ or __WINRM_HTTPS__ connection type, please refer to [README document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/README.md) and the [WinRM setup document](https://github.com/xebialabs/overthere/blob/master/overthere/winrmdoc/WinRM.md).
+To use the __WINRM_HTTP__ or the __WINRM_HTTPS__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
+
+1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRm under the section __Management and Monitoring Tools__.
+
+2. On the remote host, as the Administrator user, open a Command Prompt and follow the steps below.
+
+3. Configure WinRM to allow basic authentication:
+
+		winrm set winrm/config/service/Auth @{Basic="true"}
+
+4. Configure WinRM to allow unencrypted SOAP messages:
+
+		winrm set winrm/config/service @{AllowUnencrypted="true"}
+
+5. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
+
+		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
+
+6. To use the __WINRM_HTTP__ connection type, create an HTTP WinRM listener:
+
+		winrm create winrm/config/listener?Address=*+Transport=HTTP
+
+7. To use the __WINRM_HTTPS__ connection type, follow the steps below:
+
+	1. (optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
+
+        	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
+        	Microsoft (R) SelfSSL Version 1.0
+        	Copyright (C) 2003 Microsoft Corporation. All rights reserved.
+
+        	Do you want to replace the SSL settings for site 1 (Y/N)?Y
+        	The self signed certificate was successfully assigned to site 1.
+
+	2. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
+
+			PS C:\Windows\system32> Get-childItem cert:\LocalMachine\Root\ | Select-String -pattern HOSTNAME
+
+			[Subject]
+			  CN=HOSTNAME
+
+			[Issuer]
+			  CN=HOSTNAME
+
+			[Serial Number]
+			  527E7AF9142D96AD49A10469A264E766
+
+			[Not Before]
+			  5/23/2011 10:23:33 AM
+
+			[Not After]
+			  5/20/2021 10:23:33 AM
+
+			[Thumbprint]
+			  5C36B638BC31F505EF7F693D9A60C01551DD486F
+
+	3. Create an HTTPS WinRM listener for the remote host using the certificate you've just found:
+
+			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
+
+
+For more information on WinRM, please refer to <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">the online documentation at Microsoft's DevCenter</a>. As a quick reference, have a look at the list of useful commands below:
+
+* Do a quickconfig for WinRM: `winrm qc`
+* Do a quickconfig for WinRM with HTTPS: `winrm qc -transport:https`
+* Dump the complete WinRM configuration: `winrm get winrm/config`
+* View the listeners that have been configured: `winrm enumerate winrm/config/listener`
+* Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
+* Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
+
