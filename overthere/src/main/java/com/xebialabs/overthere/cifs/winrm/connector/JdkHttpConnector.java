@@ -69,7 +69,8 @@ public class JdkHttpConnector implements HttpConnector {
 			}
 
 			final String requestDocAsString = toString(requestDocument);
-			logger.debug("send message to {}:request {}", targetURL, requestDocAsString);
+			logger.trace("Sending request to {}", targetURL);
+			logger.trace("Request body: {}", targetURL, requestDocAsString);
 			BufferedWriter bw = new BufferedWriter(
 					new OutputStreamWriter(
 							con.getOutputStream()));
@@ -102,12 +103,12 @@ public class JdkHttpConnector implements HttpConnector {
 
 			if (logger.isDebugEnabled()) {
 				for (int i = 0; i < con.getHeaderFields().size(); i++) {
-					logger.debug("Header {} --> {}", con.getHeaderFieldKey(i), con.getHeaderField(i));
+					logger.trace("Header {}: {}", con.getHeaderFieldKey(i), con.getHeaderField(i));
 				}
 			}
 
 			final String text = writer.toString();
-			logger.debug("send message:response {}", text);
+			logger.trace("Response body: {}", text);
 
 			return DocumentHelper.parseText(text);
 
@@ -116,7 +117,7 @@ public class JdkHttpConnector implements HttpConnector {
 		} catch (InvalidFilePathRuntimeException ifprte) {
 			throw ifprte;
 		} catch (Exception e) {
-			throw new WinRMRuntimeIOException("send message on " + targetURL + " error ", requestDocument, null, e);
+			throw new WinRMRuntimeIOException("Send message on " + targetURL + " error ", requestDocument, null, e);
 		}
 	}
 
@@ -128,7 +129,7 @@ public class JdkHttpConnector implements HttpConnector {
 			xmlWriter.write(doc);
 			xmlWriter.close();
 		} catch (IOException e) {
-			throw new WinRMRuntimeIOException("error ", e);
+			throw new WinRMRuntimeIOException("Cannnot convert XML to String ", e);
 		}
 		return stringWriter.toString();
 	}
