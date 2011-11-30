@@ -18,11 +18,13 @@ Binary releases of Overthere are not provided here, but you can download it [str
 ## Depending on Overthere
 
 1. If your project is built with Maven, add the following dependency to the pom.xml:
-	<dependency>
-		<groupId>com.xebialabs.overthere</groupId>
-		<artifactId>overthere</artifactId>
-		<version>1.0.10</version>
-	</dependency>
+
+		<dependency>
+			<groupId>com.xebialabs.overthere</groupId>
+			<artifactId>overthere</artifactId>
+			<version>1.0.10</version>
+		</dependency>
+
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
 
 ## Building Overthere
