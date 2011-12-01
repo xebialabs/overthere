@@ -1,3 +1,18 @@
+# Table of Contents
+
+* [Introduction](#introduction)
+* [Getting Overthere](#getting_overthere)
+	* [Depending on Overthere](#depending_on_overthere)
+	* [Building Overthere](#building_overthere)
+	* [Running the Examples](#running_the_examples)
+* [Configuring Overthere](#configuring_overthere)
+	* [Protocols](#protocols)
+	* [Connection options](#common_connection_options)
+	* [Local](#local)
+	* [SSH](#ssh)
+	* [CIFS](#cifs) (includes Telnet and WinRM)
+
+<a name="introduction"/>
 # Introduction 
 
 Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". It was built for and is used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking it at is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
@@ -6,6 +21,7 @@ For a more thorough introducion to Overthere, check the [presentation on Overthe
 
 Overthere is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
+<a name="getting_overthere"/>
 # Getting Overthere
 
 To get Overthere, you have two options:
@@ -17,6 +33,7 @@ And, if you want, you can also run the Overthere examples used in the Overthere 
 
 Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.10%7Cjar) if you want to.
 
+<a name="depending_on_overthere"/>
 ## Depending on Overthere
 
 1. If your project is built with Maven, add the following dependency to the pom.xml:
@@ -29,12 +46,14 @@ Binary releases of Overthere are not provided here, but you can download it [str
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
 
+<a name="building_overthere"/>
 ## Building Overthere
 
 1. Install [Gradle 1.0-milestone-3](http://www.gradle.org/).
 2. Clone the Overthere repository.
 3. Run the command `gradle clean build`.
 
+<a name="running_the_examples"/>
 ## Running the examples
 
 1. Install [Maven 2.2.1 or up](http://maven.apache.org/).
@@ -43,10 +62,12 @@ Binary releases of Overthere are not provided here, but you can download it [str
 4. Import the `examples` project into Eclipse.
 5. Change the login details in the example classes (address, username and password) and run them!
 
+<a name="configuring_overthere"/>
 # Configuring Overthere
 
 The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS, Telnet and WinRM, are existing protocols for which support is built into many platforms. As such you will not need to install any custom software on the target hosts. Nevertheless in some cases the target platforms have to be configured to correctly work with Overthere. Also, Overthere has a number of configuration features that allow you tweak the way it interfaces with the remote hosts.
 
+<a name="protocols"/>
 ## Protocols
 
 Overthere supports a number of protocols to connect to remote hosts:
@@ -55,7 +76,7 @@ Overthere supports a number of protocols to connect to remote hosts:
 * [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
 * [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. This protocol is only supported for Windows hosts.
 
-<a name="common_connection_options" />
+<a name="common_connection_options"/>
 ## Connection options
 
 Apart from selecting a protocol to use, you will also need to supply a number of connection options when creating a connection. Common connection options are:
@@ -105,14 +126,14 @@ Apart from these common connection options, some protocol define additional prot
 
 The local protocol implementation uses the local file manipulation and local process execution capabilities built-in to Java. The __os__ connection property is hardcoded to the operating system of the local host and the `tmp` property defaults to the system temporary directory as specified by the `java.io.tmpdir` [system property](http://docs.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()). There are no protocol-specific connection properties.
 
-<a name="ssh" />
+<a name="ssh"/>
 ## SSH
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
 
 See the [section on the host setup](#ssh_host_setup) for more information on how to setup the remote hosts.
 
-<a name="ssh_connection_options" />
+<a name="ssh_connection_options"/>
 ### Connection options
 
 The SSH protocol implementation of Overthere defines a number of additional connection properties, in addition to the [common connection options](#common_connection_options).
@@ -168,10 +189,10 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 </table>
 
-<a name="ssh_host_setup" />
+<a name="ssh_host_setup"/>
 ### Host setup
 
-<a name="ssh_host_setup_ssh" />
+<a name="ssh_host_setup_ssh"/>
 #### SSH
 To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms two SSH servers are supported:
 
@@ -180,23 +201,23 @@ To connect to a remote host using the SSH protocol, you will need to install an 
 
 __N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
 
-<a name="ssh_host_setup_sftp" />
+<a name="ssh_host_setup_sftp"/>
 #### SFTP
 
 To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
 
-<a name="ssh_host_setup_sftp_cygwin" />
+<a name="ssh_host_setup_sftp_cygwin"/>
 #### SFTP_CYGWIN
 
 To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to Cygwin-style paths, e.g. `/cygdrive/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
 
-<a name="ssh_host_setup_sftp_winsshd" />
+<a name="ssh_host_setup_sftp_winsshd"/>
 #### SFTP_WINSSHD
 
 To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
  
-<a name="ssh_host_setup_sudo" />
-<a name="ssh_host_setup_interactive_sudo" />
+<a name="ssh_host_setup_sudo"/>
+<a name="ssh_host_setup_interactive_sudo"/>
 #### SUDO and INTERACTIVE_SUDO
 
 To use the __SUDO__ connection type, the `/etc/sudoers` coniguration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
@@ -211,7 +232,7 @@ To use the __SUDO__ connection type, the `/etc/sudoers` coniguration will have t
     
 The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, the first line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent. <br/>If the __sudoPasswordPromptRegex__ was set incorrectly, the most common symptom is for the command to appear to hang. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 
-<a name="cifs" />
+<a name="cifs"/>
 ## CIFS
 
 The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
@@ -222,7 +243,7 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
-<a name="cifs_connection_options" />
+<a name="cifs_connection_options"/>
 ### Connection options
 
 The CIFS protocol implementation of Overthere defines a number of additional connection properties, in addition to the [common connection options](#common_connection_options).
@@ -259,20 +280,20 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 </table>
 
-<a name="cifs_host_setup" />
+<a name="cifs_host_setup"/>
 ### Host setup
 
-<a name="cifs_host_setup_cifs" />
+<a name="cifs_host_setup_cifs"/>
 #### CIFS
 To connect to a remote host using the __CIFS__ protocol, make sure the host is reachable on port 445 and add the __username__ you are using to connect to the __Administrators__ group so that that user can access the [__administrative shares__](http://en.wikipedia.org/wiki/Administrative_share).<br/>__N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. <code>smb://<strong>username</strong>:<strong>password</strong>@<strong>hostname</strong>/C$/Program%20Files/IBM/WebSphere/AppServer</code> (which corresponds to the UNC path <code>\\<strong>hostname</strong>\C$\Program Files\IBM\WebSphere\AppServer</code>), so that your code can use Windows style paths. 
 
-<a name="cifs_host_setup_telnet" />
+<a name="cifs_host_setup_telnet"/>
 #### TELNET
 
 To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
 
-<a name="cifs_host_setup_winrm_http" />
-<a name="cifs_host_setup_winrm_https" />
+<a name="cifs_host_setup_winrm_http"/>
+<a name="cifs_host_setup_winrm_https"/>
 #### WINRP_HTTP and WINRM_HTTPS
 
 To use the __WINRM_HTTP__ or the __WINRM_HTTPS__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
