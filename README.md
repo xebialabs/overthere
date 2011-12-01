@@ -83,7 +83,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top">tmp</th>
-	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>deployit-20111128T132600-7234435.tmp</code> is created. By default that directory is removed when the connection is closed.</td>
+	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created. By default that directory is removed when the connection is closed.</td>
 </tr>
 <tr>
 	<th align="left" valign="top">tmpFileCreationRetries</th>
