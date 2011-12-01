@@ -60,39 +60,39 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 
 <table>
 <tr>
-	<th align="left" valign="top">os</th>
+	<th align="left" valign="top"><a name="os"/>os</th>
 	<td>The operating system of the remote host, either <code>UNIX</code> or <code>WINDOWS</code>. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">address</th>
+	<th align="left" valign="top"><a name="address"/>address</th>
 	<td>The address of the remote host, either an IP address or a DNS name.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">port</th>
+	<th align="left" valign="top"><a name="port"/>port</th>
 	<td>The port to use when connecting to the remote host. The interpretation and the default value for this connection option depend on the protocol that is used.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">username</th>
+	<th align="left" valign="top"><a name="username"/>username</th>
 	<td>The username to use when connecting to the remote host.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">password</th>
+	<th align="left" valign="top"><a name="password"/>password</th>
 	<td>The password to use.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">tmp</th>
+	<th align="left" valign="top"><a name="tmp"/>tmp</th>
 	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created. By default that directory is removed when the connection is closed.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">tmpFileCreationRetries</th>
+	<th align="left" valign="top"><a name="tmpFileCreationRetries"/>tmpFileCreationRetries</th>
 	<td>The number of times Overthere attempts to create a temporary file with a unique name. The default value is <code>100</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">tmpDeleteOnDisconnect</th>
+	<th align="left" valign="top"><a name="tmpDeleteOnDisconnect"/>tmpDeleteOnDisconnect</th>
 	<td>If set to <code>false</code>, the connection temporary directory is not removed when the connection. The default value is <code>true</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">connectionTimeoutMillis</th>
+	<th align="left" valign="top"><a name="connectionTimeoutMillis"/>connectionTimeoutMillis</th>
 	<td>The number of milliseconds Overthere waits for a connection to a remote host to be established. The default value is <code>120000</code>, i.e. 2 minutes.</td>
 </tr>
 </table>
@@ -117,7 +117,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 
 <table>
 <tr>
-	<th align="left" valign="top">connectionType</th>
+	<th align="left" valign="top"><a name="ssh_connectionType"/>connectionType</th>
 	<td>Specifies how the SSH protocol is used. One of the following values must be set:
 <ul>
 <li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix hosts.</li>
@@ -129,39 +129,39 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </ul></td>
 </tr>
 <tr>
-	<th align="left" valign="top">sudoUsername</th>
+	<th align="left" valign="top"><a name="ssh_sudoUsername"/>sudoUsername</th>
 	<td>The username of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">privateKeyFile</th>
+	<th align="left" valign="top"><a name="ssh_privateKeyFile"/>privateKeyFile</th>
 	<td>The RSA private key file to use when connecting to the remote host. When this connection option is specified, the <strong>password</strong> connection option is ignored.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">passphrase</th>
+	<th align="left" valign="top"><a name="ssh_passphrase"/>passphrase</th>
 	<td>The passphrase to unlock the RSA private key file specified with the <strong>privateKeyFile</strong> connection option. If this connection option is not specified, the RSA private key file must have an empty passphrase.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">allocateDefaultPty</th>
+	<th align="left" valign="top"><a name="ssh_allocateDefaultPty"/>allocateDefaultPty</th>
 	<td>If set to <code>true</code>, the SSH server is requested to allocate a default pty (pseudo terminal) for the process. This is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output).  The default value is <code>false</code>. <br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notable OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">interactiveKeyboardAuthRegex</th>
+	<th align="left" valign="top"><a name="ssh_interactiveKeyboardAuthRegex"/>interactiveKeyboardAuthRegex</th>
 	<td>The regular expression to look for in keyboard-interactive prompts before sending the password. The default value is <code>.*Password:[ ]?</code>. When the SSH server is configured to not allow <a href="http://www.ietf.org/rfc/rfc4252.txt">password authentication</a> but is configured to allow <a href="http://www.ietf.org/rfc/rfc4256.txt">keyboard-interactive authentication</a> using passwords, Overthere will compare the interactive-keyboard prompt against this regular expression and send the `password` when they match.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">sudoCommandPrefix</th>
+	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"/>sudoCommandPrefix</th>
 	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">sudoOverrideUmask</th>
+	<th align="left" valign="top"><a name="ssh_sudoOverrideUmask"/>sudoOverrideUmask</th>
 	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with chmod -R go+rX after uploading a file or directory with scp. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">sudoPasswordPromptRegex</th>
+	<th align="left" valign="top"><a name="ssh_sudoPasswordPromptRegex"/>sudoPasswordPromptRegex</th>
 	<td>The regular expression to be used when looking for sudo password pomprts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code> This connection options is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">sudoQuoteCommand</th>
+	<th align="left" valign="top"><a name="ssh_sudoQuoteCommand"/>sudoQuoteCommand</th>
 	<td>If set to true, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 </table>
@@ -218,8 +218,6 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 * WinRM is available on Windows Server 2008 and up. 
 
-
-
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
 <a name="cifs_connection_options" />
@@ -229,7 +227,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 
 <table>
 <tr>
-	<th align="left" valign="top">connectionType</th>
+	<th align="left" valign="top"><a name="cifs_connectionType"/>connectionType</th>
 	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:
 <ul>
 <li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
@@ -238,23 +236,23 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </ul></td>
 </tr>
 <tr>
-	<th align="left" valign="top">cifsPort</th>
+	<th align="left" valign="top"><a name="cifs_cifsPort"/>cifsPort</th>
 	<td>The CIFS port to connect to. The default value is <code>445</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">winrmContext</th>
+	<th align="left" valign="top"><a name="cifs_winrmContext"/>winrmContext</th>
 	<td>The context used by the WinRM server. The default value is <code>/wsman</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">winrmEnvelopSize</th>
+	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"/>winrmEnvelopSize</th>
 	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">winrmLocale</th>
+	<th align="left" valign="top"><a name="cifs_winrmLocale"/>winrmLocale</th>
 	<td>The WinRM locale to use. The default value is <code>en-US</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top">winrmTimeout</th>
+	<th align="left" valign="top"><a name="cifs_winrmTimeout"/>winrmTimeout</th>
 	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
 </tr>
 </table>
