@@ -193,7 +193,7 @@ public abstract class OverthereConnection implements Closeable {
 	    OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
 	    Random r = new Random();
 	    DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
-	    String prefix = "deployit-" + dateFormat.format(new Date());
+	    String prefix = "overthere-" + dateFormat.format(new Date());
 	    String infix = "";
 	    String suffix = ".tmp";
 	    for (int i = 0; i < temporaryFileCreationRetries; i++) {
