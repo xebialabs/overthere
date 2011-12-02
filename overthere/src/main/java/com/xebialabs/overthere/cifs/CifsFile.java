@@ -46,11 +46,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
 	@Override
 	public String getPath() {
-		String uncPath = smbFile.getUncPath();
-		int slashPos = uncPath.indexOf('\\', 2);
-		String drive = uncPath.substring(slashPos + 1, slashPos + 2);
-		String path = uncPath.substring(slashPos + 3);
-		return drive + ":" + path;
+		return PathEncoder.fromUncPath(smbFile.getUncPath());
 	}
 
 	@Override
