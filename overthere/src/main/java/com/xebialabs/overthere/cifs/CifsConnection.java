@@ -21,6 +21,7 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_DRIVE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
@@ -32,6 +33,7 @@ import jcifs.smb.SmbFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ImmutableMap;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnection;
@@ -74,7 +76,8 @@ public abstract class CifsConnection extends OverthereConnection {
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
 		this.cifsPort = options.get(CIFS_PORT, DEFAULT_CIFS_PORT);
-		this.encoder = new PathEncoder(username, password, address, port);
+		this.encoder = new PathEncoder(username, password, address, port, 
+		        options.get(CIFS_DRIVE_MAPPINGS, ImmutableMap.<String, String>of()));
 	}
 
 	private Integer getDefaultPort() {
