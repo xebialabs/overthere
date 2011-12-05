@@ -204,7 +204,6 @@ abstract class SshConnection extends OverthereConnection {
 		checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
 
 		CmdLine cmd = processCommandLine(commandLine);
-		logger.info("Executing command {} on {}", cmd, this);
         try {
         	Session session = getSshClient().startSession();
         	if(allocateDefaultPty) {

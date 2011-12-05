@@ -17,6 +17,8 @@
 
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -34,14 +36,15 @@ import java.io.OutputStream;
 class SshProcess implements OverthereProcess {
     private SshConnection connection;
     private final Session session;
-    private final CmdLine commandLine;
+    private final String encodedCommandLine;
     private final Session.Command command;
 
     SshProcess(final SshConnection connection, final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
         this.connection = connection;
         this.session = session;
-        this.commandLine = commandLine;
-        this.command = session.exec(commandLine.toCommandLine(connection.getHostOperatingSystem(), false));
+        this.encodedCommandLine = commandLine.toCommandLine(connection.getHostOperatingSystem(), true);
+        logger.debug("Executing command {} on {}", encodedCommandLine, connection);
+		this.command = session.exec(commandLine.toCommandLine(connection.getHostOperatingSystem(), false));
     }
 
     @Override
@@ -64,7 +67,7 @@ class SshProcess implements OverthereProcess {
         try {
             command.join();
             Integer exitStatus = command.getExitStatus();
-            logger.info("Command {} on {} returned {}", new Object[] { commandLine, connection, exitStatus });
+            logger.info("Command {} on {} returned {}", new Object[] { encodedCommandLine, connection, exitStatus });
 	        closeSession();
 	        if(exitStatus == null) {
 	        	return -1;
