@@ -114,10 +114,11 @@ public class SshSudoConnectionSudoCommandTest {
 	public void commandWithPipeShouldHaveTwoSudoSectionsIfNotQuotingCommand() {
 		SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions);
 
-		List<CmdLineArgument> prepended = connection.prefixWithSudoCommand(CmdLine.build("a", "|", "b")).getArguments();
-		assertThat(prepended.size(), equalTo(9));
-		assertThat(prepended.get(0).toString(), equalTo("sudo"));
-		assertThat(prepended.get(5).toString(), equalTo("sudo"));
+		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
+		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+		assertThat(prefixed.size(), equalTo(9));
+		assertThat(prefixed.get(0).toString(), equalTo("sudo"));
+		assertThat(prefixed.get(5).toString(), equalTo("sudo"));
 	}
 
 	@Test
@@ -126,22 +127,24 @@ public class SshSudoConnectionSudoCommandTest {
 		connectionOptions.set(SUDO_QUOTE_COMMAND, true);
 		SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions);
 
-		List<CmdLineArgument> prepended = connection.prefixWithSudoCommand(CmdLine.build("a", "|", "b")).getArguments();
-		assertThat(prepended.size(), equalTo(4));
-		assertThat(prepended.get(0).toString(), equalTo("su"));
-		assertThat(prepended.get(1).toString(), equalTo("-u"));
-		assertThat(prepended.get(2).toString(), equalTo("some-other-user"));
-		assertThat(prepended.get(3).toString(), equalTo("a\\ |\\ b"));
+		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
+		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+		assertThat(prefixed.size(), equalTo(4));
+		assertThat(prefixed.get(0).toString(), equalTo("su"));
+		assertThat(prefixed.get(1).toString(), equalTo("-u"));
+		assertThat(prefixed.get(2).toString(), equalTo("some-other-user"));
+		assertThat(prefixed.get(3).toString(), equalTo("a\\ \\|\\ b"));
 	}
 
 	@Test
 	public void commandWithSemiColonShouldHaveTwoSudoSectionsIfNotQuotingCommand() {
 		SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions);
 
-		List<CmdLineArgument> prepended = connection.prefixWithSudoCommand(CmdLine.build("a", ";", "b")).getArguments();
-		assertThat(prepended.size(), equalTo(9));
-		assertThat(prepended.get(0).toString(), equalTo("sudo"));
-		assertThat(prepended.get(5).toString(), equalTo("sudo"));
+		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
+		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+		assertThat(prefixed.size(), equalTo(9));
+		assertThat(prefixed.get(0).toString(), equalTo("sudo"));
+		assertThat(prefixed.get(5).toString(), equalTo("sudo"));
 	}
 
 	@Test
@@ -150,12 +153,13 @@ public class SshSudoConnectionSudoCommandTest {
 		connectionOptions.set(SUDO_QUOTE_COMMAND, true);
 		SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions);
 
-		List<CmdLineArgument> prepended = connection.prefixWithSudoCommand(CmdLine.build("a", ";", "b")).getArguments();
-		assertThat(prepended.size(), equalTo(4));
-		assertThat(prepended.get(0).toString(), equalTo("su"));
-		assertThat(prepended.get(1).toString(), equalTo("-u"));
-		assertThat(prepended.get(2).toString(), equalTo("some-other-user"));
-		assertThat(prepended.get(3).toString(), equalTo("a\\ \\\\\\;\\ b"));
+		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
+		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+		assertThat(prefixed.size(), equalTo(4));
+		assertThat(prefixed.get(0).toString(), equalTo("su"));
+		assertThat(prefixed.get(1).toString(), equalTo("-u"));
+		assertThat(prefixed.get(2).toString(), equalTo("some-other-user"));
+		assertThat(prefixed.get(3).toString(), equalTo("a\\ \\;\\ b"));
 	}
 
 }

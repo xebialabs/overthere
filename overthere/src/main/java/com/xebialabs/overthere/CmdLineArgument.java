@@ -17,11 +17,10 @@
 
 package com.xebialabs.overthere;
 
-import java.io.Serializable;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+
+import java.io.Serializable;
 
 /**
  * Represents a single command line argument.
@@ -30,9 +29,14 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 public abstract class CmdLineArgument implements Serializable {
 
 	/**
-	 * String containing special characters that require quoting or escaping.
+	 * String containing special characters that require quoting or escaping on Unix.
 	 */
-	private static final String SPECIAL_CHARS = " '\"\\;()${}*?";
+	private static final String SPECIAL_CHARS_UNIX = " '\"\\;&|()${}*?";
+
+	/**
+	 * String containing special characters that require quoting or escaping on Windows.
+	 */
+	private static final String SPECIAL_CHARS_WINDOWS = " '\";&|()${}*?";
 
 	/**
 	 * String used to encode an empty argument as a string.
@@ -123,14 +127,26 @@ public abstract class CmdLineArgument implements Serializable {
 	protected void encodeString(String str, OperatingSystemFamily os, StringBuilder builder) {
 		if (str.length() == 0) {
 			builder.append(EMPTY_ARGUMENT);
-		} else if (!containsAny(str, SPECIAL_CHARS)) {
-			builder.append(str);
-		} else {
-			if (os == WINDOWS) {
-				encodeArgumentWithSpecialCharactersForWindows(str, builder);
+			return;
+		}
+
+		switch (os) {
+		case UNIX:
+			if (!containsAny(str, SPECIAL_CHARS_UNIX)) {
+				builder.append(str);
 			} else {
-				encodeArgumentWithSpecialCharactersForNonWindows(str, builder);
+				encodeArgumentWithSpecialCharactersForUnix(str, builder);
 			}
+			break;
+		case WINDOWS:
+			if (!containsAny(str, SPECIAL_CHARS_WINDOWS)) {
+				builder.append(str);
+			} else {
+				encodeArgumentWithSpecialCharactersForWindows(str, builder);
+			}
+			break;
+		default:
+			throw new RuntimeException("Unknown os " + os);
 		}
 	}
 
@@ -155,10 +171,10 @@ public abstract class CmdLineArgument implements Serializable {
 		builder.append("\"");
 	}
 
-	private void encodeArgumentWithSpecialCharactersForNonWindows(String str, StringBuilder builder) {
+	private void encodeArgumentWithSpecialCharactersForUnix(String str, StringBuilder builder) {
 		for (int j = 0; j < str.length(); j++) {
 			char c = str.charAt(j);
-			if (SPECIAL_CHARS.indexOf(c) != -1) {
+			if (SPECIAL_CHARS_UNIX.indexOf(c) != -1) {
 				builder.append('\\');
 			}
 			builder.append(c);
