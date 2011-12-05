@@ -72,7 +72,7 @@ class SshSudoConnection extends SshScpConnection {
 		} else {
 			for (CmdLineArgument a : commandLine.getArguments()) {
 				commandLineWithSudo.add(a);
-				if (a.toString(os, false).equals("|") || a.toString(os, false).equals("\\;")) {
+				if (a.toString(os, false).equals("|") || a.toString(os, false).equals(";")) {
 					addSudoStatement(commandLineWithSudo);
 				}
 			}
