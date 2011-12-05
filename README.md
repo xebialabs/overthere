@@ -15,9 +15,9 @@
 <a name="introduction"/>
 # Introduction 
 
-Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". It was built for and is used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking it at is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
+Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". It was built for and is used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking at it is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
 
-For a more thorough introducion to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands. Don't worry, the presentation is in English. :-)
+For a more thorough introduction to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands. Don't worry, the presentation is in English. :-)
 
 Overthere is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
@@ -119,7 +119,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	<td>The number of milliseconds Overthere waits for a connection to a remote host to be established. The default value is <code>120000</code>, i.e. 2 minutes.</td>
 </tr>
 </table>
-Apart from these common connection options, some protocol define additional protocol-specific connection options. These are documented below, with the protocol.
+Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the protocol.
 
 <a name="local"/>
 ## LOCAL
@@ -173,19 +173,19 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"/>sudoCommandPrefix</th>
-	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoOverrideUmask"/>sudoOverrideUmask</th>
-	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with chmod -R go+rX after uploading a file or directory with scp. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with scp. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoPasswordPromptRegex"/>sudoPasswordPromptRegex</th>
-	<td>The regular expression to be used when looking for sudo password pomprts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code> This connection options is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
+	<td>The regular expression to be used when looking for sudo password prompts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoQuoteCommand"/>sudoQuoteCommand</th>
-	<td>If set to true, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 </table>
 
@@ -220,15 +220,16 @@ To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvis
 <a name="ssh_host_setup_interactive_sudo"/>
 #### SUDO and INTERACTIVE_SUDO
 
-To use the __SUDO__ connection type, the `/etc/sudoers` coniguration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
-    * `ls`
-    * `cp`
-    * `mv`
-    * `mkdir`
-    * `rmdir`
-    * `rm`
-    * `chmod`
-    * Any other command that you want to execute.
+To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
+
+* `ls`
+* `cp`
+* `mv`
+* `mkdir`
+* `rmdir`
+* `rm`
+* `chmod`
+* Any other command that you want to execute.
     
 The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, the first line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent. <br/>If the __sudoPasswordPromptRegex__ was set incorrectly, the most common symptom is for the command to appear to hang. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 
