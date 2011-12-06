@@ -21,7 +21,7 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_DRIVE_MAPPINGS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
@@ -77,7 +77,7 @@ public abstract class CifsConnection extends OverthereConnection {
 		this.password = options.get(PASSWORD);
 		this.cifsPort = options.get(CIFS_PORT, DEFAULT_CIFS_PORT);
 		this.encoder = new PathEncoder(username, password, address, port, 
-		        options.get(CIFS_DRIVE_MAPPINGS, ImmutableMap.<String, String>of()));
+		        options.get(CIFS_PATH_MAPPINGS, ImmutableMap.<String, String>of()));
 	}
 
 	private Integer getDefaultPort() {

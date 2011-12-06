@@ -15,7 +15,7 @@ public class PathEncoderTest {
     PathEncoder encoder;
     
     @Test(expected = IllegalArgumentException.class)
-    public void requiresUniqueDriveMappings() {
+    public void requiresUniquePathMappings() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of("c", "share", "d", "share"));
     }
 
@@ -80,24 +80,24 @@ public class PathEncoderTest {
     }
     
     @Test
-    public void usesDriveMappingIfSpecified() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.of("c", "cshare"));
+    public void usesPathMappingIfSpecified() {
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.of("c:\\windows", "windows-share"));
         // %3B = ;
-        assertThat(encoder.toSmbUrl("c:\\"), is("smb://user:pass@windows-box/cshare/"));
+        assertThat(encoder.toSmbUrl("c:\\Windows"), is("smb://user:pass@windows-box/windows-share"));
     }
     
     @Test
-    public void fallsBackToAdminShareForDrive() {
+    public void fallsBackToAdminShare() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
-        assertThat(encoder.toSmbUrl("c:\\"), is("smb://user:pass@windows-box/c$/"));
+        assertThat(encoder.toSmbUrl("c:\\Windows"), is("smb://user:pass@windows-box/c$/Windows"));
     }
 
     @Test
-    public void addsTrailingSeparatorIfMissing() {
+    public void supportsPathlessLocalPath() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
-        assertThat(encoder.toSmbUrl("c:"), is("smb://user:pass@windows-box/c$/"));
+        assertThat(encoder.toSmbUrl("c:"), is("smb://user:pass@windows-box/c$"));
     }
     
     @Test
@@ -107,17 +107,11 @@ public class PathEncoderTest {
         assertThat(encoder.toSmbUrl("c:\\Temp\\file.txt"), is("smb://user:pass@windows-box/c$/Temp/file.txt"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void failsIfShareIsNotMappedOrAdminShare() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
-        encoder.fromUncPath("\\\\windows-box\\cshare\\Temp\\file.txt");
-    }
-    
     @Test
-    public void usesDriveMappingToConvertUncPath() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.of("c", "cshare"));
-        assertThat(encoder.fromUncPath("\\\\windows-box\\cshare\\Temp\\file.txt"), 
-                is("c:\\Temp\\file.txt"));
+    public void usesPathMappingToConvertUncPath() {
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.of("c:\\Windows", "windows-share"));
+        assertThat(encoder.fromUncPath("\\\\windows-box\\windows-share\\Temp\\file.txt"), 
+                is("c:\\Windows\\Temp\\file.txt"));
     }
 
     @Test
@@ -136,6 +130,6 @@ public class PathEncoderTest {
     @Test
     public void supportsPathlessUncPath() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
-        assertThat(encoder.fromUncPath("\\\\windows-box\\c$"), is("c:\\"));
+        assertThat(encoder.fromUncPath("\\\\windows-box\\c$"), is("c:"));
     }
 }

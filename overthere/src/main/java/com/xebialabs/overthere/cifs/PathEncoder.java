@@ -7,11 +7,16 @@ import static java.util.regex.Pattern.quote;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.Iterables;
 import com.xebialabs.overthere.RuntimeIOException;
 
 /**
@@ -19,16 +24,18 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 class PathEncoder {
     // "\\host-name\share" or "\\host-name\share\" or "\\host-name\share\path"
-    private static final Pattern UNC_PATH_PATTERN = Pattern.compile("\\\\\\\\[^\\\\]+\\\\([^\\\\]+)(\\\\.*)?");
+    private static final Pattern UNC_PATH_PATTERN = Pattern.compile("\\\\\\\\[^\\\\]+\\\\([^\\\\]+(?:\\\\.*)?)");
     private static final char WINDOWS_SEPARATOR = '\\';
+    private static final char SMB_URL_SEPARATOR = '/';
 
     private final String smbUrlPrefix;
-    private final DriveMappings driveMappings;
+    private final PathMapper pathMapper;
 
     PathEncoder(String username, String password, String address, int cifsPort,
-            Map<String, String> driveMappings) {
+            Map<String, String> pathMappings) {
         StringBuilder urlPrefix = new StringBuilder();
         urlPrefix.append("smb://");
+        // this is *not* the Windows file separator ;-)
         urlPrefix.append(urlEncode(username.replaceFirst(quote("\\"), ";")));
         urlPrefix.append(":");
         urlPrefix.append(urlEncode(password));
@@ -38,9 +45,9 @@ class PathEncoder {
             urlPrefix.append(":");
             urlPrefix.append(cifsPort);
         }
-        urlPrefix.append("/");
+        urlPrefix.append(SMB_URL_SEPARATOR);
         this.smbUrlPrefix = urlPrefix.toString();
-        this.driveMappings = new DriveMappings(driveMappings);
+        this.pathMapper = new PathMapper(pathMappings);
     }
 
     private static String urlEncode(String value) {
@@ -60,15 +67,14 @@ class PathEncoder {
             throw new IllegalArgumentException(format("Host path '%s' does not have a colon (:) as its second character", hostPath));
         }
 
-        StringBuilder smbUrl = new StringBuilder(smbUrlPrefix);
-        smbUrl.append(driveMappings.toShare(hostPath.substring(0, 1)));
-        smbUrl.append("/");
         if (hostPath.length() >= 3) {
             if (hostPath.charAt(2) != WINDOWS_SEPARATOR) {
                 throw new IllegalArgumentException(format("Host path '%s' does not have a backslash (\\) as its third character", hostPath));
             }
-            smbUrl.append(hostPath.substring(3).replace(WINDOWS_SEPARATOR, '/'));
         }
+
+        StringBuilder smbUrl = new StringBuilder(smbUrlPrefix);
+        smbUrl.append(pathMapper.toSharedPath(hostPath).replace(WINDOWS_SEPARATOR, SMB_URL_SEPARATOR));
         return smbUrl.toString();
     }
 
@@ -82,40 +88,88 @@ class PathEncoder {
         if (!matcher.matches()) {
             throw new IllegalArgumentException(format("UNC path '%s' did not match expected expression '%s'", uncPath, UNC_PATH_PATTERN));
         }
-        String path = matcher.group(2);
-        return format("%s:%s", driveMappings.toDrive(matcher.group(1)), 
-                ((path == null) ? WINDOWS_SEPARATOR : path));
+        return pathMapper.toLocalPath(matcher.group(1));
     }
 
-    private static class DriveMappings {
-        private static final Pattern ADMINISTRATIVE_SHARE_PATTERN = Pattern.compile("[a-zA-Z]\\$");
+    @VisibleForTesting
+    static class PathMapper {
+        private static final String DRIVE_DESIGNATOR = ":";
+        private static final String ADMIN_SHARE_DESIGNATOR = "$";
+        private static final Pattern ADMIN_SHARE_PATTERN = 
+            Pattern.compile("[a-zA-Z]" + quote(ADMIN_SHARE_DESIGNATOR));
 
-        private final BiMap<String, String> mappings;
+        private final SortedMap<String, String> sharesForPaths;
+        private final Map<String, String> pathsForShares;
 
-        private DriveMappings(Map<String, String> mappings) {
-            this.mappings = ImmutableBiMap.copyOf(mappings);
+        @VisibleForTesting
+        PathMapper(Map<String, String> mappings) {
+            // longest first, so reverse lexicographical order
+            ImmutableSortedMap.Builder<String, String> sharesForPath = ImmutableSortedMap.reverseOrder();
+            ImmutableMap.Builder<String, String> pathsForShare = ImmutableMap.builder();
+            for (Entry<String, String> mapping : mappings.entrySet()) {
+                String pathPrefixToMatch = mapping.getKey();
+                String shareForPathPrefix = mapping.getValue();
+                sharesForPath.put(pathPrefixToMatch.toLowerCase(), shareForPathPrefix);
+                pathsForShare.put(shareForPathPrefix.toLowerCase(), pathPrefixToMatch);
+            }
+            this.sharesForPaths = sharesForPath.build();
+            this.pathsForShares = pathsForShare.build();
         }
 
         /**
-         * @return the mapping (share name) for the given drive letter, 
-         *      or the administrative share if no share name has been specified
+         * Attempts to use provided path-to-share mappings to convert the given
+         * local path to a remotely accessible path, using the longest matching
+         * prefix if available.
+         * <p>
+         * Falls back to using administrative shares if none of the explicit
+         * mappings applies to the path to convert.
+         *  
+         * @param path the local path to convert
+         * @return the remotely accessible path (using shares) at which the local
+         *      path can be accessed using SMB
          */
-        private String toShare(String drive) {
-            return (mappings.containsKey(drive) ? mappings.get(drive) : format("%s$", drive));
+        @VisibleForTesting
+        String toSharedPath(String path) {
+            final String lowerCasePath = path.toLowerCase();
+            // assumes correct format drive: or drive:\path
+            String mappedPathPrefix = Iterables.find(sharesForPaths.keySet(), 
+                new Predicate<String>() {
+                    @Override
+                    public boolean apply(String input) {
+                        return lowerCasePath.startsWith(input);
+                    }
+                },
+                null);
+            // the share + the remainder of the path if found, otherwise the path with ':' replaced by '$'
+            return ((mappedPathPrefix != null)
+                    ? sharesForPaths.get(mappedPathPrefix) + path.substring(mappedPathPrefix.length())
+                    : path.substring(0, 1) + ADMIN_SHARE_DESIGNATOR + path.substring(2));
         }
 
         /**
-         * @return for a drive mapped to a share, the drive letter given share name;
-         *      for an administrative share, the drive letter 
+         * @param path the remotely accessible path to convert (minus the host name, i.e. beginning with the share)
+         * @return the local path (using drive letters) corresponding to the
+         *      path that is remotely accessible using SMB
          */
-        private String toDrive(String share) {
-            if (mappings.containsValue(share)) {
-                return mappings.inverse().get(share);
-            } else if (ADMINISTRATIVE_SHARE_PATTERN.matcher(share).matches()) {
-                // will be two characters in length
-                return share.substring(0, 1);
+        @VisibleForTesting
+        String toLocalPath(String path) {
+            final String lowerCasePath = path.toLowerCase();
+            // assumes correct format share or share\path
+            String mappedShare = Iterables.find(pathsForShares.keySet(), 
+                new Predicate<String>() {
+                    @Override
+                    public boolean apply(String input) {
+                        return lowerCasePath.startsWith(input);
+                    }
+                }, 
+                null);
+            if (mappedShare != null) {
+                return pathsForShares.get(mappedShare) + path.substring(mappedShare.length());
+            } else if ((path.length() >= 2) 
+                    && ADMIN_SHARE_PATTERN.matcher(path.substring(0, 2)).matches()) {
+                return path.substring(0, 1) + DRIVE_DESIGNATOR + path.substring(2);
             } else {
-                throw new IllegalArgumentException(format("Share name '%s' was neither mapped to a drive nor an administrative share", share));
+                throw new IllegalArgumentException(format("Remote path name '%s' uses unrecognized (i.e. neither mapped nor administrative) share", path));
             }
         }
     }
