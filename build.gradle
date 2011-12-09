@@ -14,7 +14,7 @@ buildscript {
 defaultTasks 'build'
 
 allprojects {
-	version = '1.0.11'
+	version = '1.0.12-SNAPSHOT'
 	group = 'com.xebialabs.overthere'
 
 	apply plugin: 'idea'
