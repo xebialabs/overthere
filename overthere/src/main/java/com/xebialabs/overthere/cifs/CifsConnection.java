@@ -17,17 +17,28 @@
 
 package com.xebialabs.overthere.cifs;
 
-import com.xebialabs.overthere.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_MAPPINGS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+
+import java.io.IOException;
+
 import jcifs.smb.SmbFile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
-import static com.xebialabs.overthere.ConnectionOptions.*;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import com.google.common.collect.ImmutableMap;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Base class for connections to a Windows host using CIFS.
@@ -51,6 +62,8 @@ public abstract class CifsConnection extends OverthereConnection {
 	protected String username;
 
 	protected String password;
+	
+	protected PathEncoder encoder;
 
 	/**
 	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
@@ -63,6 +76,8 @@ public abstract class CifsConnection extends OverthereConnection {
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
 		this.cifsPort = options.get(CIFS_PORT, DEFAULT_CIFS_PORT);
+		this.encoder = new PathEncoder(username, password, address, port, 
+		        options.get(CIFS_PATH_MAPPINGS, ImmutableMap.<String, String>of()));
 	}
 
 	private Integer getDefaultPort() {
@@ -110,46 +125,13 @@ public abstract class CifsConnection extends OverthereConnection {
     }
 
 	private String encodeAsSmbUrl(String hostPath) {
-		StringBuffer smbUrl = new StringBuffer();
-		smbUrl.append("smb://");
-		smbUrl.append(urlEncode(username.replaceFirst("\\\\", ";")));
-		smbUrl.append(":");
-		smbUrl.append(urlEncode(password));
-		smbUrl.append("@");
-		smbUrl.append(urlEncode(address));
-		if(cifsPort != DEFAULT_CIFS_PORT) {
-			smbUrl.append(":");
-			smbUrl.append(cifsPort);
-		}
-		smbUrl.append("/");
-
-		if (hostPath.length() < 2) {
-			throw new RuntimeIOException("Host path \"" + hostPath + "\" is too short");
-		}
-
-		if (hostPath.charAt(1) != ':') {
-			throw new RuntimeIOException("Host path \"" + hostPath + "\" does not have a colon (:) as its second character");
-		}
-		smbUrl.append(hostPath.charAt(0));
-		smbUrl.append("$/");
-		if (hostPath.length() >= 3) {
-			if (hostPath.charAt(2) != '\\') {
-				throw new RuntimeIOException("Host path \"" + hostPath + "\" does not have a backslash (\\) as its third character");
-			}
-			smbUrl.append(hostPath.substring(3).replace('\\', '/'));
-		}
-
-		logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, smbUrl.toString());
-
-		return smbUrl.toString();
-	}
-
-	private static String urlEncode(String value) {
-		try {
-			return URLEncoder.encode(value, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeIOException("Unable to construct SMB URL", e);
-		}
+	    try {
+	        String smbUrl = encoder.toSmbUrl(hostPath);
+	        logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, smbUrl.toString());
+	        return smbUrl;
+	    } catch (IllegalArgumentException exception) {
+                throw new RuntimeIOException(exception);
+            }
 	}
 
     @Override

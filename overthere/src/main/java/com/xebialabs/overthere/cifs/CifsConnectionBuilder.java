@@ -68,6 +68,12 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 	public static final int DEFAULT_CIFS_PORT = 445;
 
 	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify the path/share name mappings to use for CIFS. 
+	 * If a path is not explicitly mapped to a share the administrative share will be used 
+	 */
+	public static final String CIFS_PATH_MAPPINGS = "cifsPathMappings";
+
+	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
 	 */	
 	public static final String CONTEXT = "winrmContext";
