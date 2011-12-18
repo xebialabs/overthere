@@ -132,6 +132,7 @@ public abstract class CifsConnection extends OverthereConnection {
 		smbUrl.append(hostPath.charAt(0));
 		smbUrl.append("$/");
 		if (hostPath.length() >= 3) {
+			hostPath = hostPath.replace('/', '\\');
 			if (hostPath.charAt(2) != '\\') {
 				throw new RuntimeIOException("Host path \"" + hostPath + "\" does not have a backslash (\\) as its third character");
 			}

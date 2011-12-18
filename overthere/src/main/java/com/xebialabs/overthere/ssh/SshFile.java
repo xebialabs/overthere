@@ -16,6 +16,8 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
@@ -39,7 +41,11 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 	 */
 	SshFile(C connection, String path) {
 		super(connection);
-		this.path = path;
+		if(connection.getHostOperatingSystem() != WINDOWS) {
+			this.path = path;
+		} else {
+			this.path = path.replace('/', '\\');
+		}
 	}
 
 	@Override
