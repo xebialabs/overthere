@@ -297,7 +297,7 @@ public abstract class OverthereConnectionItestBase {
 
 	@Test
 	public void shouldNormalizeWindowsPathWithForwardSlashes() {
-		assertThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
+		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
 
 		OverthereFile file = connection.getFile("C:/Windows/System32");
 		assertThat(file.getPath(), equalTo("C:\\Windows\\System32"));
