@@ -52,7 +52,7 @@ class SshSudoConnection extends SshScpConnection {
 	@Override
 	protected CmdLine processCommandLine(final CmdLine commandLine) {
 		CmdLine cmd;
-		if (commandLine.getArguments().get(0).toString(os, false).equals(NOSUDO_PSEUDO_COMMAND)) {
+		if (commandLine.getArguments().size() >= 2 && commandLine.getArguments().get(0).toString(os, false).equals(NOSUDO_PSEUDO_COMMAND)) {
 			cmd = stripNosudoCommand(commandLine);
 		} else {
 			cmd = prefixWithSudoCommand(commandLine);
