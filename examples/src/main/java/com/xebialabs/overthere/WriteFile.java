@@ -30,7 +30,7 @@ public class WriteFile {
 		options.set(CONNECTION_TYPE, SCP);
 		OverthereConnection connection = Overthere.getConnection("ssh", options);
 		try {
-			OverthereFile motd = connection.getFile("/tmp/tmp2/new-motd");
+			OverthereFile motd = connection.getFile("/tmp/new-motd");
 			PrintWriter w = new PrintWriter(motd.getOutputStream());
 			try {
 				w.println("An Overthere a day keeps the doctor away");
