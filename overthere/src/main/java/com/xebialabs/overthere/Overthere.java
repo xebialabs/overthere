@@ -18,6 +18,7 @@ package com.xebialabs.overthere;
 
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
 import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
@@ -27,9 +28,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -47,7 +51,7 @@ public class Overthere {
 		final Set<Class<?>> protocolClasses = scannit.getTypesAnnotatedWith(Protocol.class);
 		for (Class<?> protocol : protocolClasses) {
 			if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
-				final String name = ((Protocol) protocol.getAnnotation(Protocol.class)).name();
+				final String name = protocol.getAnnotation(Protocol.class).name();
 				Overthere.protocols.get().put(name, (Class<? extends OverthereConnectionBuilder>) protocol);
 			} else {
 				logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
@@ -74,10 +78,11 @@ public class Overthere {
 		}
 
 		if (logger.isTraceEnabled()) {
-			logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
+            HashSet<String> filteredKeys = newHashSet(ConnectionOptions.PASSWORD, SshConnectionBuilder.PASSPHRASE);
+            logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
 			for (String k : options.keys()) {
 				Object v = options.get(k);
-				logger.trace("{}={}", k, v);
+				logger.trace("{}={}", k, !filteredKeys.contains(k) ? v : "********");
 			}
 		}
 
