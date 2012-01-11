@@ -99,6 +99,7 @@ class SshSudoConnection extends SshScpConnection {
 		return execute(handler, nosudoCommandLine);
 	}
 
+	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		return new SshSudoFile(this, hostPath, isTempFile);
 	}
