@@ -4,10 +4,6 @@ buildscript {
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/'
-	}
-	dependencies {
-		classpath 'de.huxhorn.gradle:de.huxhorn.gradle.pgp-plugin:0.0.3'
 	}
 }
 
@@ -24,12 +20,14 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven'
-	apply plugin: de.huxhorn.gradle.pgp.PgpPlugin
+	apply plugin: 'signing'
 
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		mavenRepo urls: 'http://download.java.net/maven/2/'
+		maven {
+			url 'http://download.java.net/maven/2/'
+		}
 	}
 
 	sourceCompatibility = 1.6
@@ -47,7 +45,7 @@ subprojects {
 	}
 
 	task javadocJar(type: Jar, dependsOn: javadoc) {
-		classifier = "javadoc"
+		classifier = 'javadoc'
 		from javadoc.destinationDir
 	}
 
@@ -56,7 +54,7 @@ subprojects {
 	}
 
 	test {
-		excludes = ["**/*Itest.*"]
+		excludes = ['**/*Itest.*']
 	}
 
 	task itest(type: Test) {
@@ -69,58 +67,54 @@ subprojects {
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
 	}
 
-	pgp {
-		secretKeyRingFile = new File("${System.properties['user.home']}/.gnupg/secring.gpg")
-	}
-
 	uploadArchives {
 		if(project.hasProperty('sonatypeUsername')) {
 			repositories.mavenDeployer {
 				configuration = configurations.archives
 
-				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+				repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
 					authentication(userName: sonatypeUsername, password: sonatypePassword)
 				}
-				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
 					authentication(userName: sonatypeUsername, password: sonatypePassword)
 				}
 
 				pom.project {
-					name "Overthere"
-					description "Remote file manipulation and process execution framework for Java"
-					packaging "jar"
-					url "https://github.com/xebialabs/overthere"
-					inceptionYear "2011"
+					name 'Overthere'
+					description 'Remote file manipulation and process execution framework for Java'
+					packaging 'jar'
+					url 'https://github.com/xebialabs/overthere'
+					inceptionYear '2011'
 
 					scm {
-						url "https://github.com/xebialabs/overthere"
+						url 'https://github.com/xebialabs/overthere'
 					}
 
 					licenses {
 						license {
-							name "The Apache Software License, Version 2.0"
-							url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-							distribution "repo"
+							name 'The Apache Software License, Version 2.0'
+							url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution 'repo'
 						}
 					}
 
 					developers {
 						developer {
-							id "vpartington"
-							name "Vincent Partington"
-							url "http://www.xebialabs.com/"
-							email "vpartington@xebialabs.com"
+							id 'vpartington'
+							name 'Vincent Partington'
+							url 'http://www.xebialabs.com/'
+							email 'vpartington@xebialabs.com'
 							roles {
-								role "Developer"
+								role 'Developer'
 							}
 						}
 						developer {
-							id "hierynomus"
-							name "Jeroen van Erp"
-							url "http://www.xebialabs.com/"
-							email "jvanerp@xebialabs.com"
+							id 'hierynomus'
+							name 'Jeroen van Erp'
+							url 'http://www.xebialabs.com/'
+							email 'jvanerp@xebialabs.com'
 							roles {
-								role "Developer"
+								role 'Developer'
 							}
 						}
 					}
