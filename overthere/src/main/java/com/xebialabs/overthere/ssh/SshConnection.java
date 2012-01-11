@@ -173,16 +173,16 @@ abstract class SshConnection extends OverthereConnection {
         return sshClient;
     }
 
-    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+    public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
         return getFile(hostPath, false);
     }
 
-    public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+    public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
         return getFile(parent, child, false);
     }
 
     @Override
-    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+    protected final OverthereFile getFileForTempFile(OverthereFile parent, String name) {
     	return getFile(parent, name, true);
     }
 
