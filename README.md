@@ -250,16 +250,19 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <table>
 <tr>
 	<th align="left" valign="top"><a name="cifs_connectionType"/>connectionType</th>
-	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:
-<ul>
-<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
-<li><strong><a href="#cifs_host_setup_winrm_http">WINRM_HTTP</a></strong> - uses WinRM over HTTP to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
-<li><strong><a href="#cifs_host_setup_winrm_https">WINRM_HTTPS</a></strong> - uses WinRM over HTTPS to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
-</ul></td>
+	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set: <ul>
+		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm_http">WINRM_HTTP</a></strong> - uses WinRM over HTTP to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm_https">WINRM_HTTPS</a></strong> - uses WinRM over HTTPS to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
+	</ul></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_cifsPort"/>cifsPort</th>
 	<td>The CIFS port to connect to. The default value is <code>445</code>.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_pathShareMappings"/>pathShareMappings</a></th>
+	<td>The path to share mappings to use for CIFS specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not explicitly mapped to a share the administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmContext"/>winrmContext</th>
@@ -290,6 +293,8 @@ To connect to a remote host using the __CIFS__ protocol, make sure the host is r
 #### TELNET
 
 To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
+
+When the Telnet server is enabled any user that is in the <tt>Administrators</tt> group or that is in the <tt>TelnetClient</tt> group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
 <a name="cifs_host_setup_winrm_http"/>
 <a name="cifs_host_setup_winrm_https"/>
