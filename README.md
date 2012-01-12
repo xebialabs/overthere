@@ -163,7 +163,15 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocateDefaultPty"/>allocateDefaultPty</th>
-	<td>If set to <code>true</code>, the SSH server is requested to allocate a default pty (pseudo terminal) for the process. This is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output).  The default value is <code>false</code>. <br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notable OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
+	<td>If set to <code>true</code>, the SSH server is requested to allocate a pty (pseudo terminal) for the process, as if the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option were set to the value <code>dummy:80:24:0:0</code>. The default value is <code>false</code>.
+	<br/><strong>N.B.:</strong> This option is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output otherwise). 
+	<br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notably OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_allocatePty"/>allocatePty</th>
+	<td>If set to a non-null value, the SSH server is requested to allocate a pty (pseudo terminal) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><code>allocateDefaultPty</code></a> option. The default value is <code>null</code>.
+	<br/><strong>N.B.:</strong> This option is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output otherwise). 
+	<br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notably OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_interactiveKeyboardAuthRegex"/>interactiveKeyboardAuthRegex</th>
@@ -262,7 +270,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_pathShareMappings"/>pathShareMappings</a></th>
-	<td>The path to share mappings to use for CIFS specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not explicitly mapped to a share the administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
+	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -> <code>WebSphere</code>. If a path is not explicitly mapped to a share the administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmContext"/>winrmContext</th>
