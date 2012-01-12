@@ -11,6 +11,7 @@
 	* [Local](#local)
 	* [SSH](#ssh)
 	* [CIFS](#cifs) (includes Telnet and WinRM)
+* [Release History](#release_history)
 
 <a name="introduction"/>
 # Introduction 
@@ -29,7 +30,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.11%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.12%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -39,7 +40,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>1.0.11</version>
+			<version>1.0.12</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -376,4 +377,22 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * View the listeners that have been configured: `winrm enumerate winrm/config/listener`
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
+
+<a name="release_history"/>
+# Release History
+
+* Overthere 1.0.12 (12-Jan-2012)
+    * Allowed forward slashes (/) to be used in Windows paths.
+    * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the <a href="#cifs_pathShareMappings"><strong>pathShareMappings</strong></a> connection option.
+    * Added the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> connection option to specify an explicit pseudo terminal to use.
+* Overthere 1.0.11 (09-Dec-2011)
+    * Fixes to the SSH/WinSSHD implementation and a few other little fixes.
+    * Added a lot of documentation.
+    * Added examples project.
+    * Changed license to ASLv2.
+* Overthere 1.0.10 (23-Nov-2011)
+    * Added support for SSH/WinSSHD on Windows.
+* Overthere 1.0.9 (22-Nov-2011)
+    * Initial public release with support for SSH on Unix as well as CIFS/TELNET, CIFS/WinRM and SSH/CYGWIN on Windows.
+
 
