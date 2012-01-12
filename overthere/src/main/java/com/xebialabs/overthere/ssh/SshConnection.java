@@ -26,6 +26,8 @@ import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
@@ -34,11 +36,15 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
@@ -64,7 +70,9 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 abstract class SshConnection extends OverthereConnection {
 
-    protected final SshConnectionType sshConnectionType;
+    public static final String PTY_PATTERN = "(\\w+):(\\d+):(\\d+):(\\d+):(\\d+)";
+
+	protected final SshConnectionType sshConnectionType;
 
     protected final String host;
 
@@ -82,7 +90,11 @@ abstract class SshConnection extends OverthereConnection {
 
     protected final boolean allocateDefaultPty;
 
+    protected final String allocatePty;
+
     protected SSHClient sshClient;
+
+    private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
 	@VisibleForTesting
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
@@ -103,6 +115,7 @@ abstract class SshConnection extends OverthereConnection {
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
         this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
+        this.allocatePty = options.get(ALLOCATE_PTY, ALLOCATE_PTY_DEFAULT);
     }
 
     protected void connect() {
@@ -119,7 +132,8 @@ abstract class SshConnection extends OverthereConnection {
 
             if (privateKeyFile != null) {
                 if (password != null) {
-                    logger.warn("Both password and private key have been set for an ssh:" + sshConnectionType.toString().toLowerCase() + ": connection {}. Using the private key and ignoring the password.", this);
+					logger.warn("The " + PRIVATE_KEY_FILE + " and " + PASSWORD + " connection options have both been set for the connection {}. Ignoring " + PASSWORD
+					        + " and using " + PRIVATE_KEY_FILE + ".", this);
                 }
                 KeyProvider keys;
                 try {
@@ -206,7 +220,22 @@ abstract class SshConnection extends OverthereConnection {
 		CmdLine cmd = processCommandLine(commandLine);
         try {
         	Session session = getSshClient().startSession();
-        	if(allocateDefaultPty) {
+        	if(allocatePty != null && !allocatePty.isEmpty()) {
+        		if(allocateDefaultPty) {
+					logger.warn("The " + ALLOCATE_PTY + " and " + ALLOCATE_DEFAULT_PTY + " connection options have both been set for the connection {}. Ignoring "
+					        + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
+        		}
+        		Matcher matcher = ptyPattern.matcher(allocatePty);
+        		checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
+
+        		String term = matcher.group(1);
+        		int cols = Integer.valueOf(matcher.group(2));
+        		int rows = Integer.valueOf(matcher.group(3));
+        		int width = Integer.valueOf(matcher.group(4));
+        		int height = Integer.valueOf(matcher.group(5));
+        		logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[] { term, cols, rows, width, height});
+        		session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer>emptyMap());
+        	} else if(allocateDefaultPty) {
         		logger.debug("Allocating default PTY");
         		session.allocateDefaultPTY();
         	}

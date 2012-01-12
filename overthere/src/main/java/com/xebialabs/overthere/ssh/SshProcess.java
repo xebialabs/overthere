@@ -70,8 +70,8 @@ class SshProcess implements OverthereProcess {
             logger.info("Command {} on {} returned {}", new Object[] { encodedCommandLine, connection, exitStatus });
 	        closeSession();
 	        if(exitStatus == null) {
-				logger.warn("Command {} on {} returned null means that the process could not be started. This may be caused by the connection option "
-				        + ALLOCATE_DEFAULT_PTY + " being set to true.");
+				logger.warn("Command {} on {} could not be started. This may be caused by the connection option " + ALLOCATE_DEFAULT_PTY + " being set to true.", new Object[] {
+				        encodedCommandLine, connection });
 	        	return -1;
 	        } else {
 	        	return exitStatus;

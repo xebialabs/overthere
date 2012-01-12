@@ -24,7 +24,6 @@ import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
@@ -34,9 +33,11 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
@@ -167,6 +168,7 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 		options.set(PORT, 2222);
 		options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
 		options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
+		options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
 		return options;
 	}
 

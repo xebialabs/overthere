@@ -69,9 +69,9 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String PASSPHRASE = "passphrase";
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty should be allocated when executing a command. All sudo
-	 * implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably the one on AIX 5.3) crash
-	 * when it is allocated.
+	 * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty (<code>dummy:80:24:0:0</code>) should be allocated when
+	 * executing a command. All sudo implementations require it for interactive sudo, some even require it for normal sudo. Some SSH server implementations
+	 * (notably OpenSSH on AIX 5.3) crash when it is allocated.
 	 */
 	public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
 
@@ -79,6 +79,18 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 * Default value of the {@link ConnectionOptions connection option} used to specify whether a default pty should be allocated when executing a command.
 	 */
 	public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
+
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify a specific pty that should be allocated when executing a command. The format is
+	 * TERM:COLS:ROWS:WIDTH:HEIGTH e.g. <code>xterm:80:24:0:0</code>. If <code>null</code> or an empty string is specified, no pty is allocated. Overrides the
+	 * {@link #ALLOCATE_DEFAULT_PTY} option.
+	 */
+	public static final String ALLOCATE_PTY = "allocatePty";
+
+	/** 
+	 * Default value (<code>null</code>) of the {@link ConnectionOptions connection option} used to specify a specific pty that should be allocated when executing a command.
+	 */
+	public static final String ALLOCATE_PTY_DEFAULT = null;
 
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
