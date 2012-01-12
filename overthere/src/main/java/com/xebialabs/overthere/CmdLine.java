@@ -122,7 +122,7 @@ public class CmdLine implements Serializable {
 	}
 
 	/**
-	 * Converts this command line to a string array. All arguments are {@link CmdLineArgument#toString(boolean) converted to their string representation} and
+	 * Converts this command line to a string array. All arguments are {@link CmdLineArgument#toString(OperatingSystemFamily, boolean) converted to their string representation} and
 	 * then returned as an array.
 	 * 
 	 * @param os
