@@ -1,12 +1,5 @@
 // build.gradle for overthere repository containing the overthere and itest-support projects
 
-buildscript {
-	repositories {
-		mavenLocal()
-		mavenCentral()
-	}
-}
-
 defaultTasks 'build'
 
 allprojects {
@@ -23,7 +16,6 @@ subprojects {
 	apply plugin: 'signing'
 
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		maven {
 			url 'http://download.java.net/maven/2/'
