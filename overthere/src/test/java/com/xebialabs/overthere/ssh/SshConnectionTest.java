@@ -24,7 +24,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -38,23 +37,21 @@ import java.io.IOException;
 
 import net.schmizz.sshj.MockitoFriendlySSHClient;
 import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-
 import net.schmizz.sshj.userauth.method.AuthMethod;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Unit tests for {@link SshConnection}
  */
 public class SshConnectionTest {
-    private ConnectionOptions connectionOptions;
+
+	private ConnectionOptions connectionOptions;
 
     @Before
     public void init() {
@@ -106,23 +103,5 @@ public class SshConnectionTest {
         return new PresetClientSshConnection(connectionOptions, client);
     }
     
-    private static class PresetClientSshConnection extends SshConnection {
-
-        public PresetClientSshConnection(ConnectionOptions options, final SSHClient clientToReturn) {
-            super(SSH_PROTOCOL, options);
-            sshClientFactory = new Factory<SSHClient>() {
-                @Override
-                public SSHClient create() {
-                    return clientToReturn;
-                }
-            };
-        }
-
-        @Override
-        protected OverthereFile getFile(String hostPath, boolean isTempFile)
-                throws RuntimeIOException {
-            throw new UnsupportedOperationException("TODO Auto-generated method stub");
-        }
-    }
 }
 
