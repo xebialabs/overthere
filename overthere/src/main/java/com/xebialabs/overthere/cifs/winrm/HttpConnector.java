@@ -1,6 +1,6 @@
 /* License added by: GRADLE-LICENSE-PLUGIN
  *
- * Copyright 2008-2011 XebiaLabs
+ * Copyright 2008-2012 XebiaLabs
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
