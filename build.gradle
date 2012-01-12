@@ -31,20 +31,6 @@ subprojects {
 	    }
 	}
 
-	task sourcesJar(type: Jar) {
-		from sourceSets.main.allSource
-		classifier = 'sources'
-	}
-
-	task javadocJar(type: Jar, dependsOn: javadoc) {
-		classifier = 'javadoc'
-		from javadoc.destinationDir
-	}
-
-	artifacts {
-		archives sourcesJar, javadocJar
-	}
-
 	test {
 		excludes = ['**/*Itest.*']
 	}
@@ -59,9 +45,29 @@ subprojects {
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
 	}
 
+	task sourcesJar(type: Jar) {
+		from sourceSets.main.allSource
+		classifier = 'sources'
+	}
+
+	task javadocJar(type: Jar, dependsOn: javadoc) {
+		classifier = 'javadoc'
+		from javadoc.destinationDir
+	}
+
+	artifacts {
+		archives sourcesJar, javadocJar
+	}
+
+	signing {
+		sign configurations.archives
+	}
+
 	uploadArchives {
 		if(project.hasProperty('sonatypeUsername')) {
 			repositories.mavenDeployer {
+				beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+
 				configuration = configurations.archives
 
 				repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
