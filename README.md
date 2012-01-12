@@ -303,7 +303,7 @@ To connect to a remote host using the __CIFS__ protocol, make sure the host is r
 
 To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
 
-When the Telnet server is enabled any user that is in the <tt>Administrators</tt> group or that is in the <tt>TelnetClient</tt> group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
+When the Telnet server is enabled any user that is in the <strong>Administrators</strong> group or that is in the <strong>TelnetClients</strong> group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
 <a name="cifs_host_setup_winrm_http"/>
 <a name="cifs_host_setup_winrm_https"/>
