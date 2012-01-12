@@ -203,14 +203,14 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldListFilesInCDriveOnWindows() throws IOException {
+	public void shouldListFilesOnWindows() throws IOException {
 		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
 
-		OverthereFile cDrive = connection.getFile("C:");
-		OverthereFile autoexecBat = cDrive.getFile("Program Files");
-		List<OverthereFile> filesInCDrive = cDrive.listFiles();
+		OverthereFile folder = connection.getFile("C:\\overthere");
+		List<OverthereFile> filesInFolder = folder.listFiles();
 
-		assertThat(filesInCDrive.contains(autoexecBat), equalTo(true));
+		OverthereFile expectedFile = connection.getFile("C:\\overthere\\overhere.txt");
+		assertThat(filesInFolder.contains(expectedFile), equalTo(true));
 	}
 
 	@Test

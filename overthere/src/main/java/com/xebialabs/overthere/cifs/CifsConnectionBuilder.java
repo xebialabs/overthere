@@ -17,14 +17,17 @@
 
 package com.xebialabs.overthere.cifs;
 
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+
+import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
-
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
  * Builds CIFS connections.
@@ -66,6 +69,18 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 	 * Default value (445) for the {@link ConnectionOptions connection option} used to specify the CIFS port to connect to.
 	 */
 	public static final int DEFAULT_CIFS_PORT = 445;
+
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for CIFS, specified as a
+	 * <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not explicitly mapped to a share the administrative
+	 * share will be used..
+	 */
+	public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
+
+	/**
+	 * Default value (empty map) for the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for CIFS.
+	 */
+	public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
 	/**
 	 * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
