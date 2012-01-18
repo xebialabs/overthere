@@ -32,7 +32,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.12%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.13%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -42,7 +42,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>1.0.12</version>
+			<version>1.0.13</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -383,6 +383,9 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 <a name="release_history"/>
 # Release History
 
+* Overthere 1.0.13 (18-Jan-2012)
+    * Masked passwords in logging.
+    * Made ItestHostFactory also look for itest.properties in ~/.itest (in addition to the classpath and the current working directory).
 * Overthere 1.0.12 (12-Jan-2012)
     * Allowed forward slashes (/) to be used in Windows paths.
     * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the <a href="#cifs_pathShareMappings"><strong>pathShareMappings</strong></a> connection option.
