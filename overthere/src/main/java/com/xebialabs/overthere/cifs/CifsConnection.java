@@ -125,12 +125,16 @@ public abstract class CifsConnection extends OverthereConnection {
 	private String encodeAsSmbUrl(String hostPath) {
 		try {
 			String smbUrl = encoder.toSmbUrl(hostPath);
-			logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, smbUrl);
+			logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, maskSmbUrl(smbUrl));
 			return smbUrl;
 		} catch (IllegalArgumentException exception) {
 			throw new RuntimeIOException(exception);
 		}
 	}
+
+	private String maskSmbUrl(String smbUrl) {
+	    return smbUrl.replace(password, "********");
+    }
 
     @Override
     public String toString() {

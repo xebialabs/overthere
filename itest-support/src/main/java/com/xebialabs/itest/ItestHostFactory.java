@@ -181,7 +181,7 @@ public class ItestHostFactory {
 			if(value == null) {
 				logger.trace("Itest property {} is null", key);
 			} else {
-				logger.trace("Itest property {}={}", key, value);
+				logger.trace("Itest property {}={}", key, key.endsWith(TUNNEL_PASSWORD_PROPERTY_SUFFIX) ? "********" : value);
 			}
 		}
 		return value;
