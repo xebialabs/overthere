@@ -50,7 +50,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 <a name="building_overthere"/>
 ## Building Overthere
 
-1. Install [Gradle 1.0-milestone-3](http://www.gradle.org/).
+1. Install [Gradle 1.0-milestone-7](http://www.gradle.org/).
 2. Clone the Overthere repository.
 3. Run the command `gradle clean build`.
 
