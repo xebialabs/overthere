@@ -45,7 +45,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
  */
 public class CifsTelnetConnection extends CifsConnection {
 
-	private static final String DETECTABLE_WINDOWS_PROMPT = "WINDOWS4DEPLOYIT ";
+	private static final String DETECTABLE_WINDOWS_PROMPT = "TELNET4OVERTHERE ";
 
 	private static final String ERRORLEVEL_PREAMBLE = "ERRORLEVEL-PREAMBLE";
 
