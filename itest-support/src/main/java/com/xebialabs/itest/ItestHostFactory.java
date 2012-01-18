@@ -18,6 +18,7 @@
 package com.xebialabs.itest;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
@@ -141,18 +142,19 @@ public class ItestHostFactory {
 		try {
 			itestProperties = new Properties();
 			loadItestPropertiesFromClasspath();
-			loadItestPropertiesFromFile();
+			loadItestPropertiesFromHomeDirectory();
+			loadItestPropertiesFromCurrentDirectory();
 		} catch (IOException exc) {
 			throw new RuntimeException("Cannot load itest.properties", exc);
 		}
 	}
 
 	private static void loadItestPropertiesFromClasspath() throws IOException {
-	    URL itestPropertiesResources = Thread.currentThread().getContextClassLoader().getResource("itest.properties");
-	    if(itestPropertiesResources != null) {
-	    	InputStream in = itestPropertiesResources.openStream();
+	    URL itestPropertiesResource = Thread.currentThread().getContextClassLoader().getResource("itest.properties");
+	    if(itestPropertiesResource != null) {
+	    	InputStream in = itestPropertiesResource.openStream();
 	    	try {
-	    		logger.info("Loading itest.properties from classpath");
+	    		logger.info("Loading {}", itestPropertiesResource);
 	    		itestProperties.load(in);
 	    	} finally {
 	    		in.close();
@@ -162,26 +164,31 @@ public class ItestHostFactory {
 	    }
     }
 
-	private static void loadItestPropertiesFromFile() throws FileNotFoundException, IOException {
-	    File itestPropertiesFile = new File("itest.properties");
+	private static void loadItestPropertiesFromHomeDirectory() throws FileNotFoundException, IOException {
+	    loadItestPropertiesFromFile(new File(System.getProperty("user.home"), ".itest/itest.properties"));
+    }
+
+	private static void loadItestPropertiesFromCurrentDirectory() throws FileNotFoundException, IOException {
+	    loadItestPropertiesFromFile(new File("itest.properties"));
+    }
+
+	private static void loadItestPropertiesFromFile(File itestPropertiesFile) throws FileNotFoundException, IOException {
 	    if (itestPropertiesFile.exists()) {
 	    	FileInputStream in = new FileInputStream(itestPropertiesFile);
 	    	try {
-	    		logger.info("Loading itest.properties from current working directory");
+	    		logger.info("Loading {}", itestPropertiesFile.getAbsolutePath());
 	    		itestProperties.load(in);
 	    	} finally {
 	    		in.close();
 	    	}
 	    } else {
-	    	logger.warn("File itest.properties not found in the current directory.");
+	    	logger.warn("File {} not found.", itestPropertiesFile.getAbsolutePath());
 	    }
     }
 
 	public static String getRequiredItestProperty(String key) {
 		String value = getItestProperty(key);
-		if(value == null) {
-			throw new IllegalStateException("Required property " + key + " is not specified in itest.properties or as a system property");
-		}
+		checkState(value != null, "Required property %s is not specified as a system property or in itest.properties which can be placed in the current working directory, in ~/.itest or on the classpath", key);
 		return value;
 	}
 
