@@ -319,6 +319,8 @@ When the Telnet server is enabled any user that is in the <strong>Administrators
 <a name="cifs_host_setup_winrm_https"/>
 #### WINRP_HTTP and WINRM_HTTPS
 
+_For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
+
 To use the __WINRM_HTTP__ or the __WINRM_HTTPS__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
 
 1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRm under the section __Management and Monitoring Tools__.
