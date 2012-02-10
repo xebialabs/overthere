@@ -17,14 +17,16 @@
 
 package com.xebialabs.itest;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.util.Map;
 
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import static com.google.common.base.Preconditions.checkArgument;
 
 class TunneledItestHost implements ItestHost {
 
@@ -50,7 +52,7 @@ class TunneledItestHost implements ItestHost {
 		actualItestHost.setup();
 
         client = new SSHClient();
-        client.addHostKeyVerifier(new LaxKeyVerifier());
+        client.addHostKeyVerifier(new PromiscuousVerifier());
 
         try {
     		client.connect(actualItestHost.getHostName(), 22);
@@ -58,7 +60,14 @@ class TunneledItestHost implements ItestHost {
 	        for(Map.Entry<Integer, Integer> forwardedPort : portForwardMap.entrySet()) {
 	        	int remotePort = forwardedPort.getKey();
 	        	int localPort = forwardedPort.getValue();
-	        	final LocalPortForwarder forwarder = client.newLocalPortForwarder(new InetSocketAddress("localhost", localPort), "localhost", remotePort);
+
+		        final LocalPortForwarder.Parameters params
+				        = new LocalPortForwarder.Parameters("localhost", localPort, "localhost", remotePort);
+		        final ServerSocket ss = new ServerSocket();
+		        ss.setReuseAddress(true);
+		        ss.bind(new InetSocketAddress(params.getLocalHost(), params.getLocalPort()));
+
+		        final LocalPortForwarder forwarder = client.newLocalPortForwarder(params, ss);
 	        	Thread forwarderThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
