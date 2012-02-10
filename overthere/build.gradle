@@ -7,7 +7,7 @@ dependencies {
 	compile 'org.slf4j:slf4j-api:1.6.3'
 
 	// SSH
-	compile 'net.schmizz:sshj:0.6.1'
+	compile 'net.schmizz:sshj:0.7.0'
 	runtime 'com.jcraft:jzlib:1.0.7'
 	runtime 'org.bouncycastle:bcprov-jdk16:1.45'
 
