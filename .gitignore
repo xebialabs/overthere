@@ -11,3 +11,4 @@ bin/
 *.iws
 itest.properties
 !overthere/src/test/resources/itest.properties
+.idea
