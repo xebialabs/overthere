@@ -16,7 +16,7 @@
  */
 package com.xebialabs.overthere.spi;
 
-import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.BaseOverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.OverthereFileCopier;
@@ -24,9 +24,9 @@ import com.xebialabs.overthere.util.OverthereFileCopier;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * A file system object (file, directory, etc.) on a remote system that is accessible through an {@link OverthereConnection}.
+ * A file system object (file, directory, etc.) on a remote system that is accessible through an {@link com.xebialabs.overthere.OverthereConnection}.
  */
-public abstract class BaseOverthereFile<C extends OverthereConnection> implements OverthereFile {
+public abstract class BaseOverthereFile<C extends BaseOverthereConnection> implements OverthereFile {
 
 	protected C connection;
 
