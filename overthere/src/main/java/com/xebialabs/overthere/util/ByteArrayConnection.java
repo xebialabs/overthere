@@ -17,11 +17,11 @@
 
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.BaseOverthereConnection;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 
-class ByteArrayConnection extends OverthereConnection {
+class ByteArrayConnection extends BaseOverthereConnection {
 
 	protected ByteArrayConnection(String protocol, ConnectionOptions options) {
 	    super(protocol, options, false);

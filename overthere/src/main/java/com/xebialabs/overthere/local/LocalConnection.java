@@ -37,7 +37,7 @@ import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
  * A connection to the local host.
  */
 @Protocol(name = LOCAL_PROTOCOL)
-public class LocalConnection extends OverthereConnection implements OverthereConnectionBuilder {
+public class LocalConnection extends BaseOverthereConnection implements OverthereConnectionBuilder {
 
 	/**
 	 * Name of the protocol handled by this connection builder, i.e. "local".

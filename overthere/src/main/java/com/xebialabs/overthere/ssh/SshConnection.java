@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.xebialabs.overthere.*;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -58,18 +59,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Base class for host connections using SSH.
  */
-abstract class SshConnection extends OverthereConnection {
+abstract class SshConnection extends BaseOverthereConnection {
 
     public static final String PTY_PATTERN = "(\\w+):(\\d+):(\\d+):(\\d+):(\\d+)";
 

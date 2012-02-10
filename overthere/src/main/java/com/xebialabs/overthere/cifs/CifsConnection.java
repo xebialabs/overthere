@@ -30,16 +30,11 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPP
 import java.io.IOException;
 
 import jcifs.smb.NtlmPasswordAuthentication;
+import com.xebialabs.overthere.*;
 import jcifs.smb.SmbFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
 
 /**
  * Base class for connections to a Windows host using CIFS.
@@ -50,7 +45,7 @@ import com.xebialabs.overthere.RuntimeIOException;
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */
-public abstract class CifsConnection extends OverthereConnection {
+public abstract class CifsConnection extends BaseOverthereConnection {
 
 	protected CifsConnectionType cifsConnectionType;
 
