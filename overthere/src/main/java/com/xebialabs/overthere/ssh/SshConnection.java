@@ -46,6 +46,7 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
@@ -121,7 +122,7 @@ abstract class SshConnection extends OverthereConnection {
         try {
             SSHClient client = sshClientFactory.create();
             client.setConnectTimeout(connectionTimeoutMillis);
-            client.addHostKeyVerifier(new LaxKeyVerifier());
+            client.addHostKeyVerifier(new PromiscuousVerifier());
 
             try {
                 client.connect(host, port);
