@@ -142,12 +142,22 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
+	/**
+	 * Name of the {@link ConnectionOptions connection option} used to specify the local port forwards. The value should take the following format:
+	 * &lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt;,&lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt;,...
+	 */
+	public static final String LOCAL_PORT_FORWARDS = "localPortForwards";
+
 	protected SshConnection connection;
 
 	public SshConnectionBuilder(String type, ConnectionOptions options) {
 		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
 
 		switch (sshConnectionType) {
+		case TUNNEL:
+			connection = SshTunnelRegistry.getConnectedTunnel(options);
+
+			break;
 		case SFTP:
 			connection = new SshSftpUnixConnection(type, options);
 			break;

@@ -19,7 +19,8 @@ package com.xebialabs.overthere;
 
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshTunnelConnection;
+import com.xebialabs.overthere.ssh.SshTunnelRegistry;
 import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
@@ -35,6 +36,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -73,13 +78,13 @@ public class Overthere {
 	 *            A set of options to use for the connection.
 	 * @return the connection.
 	 */
-	public static OverthereConnection getConnection(String protocol, ConnectionOptions options) {
+	public static OverthereConnection getConnection(String protocol, final ConnectionOptions options) {
 		if (!protocols.get().containsKey(protocol)) {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
 		if (logger.isTraceEnabled()) {
-            HashSet<String> filteredKeys = newHashSet(ConnectionOptions.PASSWORD, SshConnectionBuilder.PASSPHRASE);
+            HashSet<String> filteredKeys = newHashSet(PASSWORD, PASSPHRASE);
             logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
 			for (String k : options.keys()) {
 				Object v = options.get(k);
@@ -87,6 +92,16 @@ public class Overthere {
 			}
 		}
 
+		ConnectionOptions tunnelOptions = options.get(TUNNEL, null);
+		ConnectionOptions rewrittenOptions = options;
+		if (tunnelOptions != null) {
+			SshTunnelConnection tunnel = (SshTunnelConnection) buildConnection(SSH_PROTOCOL, tunnelOptions);
+			rewrittenOptions = tunnel.rewriteAddressAndPorts(options);
+		}
+		return buildConnection(protocol, rewrittenOptions);
+	}
+
+	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options) {
 		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
 			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class);

@@ -18,6 +18,7 @@
 package com.xebialabs.overthere.spi;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.ssh.SshTunnelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,8 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	
 	protected OverthereFile workingDirectory;
 
+	private ConnectionOptions connectionOptions;
+
 	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final boolean canStartProcess) {
 		this.protocol = checkNotNull(protocol, "Cannot create HostConnection with null protocol");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
@@ -68,6 +71,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
 		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 		this.canStartProcess = canStartProcess;
+		this.connectionOptions = options;
 	}
 
 	/**
@@ -90,6 +94,11 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 		}
 
 		doClose();
+
+		ConnectionOptions tunnelOptions = connectionOptions.getOptional(TUNNEL);
+		if (tunnelOptions != null) {
+			SshTunnelRegistry.closeTunnel(tunnelOptions);
+		}
 
 		logger.info("Disconnected from {}", this);
 	}
