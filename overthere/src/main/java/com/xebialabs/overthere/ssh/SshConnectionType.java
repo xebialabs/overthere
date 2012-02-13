@@ -33,6 +33,10 @@ public enum SshConnectionType {
 	/**
 	 * An SSH connection that uses SCP to transfer files, to a Unix host. Uses SUDO, <em>not</em> been configured with NOPASSWD for all commands, to execute commands.
 	 */
-	INTERACTIVE_SUDO
+	INTERACTIVE_SUDO,
 
+	/**
+	 * An SSH connection that is used for tunneling another connection through a 'jump station', no operation on this actual connection can be performed.
+	 */
+	TUNNEL
 }

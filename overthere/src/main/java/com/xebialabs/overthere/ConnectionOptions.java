@@ -88,6 +88,11 @@ public class ConnectionOptions {
 	 */
 	public static final String PASSWORD = "password";
 
+	/**
+	 * Common connection option that specifies the connection options used to create a tunnel.
+	 */
+	public static final String TUNNEL = "tunnel";
+
 	private final Map<String, Object> options;
 
 	/**
@@ -178,4 +183,19 @@ public class ConnectionOptions {
 		return options.keySet();
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		ConnectionOptions that = (ConnectionOptions) o;
+
+		return options.equals(that.options);
+
+	}
+
+	@Override
+	public int hashCode() {
+		return options.hashCode();
+	}
 }
