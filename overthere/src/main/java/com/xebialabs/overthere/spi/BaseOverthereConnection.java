@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere;
+package com.xebialabs.overthere.spi;
 
+import com.xebialabs.overthere.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 /**
  * A connection on a host (local or remote) on which to manipulate files and execute commands.
  * 
- * All methods in this interface may throw a {@link RuntimeIOException} if an error occurs. Checked {@link java.io.IOException IOExceptions} are never thrown.
+ * All methods in this interface may throw a {@link com.xebialabs.overthere.RuntimeIOException} if an error occurs. Checked {@link java.io.IOException IOExceptions} are never thrown.
  */
 public abstract class BaseOverthereConnection implements OverthereConnection {
 

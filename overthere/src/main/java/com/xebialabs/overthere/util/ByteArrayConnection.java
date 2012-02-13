@@ -17,7 +17,7 @@
 
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.BaseOverthereConnection;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 

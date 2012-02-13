@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;

@@ -31,6 +31,7 @@ import java.io.IOException;
 
 import jcifs.smb.NtlmPasswordAuthentication;
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import jcifs.smb.SmbFile;
 
 import org.slf4j.Logger;
