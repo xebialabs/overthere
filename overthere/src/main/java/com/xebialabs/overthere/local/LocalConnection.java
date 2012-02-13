@@ -17,6 +17,7 @@
 package com.xebialabs.overthere.local;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import org.slf4j.Logger;

@@ -16,7 +16,6 @@
  */
 package com.xebialabs.overthere.spi;
 
-import com.xebialabs.overthere.BaseOverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.OverthereFileCopier;
