@@ -28,6 +28,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPP
 
 import java.io.IOException;
 
+import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
 
 import org.slf4j.Logger;
@@ -64,6 +65,8 @@ public abstract class CifsConnection extends OverthereConnection {
 	
 	protected PathEncoder encoder;
 
+	protected NtlmPasswordAuthentication authentication;
+
 	/**
 	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
@@ -75,7 +78,8 @@ public abstract class CifsConnection extends OverthereConnection {
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
 		this.cifsPort = options.get(CIFS_PORT, DEFAULT_CIFS_PORT);
-		this.encoder = new PathEncoder(username, password, address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
+		this.encoder = new PathEncoder(null, null, address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
+		this.authentication = new NtlmPasswordAuthentication(null, username, password);
 	}
 
 	private Integer getDefaultPort() {
@@ -99,7 +103,7 @@ public abstract class CifsConnection extends OverthereConnection {
 	@Override
 	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
 		try {
-			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath));
+			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath), authentication);
 			return new CifsFile(this, smbFile);
 		} catch (IOException exc) {
 			throw new RuntimeIOException(exc);

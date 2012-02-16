@@ -45,10 +45,12 @@ class PathEncoder {
 		StringBuilder urlPrefix = new StringBuilder();
 		urlPrefix.append("smb://");
 		// this is *not* the Windows file separator ;-)
-		urlPrefix.append(urlEncode(username.replaceFirst(quote("\\"), ";")));
-		urlPrefix.append(":");
-		urlPrefix.append(urlEncode(password));
-		urlPrefix.append("@");
+		if (username != null) {
+			urlPrefix.append(urlEncode(username.replaceFirst(quote("\\"), ";")));
+			urlPrefix.append(":");
+			urlPrefix.append(urlEncode(password));
+			urlPrefix.append("@");
+		}
 		urlPrefix.append(urlEncode(address));
 		if (cifsPort != DEFAULT_CIFS_PORT) {
 			urlPrefix.append(":");

@@ -56,7 +56,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 	@Override
 	public OverthereFile getParentFile() {
 		try {
-			return new CifsFile(getConnection(), new SmbFile(smbFile.getParent()));
+			return new CifsFile(getConnection(), new SmbFile(smbFile.getParent(), connection.authentication));
 		} catch (MalformedURLException exc) {
 			return null;
 		}
@@ -249,12 +249,12 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
 	private void upgradeToDirectorySmbFile() throws MalformedURLException {
 		if (!smbFile.getPath().endsWith("/")) {
-			smbFile = new SmbFile(smbFile.getURL() + "/");
+			smbFile = new SmbFile(smbFile.getURL() + "/", connection.authentication);
 		}
 	}
 
 	private void refreshSmbFile() throws MalformedURLException {
-		smbFile = new SmbFile(smbFile.getPath());
+		smbFile = new SmbFile(smbFile.getPath(), connection.authentication);
 	}
 
 	@Override
