@@ -95,9 +95,9 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
 		doClose();
 
-		ConnectionOptions tunnelOptions = connectionOptions.getOptional(TUNNEL);
-		if (tunnelOptions != null) {
-			SshTunnelRegistry.closeTunnel(tunnelOptions);
+		ConnectionOptions jumpstationOptions = connectionOptions.getOptional(JUMPSTATION);
+		if (jumpstationOptions != null) {
+			SshTunnelRegistry.closeTunnel(jumpstationOptions);
 		}
 
 		logger.info("Disconnected from {}", this);

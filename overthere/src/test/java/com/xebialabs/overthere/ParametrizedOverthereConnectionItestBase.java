@@ -18,8 +18,6 @@
 package com.xebialabs.overthere;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_PORT_FORWARDS;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,12 +42,6 @@ public abstract class ParametrizedOverthereConnectionItestBase extends ItestHost
 	protected void setTypeAndOptions() throws Exception {
 		options = new ConnectionOptions(partialOptions);
 		options.set(ADDRESS, host.getHostName());
-
-		ConnectionOptions tunnelOptions = options.getOptional(TUNNEL);
-		if (tunnelOptions != null) {
-			tunnelOptions.set(ADDRESS, host.getHostName());
-			tunnelOptions.set(LOCAL_PORT_FORWARDS, ((String) tunnelOptions.get(LOCAL_PORT_FORWARDS)).replace("TARGET", host.getHostName()));
-		}
 	}
 
 }

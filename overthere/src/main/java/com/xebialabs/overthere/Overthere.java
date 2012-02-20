@@ -18,8 +18,8 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.ssh.SshTunnelConnection;
+import com.xebialabs.overthere.ssh.SshTunnelRegistry;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -93,13 +94,20 @@ public class Overthere {
 			}
 		}
 
-		ConnectionOptions tunnelOptions = options.get(TUNNEL, null);
+		ConnectionOptions tunnelOptions = options.get(JUMPSTATION, null);
 		ConnectionOptions rewrittenOptions = options;
 		if (tunnelOptions != null) {
 			SshTunnelConnection tunnel = (SshTunnelConnection) buildConnection(SSH_PROTOCOL, tunnelOptions);
 			rewrittenOptions = tunnel.rewriteAddressAndPorts(options);
 		}
-		return buildConnection(protocol, rewrittenOptions);
+		try {
+			return buildConnection(protocol, rewrittenOptions);
+		} catch(RuntimeException exc) {
+			if(tunnelOptions != null) {
+				SshTunnelRegistry.closeTunnel(tunnelOptions);
+			}
+			throw exc;
+		}
 	}
 
 	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options) {
