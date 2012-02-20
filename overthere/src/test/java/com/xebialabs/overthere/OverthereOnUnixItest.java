@@ -26,6 +26,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
@@ -36,7 +37,12 @@ public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBa
 
 	@BeforeClass
 	public static void setupItestHost() {
-		setupItestHost("overthere-unix");
+		doSetupItestHost("overthere-unix");
+	}
+
+	@AfterClass
+	public static void teardownItestHost() {
+		doTeardownItestHost();
 	}
 
 	public OverthereOnUnixItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName) {

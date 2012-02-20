@@ -139,7 +139,6 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 		switch (sshConnectionType) {
 		case TUNNEL:
 			connection = SshTunnelRegistry.getConnectedTunnel(options);
-
 			break;
 		case SFTP:
 			connection = new SshSftpUnixConnection(type, options);

@@ -1,8 +1,9 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
+import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionType.TUNNEL;
 
 import java.util.Map;
 
@@ -20,19 +21,16 @@ public class SshTunnelRegistry {
 
 	/**
 	 * Creates or re-uses a pre-existing {@link SshTunnelConnection}.
-	 * @param tunnelOptions
+	 * @param jumpstationOptions
 	 *                  The {@link ConnectionOptions} to be used to connect to the 'jump station' and setup the port forwards.
 	 * @return A connected {@link SshTunnelConnection}. 
 	 */
-	synchronized static SshTunnelConnection getConnectedTunnel(ConnectionOptions tunnelOptions) {
-		SshTunnelConnection sshTunnelConnection = TUNNELS.get(tunnelOptions);
+	synchronized static SshTunnelConnection getConnectedTunnel(ConnectionOptions jumpstationOptions) {
+		SshTunnelConnection sshTunnelConnection = TUNNELS.get(jumpstationOptions);
 		if (sshTunnelConnection == null) {
-			checkConnectionType(tunnelOptions);
-			sshTunnelConnection = new SshTunnelConnection(TUNNEL, tunnelOptions);
-			TUNNELS.put(tunnelOptions, sshTunnelConnection);
-		} else {
-			// The tunnel might be inactive (ie. closed), try connecting to it.
-			sshTunnelConnection.connect();
+            checkArgument(jumpstationOptions.get(CONNECTION_TYPE) == TUNNEL, "Can only setup a tunnel with %s = %s, not [%s]", CONNECTION_TYPE, TUNNEL, jumpstationOptions.get(CONNECTION_TYPE));
+			sshTunnelConnection = new SshTunnelConnection(JUMPSTATION, jumpstationOptions);
+			TUNNELS.put(jumpstationOptions, sshTunnelConnection);
 		}
 		return sshTunnelConnection;
 	}
@@ -40,11 +38,11 @@ public class SshTunnelRegistry {
 	/**
 	 * Close the {@link SshTunnelConnection} belonging to the passed in {@link ConnectionOptions}.
 	 * 
-	 * @param tunnelOptions
+	 * @param jumpstationOptions
 	 *                  The {@link ConnectionOptions} that belong to the to be closed {@link SshTunnelConnection}
 	 */
-	public synchronized static void closeTunnel(ConnectionOptions tunnelOptions) {
-		SshTunnelConnection sshTunnelConnection = TUNNELS.get(tunnelOptions);
+	public synchronized static void closeTunnel(ConnectionOptions jumpstationOptions) {
+		SshTunnelConnection sshTunnelConnection = TUNNELS.get(jumpstationOptions);
 		if (sshTunnelConnection == null) {
 			logger.error("Trying to close a tunnel which is no longer there...");
 		} else {
@@ -52,10 +50,6 @@ public class SshTunnelRegistry {
 		}
 	}
 
-	private static void checkConnectionType(ConnectionOptions tunnelOptions) {
-		Object connectionType = tunnelOptions.get(CONNECTION_TYPE);
-		checkArgument(connectionType == SshConnectionType.TUNNEL, "Can only setup a tunnel with %s = %s, not [%s]", CONNECTION_TYPE, SshConnectionType.TUNNEL, connectionType);
-	}
-
 	private static final Logger logger = LoggerFactory.getLogger(SshTunnelRegistry.class);
+
 }

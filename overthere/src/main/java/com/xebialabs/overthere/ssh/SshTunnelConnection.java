@@ -59,7 +59,7 @@ public class SshTunnelConnection extends SshConnection {
 				throw new RuntimeIOException("Cannot setup portforwards", e);
 			}
 		} else {
-			logger.debug("Reusing tunnel, got [{}] references", referenceCounter.get());
+			logger.debug("Reusing tunnel, now in use by [{}] connections", referenceCounter.get());
 		}
 	}
 
@@ -76,7 +76,7 @@ public class SshTunnelConnection extends SshConnection {
 
 			super.doClose();
 		} else {
-			logger.debug("Not closing tunnel, still got [{}] references", referenceCounter.get());
+			logger.debug("Not closing tunnel, still in use by [{}] other connections", referenceCounter.get());
 		}
 	}
 

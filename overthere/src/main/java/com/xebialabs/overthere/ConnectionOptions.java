@@ -91,7 +91,7 @@ public class ConnectionOptions {
 	/**
 	 * Common connection option that specifies the connection options used to create a tunnel.
 	 */
-	public static final String TUNNEL = "tunnel";
+	public static final String JUMPSTATION = "jumpstation";
 
 	private final Map<String, Object> options;
 
