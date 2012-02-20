@@ -17,15 +17,11 @@
 
 package com.xebialabs.overthere;
 
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
-import com.xebialabs.overthere.spi.Protocol;
-import com.xebialabs.overthere.ssh.SshTunnelConnection;
-import com.xebialabs.overthere.ssh.SshTunnelRegistry;
-import nl.javadude.scannit.Configuration;
-import nl.javadude.scannit.Scannit;
-import nl.javadude.scannit.scanner.TypeAnnotationScanner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.collect.Sets.newHashSet;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -35,11 +31,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import nl.javadude.scannit.Configuration;
+import nl.javadude.scannit.Scannit;
+import nl.javadude.scannit.scanner.TypeAnnotationScanner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.ssh.SshTunnelConnection;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.

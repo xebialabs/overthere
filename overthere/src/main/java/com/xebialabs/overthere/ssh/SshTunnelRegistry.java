@@ -1,16 +1,16 @@
 package com.xebialabs.overthere.ssh;
 
-import com.google.common.collect.Maps;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Maps;
+import com.xebialabs.overthere.ConnectionOptions;
 
 /**
  * Registry that manages {@link SshTunnelConnection} connections. 
