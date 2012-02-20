@@ -1,12 +1,9 @@
 package com.xebialabs.overthere;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_PORT_FORWARDS;
 
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 

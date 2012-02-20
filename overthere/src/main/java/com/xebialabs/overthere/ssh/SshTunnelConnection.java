@@ -39,11 +39,8 @@ public class SshTunnelConnection extends SshConnection {
 
 	private AtomicInteger referenceCounter = new AtomicInteger(0);
 
-	private ConnectionOptions options;
-
 	public SshTunnelConnection(final String protocol, final ConnectionOptions options) {
 		super(protocol, options);
-		this.options = options;
 		this.localPortForwards = parseLocalPortForwards(options.<String>get(LOCAL_PORT_FORWARDS));
 	}
 

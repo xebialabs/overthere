@@ -17,7 +17,12 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
+import static com.xebialabs.overthere.ConnectionOptions.TUNNEL;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
@@ -42,16 +47,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-import com.xebialabs.overthere.ssh.SshConnectionType;
-import jcifs.util.LogStream;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.collect.ImmutableMap;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshConnectionType;
 
 public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItestBase {
 
@@ -60,7 +61,6 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 
 	private static final String REGULAR_USER_ITEST_USERNAME = "overthere";
 	private static final String REGULAR_USER_ITEST_PASSWORD = "wLitdMy@:;<>KY9";
-	private static OverthereConnection connection;
 	// The password for the regular user includes special characters to test that they get encoded correctly
 
 	@BeforeClass
