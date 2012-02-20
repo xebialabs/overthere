@@ -56,7 +56,7 @@ import com.google.common.collect.ImmutableMap;
 public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItestBase {
 
 	private static final String ADMINISTRATIVE_USER_ITEST_USERNAME = "Administrator";
-	private static final String ADMINISTRATIVE_USER_ITEST_PASSWORD = "xeb1aLabs"; //"iW8tcaM0d";
+	private static final String ADMINISTRATIVE_USER_ITEST_PASSWORD = "iW8tcaM0d";
 
 	private static final String REGULAR_USER_ITEST_USERNAME = "overthere";
 	private static final String REGULAR_USER_ITEST_PASSWORD = "wLitdMy@:;<>KY9";
@@ -65,7 +65,6 @@ public class OverthereOnWindowsItest extends ParametrizedOverthereConnectionItes
 
 	@BeforeClass
 	public static void setupItestHost() {
-		LogStream.setLevel(100);
 		setupItestHost("overthere-windows");
 	}
 
