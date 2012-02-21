@@ -17,6 +17,7 @@
 package com.xebialabs.overthere;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 public interface OverthereConnection extends Closeable {
 	/**
@@ -111,6 +112,11 @@ public interface OverthereConnection extends Closeable {
 	 */
 	boolean canStartProcess();
 
+	/**
+	 * Closes the connection. Does not throw {@link IOException} but can throw {@link RuntimeIOException}
+	 */
+	void close();
+	
 	/**
 	 * Implementations MUST implement toString properly.
 	 */
