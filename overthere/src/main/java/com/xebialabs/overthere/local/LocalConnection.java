@@ -17,9 +17,11 @@
 package com.xebialabs.overthere.local;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.util.DefaultAddressPortResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +49,15 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 	/**
 	 * Constructs a connection to the local host.
 	 */
+	public LocalConnection(String protocol, ConnectionOptions options, AddressPortResolver resolver) {
+		super(protocol, fixOptions(options), resolver, true);
+	}
+
+	/**
+	 * Constructs a connection to the local host.
+	 */
 	public LocalConnection(String protocol, ConnectionOptions options) {
-		super(protocol, fixOptions(options), true);
+		this(protocol, options, new DefaultAddressPortResolver());
 	}
 
 	private static ConnectionOptions fixOptions(ConnectionOptions options) {

@@ -11,6 +11,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PRO
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 
+import com.xebialabs.overthere.util.DefaultAddressPortResolver;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,18 +35,18 @@ public class SshInteractiveSudoConnectionOptionsTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardStar() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword*");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions);
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardQuestion() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword?");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions);
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
 	}
 
 	@Test
 	public void shouldAcceptPasswordPromptRegex() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "[Pp]assword.*:");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions);
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
 	}
 }

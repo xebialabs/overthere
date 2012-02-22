@@ -2,6 +2,7 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -133,30 +134,30 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
 	protected SshConnection connection;
 
-	public SshConnectionBuilder(String type, ConnectionOptions options) {
+	public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortResolver resolver) {
 		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
 
 		switch (sshConnectionType) {
 		case TUNNEL:
-			connection = SshTunnelRegistry.getConnectedTunnel(options);
+			connection = new SshTunnelConnection(type, options, resolver);
 			break;
 		case SFTP:
-			connection = new SshSftpUnixConnection(type, options);
+			connection = new SshSftpUnixConnection(type, options, resolver);
 			break;
 		case SFTP_CYGWIN:
-			connection = new SshSftpCygwinConnection(type, options);
+			connection = new SshSftpCygwinConnection(type, options, resolver);
 			break;
 		case SFTP_WINSSHD:
-			connection = new SshSftpWinSshdConnection(type, options);
+			connection = new SshSftpWinSshdConnection(type, options, resolver);
 			break;
 		case SCP:
-			connection = new SshScpConnection(type, options);
+			connection = new SshScpConnection(type, options, resolver);
 			break;
 		case SUDO:
-			connection = new SshSudoConnection(type, options);
+			connection = new SshSudoConnection(type, options, resolver);
 			break;
 		case INTERACTIVE_SUDO:
-			connection = new SshInteractiveSudoConnection(type, options);
+			connection = new SshInteractiveSudoConnection(type, options, resolver);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);

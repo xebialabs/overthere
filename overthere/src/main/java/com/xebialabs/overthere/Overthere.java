@@ -16,11 +16,17 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.ssh.SshTunnelConnection;
+import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import nl.javadude.scannit.Configuration;
+import nl.javadude.scannit.Scannit;
+import nl.javadude.scannit.scanner.TypeAnnotationScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -30,17 +36,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import nl.javadude.scannit.Configuration;
-import nl.javadude.scannit.Scannit;
-import nl.javadude.scannit.scanner.TypeAnnotationScanner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
-import com.xebialabs.overthere.spi.Protocol;
-import com.xebialabs.overthere.ssh.SshTunnelConnection;
-import com.xebialabs.overthere.ssh.SshTunnelRegistry;
+import static com.google.common.collect.Sets.newHashSet;
+import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -94,26 +93,23 @@ public class Overthere {
 		}
 
 		ConnectionOptions tunnelOptions = options.get(JUMPSTATION, null);
-		ConnectionOptions rewrittenOptions = options;
+		AddressPortResolver resolver = new DefaultAddressPortResolver();
 		if (tunnelOptions != null) {
-			SshTunnelConnection tunnel = (SshTunnelConnection) buildConnection(SSH_PROTOCOL, tunnelOptions);
-			rewrittenOptions = tunnel.rewriteAddressAndPorts(options);
+			resolver = (SshTunnelConnection) Overthere.getConnection(protocol, options);
 		}
 		try {
-			return buildConnection(protocol, rewrittenOptions);
+			return buildConnection(protocol, options, resolver);
 		} catch(RuntimeException exc) {
-			if(tunnelOptions != null) {
-				SshTunnelRegistry.closeTunnel(tunnelOptions);
-			}
+			Closeables.closeQuietly(resolver);
 			throw exc;
 		}
 	}
 
-	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options) {
+	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortResolver resolver) {
 		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
-			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class);
-			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options);
+			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortResolver.class);
+			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, resolver);
 			logger.info("Connecting to {}", connectionBuilder);
 			OverthereConnection connection = connectionBuilder.connect();
 			logger.trace("Connected to {}", connection);

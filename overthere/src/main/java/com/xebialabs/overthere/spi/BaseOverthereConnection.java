@@ -17,12 +17,13 @@
 
 package com.xebialabs.overthere.spi;
 
+import com.google.common.io.Closeables;
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.ssh.SshTunnelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -61,9 +62,9 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	
 	protected OverthereFile workingDirectory;
 
-	private ConnectionOptions connectionOptions;
+	private final AddressPortResolver resolver;
 
-	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final boolean canStartProcess) {
+	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortResolver resolver, final boolean canStartProcess) {
 		this.protocol = checkNotNull(protocol, "Cannot create HostConnection with null protocol");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
 		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
@@ -71,7 +72,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
 		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 		this.canStartProcess = canStartProcess;
-		this.connectionOptions = options;
+		this.resolver = resolver;
 	}
 
 	/**
@@ -82,6 +83,10 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	@Override
 	public final OperatingSystemFamily getHostOperatingSystem() {
 		return os;
+	}
+
+	public final InetSocketAddress resolveSocketAddress(InetSocketAddress address) {
+		return resolver.resolve(address);
 	}
 
 	/**
@@ -95,10 +100,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
 		doClose();
 
-		ConnectionOptions jumpstationOptions = connectionOptions.getOptional(JUMPSTATION);
-		if (jumpstationOptions != null) {
-			SshTunnelRegistry.closeTunnel(jumpstationOptions);
-		}
+		Closeables.closeQuietly(resolver);
 
 		logger.info("Disconnected from {}", this);
 	}

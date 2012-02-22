@@ -175,6 +175,16 @@ public class ConnectionOptions {
 	}
 
 	/**
+	 * Returns whether a connection option is set.
+	 * @param key
+	 *          the key of the connection option.
+	 * @return true iff the connection option is set, false otherwise.
+	 */
+	public boolean containsKey(String key) {
+		return options.containsKey(key);
+	}
+	
+	/**
 	 * Returns the keys of all connection options set.
 	 *
 	 * @return a {@link Set} containing the keys.

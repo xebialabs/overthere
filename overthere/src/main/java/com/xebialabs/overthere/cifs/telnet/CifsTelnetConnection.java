@@ -19,6 +19,7 @@ package com.xebialabs.overthere.cifs.telnet;
 import com.google.common.io.Closeables;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
@@ -58,8 +59,8 @@ public class CifsTelnetConnection extends CifsConnection {
 	/**
 	 * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
-	public CifsTelnetConnection(String type, ConnectionOptions options) {
-		super(type, options, true);
+	public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortResolver resolver) {
+		super(type, options, resolver, true);
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 	}
 
