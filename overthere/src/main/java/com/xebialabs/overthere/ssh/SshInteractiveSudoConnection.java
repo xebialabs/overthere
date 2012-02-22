@@ -19,6 +19,7 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
@@ -36,8 +37,8 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
 
 	private String passwordPromptRegex;
 
-	public SshInteractiveSudoConnection(String type, ConnectionOptions options) {
-		super(type, options);
+	public SshInteractiveSudoConnection(String type, ConnectionOptions options, AddressPortResolver resolver) {
+		super(type, options, resolver);
 		passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
 		checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
 		checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");

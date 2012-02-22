@@ -29,6 +29,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPP
 
 import java.io.IOException;
 
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import jcifs.smb.NtlmPasswordAuthentication;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
@@ -67,8 +68,8 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 	/**
 	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
-	public CifsConnection(String protocol, ConnectionOptions options, boolean canStartProcess) {
-		super(protocol, options, canStartProcess);
+	public CifsConnection(String protocol, ConnectionOptions options, AddressPortResolver resolver, boolean canStartProcess) {
+		super(protocol, options, resolver, canStartProcess);
 		this.cifsConnectionType = options.get(CONNECTION_TYPE);
 		this.address = options.get(ADDRESS);
 		this.port = options.get(PORT, getDefaultPort());

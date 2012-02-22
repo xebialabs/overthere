@@ -18,6 +18,7 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +43,8 @@ class SshSudoConnection extends SshScpConnection {
 	
 	protected boolean sudoOverrideUmask;
 
-	public SshSudoConnection(String type, ConnectionOptions options) {
-		super(type, options);
+	public SshSudoConnection(String type, ConnectionOptions options, AddressPortResolver resolver) {
+		super(type, options, resolver);
 		this.sudoUsername = options.get(SUDO_USERNAME);
 		this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
 		this.sudoQuoteCommand = options.get(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);

@@ -1,8 +1,8 @@
 package com.xebialabs.overthere.ssh;
 
-import com.google.common.base.Splitter;
 import com.google.common.io.Closeables;
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
@@ -31,7 +31,7 @@ import static java.lang.String.format;
 /**
  * A connection to a 'jump station' host using SSH w/ local port forwards.
  */
-public class SshTunnelConnection extends SshConnection {
+public class SshTunnelConnection extends SshConnection implements AddressPortResolver {
 
 	private List<LocalPortForwardConfig> localPortForwards = newArrayList();
 	
@@ -39,9 +39,8 @@ public class SshTunnelConnection extends SshConnection {
 
 	private AtomicInteger referenceCounter = new AtomicInteger(0);
 
-	public SshTunnelConnection(final String protocol, final ConnectionOptions options) {
-		super(protocol, options);
-		this.localPortForwards = parseLocalPortForwards(options.<String>get(LOCAL_PORT_FORWARDS));
+	public SshTunnelConnection(final String protocol, final ConnectionOptions options, AddressPortResolver resolver) {
+		super(protocol, options, resolver);
 	}
 
 	/**
@@ -102,20 +101,6 @@ public class SshTunnelConnection extends SshConnection {
 		rewrittenOptions.set(PORT, rewritePort(remoteHost, (Integer) options.getOptional(PORT)));
 		rewrittenOptions.set(CIFS_PORT, rewritePort(remoteHost, (Integer) options.getOptional(CIFS_PORT)));
 		return rewrittenOptions;
-	}
-
-	private List<LocalPortForwardConfig> parseLocalPortForwards(String s) {
-		List<LocalPortForwardConfig> localPortForwards = newArrayList();
-		Iterable<String> forwards = Splitter.on(",").split(s);
-		for (String f : forwards) {
-			checkArgument(f.indexOf(":") > 0, "%s not of format <localPort>:<remoteHost>:<remotePort>,<localPort>:<remoteHost>:<remotePort>,...; but [%s]", LOCAL_PORT_FORWARDS, s);
-			try {
-				localPortForwards.add(new LocalPortForwardConfig(f));
-			} catch (NumberFormatException nfe) {
-				throw new IllegalArgumentException(format("%s not of format <localPort>:<remoteHost>:<remotePort>,<localPort>:<remoteHost>:<remotePort>,...; but [%s]", LOCAL_PORT_FORWARDS, s), nfe);
-			}
-		}
-		return localPortForwards;
 	}
 
 	private void startPortForwarders() throws IOException {
@@ -193,6 +178,11 @@ public class SshTunnelConnection extends SshConnection {
 	@Override
 	public int execute(OverthereProcessOutputHandler handler, CmdLine commandLine) {
 		throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
+	}
+
+	@Override
+	public InetSocketAddress resolve(InetSocketAddress address) {
+		return null;  //To change body of implemented methods use File | Settings | File Templates.
 	}
 
 	private static class LocalPortForwardConfig {

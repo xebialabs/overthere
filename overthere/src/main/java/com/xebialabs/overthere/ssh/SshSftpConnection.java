@@ -20,6 +20,7 @@ package com.xebialabs.overthere.ssh;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortResolver;
 import net.schmizz.sshj.sftp.SFTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,8 @@ abstract class SshSftpConnection extends SshConnection {
 
 	private SFTPClient sharedSftpClient;
 
-	public SshSftpConnection(String type, ConnectionOptions options) {
-		super(type, options);
+	public SshSftpConnection(String type, ConnectionOptions options, AddressPortResolver resolver) {
+		super(type, options, resolver);
 	}
 
 	@Override
