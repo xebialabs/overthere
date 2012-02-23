@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 
 public class SshSudoConnectionSudoCommandTest {
 
@@ -44,11 +45,11 @@ public class SshSudoConnectionSudoCommandTest {
 		
 		List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
 		assertThat(args.size(), equalTo(5));
-		assertThat(args.get(0).toString(), equalTo("sudo"));
-		assertThat(args.get(1).toString(), equalTo("-u"));
-		assertThat(args.get(2).toString(), equalTo("some-other-user"));
-		assertThat(args.get(3).toString(), equalTo("ls"));
-		assertThat(args.get(4).toString(), equalTo("/tmp"));
+		assertThat(args.get(0).toString(UNIX, false), equalTo("sudo"));
+		assertThat(args.get(1).toString(UNIX, false), equalTo("-u"));
+		assertThat(args.get(2).toString(UNIX, false), equalTo("some-other-user"));
+		assertThat(args.get(3).toString(UNIX, false), equalTo("ls"));
+		assertThat(args.get(4).toString(UNIX, false), equalTo("/tmp"));
 	}
 
 	@Test
@@ -58,11 +59,11 @@ public class SshSudoConnectionSudoCommandTest {
 		
 		List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
 		assertThat(args.size(), equalTo(5));
-		assertThat(args.get(0).toString(), equalTo("sx"));
-		assertThat(args.get(1).toString(), equalTo("-u"));
-		assertThat(args.get(2).toString(), equalTo("some-other-user"));
-		assertThat(args.get(3).toString(), equalTo("ls"));
-		assertThat(args.get(4).toString(), equalTo("/tmp"));
+		assertThat(args.get(0).toString(UNIX, false), equalTo("sx"));
+		assertThat(args.get(1).toString(UNIX, false), equalTo("-u"));
+		assertThat(args.get(2).toString(UNIX, false), equalTo("some-other-user"));
+		assertThat(args.get(3).toString(UNIX, false), equalTo("ls"));
+		assertThat(args.get(4).toString(UNIX, false), equalTo("/tmp"));
 	}
 
 	@Test
@@ -72,9 +73,9 @@ public class SshSudoConnectionSudoCommandTest {
 
 		List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
 		assertThat(args.size(), equalTo(3));
-		assertThat(args.get(0).toString(), equalTo("sx"));
-		assertThat(args.get(1).toString(), equalTo("ls"));
-		assertThat(args.get(2).toString(), equalTo("/tmp"));
+		assertThat(args.get(0).toString(UNIX, false), equalTo("sx"));
+		assertThat(args.get(1).toString(UNIX, false), equalTo("ls"));
+		assertThat(args.get(2).toString(UNIX, false), equalTo("/tmp"));
 	}
 
 	@Test
@@ -86,10 +87,10 @@ public class SshSudoConnectionSudoCommandTest {
 		CmdLine cmdLine = connection.processCommandLine(CmdLine.build("ls", "/tmp"));
 		List<CmdLineArgument> args = cmdLine.getArguments();
 		assertThat(args.size(), equalTo(4));
-		assertThat(args.get(0).toString(), equalTo("su"));
-		assertThat(args.get(1).toString(), equalTo("-u"));
-		assertThat(args.get(2).toString(), equalTo("some-other-user"));
-		assertThat(args.get(3).toString(), equalTo("ls\\ /tmp"));
+		assertThat(args.get(0).toString(UNIX, false), equalTo("su"));
+		assertThat(args.get(1).toString(UNIX, false), equalTo("-u"));
+		assertThat(args.get(2).toString(UNIX, false), equalTo("some-other-user"));
+		assertThat(args.get(3).toString(UNIX, false), equalTo("ls\\ /tmp"));
 		assertThat(cmdLine.toString(), equalTo("su -u some-other-user ls\\ /tmp"));
 	}
 
@@ -100,8 +101,8 @@ public class SshSudoConnectionSudoCommandTest {
 		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
 		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
 		assertThat(prefixed.size(), equalTo(9));
-		assertThat(prefixed.get(0).toString(), equalTo("sudo"));
-		assertThat(prefixed.get(5).toString(), equalTo("sudo"));
+		assertThat(prefixed.get(0).toString(UNIX, false), equalTo("sudo"));
+		assertThat(prefixed.get(5).toString(UNIX, false), equalTo("sudo"));
 	}
 
 	@Test
@@ -113,10 +114,10 @@ public class SshSudoConnectionSudoCommandTest {
 		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
 		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
 		assertThat(prefixed.size(), equalTo(4));
-		assertThat(prefixed.get(0).toString(), equalTo("su"));
-		assertThat(prefixed.get(1).toString(), equalTo("-u"));
-		assertThat(prefixed.get(2).toString(), equalTo("some-other-user"));
-		assertThat(prefixed.get(3).toString(), equalTo("a\\ \\|\\ b"));
+		assertThat(prefixed.get(0).toString(UNIX, false), equalTo("su"));
+		assertThat(prefixed.get(1).toString(UNIX, false), equalTo("-u"));
+		assertThat(prefixed.get(2).toString(UNIX, false), equalTo("some-other-user"));
+		assertThat(prefixed.get(3).toString(UNIX, false), equalTo("a\\ \\|\\ b"));
 	}
 
 	@Test
@@ -126,8 +127,8 @@ public class SshSudoConnectionSudoCommandTest {
 		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
 		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
 		assertThat(prefixed.size(), equalTo(9));
-		assertThat(prefixed.get(0).toString(), equalTo("sudo"));
-		assertThat(prefixed.get(5).toString(), equalTo("sudo"));
+		assertThat(prefixed.get(0).toString(UNIX, false), equalTo("sudo"));
+		assertThat(prefixed.get(5).toString(UNIX, false), equalTo("sudo"));
 	}
 
 	@Test
@@ -139,10 +140,10 @@ public class SshSudoConnectionSudoCommandTest {
 		CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
 		List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
 		assertThat(prefixed.size(), equalTo(4));
-		assertThat(prefixed.get(0).toString(), equalTo("su"));
-		assertThat(prefixed.get(1).toString(), equalTo("-u"));
-		assertThat(prefixed.get(2).toString(), equalTo("some-other-user"));
-		assertThat(prefixed.get(3).toString(), equalTo("a\\ \\;\\ b"));
+		assertThat(prefixed.get(0).toString(UNIX, false), equalTo("su"));
+		assertThat(prefixed.get(1).toString(UNIX, false), equalTo("-u"));
+		assertThat(prefixed.get(2).toString(UNIX, false), equalTo("some-other-user"));
+		assertThat(prefixed.get(3).toString(UNIX, false), equalTo("a\\ \\;\\ b"));
 	}
 
 }
