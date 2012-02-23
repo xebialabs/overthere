@@ -17,6 +17,11 @@
 
 package com.xebialabs.overthere.ssh;
 
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,16 +32,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.junit.Before;
-import org.junit.Test;
-
 public class SshInteractiveSudoPasswordHandlingStreamTest {
 
+	@Mock
 	private OutputStream os;
 
-	@Before
+	@BeforeClass
 	public void init() {
-		os = mock(OutputStream.class);
+		MockitoAnnotations.initMocks(this);
 	}
 
 	@Test

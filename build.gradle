@@ -20,22 +20,46 @@ subprojects {
 		maven {
 			url 'http://download.java.net/maven/2/'
 		}
+		maven {
+			url 'https://oss.sonatype.org/content/repositories/releases'
+		}
 	}
 
 	sourceCompatibility = 1.6
 	targetCompatibility = 1.6
 
 	configurations {
-	    compile {
-		transitive = false
-	    }
+		compile {
+			transitive = false
+		}
+	}
+
+	dependencies {
+		testCompile 'nl.javadude.assumeng:assumeng:1.1.0'
+		testCompile 'org.testng:testng:5.14.10'
+		testRuntime('org.uncommons:reportng:1.1.2') {
+			exclude group: 'org.testng', module: 'testng'
+		}
 	}
 
 	test {
+		useTestNG()
+		options {
+//			listeners << 'org.uncommons.reportng.HTMLReporter'
+//			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+		}
 		excludes = ['**/*Itest.*']
 	}
 
 	task itest(type: Test) {
+    	useTestNG {
+    		suites "testng.xml"
+    	}
+		options {
+//			listeners << 'org.uncommons.reportng.HTMLReporter'
+//			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+		}
+
 		includes = ['**/*Itest.*']
 		testResultsDir = file("${buildDir}/itest-results")
 

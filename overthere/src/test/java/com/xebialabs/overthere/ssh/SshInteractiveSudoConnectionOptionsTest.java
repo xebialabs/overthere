@@ -17,28 +17,21 @@
 
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-
-import com.xebialabs.overthere.util.DefaultAddressPortResolver;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 
 public class SshInteractiveSudoConnectionOptionsTest {
 
 	private ConnectionOptions connectionOptions;
 
-	@Before
+	@BeforeClass
 	public void init() {
 		connectionOptions = new ConnectionOptions();
 		connectionOptions.set(CONNECTION_TYPE, SFTP);
@@ -49,13 +42,13 @@ public class SshInteractiveSudoConnectionOptionsTest {
 		connectionOptions.set(SUDO_USERNAME, "some-other-user");
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardStar() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword*");
 		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardQuestion() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword?");
 		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());

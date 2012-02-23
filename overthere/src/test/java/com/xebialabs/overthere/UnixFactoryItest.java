@@ -40,40 +40,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runners.Parameterized.Parameters;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 
-public class OverthereOnUnixItest extends ParametrizedOverthereConnectionItestBase {
-
-	@BeforeClass
-	public static void setupItestHost() {
-		doSetupItestHost("overthere-unix");
-	}
-
-	@AfterClass
-	public static void teardownItestHost() {
-		doTeardownItestHost();
-	}
-
-	public OverthereOnUnixItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName) {
-	    super(type, partialOptions, expectedConnectionClassName);
-    }
-
-	@Parameters
-	public static Collection<Object[]> createListOfPartialConnectionOptions() throws IOException {
-		List<Object[]> lopco = newArrayList();
-		lopco.add(new Object[] { SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection" });
-		lopco.add(new Object[] { SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection" });
-		lopco.add(new Object[] { SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection" });
-		lopco.add(new Object[] { SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection" });
-		return lopco;
+public class UnixFactoryItest {
+	public Object[] createItests() throws Exception {
+		Object[] objects = new Object[4];
+		objects[0] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
+		objects[1] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection", "overthere-unix");
+		objects[2] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection", "overthere-unix");
+		objects[3] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix");
+		return objects;
 	}
 
 	private static ConnectionOptions createSftpOptions() {

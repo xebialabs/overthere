@@ -18,12 +18,11 @@
 package com.xebialabs.overthere.cifs;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.testng.annotations.Test;
 
 /**
  * Unit tests for the {@link PathEncoder}
@@ -31,24 +30,24 @@ import com.google.common.collect.ImmutableMap;
 public class PathEncoderTest {
     PathEncoder encoder;
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void requiresUniquePathMappings() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of("c", "share", "d", "share"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void hostPathOfLessThanTwoCharsFails() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c");
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void requiresColonAsSecondChar() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c!");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void charAfterColonMustBeSlash() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c:c");
