@@ -22,7 +22,7 @@ import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,16 +30,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Test;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
-import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
+import nl.javadude.assumeng.AssumptionListener;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
+@Listeners(AssumptionListener.class)
 public class LocalConnectionItest extends OverthereConnectionItestBase {
+	@Override
+	protected void doInitHost() {
+	}
+
+	@Override
+	protected void doTeardownHost() {
+	}
 
 	@Override
 	protected void setTypeAndOptions() {

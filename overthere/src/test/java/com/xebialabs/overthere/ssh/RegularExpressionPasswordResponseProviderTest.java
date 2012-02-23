@@ -1,21 +1,21 @@
 package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class RegularExpressionPasswordResponseProviderTest {
 
 	private static final char[] SECRET_PASSWORD = "secret".toCharArray();
 	private RegularExpressionPasswordResponseProvider provider;
 
-	@Before
+	@BeforeMethod
 	public void setup() {
 		provider = new RegularExpressionPasswordResponseProvider(new PasswordFinder() {
 			@Override

@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="" verbose="1" parallel="false" >
+	<test name="Itests">
+		<classes>
+			<class name="com.xebialabs.overthere.WindowsFactoryItest" />
+			<class name="com.xebialabs.overthere.UnixFactoryItest" />
+			<class name="com.xebialabs.overthere.local.LocalConnectionItest" />
+		</classes>
+	</test>
+</suite>

@@ -32,7 +32,6 @@ dependencies {
 
 	// Test dependencies
 	testCompile project(':itest-support')
-	testCompile 'junit:junit:4.10'
 	testCompile 'org.hamcrest:hamcrest-core:1.2.1'
 	testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 	testCompile 'org.mockito:mockito-core:1.8.5'

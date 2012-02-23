@@ -17,12 +17,11 @@
 
 package com.xebialabs.overthere.cifs;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
+import org.testng.annotations.Test;
 
 /**
  * Unit tests for {@link PathMapper}.
@@ -55,13 +54,13 @@ public class PathMapperTest {
         assertThat(mapper.toSharedPath("c:\\Temp"), is("c$\\Temp"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedOrAdminShare() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
         .toLocalPath("temp-share\\file.txt");
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedAndTooShort() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
         .toLocalPath("s");

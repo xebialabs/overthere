@@ -20,11 +20,11 @@ import static com.google.common.base.Joiner.on;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class CmdLineTest {
 
@@ -38,23 +38,23 @@ public class CmdLineTest {
 
 	private String argumentWithSpecialChars = "heretheycome'\"\\;()${}*?andthatwasem";
 
-	@Test(expected = NullPointerException.class)
+	@Test(expectedExceptions = NullPointerException.class)
 	public void shouldThrowNullPointerExceptionWhenAddingNullArgument() {
 		new CmdLine().add((CmdLineArgument) null);
 	}
 
-	@Test(expected = NullPointerException.class)
+	@Test(expectedExceptions = NullPointerException.class)
 	public void shouldThrowNullPointerExceptionWhenAddingNullArguments() {
 		new CmdLine().add((List<CmdLineArgument>) null);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expectedExceptions = IllegalStateException.class)
 	public void shouldThrowIllegalStateExceptionWhenEncodingEmptyCmdLineAsArray() {
 		CmdLine commandLine = new CmdLine();
 		commandLine.toCommandArray(UNIX, false);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test(expectedExceptions = IllegalStateException.class)
 	public void shouldThrowIllegalStateExceptionWhenEncodingEmptyCmdLineAsString() {
 		CmdLine commandLine = new CmdLine();
 		commandLine.toCommandLine(UNIX, false);

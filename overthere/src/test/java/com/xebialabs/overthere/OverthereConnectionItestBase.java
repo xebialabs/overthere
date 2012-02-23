@@ -16,6 +16,23 @@
  */
 package com.xebialabs.overthere;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.OutputSupplier;
+import com.xebialabs.itest.ItestHost;
+import com.xebialabs.overthere.local.LocalFile;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.OverthereUtils;
+import nl.javadude.assumeng.Assumption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.*;
+
+import java.io.*;
+import java.util.List;
+import java.util.Random;
+
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -26,45 +43,16 @@ import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandle
 import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-import static org.hamcrest.CoreMatchers.allOf;
+import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.junit.Assume.assumeThat;
-import static org.junit.matchers.JUnitMatchers.containsString;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Random;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.OutputSupplier;
-import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import com.xebialabs.overthere.util.OverthereUtils;
+import static org.testng.Assert.fail;
 
 /**
  * Base class for all Overthere connection itests.
@@ -85,18 +73,27 @@ public abstract class OverthereConnectionItestBase {
 
 	protected OverthereConnection connection;
 
-	@Rule
 	public TemporaryFolder temp = new TemporaryFolder();
-	
-	@Before
-	public void connect() throws Exception {
+
+	protected ItestHost host;
+	protected String hostname;
+
+	protected abstract void doInitHost();
+	protected abstract void doTeardownHost();
+
+	@BeforeClass
+	public void setupHost() throws Exception {
+		doInitHost();
+		logger.error("****************************Running before class!*******************************");
+		host = ItestHostHolder.getHost(hostname);
+		temp.create();
 		setTypeAndOptions();
 		connection = Overthere.getConnection(type, options);
 	}
 
 	protected abstract void setTypeAndOptions() throws Exception;
 
-	@After
+	@AfterClass
 	public void disconnect() {
 		if (connection != null) {
 			try {
@@ -107,6 +104,8 @@ public abstract class OverthereConnectionItestBase {
 				exc.printStackTrace(System.out);
 			}
 		}
+		temp.delete();
+		doTeardownHost();
 	}
 
 	@Test
@@ -116,9 +115,8 @@ public abstract class OverthereConnectionItestBase {
 
 	@SuppressWarnings("unchecked")
     @Test
+	@Assumption(methods = {"notLocal", "notCifs"})
 	public void shouldNotConnectWithIncorrectUsername() {
-		assumeThat(type, allOf(not(equalTo(LOCAL_PROTOCOL)), not(equalTo(CIFS_PROTOCOL))));
-
 		options.set("username", "an-incorrect-username");
 		try {
 			Overthere.getConnection(type, options);
@@ -129,9 +127,8 @@ public abstract class OverthereConnectionItestBase {
 
 	@SuppressWarnings("unchecked")
     @Test
+	@Assumption(methods = {"notLocal", "notCifs", "withPassword"})
 	public void shouldNotConnectWithIncorrectPassword() {
-		assumeThat(type, allOf(not(equalTo(LOCAL_PROTOCOL)), not(equalTo(CIFS_PROTOCOL))));
-		assumeThat(options.getOptional("password"), notNullValue());
 
 		options.set("password", "an-incorrect-password");
 		try {
@@ -142,9 +139,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = "onUnix")
 	public void shouldExecuteSimpleCommandOnUnix() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("ls", "-ld", "/tmp/."));
 		assertThat(res, equalTo(0));
@@ -160,8 +156,8 @@ public abstract class OverthereConnectionItestBase {
 
 
 	@Test
+	@Assumption(methods = "onUnix")
 	public void shouldExecuteSimpleCommandInWorkingDirectoryOnUnix() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
 
 		connection.setWorkingDirectory(connection.getFile("/etc"));
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
@@ -171,9 +167,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = "onUnix")
 	public void shouldCaptureLastLineOfSimpleCommandOnUnix() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("echo", "-n", "line", "that", "does", "not", "end", "in", "a", "newline"));
 		assertThat(res, equalTo(0));
@@ -188,9 +183,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = "onUnix")
 	public void shouldStartProcessSimpleCommandOnUnix() throws IOException, InterruptedException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-
 		OverthereProcess p = connection.startProcess(CmdLine.build("ls", "-ld", "/tmp/."));
 		try {
 			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
@@ -202,9 +196,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = "onWindows")
 	public void shouldListFilesOnWindows() throws IOException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-
 		OverthereFile folder = connection.getFile("C:\\overthere");
 		List<OverthereFile> filesInFolder = folder.listFiles();
 
@@ -213,9 +206,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = "onWindows")
 	public void shouldExecuteSimpleCommandOnWindows() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("ipconfig"));
 		assertThat(res, equalTo(0));
@@ -224,10 +216,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = {"onWindows", "notSftpCygwin"})
 	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsNotWithSftpCygwin() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-		assumeThat(connection.getClass().getName(), not(equalTo("com.xebialabs.overthere.ssh.SshSftpCygwinConnection")));
-
 		connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("cd"));
@@ -237,10 +227,8 @@ public abstract class OverthereConnectionItestBase {
 
 
 	@Test
+	@Assumption(methods = {"onWindows", "onlySftpCygwin"})
 	public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsWithSftpCygwin() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-		assumeThat(connection.getClass().getName(), equalTo("com.xebialabs.overthere.ssh.SshSftpCygwinConnection"));
-
 		connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
 		CapturingOverthereProcessOutputHandler captured = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("pwd"));
@@ -249,10 +237,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = {"onWindows", "supportsProcess"})
 	public void shouldStartProcessSimpleCommandOnWindows() throws IOException, InterruptedException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-		assumeThat(connection.canStartProcess(), equalTo(true));
-
 		OverthereProcess p = connection.startProcess(CmdLine.build("ipconfig"));
 		try {
 			String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
@@ -265,10 +251,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 	
 	@Test
+	@Assumption(methods = {"onWindows", "notSupportsProcess"})
 	public void shouldStartProcessSimpleCommandOnWindowsShouldThrowExceptionWhenNotSupported() throws IOException, InterruptedException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-		assumeThat(connection.canStartProcess(), equalTo(false));
-
 		try {
 			connection.startProcess(CmdLine.build("ipconfig"));
 			fail("Expected UnsupportedOperationException to be thrown");
@@ -278,9 +262,8 @@ public abstract class OverthereConnectionItestBase {
 
 
 	@Test
+	@Assumption(methods = {"onWindows"})
 	public void shouldExecuteCommandWithArgumentOnWindows() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig", "/all"));
 		assertThat(res, equalTo(0));
@@ -288,17 +271,15 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
+	@Assumption(methods = {"onWindows"})
 	public void shoudNotExecuteIncorrectCommandOnWindows() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-
 		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
 		assertThat(res, not(equalTo(0)));
 	}
 
 	@Test
+	@Assumption(methods = {"onWindows"})
 	public void shouldNormalizeWindowsPathWithForwardSlashes() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(WINDOWS));
-
 		OverthereFile file = connection.getFile("C:/Windows/System32");
 		assertThat(file.getPath(), equalTo("C:\\Windows\\System32"));
 	}
@@ -495,10 +476,8 @@ public abstract class OverthereConnectionItestBase {
 	 * Tests whether getOutputStream and getInputStream have the right permission behaviour (specifically for SSH/SUDO connections).
 	 */
 	@Test
+	@Assumption(methods = {"onUnix", "notLocal"})
 	public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectoryOnUnix() throws IOException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-		assumeThat(type, not(equalTo(LOCAL_PROTOCOL)));
-
 		// get handle to file in home dir
 		final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());
 		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
@@ -537,10 +516,8 @@ public abstract class OverthereConnectionItestBase {
 	 * Tests whether copyTo has the right permission behaviour (specifically for SSH/SUDO connections).
 	 */
 	@Test
+	@Assumption(methods = {"onUnix", "notLocal"})
 	public void shouldCopyFileToAndFromSudoUserHomeDirectoryOnUnix() throws IOException {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-		assumeThat(type, not(equalTo(LOCAL_PROTOCOL)));
-
 		// get handle to file in home dir
 		final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());
 		final OverthereFile fileInHomeDir = homeDir.getFile("file" + System.currentTimeMillis() + ".dat");
@@ -586,9 +563,8 @@ public abstract class OverthereConnectionItestBase {
     }
 
 	@Test
+	@Assumption(methods = "onUnix")
 	public void shouldSetExecutableOnUnix() {
-		assumeThat(connection.getHostOperatingSystem(), equalTo(UNIX));
-
 		OverthereFile remoteFile = connection.getTempFile("executable.sh");
 		OverthereUtils.write(generateRandomBytes(256), remoteFile);
 		
@@ -645,6 +621,42 @@ public abstract class OverthereConnectionItestBase {
 		new Random().nextBytes(randomBytes);
 	    return randomBytes;
     }
+
+	public boolean notLocal() {
+		return !type.equals(LOCAL_PROTOCOL);
+	}
+
+	public boolean notCifs() {
+		return !type.equals(CIFS_PROTOCOL);
+	}
+
+	public boolean withPassword() {
+		return options.containsKey("password");
+	}
+
+	public boolean onUnix() {
+		return connection.getHostOperatingSystem().equals(UNIX);
+	}
+
+	public boolean onWindows() {
+		return connection.getHostOperatingSystem().equals(WINDOWS);
+	}
+
+	public boolean notSftpCygwin() {
+		return !connection.getClass().getName().equals("com.xebialabs.overthere.ssh.SshSftpCygwinConnection");
+	}
+
+	public boolean onlySftpCygwin() {
+		return connection.getClass().getName().equals("com.xebialabs.overthere.ssh.SshSftpCygwinConnection");
+	}
+
+	public boolean supportsProcess() {
+		return connection.canStartProcess();
+	}
+
+	public boolean notSupportsProcess() {
+		return !supportsProcess();
+	}
 
 	private static Logger logger = LoggerFactory.getLogger(OverthereConnectionItestBase.class);
 

@@ -44,28 +44,27 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.method.AuthMethod;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Unit tests for {@link SshConnection}
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SshConnectionTest {
 
 	@Mock MockitoFriendlySSHClient client;
 
 	private ConnectionOptions connectionOptions;
 
-    @Before
+    @BeforeMethod
     public void init() {
+	    MockitoAnnotations.initMocks(this);
         connectionOptions = new ConnectionOptions();
         connectionOptions.set(CONNECTION_TYPE, SFTP);
         connectionOptions.set(OPERATING_SYSTEM, UNIX);

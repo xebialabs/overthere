@@ -12,24 +12,24 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAN
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
 import com.xebialabs.overthere.util.DefaultAddressPortResolver;
-import org.junit.Before;
-import org.junit.Test;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class SshSudoConnectionSudoCommandTest {
 
 	private ConnectionOptions connectionOptions;
 	private DefaultAddressPortResolver resolver;
 
-	@Before
+	@BeforeMethod
 	public void init() {
 		connectionOptions = new ConnectionOptions();
 		connectionOptions.set(CONNECTION_TYPE, SUDO);
