@@ -41,6 +41,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -96,7 +97,7 @@ public class Overthere {
 		ConnectionOptions tunnelOptions = options.get(JUMPSTATION, null);
 		AddressPortResolver resolver = new DefaultAddressPortResolver();
 		if (tunnelOptions != null) {
-			resolver = (SshTunnelConnection) Overthere.getConnection(protocol, options);
+			resolver = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, tunnelOptions);
 		}
 		try {
 			return buildConnection(protocol, options, resolver);

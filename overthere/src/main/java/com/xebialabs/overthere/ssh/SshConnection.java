@@ -34,8 +34,10 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBO
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
+import static java.net.InetSocketAddress.createUnresolved;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,8 +106,9 @@ abstract class SshConnection extends BaseOverthereConnection {
 	public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortResolver resolver) {
         super(protocol, options, resolver, true);
         this.sshConnectionType = options.get(CONNECTION_TYPE);
-        this.host = options.get(ADDRESS);
-        this.port = options.get(PORT, SSH_PORT_DEFAULT);
+		InetSocketAddress addressPort = resolver.resolve(createUnresolved(options.<String>get(ADDRESS), options.get(PORT, SSH_PORT_DEFAULT)));
+        this.host = addressPort.getHostName();
+        this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
         this.password = options.getOptional(PASSWORD);
         this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);

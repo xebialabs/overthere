@@ -17,15 +17,14 @@
 
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.spi.AddressPortResolver;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 class ByteArrayConnection extends BaseOverthereConnection {
 
 	protected ByteArrayConnection(String protocol, ConnectionOptions options) {
-	    super(protocol, options, null, false);
+	    super(protocol, options, new DefaultAddressPortResolver(), false);
     }
 
 	@Override

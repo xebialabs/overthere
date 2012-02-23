@@ -1,6 +1,7 @@
 package com.xebialabs.overthere.ssh;
 
 import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.Monitor;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.AddressPortResolver;
 import net.schmizz.sshj.SSHClient;
@@ -16,101 +17,86 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_PORT_FORWARDS;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
+import static com.xebialabs.overthere.util.Sockets.checkAvailable;
+import static com.xebialabs.overthere.util.Sockets.getServerSocket;
 import static java.lang.String.format;
+import static java.net.InetSocketAddress.createUnresolved;
 
 /**
  * A connection to a 'jump station' host using SSH w/ local port forwards.
  */
 public class SshTunnelConnection extends SshConnection implements AddressPortResolver {
 
-	private List<LocalPortForwardConfig> localPortForwards = newArrayList();
+	private static final Monitor M = new Monitor();
+	private static final int MAX_PORT = 65536;
+
+	private Map<InetSocketAddress, Integer> localPortForwards = newHashMap();
 	
 	private List<PortForwarder> portForwarders = newArrayList();
 
-	private AtomicInteger referenceCounter = new AtomicInteger(0);
+	private Integer startPortRange;
 
 	public SshTunnelConnection(final String protocol, final ConnectionOptions options, AddressPortResolver resolver) {
 		super(protocol, options, resolver);
+		this.startPortRange = options.get(PORT_ALLOCATION_RANGE_START, PORT_ALLOCATION_RANGE_START_DEFAULT);
 	}
 
-	/**
-	 * Establishes the connection to the 'jump station' and sets up the local port forwards, if it hasn't already done so.
-	 */
 	@Override
 	protected void connect() {
-		if (referenceCounter.getAndIncrement() == 0) {
-			super.connect();
-			checkState(sshClient != null, "Should have set an SSH client when connected");
-			try {
-				startPortForwarders();
-			} catch (Exception e) {
-				Closeables.closeQuietly(this);
-				throw new RuntimeIOException("Cannot setup portforwards", e);
-			}
-		} else {
-			logger.debug("Reusing tunnel, now in use by [{}] connections", referenceCounter.get());
-		}
+		super.connect();
+		checkState(sshClient != null, "Should have set an SSH client when connected");
 	}
 
-	/**
-	 * Closes the {@link SshTunnelConnection} only if there are no more references to it from other connections. 
-	 */
 	@Override
 	public void doClose() {
-		if (referenceCounter.decrementAndGet() == 0) {
-			logger.debug("Closing tunnel.");
-			for (PortForwarder portForwarder : portForwarders) {
-				Closeables.closeQuietly(portForwarder);
+		logger.debug("Closing tunnel.");
+		for (PortForwarder portForwarder : portForwarders) {
+			Closeables.closeQuietly(portForwarder);
+		}
+
+		super.doClose();
+	}
+
+	@Override
+	public InetSocketAddress resolve(InetSocketAddress address) {
+		M.enter();
+		try {
+			if (localPortForwards.containsKey(address)) {
+				return createUnresolved("localhost", localPortForwards.get(address));
 			}
 
-			super.doClose();
-		} else {
-			logger.debug("Not closing tunnel, still in use by [{}] other connections", referenceCounter.get());
+			Integer localPort = findFreePort();
+			try {
+				portForwarders.add(startForwarder(address, localPort));
+			} catch (IOException e) {
+				Closeables.closeQuietly(this);
+				throw new RuntimeIOException(e);
+			}
+			return createUnresolved("localhost", localPort);
+		} finally {
+			M.leave();
 		}
 	}
 
-	/**
-	 * Rewrite the {@link ConnectionOptions} for a connection that traverses through the 'jump station' this {@link SshTunnelConnection} is connected to.
-	 * 
-	 * <ul>
-	 *     <li>Change the {@link ConnectionOptions#ADDRESS} connection option to 'localhost'.</li>
-	 *     <li>Change the {@link ConnectionOptions#PORT} and {@link com.xebialabs.overthere.cifs.CifsConnectionBuilder#CIFS_PORT} connection options to the forwarded local ports</li>
-	 * </ul>
-	 * 
-	 * <em>N.B.</em> the {@link ConnectionOptions#PORT} and {@link com.xebialabs.overthere.cifs.CifsConnectionBuilder#CIFS_PORT} should be supplied explicitly.
-	 * 
-	 * @param options
-	 *              The {@link ConnectionOptions} that need rewriting.
-	 * @return A rewritten copy of the {@link ConnectionOptions} passed in.
-	 */
-	public ConnectionOptions rewriteAddressAndPorts(ConnectionOptions options) {
-		ConnectionOptions rewrittenOptions = new ConnectionOptions(options);
-		String remoteHost = options.get(ADDRESS);
-		rewrittenOptions.set(ADDRESS, "localhost");
-
-		rewrittenOptions.set(PORT, rewritePort(remoteHost, (Integer) options.getOptional(PORT)));
-		rewrittenOptions.set(CIFS_PORT, rewritePort(remoteHost, (Integer) options.getOptional(CIFS_PORT)));
-		return rewrittenOptions;
-	}
-
-	private void startPortForwarders() throws IOException {
-		for (LocalPortForwardConfig portForward : localPortForwards) {
-			portForwarders.add(startForwarder(portForward));
+	private Integer findFreePort() {
+		for (int port = startPortRange; port < MAX_PORT; port++) {
+			if (checkAvailable(port)) {
+				return port;
+			}
 		}
+		throw new IllegalStateException("Could not find a single free port in the range 1025-65535...");
 	}
 
-	private PortForwarder startForwarder(LocalPortForwardConfig portForward) throws IOException {
-		PortForwarder forwarderThread = new PortForwarder(sshClient, portForward);
+	private PortForwarder startForwarder(InetSocketAddress remoteAddress, Integer localPort) throws IOException {
+		PortForwarder forwarderThread = new PortForwarder(sshClient, remoteAddress, localPort);
 		logger.info("Starting {}", forwarderThread.getName());
 		forwarderThread.start();
 		try {
@@ -121,20 +107,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortRes
 		return forwarderThread;
 	}
 
-	private Integer rewritePort(String remoteHost, Integer port) {
-		if (port == null) {
-			return null;
-		}
-
-		for (LocalPortForwardConfig portForward : localPortForwards) {
-			if (portForward.remoteHost.equals(remoteHost) && portForward.remotePort == port) {
-				return portForward.localPort;
-			}
-		}
-		return port;
-	}
-
-	
 	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
@@ -180,65 +152,42 @@ public class SshTunnelConnection extends SshConnection implements AddressPortRes
 		throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
 	}
 
-	@Override
-	public InetSocketAddress resolve(InetSocketAddress address) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	private static class LocalPortForwardConfig {
-		private int localPort;
-		private String remoteHost;
-		private int remotePort;
-
-		private LocalPortForwardConfig(String forward) {
-			String[] f = forward.split(":");
-			checkArgument(f.length == 3, " Element [%s] of %s is not of format <localPort>:<remoteHost>:<remotePort>", forward, LOCAL_PORT_FORWARDS);
-			localPort = Integer.parseInt(f[0]);
-			remoteHost = f[1];
-			remotePort = Integer.parseInt(f[2]);
-		}
-
-		@Override
-		public String toString() {
-			return format("%d:%s:%d", localPort, remoteHost, remotePort);
-		}
-	}
-
 	private static final Logger logger = LoggerFactory.getLogger(SshTunnelConnection.class);
 
 	private static class PortForwarder extends Thread implements Closeable {
 		private final SSHClient sshClient;
-		private final LocalPortForwardConfig portForward;
+		private final InetSocketAddress remoteAddress;
+		private final Integer localPort;
 		private ServerSocket ss;
 		private CountDownLatch latch = new CountDownLatch(1);
 
-		public PortForwarder(SSHClient sshClient, LocalPortForwardConfig portForward) {
-			super(buildName(portForward));
+		public PortForwarder(SSHClient sshClient, InetSocketAddress remoteAddress, Integer localPort) {
+			super(buildName(remoteAddress, localPort));
 			this.sshClient = sshClient;
-			this.portForward = portForward;
+			this.remoteAddress = remoteAddress;
+			this.localPort = localPort;
 		}
 
-		private static String buildName(LocalPortForwardConfig portForward) {
-			return format("SSH local port forward thread [%s]", portForward);
+		private static String buildName(InetSocketAddress remoteAddress, Integer localPort) {
+			return format("SSH local port forward thread [%d:%s]", localPort, remoteAddress.toString());
 		}
 
 		@Override
 		public void run() {
-			LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", portForward.localPort, portForward.remoteHost, portForward.remotePort);
+			LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localPort, remoteAddress.getHostName(), remoteAddress.getPort());
 			try {
-				ss = new ServerSocket();
-				ss.setReuseAddress(true);
-				ss.bind(new InetSocketAddress(params.getLocalHost(), params.getLocalPort()));
-
-				LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, ss);
-				try {
-					latch.countDown();
-					forwarder.listen();
-				} catch (IOException ignore) {
-					// OK.
-				}
+				ss = getServerSocket(localPort);
 			} catch (IOException ioe) {
-				logger.error(format("Couldn't setup local port forward [%s]", portForward), ioe);
+				logger.error(format("Couldn't setup local port forward [%d:%s]", localPort, remoteAddress.toString()), ioe);
+				throw new RuntimeIOException(ioe);
+			}
+
+			LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, ss);
+			try {
+				latch.countDown();
+				forwarder.listen();
+			} catch (IOException ignore) {
+				// OK.
 			}
 		}
 		

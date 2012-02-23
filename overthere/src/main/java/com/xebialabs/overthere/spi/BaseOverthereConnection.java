@@ -62,17 +62,17 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	
 	protected OverthereFile workingDirectory;
 
-	private final AddressPortResolver resolver;
+	protected final AddressPortResolver resolver;
 
 	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortResolver resolver, final boolean canStartProcess) {
-		this.protocol = checkNotNull(protocol, "Cannot create HostConnection with null protocol");
+		this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
 		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
 		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
 		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 		this.canStartProcess = canStartProcess;
-		this.resolver = resolver;
+		this.resolver = checkNotNull(resolver, "Cannot create OverthereConnection with null addres-port resolver");
 	}
 
 	/**
@@ -83,10 +83,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	@Override
 	public final OperatingSystemFamily getHostOperatingSystem() {
 		return os;
-	}
-
-	public final InetSocketAddress resolveSocketAddress(InetSocketAddress address) {
-		return resolver.resolve(address);
 	}
 
 	/**
