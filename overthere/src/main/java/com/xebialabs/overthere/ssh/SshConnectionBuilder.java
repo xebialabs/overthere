@@ -127,10 +127,14 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
 	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the local port forwards. The value should take the following format:
-	 * &lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt;,&lt;local port&gt;:&lt;remote host&gt;:&lt;remote port&gt;,...
+	 * Name of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate an empty port for a local port forward in an {@link SshTunnelConnection tunnel}
 	 */
-	public static final String LOCAL_PORT_FORWARDS = "localPortForwards";
+	public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
+
+	/**
+	 * Default value of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate an empty port for a local port forward in an {@link SshTunnelConnection tunnel}
+	 */
+	public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1025;
 
 	protected SshConnection connection;
 
