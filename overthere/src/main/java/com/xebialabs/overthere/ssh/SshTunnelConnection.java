@@ -136,11 +136,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 	}
 
 	@Override
-	protected void addCommandSeparator(CmdLine commandLine) {
-		throw new UnsupportedOperationException("Cannot add a separator to the command line in the tunnel.");
-	}
-
-	@Override
 	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
 		throw new UnsupportedOperationException("Cannot create a process in the tunnel.");
 	}

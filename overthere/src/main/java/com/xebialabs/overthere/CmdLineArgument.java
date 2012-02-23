@@ -1,7 +1,6 @@
 package com.xebialabs.overthere;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 
 import java.io.Serializable;
 
@@ -99,14 +98,6 @@ public abstract class CmdLineArgument implements Serializable {
 	 */
 	public abstract void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder);
 
-	/**
-	 * Invokes <code>toString(UNIX, true)</code>.
-	 */
-	@Override
-	public String toString() {
-		return toString(UNIX, true);
-	}
-
 	protected void encodeString(String str, OperatingSystemFamily os, StringBuilder builder) {
 		if (str.length() == 0) {
 			builder.append(EMPTY_ARGUMENT);
@@ -170,6 +161,11 @@ public abstract class CmdLineArgument implements Serializable {
 		private Single(String arg) {
 			this.arg = arg;
 		}
+
+		@Override
+		public String toString() {
+			return arg;
+		}
 	}
 
 	private static class Raw extends Single {
@@ -203,6 +199,8 @@ public abstract class CmdLineArgument implements Serializable {
 
 	private static class Password extends Basic {
 
+		private static final String HIDDEN_PASSWORD = "********";
+
 		public Password(String arg) {
 			super(arg);
 		}
@@ -210,10 +208,15 @@ public abstract class CmdLineArgument implements Serializable {
 		@Override
 		public void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder) {
 			if (forLogging) {
-				builder.append("********");
+				builder.append(HIDDEN_PASSWORD);
 			} else {
 				super.buildString(os, forLogging, builder);
 			}
+		}
+
+		@Override
+		public String toString() {
+			return HIDDEN_PASSWORD;
 		}
 	}
 
@@ -228,6 +231,11 @@ public abstract class CmdLineArgument implements Serializable {
 		@Override
 		public void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder) {
 			encodeString(line.toCommandLine(os, forLogging), os, builder);
+		}
+
+		@Override
+		public String toString() {
+			return line.toString();
 		}
 	}
 

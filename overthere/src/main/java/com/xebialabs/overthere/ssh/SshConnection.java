@@ -250,7 +250,7 @@ abstract class SshConnection extends BaseOverthereConnection {
     		CmdLine commandLineWithCd = new CmdLine();
     		commandLineWithCd.addArgument("cd");
     		commandLineWithCd.addArgument(workingDirectory.getPath());
-    		addCommandSeparator(commandLineWithCd);
+    		commandLineWithCd.addRaw(os.getCommandSeparator());
     		for (CmdLineArgument a : commandLine.getArguments()) {
     			commandLineWithCd.add(a);
     		}
@@ -260,12 +260,8 @@ abstract class SshConnection extends BaseOverthereConnection {
         }
     }
 
-	protected void addCommandSeparator(CmdLine commandLine) {
-	    commandLine.addRaw(os.getCommandSeparator());
-    }
-
 	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
-    	return new SshProcess(this, session, commandLine);
+    	return new SshProcess(this, os, session, commandLine);
     }
 
     @Override

@@ -260,7 +260,6 @@ public abstract class OverthereConnectionItestBase {
 		}
 	}
 
-
 	@Test
 	@Assumption(methods = {"onWindows"})
 	public void shouldExecuteCommandWithArgumentOnWindows() {
@@ -272,6 +271,32 @@ public abstract class OverthereConnectionItestBase {
 
 	@Test
 	@Assumption(methods = {"onWindows"})
+	public void shouldExecuteBatchFileOnWindows() {
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("C:\\overthere\\helloworld.bat"));
+		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), containsString("Hello World"));
+	}
+
+	@Test
+    @Assumption(methods = {"onWindows"})
+	public void shouldExecuteBatchFileWithArgumentsOnWindows() throws IOException {
+		String content = "Hello from the file just uploaded";
+		OverthereFile tempFile = connection.getTempFile("hello world", ".txt");
+		OutputStream outputStream = tempFile.getOutputStream();
+		try {
+			outputStream.write(content.getBytes());
+		} finally {
+			outputStream.close();
+		}
+
+		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
+		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("C:\\overthere\\typefile.bat", tempFile.getPath()));
+		assertThat(res, equalTo(0));
+		assertThat(capturingHandler.getOutput(), containsString(content));
+	}
+
+	@Test
 	public void shoudNotExecuteIncorrectCommandOnWindows() {
 		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
 		assertThat(res, not(equalTo(0)));
