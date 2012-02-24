@@ -45,6 +45,7 @@ subprojects {
 	test {
 		useTestNG()
 		options {
+			listeners << 'org.testng.reporters.JUnitXMLReporter'
 //			listeners << 'org.uncommons.reportng.HTMLReporter'
 //			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
 		}
@@ -56,6 +57,7 @@ subprojects {
     		suites "testng.xml"
     	}
 		options {
+			listeners << 'org.testng.reporters.JUnitXMLReporter'
 //			listeners << 'org.uncommons.reportng.HTMLReporter'
 //			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
 		}
