@@ -36,6 +36,8 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 
+import org.testng.annotations.Factory;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 
 public class UnixFactoryItest {
+	@Factory
 	public Object[] createItests() throws Exception {
 		Object[] objects = new Object[4];
 		objects[0] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
