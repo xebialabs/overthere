@@ -24,7 +24,7 @@ import com.xebialabs.overthere.spi.BaseOverthereConnection;
 class ByteArrayConnection extends BaseOverthereConnection {
 
 	protected ByteArrayConnection(String protocol, ConnectionOptions options) {
-	    super(protocol, options, new DefaultAddressPortResolver(), false);
+	    super(protocol, options, new DefaultAddressPortMapper(), false);
     }
 
 	@Override

@@ -18,7 +18,7 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -45,19 +45,19 @@ public class SshInteractiveSudoConnectionOptionsTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardStar() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword*");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortMapper());
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void shouldNotAcceptPasswordPromptRegexWithWildcardQuestion() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "assword?");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortMapper());
 	}
 
 	@Test
 	public void shouldAcceptPasswordPromptRegex() {
 		connectionOptions.set(SUDO_PASSWORD_PROMPT_REGEX, "[Pp]assword.*:");
-		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortResolver());
+		new SshInteractiveSudoConnection(SSH_PROTOCOL, connectionOptions, new DefaultAddressPortMapper());
 	}
 }
 

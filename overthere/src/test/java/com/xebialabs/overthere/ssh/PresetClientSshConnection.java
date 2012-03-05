@@ -19,7 +19,7 @@ package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
-import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 
@@ -30,7 +30,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 public class PresetClientSshConnection extends SshConnection {
 
     public PresetClientSshConnection(ConnectionOptions options, final SSHClient clientToReturn) {
-        super(SSH_PROTOCOL, options, new DefaultAddressPortResolver());
+        super(SSH_PROTOCOL, options, new DefaultAddressPortMapper());
         sshClientFactory = new Factory<SSHClient>() {
             @Override
             public SSHClient create() {

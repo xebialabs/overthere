@@ -17,13 +17,11 @@
 
 package com.xebialabs.overthere.spi;
 
-import com.google.common.io.Closeables;
 import com.xebialabs.overthere.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,9 +60,9 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	
 	protected OverthereFile workingDirectory;
 
-	protected final AddressPortResolver resolver;
+	protected final AddressPortMapper mapper;
 
-	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortResolver resolver, final boolean canStartProcess) {
+	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
 		this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
 		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
 		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
@@ -72,7 +70,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
 		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 		this.canStartProcess = canStartProcess;
-		this.resolver = checkNotNull(resolver, "Cannot create OverthereConnection with null addres-port resolver");
+		this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null addres-port mapper");
 	}
 
 	/**
@@ -96,7 +94,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
 		doClose();
 
-		Closeables.closeQuietly(resolver);
+		closeQuietly(mapper);
 
 		logger.info("Disconnected from {}", this);
 	}

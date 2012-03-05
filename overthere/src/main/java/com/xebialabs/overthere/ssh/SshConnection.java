@@ -43,7 +43,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
@@ -103,10 +103,10 @@ abstract class SshConnection extends BaseOverthereConnection {
         }
     };
 
-	public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortResolver resolver) {
-        super(protocol, options, resolver, true);
+	public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
+        super(protocol, options, mapper, true);
         this.sshConnectionType = options.get(CONNECTION_TYPE);
-		InetSocketAddress addressPort = resolver.resolve(createUnresolved(options.<String>get(ADDRESS), options.get(PORT, SSH_PORT_DEFAULT)));
+		InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String>get(ADDRESS), options.get(PORT, SSH_PORT_DEFAULT)));
         this.host = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);

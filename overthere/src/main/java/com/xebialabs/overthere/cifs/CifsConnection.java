@@ -31,7 +31,7 @@ import static java.net.InetSocketAddress.createUnresolved;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 import jcifs.smb.NtlmPasswordAuthentication;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
@@ -70,16 +70,16 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 	/**
 	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
-	public CifsConnection(String protocol, ConnectionOptions options, AddressPortResolver resolver, boolean canStartProcess) {
-		super(protocol, options, resolver, canStartProcess);
+	public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
+		super(protocol, options, mapper, canStartProcess);
 		this.cifsConnectionType = options.get(CONNECTION_TYPE);
 		String address = options.get(ADDRESS);
-		InetSocketAddress addressPort = resolver.resolve(createUnresolved(address, options.get(PORT, getDefaultPort())));
+		InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort())));
 		this.address = addressPort.getHostName();
 		this.port = addressPort.getPort();
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
-		InetSocketAddress addressCifsPort = resolver.resolve(createUnresolved(address, options.get(CIFS_PORT, DEFAULT_CIFS_PORT)));
+		InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.get(CIFS_PORT, DEFAULT_CIFS_PORT)));
 		this.cifsPort = addressCifsPort.getPort();
 		this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
 		this.authentication = new NtlmPasswordAuthentication(null, username, password);

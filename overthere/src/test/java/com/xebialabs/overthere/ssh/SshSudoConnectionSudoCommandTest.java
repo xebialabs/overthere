@@ -33,7 +33,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
@@ -44,7 +44,7 @@ import org.testng.annotations.Test;
 public class SshSudoConnectionSudoCommandTest {
 
 	private ConnectionOptions connectionOptions;
-	private DefaultAddressPortResolver resolver;
+	private DefaultAddressPortMapper resolver;
 
 	@BeforeMethod
 	public void init() {
@@ -55,7 +55,7 @@ public class SshSudoConnectionSudoCommandTest {
 		connectionOptions.set(USERNAME, "some-user");
 		connectionOptions.set(PASSWORD, "foo");
 		connectionOptions.set(SUDO_USERNAME, "some-other-user");
-		resolver = new DefaultAddressPortResolver();
+		resolver = new DefaultAddressPortMapper();
 	}
 
 	@Test
