@@ -10,7 +10,7 @@ import com.xebialabs.overthere.cifs.winrm.connector.JdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.connector.LaxJdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.tokengenerator.BasicTokenGenerator;
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -39,8 +39,8 @@ public class CifsWinRmConnection extends CifsConnection {
 	/**
 	 * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
 	 */
-	public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortResolver resolver) {
-		super(type, options, resolver, false);
+	public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+		super(type, options, mapper, false);
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 
 		TokenGenerator tokenGenerator = getTokenGenerator(options);

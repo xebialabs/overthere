@@ -2,7 +2,7 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -138,30 +138,30 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
 	protected SshConnection connection;
 
-	public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortResolver resolver) {
+	public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
 		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
 
 		switch (sshConnectionType) {
 		case TUNNEL:
-			connection = new SshTunnelConnection(type, options, resolver);
+			connection = new SshTunnelConnection(type, options, mapper);
 			break;
 		case SFTP:
-			connection = new SshSftpUnixConnection(type, options, resolver);
+			connection = new SshSftpUnixConnection(type, options, mapper);
 			break;
 		case SFTP_CYGWIN:
-			connection = new SshSftpCygwinConnection(type, options, resolver);
+			connection = new SshSftpCygwinConnection(type, options, mapper);
 			break;
 		case SFTP_WINSSHD:
-			connection = new SshSftpWinSshdConnection(type, options, resolver);
+			connection = new SshSftpWinSshdConnection(type, options, mapper);
 			break;
 		case SCP:
-			connection = new SshScpConnection(type, options, resolver);
+			connection = new SshScpConnection(type, options, mapper);
 			break;
 		case SUDO:
-			connection = new SshSudoConnection(type, options, resolver);
+			connection = new SshSudoConnection(type, options, mapper);
 			break;
 		case INTERACTIVE_SUDO:
-			connection = new SshInteractiveSudoConnection(type, options, resolver);
+			connection = new SshInteractiveSudoConnection(type, options, mapper);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);

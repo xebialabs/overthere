@@ -17,11 +17,11 @@
 package com.xebialabs.overthere;
 
 import com.google.common.io.Closeables;
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.ssh.SshTunnelConnection;
-import com.xebialabs.overthere.util.DefaultAddressPortResolver;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
@@ -93,24 +93,24 @@ public class Overthere {
 			}
 		}
 
-		ConnectionOptions tunnelOptions = options.get(JUMPSTATION, null);
-		AddressPortResolver resolver = new DefaultAddressPortResolver();
-		if (tunnelOptions != null) {
-			resolver = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, tunnelOptions);
+		ConnectionOptions jumpstationOptions = options.get(JUMPSTATION, null);
+		AddressPortMapper mapper = new DefaultAddressPortMapper();
+		if (jumpstationOptions != null) {
+			mapper = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, jumpstationOptions);
 		}
 		try {
-			return buildConnection(protocol, options, resolver);
+			return buildConnection(protocol, options, mapper);
 		} catch(RuntimeException exc) {
-			Closeables.closeQuietly(resolver);
+			Closeables.closeQuietly(mapper);
 			throw exc;
 		}
 	}
 
-	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortResolver resolver) {
+	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
 		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
 		try {
-			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortResolver.class);
-			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, resolver);
+			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortMapper.class);
+			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
 			logger.info("Connecting to {}", connectionBuilder);
 			OverthereConnection connection = connectionBuilder.connect();
 			logger.trace("Connected to {}", connection);

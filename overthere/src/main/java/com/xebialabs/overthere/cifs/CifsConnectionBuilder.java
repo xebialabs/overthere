@@ -9,7 +9,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
-import com.xebialabs.overthere.spi.AddressPortResolver;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
@@ -87,16 +87,16 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 
 	private OverthereConnection connection;
 
-	public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortResolver resolver) {
+	public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
 		CifsConnectionType cifsConnectionType = options.get(CONNECTION_TYPE);
 
 		switch(cifsConnectionType) {
 		case TELNET:
-			connection = new CifsTelnetConnection(type, options, resolver);
+			connection = new CifsTelnetConnection(type, options, mapper);
 			break;
 		case WINRM_HTTP:
 		case WINRM_HTTPS:
-			connection = new CifsWinRmConnection(type, options, resolver);
+			connection = new CifsWinRmConnection(type, options, mapper);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
