@@ -1,5 +1,3 @@
-**N.B.:** We have reverted the changes made to support SSH tunnels in Overthere 1.0.14 and 1.0.15 because it did not work as well as we hoped. We are reimplementing it for Overthere 2.0 to be released early March. In the meantime please check Overthere 1.0.16 on the [1.0.x-maintenance branch](https://github.com/xebialabs/overthere/tree/1.0.x-maintenance).
-
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -35,7 +33,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.16%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-1%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -45,7 +43,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>1.0.16</version>
+			<version>2.0.0-beta-1</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -395,6 +393,9 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 <a name="release_history"/>
 # Release History
 
+* Overthere 2.0.0-beta-1 (5-Mar-2012)
+    * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
+    * Ported Overthere tests to use TestNG instead of JUnit.
 * Overthere 1.0.16 (23-Feb-2012)
     * Reverted changes made to support SSH tunnels in 1.0.14 and 1.0.15 because it did not work as well as we hoped. We are reimplementing it for Overthere 2.0 to be released early March.
     * Fixed command line encoding bugs for SSH/CYGWIN on Windows:
