@@ -1,16 +1,12 @@
 package com.xebialabs.overthere.ssh;
 
-import com.google.common.io.Closeables;
-import com.google.common.util.concurrent.Monitor;
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
+import static java.lang.String.format;
+import static java.net.InetSocketAddress.createUnresolved;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -20,13 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
-import static java.lang.String.format;
-import static java.net.InetSocketAddress.createUnresolved;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.Monitor;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
 /**
  * A connection to a 'jump station' host using SSH w/ local port forwards.
@@ -186,8 +193,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 			}
 		}
 		
-		private static final Logger logger = LoggerFactory.getLogger(PortForwarder.class);
-
 		@Override
 		public void close() throws IOException {
 			localSocket.close();

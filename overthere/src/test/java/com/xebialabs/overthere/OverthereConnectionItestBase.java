@@ -113,7 +113,6 @@ public abstract class OverthereConnectionItestBase {
 		assertThat(connection.getClass().getName(), equalTo(expectedConnectionClassName));
 	}
 
-	@SuppressWarnings("unchecked")
     @Test
 	@Assumption(methods = {"notLocal", "notCifs"})
 	public void shouldNotConnectWithIncorrectUsername() {
@@ -125,7 +124,6 @@ public abstract class OverthereConnectionItestBase {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
     @Test
 	@Assumption(methods = {"notLocal", "notCifs", "withPassword"})
 	public void shouldNotConnectWithIncorrectPassword() {
