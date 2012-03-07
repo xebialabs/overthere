@@ -17,7 +17,6 @@
 
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -36,12 +35,12 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 
-import org.testng.annotations.Factory;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+
+import org.testng.annotations.Factory;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;

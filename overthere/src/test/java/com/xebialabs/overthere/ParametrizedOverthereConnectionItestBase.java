@@ -21,14 +21,14 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 
-import com.xebialabs.itest.ItestHost;
-import nl.javadude.assumeng.AssumptionListener;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import nl.javadude.assumeng.AssumptionListener;
+
+import org.testng.annotations.Listeners;
+
+import com.xebialabs.itest.ItestHost;
 
 /**
  * Base class for all parametrized Overthere connection itests that use an {@link ItestHost}.

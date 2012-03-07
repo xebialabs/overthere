@@ -31,13 +31,17 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import com.xebialabs.overthere.util.OverthereUtils;
 import nl.javadude.assumeng.AssumptionListener;
-import org.testng.annotations.BeforeClass;
+
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.OverthereUtils;
 
 @Listeners(AssumptionListener.class)
 public class LocalConnectionItest extends OverthereConnectionItestBase {
