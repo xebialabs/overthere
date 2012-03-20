@@ -13,3 +13,4 @@ itest.properties
 !overthere/src/test/resources/itest.properties
 .idea
 *.log
+test-output
