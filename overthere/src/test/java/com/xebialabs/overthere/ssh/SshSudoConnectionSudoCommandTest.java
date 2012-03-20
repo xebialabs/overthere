@@ -22,7 +22,6 @@ import org.junit.Test;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
 
 public class SshSudoConnectionSudoCommandTest {
 
