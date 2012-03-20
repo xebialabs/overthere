@@ -29,13 +29,14 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.OutputSupplier;
 
 public class UnixFactoryItest {
+
 	@Factory
 	public Object[] createItests() throws Exception {
 		Object[] objects = new Object[4];
-		objects[0] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
-		objects[1] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection", "overthere-unix");
-		objects[2] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection", "overthere-unix");
-		objects[3] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix");
+		objects[0] = new OverthereConnectionItest(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
+		objects[1] = new OverthereConnectionItest(SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection", "overthere-unix");
+		objects[2] = new OverthereConnectionItest(SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection", "overthere-unix");
+		objects[3] = new OverthereConnectionItest(SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix");
 		return objects;
 	}
 

@@ -17,12 +17,12 @@ import com.xebialabs.itest.ItestHost;
  * Base class for all parametrized Overthere connection itests that use an {@link ItestHost}.
  */
 @Listeners({AssumptionListener.class})
-public class ParametrizedOverthereConnectionItestBase extends OverthereConnectionItestBase {
+public class OverthereConnectionItest extends OverthereConnectionItestBase {
 
 	protected final ConnectionOptions partialOptions;
 	private static final Map<String, AtomicInteger> timesHostNeeded = newHashMap();
 
-	public ParametrizedOverthereConnectionItestBase(String type, ConnectionOptions partialOptions, String expectedConnectionClassName, String host) throws Exception {
+	public OverthereConnectionItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName, String host) throws Exception {
 		hostname = host;
 		registerHostNeeded(host);
 		this.type = type;
