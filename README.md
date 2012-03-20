@@ -33,7 +33,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.16%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C1.0.17%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -43,7 +43,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>1.0.16</version>
+			<version>1.0.17</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -393,6 +393,9 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 <a name="release_history"/>
 # Release History
 
+* Overthere 1.0.17 (20-Mar-2012)
+    * Method setExecutable now uses "chmod a+x" instead of "chmod +x" to prevent the umask from preventing some of the executable bits from being set (#39).
+    * Fixed bug that prevented connection temporary directory from being removed on some platforms when the current working directory was set inside of that directory (#40).
 * Overthere 1.0.16 (23-Feb-2012)
     * Reverted changes made to support SSH tunnels in 1.0.14 and 1.0.15 because it did not work as well as we hoped. We are reimplementing it for Overthere 2.0 to be released early March.
     * Fixed command line encoding bugs for SSH/CYGWIN on Windows:
@@ -401,16 +404,16 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * Overthere 1.0.15 (21-Feb-2012)
     * Added explicit close() method to the new OverthereConnection interface (it was a class in 1.0.13) that does not throw java.io.IOException.
 * Overthere 1.0.14 (20-Feb-2012)
-    * Added support for SSH tunnels to jumpstations.
-    * Added support for NTLM authentication.
+    * Added support for SSH tunnels to jumpstations (#1).
+    * Added support for NTLM authentication (#27, #34).
     * Upgraded to SSH/J 0.7.0.
 * Overthere 1.0.13 (18-Jan-2012)
     * Masked passwords in logging.
     * Made ItestHostFactory also look for itest.properties in ~/.itest (in addition to the classpath and the current working directory).
 * Overthere 1.0.12 (12-Jan-2012)
-    * Allowed forward slashes (/) to be used in Windows paths.
+    * Allowed forward slashes (/) to be used in Windows paths (#31).
     * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the <a href="#cifs_pathShareMappings"><strong>pathShareMappings</strong></a> connection option.
-    * Added the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> connection option to specify an explicit pseudo terminal to use.
+    * Added the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> connection option to specify an explicit pseudo terminal to use (#33).
 * Overthere 1.0.11 (09-Dec-2011)
     * Fixes to the SSH/WinSSHD implementation and a few other little fixes.
     * Added a lot of documentation.
