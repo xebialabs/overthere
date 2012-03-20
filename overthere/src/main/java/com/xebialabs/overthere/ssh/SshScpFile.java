@@ -17,26 +17,34 @@
 
 package com.xebialabs.overthere.ssh;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import net.schmizz.sshj.xfer.LocalFileFilter;
+import net.schmizz.sshj.xfer.LocalSourceFile;
+import net.schmizz.sshj.xfer.scp.SCPUploadClient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import net.schmizz.sshj.xfer.LocalFileFilter;
-import net.schmizz.sshj.xfer.LocalSourceFile;
-import net.schmizz.sshj.xfer.scp.SCPUploadClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.List;
-import java.util.StringTokenizer;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.CmdLine.build;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
 /**
  * A file on a host connected through SSH w/ SCP.
@@ -106,7 +114,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	public LsResults getFileInfo() throws RuntimeIOException {
 		LsResults results = new LsResults();
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int errno = executeCommand(capturedOutput, CmdLine.build("ls", "-ld", getPath()));
+		int errno = executeCommand(capturedOutput, CmdLine.build(NOCD_PSEUDO_COMMAND, "ls", "-ld", getPath()));
 		if (errno == 0) {
 			results.exists = true;
 			if (capturedOutput.getOutputLines().size() > 0) {
@@ -161,18 +169,22 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {
-        logger.debug("Opening ssh:scp: input stream to read from file {}", this);
 
         try {
             final File tempFile = File.createTempFile("scp_download", ".tmp");
             tempFile.deleteOnExit();
+
+            logger.debug("Downloading contents of {} to temporary file {}", this, tempFile);
             connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
+
+            logger.debug("Opening input stream to temporary file {} to retrieve contents download from {}. Temporary file will be deleted when the stream is closed", tempFile, this);
             return new FileInputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
                     try {
                         super.close();
                     } finally {
+                    	logger.debug("Removing temporary file {}", tempFile);
                         tempFile.delete();
                     }
 
@@ -185,11 +197,11 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public OutputStream getOutputStream() throws RuntimeIOException {
-		logger.debug("Opening ssh:scp: output stream to write to file {}", this);
-
         try {
             final File tempFile = File.createTempFile("scp_upload", ".tmp");
             tempFile.deleteOnExit();
+
+            logger.debug("Opening output stream to temporary file {} to store contents to be uploaded to {} when the stream is closed", tempFile, this);
             return new FileOutputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
@@ -201,9 +213,11 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 }
 
                 private void uploadAndDelete(File tempFile) throws IOException {
+                    logger.debug("Uploading contents of temporary file {} to to {}", tempFile, this);
                     try {
                         connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
                     } finally {
+                    	logger.debug("Removing temporary file {}", tempFile);
                         tempFile.delete();
                     }
                 }
@@ -220,7 +234,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		// Yes, this *is* meant to be 'el es minus one'! Each file should go one a separate line, even if we create a pseudo-tty. Long format is NOT what we
 		// want here.
-		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), build("ls", "-1", getPath()));
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), build(NOCD_PSEUDO_COMMAND, "ls", "-1", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
@@ -246,7 +260,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 	}
 
 	protected void mkdir(String... mkdirOptions) throws RuntimeIOException {
-		CmdLine commandLine = CmdLine.build("mkdir");
+		CmdLine commandLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "mkdir");
 		for (String opt : mkdirOptions) {
 			commandLine.addArgument(opt);
 		}
@@ -271,7 +285,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 			SshScpFile sshScpDestFile = (SshScpFile) dest;
 			if (sshScpDestFile.getConnection() == getConnection()) {
 				CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-				int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("mv", getPath(), sshScpDestFile.getPath()));
+				int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "mv", getPath(), sshScpDestFile.getPath()));
 				if (errno != 0) {
 					throw new RuntimeIOException("Cannot rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 				}
@@ -290,7 +304,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		logger.debug("Setting execute permission on {} to {}", this, executable);
  
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("chmod", executable ? "+x" : "-x", getPath()));
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", executable ? "a+x" : "a-x", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot set execute permission on file " + this + " to " + executable + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}		
@@ -301,7 +315,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		logger.debug("Deleting directory {}", this);
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rmdir", getPath()));
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rmdir", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
@@ -312,7 +326,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		logger.debug("Deleting file {}", this);
 
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-f", getPath()));
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-f", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot delete file " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}
@@ -323,7 +337,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		logger.debug("Recursively deleting file or directory {}", this);
 
 			CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build("rm", "-rf", getPath()));
+		int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-rf", getPath()));
 		if (errno != 0) {
 			throw new RuntimeIOException("Cannot recursively delete file or directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
 		}

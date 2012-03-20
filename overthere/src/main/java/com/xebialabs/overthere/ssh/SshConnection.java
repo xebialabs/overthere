@@ -71,6 +71,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public static final String PTY_PATTERN = "(\\w+):(\\d+):(\\d+):(\\d+):(\\d+)";
 
+	public static final String NOCD_PSEUDO_COMMAND = "nocd";
+
 	protected final SshConnectionType sshConnectionType;
 
     protected final String host;
@@ -247,18 +249,33 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     protected CmdLine processCommandLine(final CmdLine commandLine) {
-        if(getWorkingDirectory() != null) {
-    		CmdLine commandLineWithCd = new CmdLine();
-    		commandLineWithCd.addArgument("cd");
-    		commandLineWithCd.addArgument(workingDirectory.getPath());
-    		commandLineWithCd.addRaw(os.getCommandSeparator());
+		if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
+			logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND + " pseudo command was present, but the pseudo command will be stripped");
+			logger.trace("Replacing: {}", commandLine);
+			CmdLine cmd = stripPrefixedPseudoCommand(commandLine);
+			logger.trace("With     : {}", cmd);
+			return cmd;
+		} else if(getWorkingDirectory() != null) {
+			logger.trace("Prefixing command line with cd statement because the current working directory was set");
+			logger.trace("Replacing: {}", commandLine);
+    		CmdLine cmd = new CmdLine();
+    		cmd.addArgument("cd");
+    		cmd.addArgument(workingDirectory.getPath());
+    		cmd.addRaw(os.getCommandSeparator());
     		for (CmdLineArgument a : commandLine.getArguments()) {
-    			commandLineWithCd.add(a);
+    			cmd.add(a);
     		}
-    		return commandLineWithCd;
+			logger.trace("With     : {}", cmd);
+    		return cmd;
         } else {
+			logger.trace("Not prefixing command line with cd statement because the current working directory was not set");
+			logger.trace("Keeping  : {}", commandLine);
         	return commandLine;
         }
+    }
+
+    protected boolean startsWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {
+    	return commandLine.getArguments().size() >= 2 && commandLine.getArguments().get(0).toString(os, false).equals(pseudoCommand);
     }
 
 	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
@@ -268,6 +285,17 @@ abstract class SshConnection extends BaseOverthereConnection {
     @Override
     public String toString() {
         return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + "@" + host + ":" + port;
+    }
+
+    protected static CmdLine stripPrefixedPseudoCommand(final CmdLine commandLine) {
+		return new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
+	}
+
+	protected static CmdLine prefixWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {
+	    CmdLine nosudoCommandLine = new CmdLine();
+		nosudoCommandLine.addArgument(pseudoCommand);
+		nosudoCommandLine.add(commandLine.getArguments());
+	    return nosudoCommandLine;
     }
 
     private static Logger logger = LoggerFactory.getLogger(SshConnection.class);
