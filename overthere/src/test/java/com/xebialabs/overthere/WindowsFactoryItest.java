@@ -25,14 +25,14 @@ public class WindowsFactoryItest {
 	@Factory
 	public Object[] createWindowsTests() throws Exception {
 		Object[] objects = new Object[8];
-		objects[0] = new ParametrizedOverthereConnectionItestBase(CIFS_PROTOCOL, createCifsTelnetWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
-		objects[1] = new ParametrizedOverthereConnectionItestBase(CIFS_PROTOCOL, createCifsTelnetWithRegularUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
-		objects[2] = new ParametrizedOverthereConnectionItestBase(CIFS_PROTOCOL, createCifsWinRmHttpWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
-		objects[3] = new ParametrizedOverthereConnectionItestBase(CIFS_PROTOCOL, createCifsWinRmHttpsWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
-		objects[4] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSshSftpCygwinWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
-		objects[5] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSshSftpCygwinWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
-		objects[6] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSshSftpWinSshdWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
-		objects[7] = new ParametrizedOverthereConnectionItestBase(SSH_PROTOCOL, createSshSftpWinSshdWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
+		objects[0] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
+		objects[1] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithRegularUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
+		objects[2] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
+		objects[3] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpsWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
+		objects[4] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
+		objects[5] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
+		objects[6] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
+		objects[7] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
 		return objects;
 	}
 
