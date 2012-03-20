@@ -16,21 +16,30 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 
 import java.text.MessageFormat;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
 /**
  * A connection to a Unix host using SSH w/ SUDO.
  */
 class SshSudoConnection extends SshScpConnection {
-
-	public static final String SUDO_COMMAND = "sudo";
 
 	public static final String NOSUDO_PSEUDO_COMMAND = "nosudo";
 
@@ -53,16 +62,27 @@ class SshSudoConnection extends SshScpConnection {
 	@Override
 	protected CmdLine processCommandLine(final CmdLine commandLine) {
 		CmdLine cmd;
-		if (commandLine.getArguments().size() >= 2 && commandLine.getArguments().get(0).toString(os, false).equals(NOSUDO_PSEUDO_COMMAND)) {
-			cmd = stripNosudoCommand(commandLine);
+		if (startsWithPseudoCommand(commandLine, NOSUDO_PSEUDO_COMMAND)) {
+			logger.trace("Not prefixing command line with sudo statement because the " + NOSUDO_PSEUDO_COMMAND + " pseudo command was present, but the pseudo command will be stripped");
+			logger.trace("Replacing: {}", commandLine);
+			cmd = stripPrefixedPseudoCommand(commandLine);
+			logger.trace("With     : {}", cmd);
 		} else {
-			cmd = prefixWithSudoCommand(commandLine);
+			logger.trace("Prefixing command line with sudo statement");
+			logger.trace("Replacing: {}", commandLine);
+			boolean nocd = startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND);
+			if(nocd) {
+				cmd = stripPrefixedPseudoCommand(commandLine);
+			} else {
+				cmd = commandLine;
+			}
+			cmd = prefixWithSudoCommand(cmd);
+			if(nocd) {
+				cmd = prefixWithPseudoCommand(cmd, NOCD_PSEUDO_COMMAND);
+			}
+			logger.trace("With     : {}", cmd);
 		}
 		return super.processCommandLine(cmd);
-	}
-
-	protected CmdLine stripNosudoCommand(final CmdLine commandLine) {
-		return new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
 	}
 
 	protected CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
@@ -88,17 +108,6 @@ class SshSudoConnection extends SshScpConnection {
 		}
 	}
 
-	protected int noSudoExecute(OverthereProcessOutputHandler handler, CmdLine commandLine) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("NOT adding sudo statement");
-		}
-
-		CmdLine nosudoCommandLine = new CmdLine();
-		nosudoCommandLine.addArgument(NOSUDO_PSEUDO_COMMAND);
-		nosudoCommandLine.add(commandLine.getArguments());
-		return execute(handler, nosudoCommandLine);
-	}
-
 	@Override
 	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
 		return new SshSudoFile(this, hostPath, isTempFile);
@@ -109,6 +118,6 @@ class SshSudoConnection extends SshScpConnection {
         return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + ":" + sudoUsername + "@" + host + ":" + port;
     }
 
-	private Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
+	private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
 }
