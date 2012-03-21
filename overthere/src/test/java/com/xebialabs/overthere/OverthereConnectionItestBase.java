@@ -81,6 +81,7 @@ public abstract class OverthereConnectionItestBase {
 
 	protected abstract void doInitHost();
 	protected abstract void doTeardownHost();
+	protected abstract void setTypeAndOptions() throws Exception;
 
 	@BeforeClass
 	public void setupHost() throws Exception {
@@ -91,8 +92,6 @@ public abstract class OverthereConnectionItestBase {
 		setTypeAndOptions();
 		connection = Overthere.getConnection(type, options);
 	}
-
-	protected abstract void setTypeAndOptions() throws Exception;
 
 	@AfterClass
 	public void disconnect() {
@@ -117,9 +116,10 @@ public abstract class OverthereConnectionItestBase {
     @Test
 	@Assumption(methods = {"notLocal", "notCifs"})
 	public void shouldNotConnectWithIncorrectUsername() {
-		options.set("username", "an-incorrect-username");
+	    ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
+	    incorrectUserNameOptions.set("username", "an-incorrect-username");
 		try {
-			Overthere.getConnection(type, options);
+			Overthere.getConnection(type, incorrectUserNameOptions);
 			fail("Expected not to be able to connect with an incorrect username");
 		} catch (RuntimeIOException expected) {
 		}
@@ -128,10 +128,10 @@ public abstract class OverthereConnectionItestBase {
     @Test
 	@Assumption(methods = {"notLocal", "notCifs", "withPassword"})
 	public void shouldNotConnectWithIncorrectPassword() {
-
-		options.set("password", "an-incorrect-password");
+	    ConnectionOptions incorrectPasswordOptions = new ConnectionOptions(options);
+	    incorrectPasswordOptions.set("password", "an-incorrect-password");
 		try {
-			Overthere.getConnection(type, options);
+			Overthere.getConnection(type, incorrectPasswordOptions);
 			fail("Expected not to be able to connect with an incorrect password");
 		} catch (RuntimeIOException expected) {
 		}
