@@ -104,7 +104,7 @@ class TunneledItestHost implements ItestHost {
 
 	@Override
     public int getPort(int port) {
-		checkArgument(portForwardMap.containsKey(port), "Port " + port + " is not tunneled");
+		checkArgument(portForwardMap.containsKey(port), "Port %d is not tunneled", port);
 	   	return portForwardMap.get(port);
 	}
 	
