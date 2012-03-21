@@ -45,8 +45,6 @@ subprojects {
 	test {
 		useTestNG()
 		options {
-//			listeners << 'org.testng.reporters.JUnitXMLReporter'
-//			listeners << 'org.uncommons.reportng.HTMLReporter'
 			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
 		}
 		excludes = ['**/*Itest.*']
@@ -57,14 +55,12 @@ subprojects {
     		suites "testng.xml"
     	}
 		options {
-//			listeners << 'org.testng.reporters.JUnitXMLReporter'
-//			listeners << 'org.uncommons.reportng.HTMLReporter'
 			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
 		}
 
 		includes = ['**/*Itest.*']
 		testResultsDir = file("${buildDir}/itest-results")
-    testReportDir = file("${buildDir}/reports/itests")
+		testReportDir = file("${buildDir}/reports/itests")
 
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
 		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
@@ -87,6 +83,7 @@ subprojects {
 	}
 
 	signing {
+		required { gradle.taskGraph.hasTask('uploadArchives') }
 		sign configurations.archives
 	}
 
