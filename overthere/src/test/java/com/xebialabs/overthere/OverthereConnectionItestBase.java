@@ -296,7 +296,8 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shoudNotExecuteIncorrectCommandOnWindows() {
+	@Assumption(methods = {"onWindows"})
+	public void shouldNotExecuteIncorrectCommandOnWindows() {
 		int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
 		assertThat(res, not(equalTo(0)));
 	}
