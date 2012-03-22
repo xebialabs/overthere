@@ -89,7 +89,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected final String passphrase;
 
-    protected final boolean allocateDefaultPty;
+    protected boolean allocateDefaultPty;
 
     protected final String allocatePty;
 
@@ -297,6 +297,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 		nosudoCommandLine.add(commandLine.getArguments());
 	    return nosudoCommandLine;
     }
+
+
 
     private static Logger logger = LoggerFactory.getLogger(SshConnection.class);
 
