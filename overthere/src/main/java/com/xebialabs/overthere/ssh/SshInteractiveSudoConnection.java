@@ -22,6 +22,8 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 
@@ -42,6 +44,10 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
 		checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
 		checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
 		checkArgument(password != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
+		if (!allocateDefaultPty && allocatePty == null) {
+			logger.warn("SSH Interactive Sudo requires a PTY, allocating a default one.");
+			allocateDefaultPty = true;
+		}
 	}
 
     @Override
@@ -53,4 +59,6 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
             }
         };
     }
+	
+	private static final Logger logger = LoggerFactory.getLogger(SshInteractiveSudoConnection.class);
 }
