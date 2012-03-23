@@ -3,7 +3,7 @@
 defaultTasks 'build'
 
 allprojects {
-	version = '2.0.0-SNAPSHOT'
+	version = '2.0.0-beta-2'
 	group = 'com.xebialabs.overthere'
 
 	apply plugin: 'idea'
