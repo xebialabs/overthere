@@ -12,6 +12,7 @@
 	* [Local](#local)
 	* [SSH](#ssh)
 	* [CIFS](#cifs) (includes Telnet and WinRM)
+	* [Tunnelling](#tunnelling)
 * [Release History](#release_history)
 
 <a name="introduction"/>
@@ -126,6 +127,10 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <tr>
 	<th align="left" valign="top"><a name="connectionTimeoutMillis"/>connectionTimeoutMillis</th>
 	<td>The number of milliseconds Overthere waits for a connection to a remote host to be established. The default value is <code>120000</code>, i.e. 2 minutes.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="jumpstation"/>jumpstation</th>
+	<td>The connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>)</td>
 </tr>
 </table>
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the protocol.
@@ -390,9 +395,29 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
 
+<a name="tunnelling"/>
+# Tunnelling
+
+Overthere supports the tunnelling of every protocol over SSH. This can be used to reach hosts that live in a DMZ which can only be reached by connecting to a different host first. This in-between host is called the jump station. In order to configure an SSH tunnel, you need to provide a set of nested connection options specifying which host is used as the jump station.
+
+When using a jumpstation to connect to the remote host, Overthere will dynamically allocate an available local port to use for the connection to the end station. Using an additional connection option, you can configure from which port onwards Overthere starts the allocation.
+
+
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="portAllocationRangeStart"/>portAllocationRangeStart</th>
+	<td>At which port Overthere starts finding an available local port for connecting to the end station. The default value is: <code>1025</code>.</td>
+</tr>
+</table>
+
 <a name="release_history"/>
 # Release History
 
+* Overthere 2.0.0-beta-2 (23-Mar-2012)
+	* Fixed issues #39 and #40
+	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels
+	* Set default pty to true in case of interactive sudo and no pty set
 * Overthere 2.0.0-beta-1 (5-Mar-2012)
     * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
     * Ported Overthere tests to use TestNG instead of JUnit.
