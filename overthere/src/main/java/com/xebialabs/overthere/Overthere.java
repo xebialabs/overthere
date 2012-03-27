@@ -85,14 +85,7 @@ public class Overthere {
 			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
 		}
 
-		if (logger.isTraceEnabled()) {
-            HashSet<String> filteredKeys = newHashSet(PASSWORD, PASSPHRASE);
-            logger.trace("Connection for protocol {} requested with the following connection options:", protocol);
-			for (String k : options.keys()) {
-				Object v = options.get(k);
-				logger.trace("{}={}", k, !filteredKeys.contains(k) ? v : "********");
-			}
-		}
+        logger.trace("Connection for protocol {} requested with the following connection options: {}", protocol, options);
 
 		ConnectionOptions jumpstationOptions = options.get(JUMPSTATION, null);
 		AddressPortMapper mapper = new DefaultAddressPortMapper();

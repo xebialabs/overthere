@@ -17,10 +17,15 @@
 
 package com.xebialabs.overthere;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
@@ -96,6 +101,8 @@ public class ConnectionOptions {
 
 	private final Map<String, Object> options;
 
+	private static final ImmutableSet<String> filteredKeys = ImmutableSet.of(PASSWORD, PASSPHRASE);
+	
 	/**
 	 * Creates an empty options object.
 	 */
@@ -208,6 +215,28 @@ public class ConnectionOptions {
 	@Override
 	public int hashCode() {
 		return options.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return print(this, "");
+	}
+	
+	private static String print(ConnectionOptions options, String indent) {
+		StringBuilder b = new StringBuilder();
+		b.append("ConnectionOptions[\n");
+		for (Map.Entry<String, Object> e : options.options.entrySet()) {
+			b.append(indent).append("\t").append(e.getKey()).append(" --> ");
+			Object value = e.getValue();
+			if (value instanceof ConnectionOptions) {
+				b.append(print((ConnectionOptions) value, indent + "\t"));
+			} else {
+				b.append(filteredKeys.contains(e.getKey()) ? "********" : value);
+			}
+			b.append("\n");
+		}
+		b.append(indent).append("]");
+		return b.toString();
 	}
 }
 
