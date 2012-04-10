@@ -16,15 +16,13 @@
  */
 package com.xebialabs.overthere;
 
-import com.google.common.collect.ImmutableSet;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
