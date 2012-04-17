@@ -70,7 +70,7 @@ public class JdkHttpConnector implements HttpConnector {
 
 			final String requestDocAsString = toString(requestDocument);
 			logger.trace("Sending request to {}", targetURL);
-			logger.trace("Request body: {}", targetURL, requestDocAsString);
+			logger.trace("Request body: {} {}", targetURL, requestDocAsString);
 			BufferedWriter bw = new BufferedWriter(
 					new OutputStreamWriter(
 							con.getOutputStream()));
