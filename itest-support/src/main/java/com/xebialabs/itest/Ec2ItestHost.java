@@ -17,19 +17,6 @@
 
 package com.xebialabs.itest;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.itest.ItestHostFactory.AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX;
-import static com.xebialabs.itest.ItestHostFactory.AMI_BOOT_SECONDS_PROPERTY_SUFFIX;
-import static com.xebialabs.itest.ItestHostFactory.AMI_INSTANCE_TYPE_PROPERTY_SUFFIX;
-import static com.xebialabs.itest.ItestHostFactory.AMI_KEY_NAME_PROPERTY_SUFFIX;
-import static com.xebialabs.itest.ItestHostFactory.AMI_SECURITY_GROUP_PROPERTY_SUFFIX;
-import static com.xebialabs.itest.ItestHostFactory.AWS_ACCESS_KEY_PROPERTY;
-import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_DEFAULT;
-import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_PROPERTY;
-import static com.xebialabs.itest.ItestHostFactory.AWS_SECRET_KEY_PROPERTY;
-import static com.xebialabs.itest.ItestHostFactory.getItestProperty;
-import static com.xebialabs.itest.ItestHostFactory.getRequiredItestProperty;
-
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -45,6 +32,19 @@ import com.amazonaws.services.ec2.model.RunInstancesRequest;
 import com.amazonaws.services.ec2.model.RunInstancesResult;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.itest.ItestHostFactory.AMI_AVAILABILITY_ZONE_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_BOOT_SECONDS_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_INSTANCE_TYPE_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_KEY_NAME_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AMI_SECURITY_GROUP_PROPERTY_SUFFIX;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ACCESS_KEY_PROPERTY;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_DEFAULT;
+import static com.xebialabs.itest.ItestHostFactory.AWS_ENDPOINT_PROPERTY;
+import static com.xebialabs.itest.ItestHostFactory.AWS_SECRET_KEY_PROPERTY;
+import static com.xebialabs.itest.ItestHostFactory.getItestProperty;
+import static com.xebialabs.itest.ItestHostFactory.getRequiredItestProperty;
 
 class Ec2ItestHost implements ItestHost {
 
@@ -150,13 +150,13 @@ class Ec2ItestHost implements ItestHost {
 		sleep(amiBootSeconds);
 	}
 
-	private void sleep(final int seconds) {
-	    try {
-	    	Thread.sleep(seconds * 1000);
-	    } catch (InterruptedException e) {
-	    	Thread.currentThread().interrupt();
-	    }
-    }
+	private static void sleep(final int seconds) {
+		try {
+			Thread.sleep(seconds * 1000);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(Ec2ItestHost.class);
 

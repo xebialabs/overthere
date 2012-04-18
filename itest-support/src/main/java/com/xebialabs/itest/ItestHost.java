@@ -19,7 +19,10 @@ package com.xebialabs.itest;
 
 /**
  * Represents a host that is used for an integration test.
+ * 
+ * @deprecated Code has been moved to the CloudTest project: git@github.com:xebialabs/overcast.git
  */
+@Deprecated
 public interface ItestHost {
 
 	/**

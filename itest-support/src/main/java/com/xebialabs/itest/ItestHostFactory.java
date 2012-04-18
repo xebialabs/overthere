@@ -17,10 +17,6 @@
 
 package com.xebialabs.itest;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Maps.newLinkedHashMap;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,6 +30,14 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Maps.newLinkedHashMap;
+
+/**
+ * @deprecated Code has been moved to the CloudTest project: git@github.com:xebialabs/overcast.git
+ */
+@Deprecated
 public class ItestHostFactory {
 
 	public static final String HOSTNAME_PROPERTY_SUFFIX = ".hostname";
