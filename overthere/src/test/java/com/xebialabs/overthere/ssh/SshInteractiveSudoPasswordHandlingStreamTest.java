@@ -1,9 +1,5 @@
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +9,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 public class SshInteractiveSudoPasswordHandlingStreamTest {
 
@@ -40,9 +40,9 @@ public class SshInteractiveSudoPasswordHandlingStreamTest {
 		readStream(foo);
 		verifyZeroInteractions(os);
 	}
-	
-	private void readStream(SshInteractiveSudoPasswordHandlingStream foo) throws IOException {
-		while(foo.available() > 0) {
+
+	private static void readStream(SshInteractiveSudoPasswordHandlingStream foo) throws IOException {
+		while (foo.available() > 0) {
 			foo.read();
 		}
 	}
