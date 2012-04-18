@@ -17,10 +17,6 @@
 
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
-
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,12 +24,15 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import org.testng.annotations.Listeners;
 
-import com.xebialabs.itest.ItestHost;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 
 /**
- * Base class for all parametrized Overthere connection itests that use an {@link ItestHost}.
+ * Base class for all parametrized Overthere connection itests that use a
+ * {@link com.xebialabs.overcast.CloudHost}.
  */
-@Listeners({AssumptionListener.class})
+@Listeners({ AssumptionListener.class })
 public class OverthereConnectionItest extends OverthereConnectionItestBase {
 
 	protected final ConnectionOptions partialOptions;
@@ -47,7 +46,7 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 		this.expectedConnectionClassName = expectedConnectionClassName;
 	}
 
-	private void registerHostNeeded(String host) {
+	private static void registerHostNeeded(String host) {
 		if (!timesHostNeeded.containsKey(host)) {
 			timesHostNeeded.put(host, new AtomicInteger(0));
 		}
@@ -56,13 +55,13 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 
 	@Override
 	protected void doInitHost() {
-		ItestHostHolder.doSetupItestHost(hostname);
+		CloudHostHolder.setupHost(hostname);
 	}
 
 	@Override
 	protected void doTeardownHost() {
 		if (timesHostNeeded.get(hostname).decrementAndGet() == 0) {
-			ItestHostHolder.doTeardownItestHost(hostname);
+			CloudHostHolder.teardownHost(hostname);
 		}
 	}
 
@@ -75,8 +74,5 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 		if (tunnelOptions != null) {
 			tunnelOptions.set(ADDRESS, host.getHostName());
 		}
-
 	}
-
 }
-

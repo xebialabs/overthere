@@ -17,36 +17,36 @@
 
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static com.xebialabs.itest.ItestHostFactory.getItestHost;
-
-import com.xebialabs.itest.ItestHost;
-
 import java.util.Map;
 
+import com.xebialabs.overcast.CloudHost;
+import com.xebialabs.overcast.CloudHostFactory;
+
+import static com.google.common.collect.Maps.newHashMap;
+
 /**
- * Base class for all Overthere connection itests that use an {@link ItestHost}.
+ * Base class for all Overthere connection itests that use an {@link CloudHost}.
  */
-public final class ItestHostHolder {
+public final class CloudHostHolder {
 
-	protected static Map<String, ItestHost> hosts = newHashMap();
+	protected static Map<String, CloudHost> hosts = newHashMap();
 
-	public static void doSetupItestHost(String itestHostLabel) {
-		if (hosts.get(itestHostLabel) == null) {
-			ItestHost host = getItestHost(itestHostLabel);
+	public static void setupHost(String hostLabel) {
+		if (hosts.get(hostLabel) == null) {
+			CloudHost host = CloudHostFactory.getCloudHost(hostLabel);
 			host.setup();
-			hosts.put(itestHostLabel, host);
+			hosts.put(hostLabel, host);
 		}
 	}
 	
-	public static void doTeardownItestHost(String hostname) {
+	public static void teardownHost(String hostname) {
 		if(hosts.get(hostname) != null) {
 			hosts.get(hostname).teardown();
 			hosts.remove(hostname);
 		}
 	}
 
-	public static ItestHost getHost(String hostname) {
+	public static CloudHost getHost(String hostname) {
 		return hostname != null ? hosts.get(hostname) : null;
 	}
 }

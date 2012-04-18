@@ -17,22 +17,33 @@
 
 package com.xebialabs.overthere;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Random;
+
+import nl.javadude.assumeng.Assumption;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
-import com.xebialabs.itest.ItestHost;
+import com.xebialabs.overcast.CloudHost;
 import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
-import nl.javadude.assumeng.Assumption;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.annotations.*;
-
-import java.io.*;
-import java.util.List;
-import java.util.Random;
 
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
@@ -61,22 +72,17 @@ import static org.testng.Assert.fail;
 public abstract class OverthereConnectionItestBase {
 
 	private static final int NR_OF_SMALL_FILES = 100;
-
 	public static final int SMALL_FILE_SIZE = 10 * 1024;
-
 	public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
 
 	protected String type;
-
 	protected ConnectionOptions options;
-
 	protected String expectedConnectionClassName;
-
 	protected OverthereConnection connection;
 
 	public TemporaryFolder temp = new TemporaryFolder();
 
-	protected ItestHost host;
+	protected CloudHost host;
 	protected String hostname;
 
 	protected abstract void doInitHost();
@@ -87,7 +93,7 @@ public abstract class OverthereConnectionItestBase {
 	public void setupHost() throws Exception {
 		doInitHost();
 		logger.error("****************************Running before class!*******************************");
-		host = ItestHostHolder.getHost(hostname);
+		host = CloudHostHolder.getHost(hostname);
 		temp.create();
 		setTypeAndOptions();
 		connection = Overthere.getConnection(type, options);
@@ -102,6 +108,8 @@ public abstract class OverthereConnectionItestBase {
 			} catch(Exception exc) {
 				System.out.println("Exception while disconnecting at end of test case:");
 				exc.printStackTrace(System.out);
+			} catch (AssertionError e) {
+				System.out.println("Ignoring " + e);
 			}
 		}
 		temp.delete();
@@ -196,7 +204,7 @@ public abstract class OverthereConnectionItestBase {
 
 	@Test
 	@Assumption(methods = "onWindows")
-	public void shouldListFilesOnWindows() throws IOException {
+	public void shouldListFilesOnWindows() {
 		OverthereFile folder = connection.getFile("C:\\overthere");
 		List<OverthereFile> filesInFolder = folder.listFiles();
 
@@ -251,7 +259,7 @@ public abstract class OverthereConnectionItestBase {
 	
 	@Test
 	@Assumption(methods = {"onWindows", "notSupportsProcess"})
-	public void shouldStartProcessSimpleCommandOnWindowsShouldThrowExceptionWhenNotSupported() throws IOException, InterruptedException {
+	public void shouldStartProcessSimpleCommandOnWindowsShouldThrowExceptionWhenNotSupported() {
 		try {
 			connection.startProcess(CmdLine.build("ipconfig"));
 			fail("Expected UnsupportedOperationException to be thrown");
@@ -354,7 +362,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
 	@Test
-	public void shouldCreatePopulateListAndRemoveTemporaryDirectory() throws IOException {
+	public void shouldCreatePopulateListAndRemoveTemporaryDirectory() {
 		final String prefix = "prefix";
 		final String suffix = "suffix";
 
@@ -454,7 +462,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
     @Test
-	public void shouldCopyDirectoryContentToOtherLocation() throws IOException {
+	public void shouldCopyDirectoryContentToOtherLocation() {
 		OverthereFile tempDir = connection.getTempFile("tempdir");
         tempDir.mkdir();
         //Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
@@ -475,7 +483,7 @@ public abstract class OverthereConnectionItestBase {
 	}
 
     @Test
-	public void shouldCopyDirectoryContentToExistingOtherLocation() throws IOException {
+	public void shouldCopyDirectoryContentToExistingOtherLocation() {
 		OverthereFile tempDir = connection.getTempFile("tempdir");
         tempDir.mkdir();
 
@@ -620,7 +628,7 @@ public abstract class OverthereConnectionItestBase {
 		assertThat(bytes, equalTo("++++++++++".getBytes()));
 	}
 
-	private void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
+	private static void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
 		ByteStreams.write(data, new OutputSupplier<OutputStream>() {
 			@Override
 			public OutputStream getOutput() throws IOException {
