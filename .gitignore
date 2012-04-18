@@ -14,3 +14,5 @@ itest.properties
 .idea
 *.log
 test-output
+.DS_Store
+overthere/.DS_Store
