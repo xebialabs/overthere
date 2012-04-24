@@ -1,143 +1,174 @@
-// build.gradle for overthere repository containing the overthere and itest-support projects
+// build.gradle for Overthere
 
 defaultTasks 'build'
 
-allprojects {
-	version = '2.0.0-SNAPSHOT'
-	group = 'com.xebialabs.overthere'
+version = '2.0.0-SNAPSHOT'
+group = 'com.xebialabs.overthere'
 
-	apply plugin: 'idea'
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'http://download.java.net/maven/2/'
+	}
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/releases'
+	}
 }
 
-subprojects {
-	apply plugin: 'java'
-	apply plugin: 'eclipse'
-	apply plugin: 'maven'
-	apply plugin: 'signing'
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
-	repositories {
-		mavenCentral()
-		maven {
-			url 'http://download.java.net/maven/2/'
-		}
-		maven {
-			url 'https://oss.sonatype.org/content/repositories/releases'
-		}
+configurations {
+	compile {
+		transitive = false
+	}
+}
+
+dependencies {
+	// General dependencies
+	compile 'com.google.guava:guava:10.0.1'
+	compile 'nl.javadude.scannit:scannit:0.13'
+	compile 'org.slf4j:slf4j-api:1.6.3'
+
+	// SSH
+	compile 'net.schmizz:sshj:0.7.0'
+	runtime 'com.jcraft:jzlib:1.0.7'
+	runtime 'org.bouncycastle:bcprov-jdk16:1.45'
+
+	// CIFS
+	compile 'jcifs:jcifs:1.3.17'
+
+	// Telnet 
+	compile 'commons-net:commons-net:2.0'
+
+	// WinRM
+	compile('dom4j:dom4j:1.6.1') {
+		exclude group: 'xml-apis', module: 'xml-apis'
+	}
+	compile('jaxen:jaxen:1.1.1') {
+		exclude group: 'xml-apis', module: 'xml-apis'
+		exclude group: 'xalan', module: 'xalan'
+		exclude group: 'xerces', module: 'xmlParserAPIs'
+		exclude group: 'xerces', module: 'xercesImpl'
+	}
+	compile 'org.apache.httpcomponents:httpclient:4.1.1'
+	compile 'commons-codec:commons-codec:1.5'
+
+	// Test dependencies
+	testCompile 'com.xebialabs.cloud:overcast:1.0.0'
+	testCompile 'org.hamcrest:hamcrest-core:1.2.1'
+	testCompile 'org.hamcrest:hamcrest-library:1.2.1'
+	testCompile 'org.mockito:mockito-core:1.8.5'
+	testCompile 'nl.javadude.assumeng:assumeng:1.1.0'
+	testCompile 'org.testng:testng:5.14.10'
+
+	testRuntime 'ch.qos.logback:logback-classic:0.9.30'
+	testRuntime('org.uncommons:reportng:1.1.2') {
+		exclude group: 'org.testng', module: 'testng'
+	}
+}
+
+test {
+	useTestNG()
+	options {
+		listeners << 'org.uncommons.reportng.JUnitXMLReporter'
+	}
+	excludes = ['**/*Itest.*']
+}
+
+task itest(type: Test) {
+	useTestNG {
+		suites "testng.xml"
+	}
+	options {
+		listeners << 'org.uncommons.reportng.JUnitXMLReporter'
 	}
 
-	sourceCompatibility = 1.6
-	targetCompatibility = 1.6
+	includes = ['**/*Itest.*']
+	testResultsDir = file("${buildDir}/itest-results")
+	testReportDir = file("${buildDir}/reports/itests")
 
-	configurations {
-		compile {
-			transitive = false
-		}
-	}
+	copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
+	copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
+	copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
+	copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
+}
 
-	dependencies {
-		testCompile 'nl.javadude.assumeng:assumeng:1.1.0'
-		testCompile 'org.testng:testng:5.14.10'
-		testRuntime('org.uncommons:reportng:1.1.2') {
-			exclude group: 'org.testng', module: 'testng'
-		}
-	}
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
 
-	test {
-		useTestNG()
-		options {
-			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
-		}
-		excludes = ['**/*Itest.*']
-	}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
 
-	task itest(type: Test) {
-    	useTestNG {
-    		suites "testng.xml"
-    	}
-		options {
-			listeners << 'org.uncommons.reportng.JUnitXMLReporter'
-		}
+artifacts {
+	archives sourcesJar, javadocJar
+}
 
-		includes = ['**/*Itest.*']
-		testResultsDir = file("${buildDir}/itest-results")
-		testReportDir = file("${buildDir}/reports/itests")
+signing {
+	required { gradle.taskGraph.hasTask('uploadArchives') }
+	sign configurations.archives
+}
 
-		copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
-		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
-		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
-		copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
-	}
+uploadArchives {
+	if(project.hasProperty('sonatypeUsername')) {
+		repositories.mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
 
-	task sourcesJar(type: Jar) {
-		from sourceSets.main.allSource
-		classifier = 'sources'
-	}
+			configuration = configurations.archives
 
-	task javadocJar(type: Jar, dependsOn: javadoc) {
-		classifier = 'javadoc'
-		from javadoc.destinationDir
-	}
+			repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
 
-	artifacts {
-		archives sourcesJar, javadocJar
-	}
+			pom.project {
+				name 'Overthere'
+				description 'Remote file manipulation and process execution framework for Java'
+				packaging 'jar'
+				url 'https://github.com/xebialabs/overthere'
+				inceptionYear '2011'
 
-	signing {
-		required { gradle.taskGraph.hasTask('uploadArchives') }
-		sign configurations.archives
-	}
-
-	uploadArchives {
-		if(project.hasProperty('sonatypeUsername')) {
-			repositories.mavenDeployer {
-				beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
-
-				configuration = configurations.archives
-
-				repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-					authentication(userName: sonatypeUsername, password: sonatypePassword)
-				}
-				snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-					authentication(userName: sonatypeUsername, password: sonatypePassword)
-				}
-
-				pom.project {
-					name 'Overthere'
-					description 'Remote file manipulation and process execution framework for Java'
-					packaging 'jar'
+				scm {
 					url 'https://github.com/xebialabs/overthere'
-					inceptionYear '2011'
+				}
 
-					scm {
-						url 'https://github.com/xebialabs/overthere'
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+						distribution 'repo'
 					}
+				}
 
-					licenses {
-						license {
-							name 'The Apache Software License, Version 2.0'
-							url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-							distribution 'repo'
+				developers {
+					developer {
+						id 'vpartington'
+						name 'Vincent Partington'
+						url 'http://www.xebialabs.com/'
+						email 'vpartington@xebialabs.com'
+						roles {
+							role 'Developer'
 						}
 					}
-
-					developers {
-						developer {
-							id 'vpartington'
-							name 'Vincent Partington'
-							url 'http://www.xebialabs.com/'
-							email 'vpartington@xebialabs.com'
-							roles {
-								role 'Developer'
-							}
-						}
-						developer {
-							id 'hierynomus'
-							name 'Jeroen van Erp'
-							url 'http://www.xebialabs.com/'
-							email 'jvanerp@xebialabs.com'
-							roles {
-								role 'Developer'
-							}
+					developer {
+						id 'hierynomus'
+						name 'Jeroen van Erp'
+						url 'http://www.xebialabs.com/'
+						email 'jvanerp@xebialabs.com'
+						roles {
+							role 'Developer'
 						}
 					}
 				}
