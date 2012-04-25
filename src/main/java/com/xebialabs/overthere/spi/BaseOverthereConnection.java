@@ -17,10 +17,6 @@
 
 package com.xebialabs.overthere.spi;
 
-import com.xebialabs.overthere.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,10 +24,29 @@ import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import com.xebialabs.overthere.RuntimeIOException;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.io.Closeables.closeQuietly;
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_CONNECTION_TIMEOUT_MILLIS;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
+import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_FILE_CREATION_RETRIES;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
@@ -87,6 +102,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 	 * Closes the connection. Depending on the {@link ConnectionOptions#TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT} connection option, deletes all temporary files
 	 * that have been created on the host.
 	 */
+	@Override
 	public final void close() {
 		if (deleteTemporaryDirectoryOnDisconnect) {
 			deleteConnectionTemporaryDirectory();
@@ -259,6 +275,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 		final CountDownLatch latch = new CountDownLatch(2);
 		try {
 			stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
+				@Override
 				public void run() {
 					StringBuilder lineBuffer = new StringBuilder();
 					InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
@@ -290,6 +307,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 			stdoutReaderThread.start();
 
 			stderrReaderThread = new Thread("Stderr reader thread for command " + commandLine + " on " + this) {
+				@Override
 				public void run() {
 					StringBuilder lineBuffer = new StringBuilder();
 					InputStreamReader stderrReader = new InputStreamReader(process.getStderr());

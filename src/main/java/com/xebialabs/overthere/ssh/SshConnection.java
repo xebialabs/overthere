@@ -17,34 +17,12 @@
 
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
-import static java.net.InetSocketAddress.createUnresolved;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -63,6 +41,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
+import static java.net.InetSocketAddress.createUnresolved;
 
 /**
  * Base class for host connections using SSH.
@@ -162,10 +167,12 @@ abstract class SshConnection extends BaseOverthereConnection {
 	private PasswordFinder getPasswordFinder() {
 		return new PasswordFinder() {
 
+			@Override
 			public char[] reqPassword(Resource<?> resource) {
 				return password.toCharArray();
 			}
 
+			@Override
 			public boolean shouldRetry(Resource<?> resource) {
 				return false;
 			}
@@ -190,11 +197,13 @@ abstract class SshConnection extends BaseOverthereConnection {
         return sshClient;
     }
 
-    public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
+    @Override
+	public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
         return getFile(hostPath, false);
     }
 
-    public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+    @Override
+	public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
         return getFile(parent, child, false);
     }
 
@@ -215,7 +224,8 @@ abstract class SshConnection extends BaseOverthereConnection {
         return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
     }
 
-    public OverthereProcess startProcess(final CmdLine commandLine) {
+    @Override
+	public OverthereProcess startProcess(final CmdLine commandLine) {
 		checkNotNull(commandLine, "Cannot execute null command line");
 		checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
 

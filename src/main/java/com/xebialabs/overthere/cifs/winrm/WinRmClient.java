@@ -17,9 +17,15 @@
 
 package com.xebialabs.overthere.cifs.winrm;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.commons.codec.binary.Base64;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -30,13 +36,9 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 
 public class WinRmClient {
 
@@ -159,10 +161,10 @@ public class WinRmClient {
 
 	}
 
-	private String handleStream(Document responseDocument, ResponseExtractor stream) {
+	private static String handleStream(Document responseDocument, ResponseExtractor stream) {
 		StringBuffer buffer = new StringBuffer();
 		@SuppressWarnings("unchecked")
-        final List<Element> streams = (List<Element>) stream.getXPath().selectNodes(responseDocument);
+        final List<Element> streams = stream.getXPath().selectNodes(responseDocument);
 		if (!streams.isEmpty()) {
 			final Base64 base64 = new Base64();
 			Iterator<Element> itStreams = streams.iterator();
@@ -198,13 +200,13 @@ public class WinRmClient {
 	}
 
 
-	private String getFirstElement(Document doc, ResponseExtractor extractor) {
+	private static String getFirstElement(Document doc, ResponseExtractor extractor) {
 		@SuppressWarnings("unchecked")
-        final List<Element> nodes = (List<Element>) extractor.getXPath().selectNodes(doc);
+        final List<Element> nodes = extractor.getXPath().selectNodes(doc);
 		if (nodes.isEmpty())
 			throw new RuntimeException("Cannot find " + extractor.getXPath() + " in " + toString(doc));
 
-		final Element next = (Element) nodes.iterator().next();
+		final Element next = nodes.iterator().next();
 		return next.getText();
 	}
 
@@ -264,7 +266,7 @@ public class WinRmClient {
 	}
 
 
-	private String toString(Document doc) {
+	private static String toString(Document doc) {
 		StringWriter stringWriter = new StringWriter();
 		XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
 		try {
@@ -276,8 +278,8 @@ public class WinRmClient {
 		return stringWriter.toString();
 	}
 
-	private String getUUID() {
-		return "uuid:" + java.util.UUID.randomUUID().toString().toUpperCase();
+	private static String getUUID() {
+		return "uuid:" + UUID.randomUUID().toString().toUpperCase();
 	}
 
 	public int getExitCode() {

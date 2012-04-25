@@ -17,13 +17,6 @@
 
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.CmdLine.build;
-import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,6 +38,13 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.CmdLine.build;
+import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
 
 /**
  * A file on a host connected through SSH w/ SCP.
@@ -247,12 +247,14 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		return files;
 	}
 
+	@Override
 	public void mkdir() {
 		logger.debug("Creating directory {}", this);
 
 		mkdir(new String[0]);
 	}
 
+	@Override
 	public void mkdirs() {
 		logger.debug("Creating directories {}", this);
 

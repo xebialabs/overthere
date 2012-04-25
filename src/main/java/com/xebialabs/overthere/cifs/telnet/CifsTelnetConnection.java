@@ -17,17 +17,28 @@
 
 package com.xebialabs.overthere.cifs.telnet;
 
-import com.google.common.io.Closeables;
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -188,11 +199,13 @@ public class CifsTelnetConnection extends CifsConnection {
 		}
 	}
 
-	private void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout, final String expectedString) throws IOException {
+	private static void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout,
+			final String expectedString) throws IOException {
 		receive(stdout, outputBuf, toCallersStdout, expectedString, null);
 	}
 
-	private void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout, final String expectedString, final String unexpectedString) throws IOException {
+	private static void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout,
+			final String expectedString, final String unexpectedString) throws IOException {
 		boolean lastCharWasCr = false;
 		boolean lastCharWasEsc = false;
 		for (;;) {
@@ -244,15 +257,16 @@ public class CifsTelnetConnection extends CifsConnection {
 		}
 	}
 
-	private void handleReceivedLine(final ByteArrayOutputStream outputBuf, final String outputBufStr, final PipedOutputStream toCallersStdout) throws IOException {
-		if(!outputBufStr.contains(DETECTABLE_WINDOWS_PROMPT)) {
+	private static void handleReceivedLine(final ByteArrayOutputStream outputBuf, final String outputBufStr, final PipedOutputStream toCallersStdout)
+			throws IOException {
+		if (!outputBufStr.contains(DETECTABLE_WINDOWS_PROMPT)) {
 			toCallersStdout.write(outputBuf.toByteArray());
-		    toCallersStdout.flush();
+			toCallersStdout.flush();
 		}
 		outputBuf.reset();
-    }
+	}
 
-	private void send(final OutputStream stdin, final String lineToSend) throws IOException {
+	private static void send(final OutputStream stdin, final String lineToSend) throws IOException {
 		byte[] bytesToSend = (lineToSend + "\r\n").getBytes();
 		stdin.write(bytesToSend);
 		stdin.flush();

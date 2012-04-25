@@ -17,10 +17,10 @@
 
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 import static com.google.common.base.Joiner.on;
 import static java.util.Collections.unmodifiableList;
@@ -39,16 +39,19 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 	private CapturingOverthereProcessOutputHandler() {
 	}
 
+	@Override
 	public void handleOutputLine(final String line) {
 		outputLines.add(line);
 		allLines.add(line);
 	}
 
+	@Override
 	public void handleErrorLine(final String line) {
 		errorLines.add(line);
 		allLines.add(line);
 	}
 
+	@Override
 	public void handleOutput(final char c) {
 		// no-op
 	}

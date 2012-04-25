@@ -17,9 +17,9 @@
 
 package com.xebialabs.overthere;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.Serializable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Represents a single command line argument.
@@ -141,7 +141,7 @@ public abstract class CmdLineArgument implements Serializable {
 		}
 	}
 
-	private boolean containsAny(String str, String chars) {
+	private static boolean containsAny(String str, String chars) {
 		for (char c : chars.toCharArray()) {
 			if (str.indexOf(c) >= 0) {
 				return true;
@@ -150,7 +150,7 @@ public abstract class CmdLineArgument implements Serializable {
 		return false;
 	}
 
-	private void encodeArgumentWithSpecialCharactersForWindows(String str, StringBuilder builder) {
+	private static void encodeArgumentWithSpecialCharactersForWindows(String str, StringBuilder builder) {
 		builder.append("\"");
 		for (int j = 0; j < str.length(); j++) {
 			char c = str.charAt(j);
@@ -162,7 +162,7 @@ public abstract class CmdLineArgument implements Serializable {
 		builder.append("\"");
 	}
 
-	private void encodeArgumentWithSpecialCharactersForUnix(String str, StringBuilder builder) {
+	private static void encodeArgumentWithSpecialCharactersForUnix(String str, StringBuilder builder) {
 		for (int j = 0; j < str.length(); j++) {
 			char c = str.charAt(j);
 			if (SPECIAL_CHARS_UNIX.indexOf(c) != -1) {
