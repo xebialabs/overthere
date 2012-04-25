@@ -1,17 +1,18 @@
 package com.xebialabs.overthere.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Stack;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Stack;
 
 /**
  * OverthereFile copy utility that uses only the input and output streams exposed by the OverthereFile to perform the copying action.
@@ -32,6 +33,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 		OverthereFileCopier.checkDirectoryExists(srcDir, SOURCE);
 	}
 
+	@Override
 	protected void handleDirectoryStart(OverthereFile scrDir, int depth) throws IOException {
 		OverthereFile dstDir = getCurrentDestinationDir();
 		if (depth != ROOT) {
@@ -63,11 +65,13 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 		return dstDirStack.peek();
 	}
 
+	@Override
 	protected void handleFile(OverthereFile srcFile, int depth) throws IOException {
 		OverthereFile dstFile = getCurrentDestinationDir().getFile(srcFile.getName());
 		OverthereFileCopier.copyFile(srcFile, dstFile);
 	}
 
+	@Override
 	protected void handleDirectoryEnd(OverthereFile directory, int depth) throws IOException {
 		if (depth != ROOT) {
 			dstDirStack.pop();
@@ -129,11 +133,13 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
 		try {
 	        ByteStreams.copy(new InputSupplier<InputStream>() {
-	            public InputStream getInput() throws IOException {
+	            @Override
+				public InputStream getInput() throws IOException {
 	                return srcFile.getInputStream();
 	            }
 	        }, new OutputSupplier<OutputStream>() {
-	            public OutputStream getOutput() throws IOException {
+	            @Override
+				public OutputStream getOutput() throws IOException {
 	                return dstFile.getOutputStream();
 	            }
 	        });

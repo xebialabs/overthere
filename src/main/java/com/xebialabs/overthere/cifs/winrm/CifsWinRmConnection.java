@@ -1,5 +1,8 @@
 package com.xebialabs.overthere.cifs.winrm;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -12,14 +15,19 @@ import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.tokengenerator.BasicTokenGenerator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TIMEOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 
 /**
@@ -43,7 +51,7 @@ public class CifsWinRmConnection extends CifsConnection {
 		super(type, options, mapper, false);
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 
-		TokenGenerator tokenGenerator = getTokenGenerator(options);
+		TokenGenerator tokenGenerator = newTokenGenerator(options);
 		URL targetURL = getTargetURL(options);
 		HttpConnector httpConnector = newHttpConnector(cifsConnectionType, targetURL, tokenGenerator);
 
@@ -53,10 +61,8 @@ public class CifsWinRmConnection extends CifsConnection {
 		winRmClient.setLocale(options.get(LOCALE, DEFAULT_LOCALE));
 	}
 
-	private TokenGenerator getTokenGenerator(ConnectionOptions options) {
-		String username = options.get(USERNAME);
-		String password = options.get(PASSWORD);
-		return new BasicTokenGenerator(username, password);
+	private static TokenGenerator newTokenGenerator(ConnectionOptions options) {
+		return new BasicTokenGenerator(options.<String>get(USERNAME), options.<String>get(PASSWORD));
 	}
 
 	private URL getTargetURL(ConnectionOptions options) {

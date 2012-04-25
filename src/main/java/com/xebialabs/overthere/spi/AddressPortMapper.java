@@ -13,5 +13,6 @@ public interface AddressPortMapper extends Closeable {
 	/**
 	 * Closes the mapper. Does not throw {@link java.io.IOException} but can throw {@link com.xebialabs.overthere.RuntimeIOException}
 	 */
+	@Override
 	void close();
 }

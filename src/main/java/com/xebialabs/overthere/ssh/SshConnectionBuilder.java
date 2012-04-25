@@ -174,6 +174,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 		return connection;
 	}
 
+	@Override
 	public String toString() {
 		return connection.toString();
 	}

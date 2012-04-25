@@ -16,13 +16,19 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import com.google.common.io.Closeables;
-import com.xebialabs.overthere.cifs.winrm.HttpConnector;
-import com.xebialabs.overthere.cifs.winrm.SoapAction;
-import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
-import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
-import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
@@ -30,10 +36,13 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.cifs.winrm.HttpConnector;
+import com.xebialabs.overthere.cifs.winrm.SoapAction;
+import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
+import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 
 /**
  */
@@ -120,7 +129,7 @@ public class JdkHttpConnector implements HttpConnector {
 	}
 
 
-	private String toString(Document doc) {
+	private static String toString(Document doc) {
 		StringWriter stringWriter = new StringWriter();
 		XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
 		try {

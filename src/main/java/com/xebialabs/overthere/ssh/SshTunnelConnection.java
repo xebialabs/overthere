@@ -1,13 +1,5 @@
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
-import static java.lang.String.format;
-import static java.net.InetSocketAddress.createUnresolved;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,6 +26,14 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
+import static java.lang.String.format;
+import static java.net.InetSocketAddress.createUnresolved;
 
 /**
  * A connection to a 'jump station' host using SSH w/ local port forwards.
@@ -99,7 +99,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 		throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startPortRange, MAX_PORT));
 	}
 
-    private ServerSocket tryBind(int localPort) {
+    private static ServerSocket tryBind(int localPort) {
         try {
             ServerSocket ss = new ServerSocket();
             ss.setReuseAddress(true);

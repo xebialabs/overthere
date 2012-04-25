@@ -26,14 +26,17 @@ public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOut
 	private ConsoleOverthereProcessOutputHandler() {
 	}
 
+	@Override
 	public void handleOutputLine(final String line) {
 		System.out.println(line);
 	}
 
+	@Override
 	public void handleErrorLine(final String line) {
 		System.err.println(line);
 	}
 
+	@Override
 	public void handleOutput(final char c) {
 		// no-op
 	}

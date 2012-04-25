@@ -16,13 +16,14 @@
  */
 package com.xebialabs.overthere.cifs.winrm.exception;
 
-import com.xebialabs.overthere.RuntimeIOException;
+import java.io.IOException;
+import java.io.StringWriter;
+
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import com.xebialabs.overthere.RuntimeIOException;
 
 @SuppressWarnings("serial")
 public class WinRMRuntimeIOException extends RuntimeIOException {
@@ -50,7 +51,7 @@ public class WinRMRuntimeIOException extends RuntimeIOException {
 		return String.format("%s, document in %s, document out %s,", super.getMessage(), toString(in), toString(out));
 	}
 
-	private String toString(Document doc) {
+	private static String toString(Document doc) {
 		if (doc == null) {
 			return "[EMPTY]";
 		}

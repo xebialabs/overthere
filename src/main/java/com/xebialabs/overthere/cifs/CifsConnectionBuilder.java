@@ -1,7 +1,5 @@
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -12,6 +10,8 @@ import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
  * Builds CIFS connections.
@@ -108,6 +108,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 		return connection;
 	}
 
+	@Override
 	public String toString() {
 		return connection.toString();
 	}

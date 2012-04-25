@@ -115,10 +115,12 @@ public interface OverthereConnection extends Closeable {
 	/**
 	 * Closes the connection. Does not throw {@link IOException} but can throw {@link RuntimeIOException}
 	 */
+	@Override
 	void close();
 	
 	/**
 	 * Implementations MUST implement toString properly.
 	 */
+	@Override
 	String toString();
 }

@@ -16,17 +16,18 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.security.SecureRandom;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.security.SecureRandom;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class LaxSSLSocketFactory extends SSLSocketFactory {
 
@@ -46,37 +47,45 @@ class LaxSSLSocketFactory extends SSLSocketFactory {
 		return new LaxSSLSocketFactory();
 	}
 
+	@Override
 	public Socket createSocket() throws IOException {
 		return factory.createSocket();
 	}
 
+	@Override
 	public Socket createSocket(Socket socket, String s, int i, boolean flag)
 			throws IOException {
 		return factory.createSocket(socket, s, i, flag);
 	}
 
+	@Override
 	public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1,
 	                           int j) throws IOException {
 		return factory.createSocket(inaddr, i, inaddr1, j);
 	}
 
+	@Override
 	public Socket createSocket(InetAddress inaddr, int i) throws IOException {
 		return factory.createSocket(inaddr, i);
 	}
 
+	@Override
 	public Socket createSocket(String s, int i, InetAddress inaddr, int j)
 			throws IOException {
 		return factory.createSocket(s, i, inaddr, j);
 	}
 
+	@Override
 	public Socket createSocket(String s, int i) throws IOException {
 		return factory.createSocket(s, i);
 	}
 
+	@Override
 	public String[] getDefaultCipherSuites() {
 		return factory.getSupportedCipherSuites();
 	}
 
+	@Override
 	public String[] getSupportedCipherSuites() {
 		return factory.getSupportedCipherSuites();
 	}

@@ -16,17 +16,18 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.BaseOverthereFile;
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.List;
+
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -271,6 +272,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 		return smbFile.getPath().hashCode();
 	}
 
+	@Override
 	public String toString() {
 		return getConnection() + "/" + getPath();
 	}
