@@ -33,7 +33,7 @@ configurations {
 dependencies {
 	// General dependencies
 	compile 'com.google.guava:guava:10.0.1'
-	compile 'nl.javadude.scannit:scannit:0.13'
+	compile 'nl.javadude.scannit:scannit:1.0.2'
 	compile 'org.slf4j:slf4j-api:1.6.3'
 
 	// SSH
