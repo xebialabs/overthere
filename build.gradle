@@ -122,7 +122,7 @@ signing {
 uploadArchives {
 	if(project.hasProperty('sonatypeUsername')) {
 		repositories.mavenDeployer {
-			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
 			configuration = configurations.archives
 
