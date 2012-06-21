@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import net.schmizz.sshj.xfer.LocalFileFilter;
 import net.schmizz.sshj.xfer.LocalSourceFile;
@@ -31,6 +32,7 @@ import net.schmizz.sshj.xfer.scp.SCPUploadClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import com.google.common.base.Joiner;
 import com.xebialabs.overthere.CmdLine;
@@ -49,6 +51,10 @@ import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler
  * A file on a host connected through SSH w/ SCP.
  */
 class SshScpFile extends SshFile<SshScpConnection> {
+
+	private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}\\@?";
+
+	private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
 	/**
 	 * Constructs an SshScpOverthereFile
@@ -115,41 +121,58 @@ class SshScpFile extends SshFile<SshScpConnection> {
 		CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
 		int errno = executeCommand(capturedOutput, CmdLine.build(NOCD_PSEUDO_COMMAND, "ls", "-ld", getPath()));
 		if (errno == 0) {
-			results.exists = true;
-			if (capturedOutput.getOutputLines().size() > 0) {
-				// parse ls results
-				String outputLine = capturedOutput.getOutputLines().get(capturedOutput.getOutputLines().size() - 1);
-				if (logger.isDebugEnabled())
-					logger.debug("ls output = " + outputLine);
-				StringTokenizer outputTokens = new StringTokenizer(outputLine);
-				if (outputTokens.countTokens() < 5) {
-					throw new RuntimeIOException("ls -ld " + getPath() + " returned output that contains less than the expected 5 tokens: " + outputLine);
+			for(int i = capturedOutput.getOutputLines().size() -1; i >= 0; i--) {
+				if(parseLsOutputLine(results, capturedOutput.getOutputLines().get(i))) {
+					results.exists = true;
+					break;
 				}
-				String permissions = outputTokens.nextToken();
-				outputTokens.nextToken(); // inodelinks
-				outputTokens.nextToken(); // owner
-				outputTokens.nextToken(); // group
-				String size = outputTokens.nextToken();
+			}
 
-				results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';
-				results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
-				results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
-				results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
-				results.canExecute = permissions.length() >= 4 && permissions.charAt(3) == 'x';
-				try {
-					results.length = Integer.parseInt(size);
-				} catch (NumberFormatException exc) {
-					logger.warn("Cannot parse length of " + this.getPath() + " from ls output: " + outputLine + ". Length will be reported as -1.", exc);
-				}
+			if(!results.exists) {
+				throw new RuntimeIOException("ls -ld " + getPath() + " returned unparseable output: " + capturedOutput.getOutput());
 			}
 		} else {
 			results.exists = false;
 		}
 
-		if (logger.isDebugEnabled())
+		if (logger.isDebugEnabled()) {
 			logger.debug("Listed file " + this + ": exists=" + results.exists + ", isDirectory=" + results.isDirectory + ", length=" + results.length
 			        + ", canRead=" + results.canRead + ", canWrite=" + results.canWrite + ", canExecute=" + results.canExecute);
+		}
+
 		return results;
+	}
+
+	protected boolean parseLsOutputLine(LsResults results, String outputLine) {
+		StringTokenizer outputTokens = new StringTokenizer(outputLine);
+		if (outputTokens.countTokens() < 5) {
+			logger.debug("Not parsing ls output line [%s] because it has less than 5 tokens", outputLine);
+			return false;
+		}
+
+		String permissions = outputTokens.nextToken();
+		if (!permissionsTokenPattern.matcher(permissions).matches()) {
+			logger.debug("Not parsing ls output line [%s] because it the first token does not match the pattern for permissions [" + PERMISSIONS_TOKEN_PATTERN + "]", outputLine);
+			return false;
+		}
+
+		logger.debug("Parsing ls output line [%s]", outputLine);
+		outputTokens.nextToken(); // inodelinks
+		outputTokens.nextToken(); // owner
+		outputTokens.nextToken(); // group
+		String size = outputTokens.nextToken();
+
+		results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';
+		results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
+		results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
+		results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
+		results.canExecute = permissions.length() >= 4 && permissions.charAt(3) == 'x';
+		try {
+			results.length = Integer.parseInt(size);
+		} catch (NumberFormatException exc) {
+			logger.warn("Cannot parse length of " + this.getPath() + " from ls output: " + outputLine + ". Length will be reported as -1.", exc);
+		}
+		return true;
 	}
 
 	/**
@@ -168,7 +191,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
 	@Override
 	public InputStream getInputStream() throws RuntimeIOException {
-
         try {
             final File tempFile = File.createTempFile("scp_download", ".tmp");
             tempFile.deleteOnExit();
