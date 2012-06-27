@@ -130,7 +130,7 @@ public class JdkHttpConnector implements HttpConnector {
 	}
 
 
-	private static String toString(Document doc) {
+	protected static String toString(Document doc) {
 		StringWriter stringWriter = new StringWriter();
 		XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
 		try {
@@ -143,4 +143,11 @@ public class JdkHttpConnector implements HttpConnector {
 	}
 
 	private static Logger logger = LoggerFactory.getLogger(JdkHttpConnector.class);
+
+	/**
+	 * Return the targetURL
+	 */
+	protected URL getTargetURL() {
+		return targetURL;
+	}
 }
