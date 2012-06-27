@@ -102,6 +102,21 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 	public static final String LOCALE = "winrmLocale";
 	public static final String DEFAULT_LOCALE = "en-US";
 
+
+	/**
+	 * Kerberos JAAS option to enable debug output.
+	 */
+	public static final String DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
+
+	/**
+	 * Specify strategy to trust certificates: "all", "self-signed", or "default" or null for default.
+	 */
+	public static final String HTTPS_CERTIFICATE_TRUST_STRATEGY = "winrmHttpsCertificateTrustStrategy";
+	/**
+	 * Specify the strategy to verify hostnames: "all" (trust all), or "default" or null for default
+	 */
+	public static final String HTTPS_HOSTNAME_VERIFY_STRATEGY = "winrmHttpsHostnameVerifyStrategy";
+
 	private OverthereConnection connection;
 
 	public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
@@ -113,6 +128,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 			break;
 		case WINRM_HTTP:
 		case WINRM_HTTPS:
+		case WINRM_HTTP_KB5:
+		case WINRM_HTTPS_KB5:
 			connection = new CifsWinRmConnection(type, options, mapper);
 			break;
 		default:
