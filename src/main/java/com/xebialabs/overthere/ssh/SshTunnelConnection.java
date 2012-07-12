@@ -1,35 +1,31 @@
 package com.xebialabs.overthere.ssh;
 
+import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.Monitor;
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Closeables;
-import com.google.common.util.concurrent.Monitor;
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
 import static java.lang.String.format;
@@ -41,6 +37,7 @@ import static java.net.InetSocketAddress.createUnresolved;
 public class SshTunnelConnection extends SshConnection implements AddressPortMapper {
 
 	private static final Monitor M = new Monitor();
+	static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
 	private static final int MAX_PORT = 65536;
 
 	private Map<InetSocketAddress, InetSocketAddress> localPortForwards = newHashMap();
@@ -78,7 +75,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 				return localPortForwards.get(address);
 			}
 
-			ServerSocket serverSocket = bindAvailablePort();
+			ServerSocket serverSocket = PORT_MANAGER.get().leaseNewPort(startPortRange);
             portForwarders.add(startForwarder(address, serverSocket));
 
             InetSocketAddress localAddress = createUnresolved("localhost", serverSocket.getLocalPort());
@@ -88,27 +85,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 			M.leave();
 		}
 	}
-
-    private ServerSocket bindAvailablePort() {
-		for (int port = startPortRange; port < MAX_PORT; port++) {
-            ServerSocket serverSocket = tryBind(port);
-            if (serverSocket != null) {
-                return serverSocket;
-            }
-		}
-		throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startPortRange, MAX_PORT));
-	}
-
-    private static ServerSocket tryBind(int localPort) {
-        try {
-            ServerSocket ss = new ServerSocket();
-            ss.setReuseAddress(true);
-            ss.bind(new InetSocketAddress("localhost", localPort));
-            return ss;
-        } catch (IOException e) {
-            return null;
-        }
-    }
 
     private PortForwarder startForwarder(InetSocketAddress remoteAddress, ServerSocket serverSocket) {
         PortForwarder forwarderThread = new PortForwarder(sshClient, remoteAddress, serverSocket);
@@ -196,6 +172,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 		@Override
 		public void close() throws IOException {
 			localSocket.close();
+			PORT_MANAGER.get().returnPort(localSocket);
 			try {
 				this.join();
 			} catch (InterruptedException e) {
@@ -203,4 +180,54 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 			}
 		}
 	}
+
+	static class TunnelPortManager {
+		private static final Set<Integer> portsHandedOut = newHashSet();
+		private static Monitor M = new Monitor();
+
+		ServerSocket leaseNewPort(Integer startFrom) {
+			M.enter();
+			try {
+				for (int port = startFrom; port < MAX_PORT; port++) {
+					if (isLeased(port)) {
+						continue;
+					}
+
+					ServerSocket socket = tryBind(port);
+					if (socket != null) {
+						portsHandedOut.add(port);
+						return socket;
+					}
+				}
+				throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
+			} finally {
+				M.leave();
+			}
+		}
+
+		synchronized void returnPort(ServerSocket socket) {
+			M.enter();
+			try {
+				portsHandedOut.remove(socket.getLocalPort());
+			} finally {
+				M.leave();
+			}
+		}
+
+		private boolean isLeased(int port) {
+			return portsHandedOut.contains(port);
+		}
+
+		protected ServerSocket tryBind(int localPort) {
+			try {
+				ServerSocket ss = new ServerSocket();
+				ss.setReuseAddress(true);
+				ss.bind(new InetSocketAddress("localhost", localPort));
+				return ss;
+			} catch (IOException e) {
+				return null;
+			}
+		}
+	}
 }
+
