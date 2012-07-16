@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-public enum SoapAction {
+import java.net.URI;
 
-	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
+public enum Action {
 
-	private final String value;
+	WS_ACTION("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"),
+	WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
+	WS_RECEIVE("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive"),
+	WS_SIGNAL("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal"),
+	WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
 
-	SoapAction(String value) {
-		this.value = value;
+	private String uri;
+
+	Action(String uri) {
+		this.uri = uri;
 	}
 
-	public String getValue() {
-		return value;
+	public URI getUri() {
+		return Soapy.getUri(uri);
 	}
 }
 

@@ -57,7 +57,8 @@ dependencies {
 		exclude group: 'xerces', module: 'xmlParserAPIs'
 		exclude group: 'xerces', module: 'xercesImpl'
 	}
-	compile 'org.apache.httpcomponents:httpclient:4.1.1'
+	compile 'org.apache.httpcomponents:httpclient:4.2.1'
+	compile 'org.apache.httpcomponents:httpcore:4.2.1'
 	compile 'commons-codec:commons-codec:1.5'
 
 	// Test dependencies

@@ -31,6 +31,7 @@ import com.xebialabs.overthere.cifs.winrm.connector.LaxJdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.tokengenerator.BasicTokenGenerator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import org.ietf.jgss.GSSManager;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -67,7 +68,6 @@ public class CifsWinRmConnection extends CifsConnection {
 	public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
 		super(type, options, mapper, false);
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
-
 		TokenGenerator tokenGenerator = newTokenGenerator(options);
 		URL targetURL = getTargetURL(options);
 		HttpConnector httpConnector = newHttpConnector(cifsConnectionType, targetURL, tokenGenerator);

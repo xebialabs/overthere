@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
 public class KeyValuePair {
 

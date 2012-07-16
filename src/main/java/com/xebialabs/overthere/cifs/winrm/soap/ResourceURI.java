@@ -15,13 +15,23 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
-import org.dom4j.Document;
+import java.net.URI;
+import java.net.URISyntaxException;
 
+public enum ResourceURI {
 
-public interface HttpConnector {
-	Document sendMessage(Document requestDocument, SoapAction soapAction);
+	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
+
+	private final String uri;
+
+	ResourceURI(String uri) {
+		this.uri = uri;
+	}
+
+	public URI getUri() throws URISyntaxException {
+		return Soapy.getUri(uri);
+	}
 }
 

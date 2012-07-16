@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
 import com.google.common.collect.Lists;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
 
 import java.util.List;
 
@@ -38,12 +35,8 @@ public enum OptionSet {
 		this.keyValuePairs = keyValuePairs;
 	}
 
-	public Element getElement() {
-		final Element optionSet = DocumentHelper.createElement(QName.get("OptionSet", Namespaces.NS_WSMAN_DMTF));
-		for (KeyValuePair p : keyValuePairs) {
-			optionSet.addElement(QName.get("Option", Namespaces.NS_WSMAN_DMTF)).addAttribute("Name", p.getKey()).addText(p.getValue());
-		}
-		return optionSet;
+	public List<KeyValuePair> getKeyValuePairs() {
+		return keyValuePairs;
 	}
 }
 

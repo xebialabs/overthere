@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+public enum SoapAction {
 
-public enum ResourceURI {
+	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
 
-	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
+	private final String value;
 
-	private final String uri;
-
-	ResourceURI(String uri) {
-		this.uri = uri;
+	SoapAction(String value) {
+		this.value = value;
 	}
 
-	public Element getElement() {
-		return DocumentHelper.createElement(QName.get("ResourceURI", Namespaces.NS_WSMAN_DMTF)).addAttribute("mustUnderstand", "true").addText(uri);
+	public String getValue() {
+		return value;
 	}
 }
 
