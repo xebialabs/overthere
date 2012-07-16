@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
 import com.xebialabs.overthere.cifs.winrm.HttpConnector;
-import com.xebialabs.overthere.cifs.winrm.SoapAction;
+import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import com.xebialabs.overthere.cifs.winrm.TokenGenerator;
 import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
 import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;

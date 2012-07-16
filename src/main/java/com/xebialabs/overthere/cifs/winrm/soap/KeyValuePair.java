@@ -14,23 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+public class KeyValuePair {
 
-public enum ResourceURI {
+	final String key;
+	final String value;
 
-	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
-
-	private final String uri;
-
-	ResourceURI(String uri) {
-		this.uri = uri;
+	public KeyValuePair(String key, String value) {
+		this.key = key;
+		this.value = value;
 	}
 
-	public Element getElement() {
-		return DocumentHelper.createElement(QName.get("ResourceURI", Namespaces.NS_WSMAN_DMTF)).addAttribute("mustUnderstand", "true").addText(uri);
+	public String getKey() {
+		return key;
+	}
+
+	public String getValue() {
+		return value;
 	}
 }

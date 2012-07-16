@@ -16,6 +16,7 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
+import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import org.dom4j.Document;
 
 

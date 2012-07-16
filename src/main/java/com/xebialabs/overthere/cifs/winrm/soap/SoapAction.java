@@ -14,20 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-public class KeyValuePair {
+public enum SoapAction {
 
-	final String key;
-	final String value;
+	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
 
-	public KeyValuePair(String key, String value) {
-		this.key = key;
+	private final String value;
+
+	SoapAction(String value) {
 		this.value = value;
-	}
-
-	public String getKey() {
-		return key;
 	}
 
 	public String getValue() {

@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import java.net.URI;
 
-enum Action {
+public enum Action {
 
 	WS_ACTION("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"),
 	WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
@@ -34,8 +32,7 @@ enum Action {
 		this.uri = uri;
 	}
 
-	public Element getElement() {
-		return DocumentHelper.createElement(QName.get("Action", Namespaces.NS_ADDRESSING)).addAttribute("mustUnderstand", "true").addText(uri);
+	public URI getUri() {
+		return Soapy.getUri(uri);
 	}
-
 }

@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with WinRM.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-public enum SoapAction {
+import java.net.URI;
+import java.net.URISyntaxException;
 
-	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
+public enum ResourceURI {
 
-	private final String value;
+	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
 
-	SoapAction(String value) {
-		this.value = value;
+	private final String uri;
+
+	ResourceURI(String uri) {
+		this.uri = uri;
 	}
 
-	public String getValue() {
-		return value;
+	public URI getUri() throws URISyntaxException {
+		return Soapy.getUri(uri);
 	}
 }
