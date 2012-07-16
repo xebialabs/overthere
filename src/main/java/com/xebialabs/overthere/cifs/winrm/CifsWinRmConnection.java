@@ -27,6 +27,7 @@ import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.winrm.connector.JdkHttpConnector;
+import com.xebialabs.overthere.cifs.winrm.connector.Kb5HttpConnector;
 import com.xebialabs.overthere.cifs.winrm.connector.LaxJdkHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.tokengenerator.BasicTokenGenerator;
@@ -37,16 +38,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TIMEOUT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP_KB5;
 
 /**
  * A connection to a Windows host using CIFS and WinRM.
@@ -68,9 +62,10 @@ public class CifsWinRmConnection extends CifsConnection {
 	public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
 		super(type, options, mapper, false);
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
-		TokenGenerator tokenGenerator = newTokenGenerator(options);
+
+		TokenGenerator tokenGenerator = newTokenGenerator(cifsConnectionType,options);
 		URL targetURL = getTargetURL(options);
-		HttpConnector httpConnector = newHttpConnector(cifsConnectionType, targetURL, tokenGenerator);
+		HttpConnector httpConnector = newHttpConnector(cifsConnectionType, targetURL, tokenGenerator, options);
 
 		winRmClient = new WinRmClient(httpConnector, targetURL);
 		winRmClient.setTimeout(options.get(TIMEMOUT, DEFAULT_TIMEOUT));
@@ -78,12 +73,21 @@ public class CifsWinRmConnection extends CifsConnection {
 		winRmClient.setLocale(options.get(LOCALE, DEFAULT_LOCALE));
 	}
 
-	private static TokenGenerator newTokenGenerator(ConnectionOptions options) {
-		return new BasicTokenGenerator(options.<String>get(USERNAME), options.<String>get(PASSWORD));
+	private static TokenGenerator newTokenGenerator(CifsConnectionType ccType,ConnectionOptions options) {
+		switch (ccType) {
+			case WINRM_HTTP:
+			case WINRM_HTTPS:
+				return new BasicTokenGenerator(options.<String>get(USERNAME), options.<String>get(PASSWORD));
+			case WINRM_HTTP_KB5:
+			case WINRM_HTTPS_KB5:
+				//auth is handled by the connector
+				return null;
+		}
+		throw new IllegalArgumentException("Invalid CIFS connection type " + ccType);
 	}
 
 	private URL getTargetURL(ConnectionOptions options) {
-		String scheme = cifsConnectionType == WINRM_HTTP ? "http" : "https";
+		String scheme = cifsConnectionType == WINRM_HTTP || cifsConnectionType == WINRM_HTTP_KB5 ? "http" : "https";
 		String context = options.get(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		try {
 			return new URL(scheme, address, port, context);
@@ -92,12 +96,16 @@ public class CifsWinRmConnection extends CifsConnection {
 		}
 	}
 
-	public static HttpConnector newHttpConnector(CifsConnectionType ccType, URL targetURL, TokenGenerator tokenGenerator) {
+	public static HttpConnector newHttpConnector(CifsConnectionType ccType, URL targetURL, TokenGenerator tokenGenerator,
+												 ConnectionOptions options) {
 		switch (ccType) {
 			case WINRM_HTTP:
 				return new JdkHttpConnector(targetURL, tokenGenerator);
 			case WINRM_HTTPS:
 				return new LaxJdkHttpConnector(targetURL, tokenGenerator);
+			case WINRM_HTTPS_KB5:
+			case WINRM_HTTP_KB5:
+				return new Kb5HttpConnector(targetURL, options);
 		}
 		throw new IllegalArgumentException("Invalid CIFS connection type " + ccType);
 	}

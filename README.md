@@ -278,6 +278,8 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
 		<li><strong><a href="#cifs_host_setup_winrm_http">WINRM_HTTP</a></strong> - uses WinRM over HTTP to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
 		<li><strong><a href="#cifs_host_setup_winrm_https">WINRM_HTTPS</a></strong> - uses WinRM over HTTPS to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm_http_kb5">WINRM_HTTP_KB5</a></strong> - uses WinRM over HTTP to execute remote commands, using Kerberos authentication. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm_https_kb5">WINRM_HTTPS_KB5</a></strong> - uses WinRM over HTTPS to execute remote commands, using Kerberos authentication. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
 	</ul></td>
 </tr>
 <tr>
@@ -303,6 +305,18 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmTimeout"/>winrmTimeout</th>
 	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmDebugKerberosAuth"/>winrmDebugKerberosAuth</th>
+	<td>If true, turns on debug output for the [JAAS](https://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service)-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>. This connection options is only applicable for the <strong>WINRM_HTTP_KB5</strong> and <strong>WINRM_HTTPS_KB5</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmHttpsCertificateTrustStrategy"/>winrmHttpsCertificateTrustStrategy</th>
+	<td>Set the HTTPS certificate trust strategy, which can be "all" (trust all certs), "self-signed" (trust self-signed certs in addition to normally trusted certs), or "default" (use Java's trusted certificate chains). The default value is "default". This connection option is only applicable for the <strong>WINRM_HTTPS_KB5</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerifyStrategy"/>winrmHttpsHostnameVerifyStrategy</th>
+	<td>Set the HTTPS hostname verification strategy, which can be "all" (allow all hostnames without verification), "browser-compatible" (verify hostnames as a web-browser would), "strict" (strict verification). The default value is "browser-compatible". This connection option is only applicable for the <strong>WINRM_HTTPS_KB5</strong> connection type.</td>
 </tr>
 </table>
 
@@ -394,6 +408,14 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * View the listeners that have been configured: `winrm enumerate winrm/config/listener`
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
+
+<a name="cifs_host_setup_winrm_http_kb5"/>
+<a name="cifs_host_setup_winrm_https_kb5"/>
+#### WINRM Kerberos Authentication
+
+In addition to the setup requirements mentioned in the <a href="#cifs_host_setup_winrm_http">WINRM_HTTP and WINRM_HTTPS</a> section, Kerberos authentication requires that you follow the <a href="http://docs.oracle.com/javase/1.4.2/docs/guide/security/jgss/tutorials/KerberosReq.html">Kerberos Requirements</a> for Java. 
+
+The simplest configuration is with a single domain/realm, and involves adding these Java System properties to your commandline: <code>-Djava.security.krb5.realm=&lt;example.com&gt; -Djava.security.krb5.kdc=&lt;kdc.example.com&gt;</code>.  Replace the values with the name of your domain/realm and the hostname of your domain controller.
 
 <a name="tunnelling"/>
 # Tunnelling

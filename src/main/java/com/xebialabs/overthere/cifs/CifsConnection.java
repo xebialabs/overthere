@@ -90,13 +90,15 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 		case TELNET:
 			return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
 		case WINRM_HTTP:
+		case WINRM_HTTP_KB5:
 			return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
 		case WINRM_HTTPS:
+		case WINRM_HTTPS_KB5:
 			return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 		default:
 			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);	
 		}
-    }
+	}
 
 	@Override
 	public void doClose() {
@@ -124,10 +126,10 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 		return getFile(childPath.toString());
 	}
 
-    @Override
-    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-    	return getFile(parent, name);
-    }
+	@Override
+	protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+		return getFile(parent, name);
+	}
 
 	private String encodeAsSmbUrl(String hostPath) {
 		try {
@@ -140,13 +142,13 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 	}
 
 	private String maskSmbUrl(String smbUrl) {
-	    return smbUrl.replace(password, "********");
-    }
+		return smbUrl.replace(password, "********");
+	}
 
-    @Override
-    public String toString() {
-        return "cifs:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + address + ":" + cifsPort + ":" + port;
-    }
+	@Override
+	public String toString() {
+		return "cifs:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + address + ":" + cifsPort + ":" + port;
+	}
 
 	private static Logger logger = LoggerFactory.getLogger(CifsConnection.class);
 
