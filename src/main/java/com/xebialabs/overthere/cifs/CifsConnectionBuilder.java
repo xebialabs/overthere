@@ -103,7 +103,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 	private OverthereConnection connection;
 
 	public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		CifsConnectionType cifsConnectionType = options.get(CONNECTION_TYPE);
+		CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
 
 		switch(cifsConnectionType) {
 		case TELNET:

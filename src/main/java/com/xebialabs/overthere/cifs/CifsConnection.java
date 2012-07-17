@@ -71,14 +71,14 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 	 */
 	public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
 		super(protocol, options, mapper, canStartProcess);
-		this.cifsConnectionType = options.get(CONNECTION_TYPE);
+		this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
 		String address = options.get(ADDRESS);
 		InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort())));
 		this.address = addressPort.getHostName();
 		this.port = addressPort.getPort();
 		this.username = options.get(USERNAME);
 		this.password = options.get(PASSWORD);
-		InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.get(CIFS_PORT, DEFAULT_CIFS_PORT)));
+		InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
 		this.cifsPort = addressCifsPort.getPort();
 		this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
 		this.authentication = new NtlmPasswordAuthentication(null, username, password);

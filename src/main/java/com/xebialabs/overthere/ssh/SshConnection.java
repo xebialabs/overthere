@@ -111,8 +111,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
 	public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
-        this.sshConnectionType = options.get(CONNECTION_TYPE);
-		InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String>get(ADDRESS), options.get(PORT, SSH_PORT_DEFAULT)));
+        this.sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
+        InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String>get(ADDRESS), options.getInteger(PORT, SSH_PORT_DEFAULT)));
         this.host = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
@@ -120,7 +120,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
-        this.allocateDefaultPty = options.get(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
+        this.allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
         this.allocatePty = options.get(ALLOCATE_PTY, ALLOCATE_PTY_DEFAULT);
     }
 

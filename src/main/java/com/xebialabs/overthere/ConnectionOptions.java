@@ -179,6 +179,86 @@ public class ConnectionOptions {
 		}
 	}
 
+	public boolean getBoolean(String key) {
+		Object o = options.get(key);
+		if (o == null) {
+			throw new IllegalArgumentException("No value specified for required connection option " + key);
+		} else if (o instanceof Boolean) {
+			return (Boolean) o;
+		} else if (o instanceof String) {
+			return Boolean.valueOf((String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for required connection option " + key + " is neither a Boolean nor a String");
+		}
+	}
+
+	public boolean getBoolean(String key, boolean defaultValue) {
+		Object o = options.get(key);
+		if (o == null) {
+			return defaultValue;
+		} else if (o instanceof Boolean) {
+			return (Boolean) o;
+		} else if (o instanceof String) {
+			return Boolean.valueOf((String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for connection option " + key + " is neither a Boolean nor a String");
+		}
+	}
+
+	public int getInteger(String key) {
+		Object o = options.get(key);
+		if (o == null) {
+			throw new IllegalArgumentException("No value specified for required connection option " + key);
+		} else if (o instanceof Integer) {
+			return (Integer) o;
+		} else if (o instanceof String) {
+			return Integer.parseInt((String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for required connection option " + key + " is neither an Integer nor a String");
+		}
+	}
+
+	public int getInteger(String key, int defaultValue) {
+		Object o = options.get(key);
+		if (o == null) {
+			return defaultValue;
+		} else if (o instanceof Integer) {
+			return (Integer) o;
+		} else if (o instanceof String) {
+			return Integer.parseInt((String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for connection option " + key + " is neither an Integer nor a String");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Enum<T>> T getEnum(String key, Class<T> enumClazz) {
+		Object o = options.get(key);
+		if (o == null) {
+			throw new IllegalArgumentException("No value specified for required connection option " + key);
+		} else if (o.getClass().equals(enumClazz)) {
+			return (T) o;
+		} else if (o instanceof String) {
+			return Enum.valueOf(enumClazz, (String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for required connection option " + key + " is neither an " + enumClazz.getName() + " nor a String");
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Enum<T>> T getEnum(String key, Class<T> enumClazz, T defaultValue) {
+		Object o = options.get(key);
+		if (o == null) {
+			return defaultValue;
+		} else if (o.getClass().equals(enumClazz)) {
+			return (T) o;
+		} else if (o instanceof String) {
+			return Enum.valueOf(enumClazz, (String) o);
+		} else {
+			throw new IllegalArgumentException("Value specified for connection option " + key + " is neither an instanceof of " + enumClazz.getName() + " nor a String");
+		}
+	}
+
 	/**
 	 * Returns whether a connection option is set.
 	 * @param key

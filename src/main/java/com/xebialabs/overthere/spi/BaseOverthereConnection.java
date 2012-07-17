@@ -79,11 +79,11 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
 	protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
 		this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
-		this.os = options.<OperatingSystemFamily>get(OPERATING_SYSTEM);
-		this.connectionTimeoutMillis = options.get(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
+		this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
+		this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
 		this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
-		this.deleteTemporaryDirectoryOnDisconnect = options.get(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
-		this.temporaryFileCreationRetries = options.get(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
+		this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
+		this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
 		this.canStartProcess = canStartProcess;
 		this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null addres-port mapper");
 	}

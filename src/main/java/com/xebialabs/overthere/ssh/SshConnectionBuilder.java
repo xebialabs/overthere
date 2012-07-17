@@ -139,7 +139,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 	protected SshConnection connection;
 
 	public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		SshConnectionType sshConnectionType = options.get(CONNECTION_TYPE);
+		SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
 
 		switch (sshConnectionType) {
 		case TUNNEL:
