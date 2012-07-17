@@ -336,7 +336,7 @@ When the Telnet server is enabled any user that is in the <strong>Administrators
 
 <a name="cifs_host_setup_winrm_http"/>
 <a name="cifs_host_setup_winrm_https"/>
-#### WINRP_HTTP and WINRM_HTTPS
+#### WINRM_HTTP and WINRM_HTTPS
 
 _For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
 
