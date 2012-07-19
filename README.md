@@ -20,7 +20,7 @@
 
 Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". It was originally developed for and is still used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking at it is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
 
-For a more thorough introduction to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands (in English).
+Overthere is available under the [GPLv2 with XebiaLabs FLOSS License Exception](https://raw.github.com/xebialabs/overthere/master/LICENSE).
 
 **P.S.:** Check the [Overthere Ohloh page](http://www.ohloh.net/p/overthere) for some interesting code analysis statistics. If you use Overthere, don't forget to tell Ohloh! And while you're at it, you might want to vote for Overthere on the [Overthere Freecode page](http://freecode.com/projects/overthere) too! ;-)
 
