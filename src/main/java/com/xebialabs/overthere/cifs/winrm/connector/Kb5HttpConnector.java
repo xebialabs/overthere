@@ -24,7 +24,6 @@ import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.*;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.KerberosSchemeFactory;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.*;
+import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
@@ -262,11 +262,11 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 
 		final Credentials use_jaas_creds = new Credentials() {
 			public String getPassword() {
-				return null;
+				return password;
 			}
 
 			public Principal getUserPrincipal() {
-				return null;
+				return new KerberosPrincipal(username);
 			}
 		};
 
