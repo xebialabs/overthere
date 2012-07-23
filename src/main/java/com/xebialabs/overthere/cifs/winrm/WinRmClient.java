@@ -115,6 +115,11 @@ public class WinRmClient {
                     if (line == null) {
                         break;
                     }
+                    for(int i = 0; i < line.length(); i++) {
+                        handler.handleOutput(line.charAt(i));
+                    }
+                    handler.handleOutput('\r');
+                    handler.handleOutput('\n');
                     handler.handleOutputLine(line);
                 }
             } catch (IOException exc) {
