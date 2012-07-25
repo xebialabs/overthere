@@ -257,8 +257,6 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 	 * Configure auth schemes to use for the HttpClient.
 	 */
 	protected void configureAuthentication(final DefaultHttpClient httpclient) {
-		httpclient.getAuthSchemes().register(AuthPolicy.KERBEROS, new KerberosSchemeFactory());
-
 		final Credentials use_jaas_creds = new Credentials() {
 			public String getPassword() {
 				return password;
