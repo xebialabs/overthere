@@ -213,7 +213,7 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 
 			final HttpResponse response = client.execute(request, context);
 
-			if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled()) {
 				for (final Header header : response.getAllHeaders()) {
 					logger.trace("Header {}: {}", header.getName(), header.getValue());
 				}
