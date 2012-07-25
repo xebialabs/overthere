@@ -77,119 +77,118 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 	}
 
 	/**
-	 * CallbackHandler that uses provided username/password credentials.
-	 */
-	private static class ProvidedAuthCallback implements CallbackHandler {
-
-		private String username;
-		private String password;
-
-		ProvidedAuthCallback(final String username, final String password) {
-			this.username = username;
-			this.password = password;
-		}
-
-		public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-			for (final Callback callback : callbacks) {
-				if (callback instanceof NameCallback) {
-					final NameCallback nc = (NameCallback) callback;
-					nc.setName(username);
-				} else if (callback instanceof PasswordCallback) {
-					final PasswordCallback pc = (PasswordCallback) callback;
-					pc.setPassword(password.toCharArray());
-				} else {
-					throw new UnsupportedCallbackException
-						(callback, "Unrecognized Callback");
-				}
-			}
-		}
-	}
-
-	/**
-	 * PrivilegedActionException that wraps the internal sendMessage
-	 */
-	private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
-		Kb5HttpConnector connector;
-		private Document requestDocument;
-		SoapAction soapAction;
-
-		private PrivilegedSendMessage(final Kb5HttpConnector connector, final Document requestDocument,
-		                              final SoapAction soapAction) {
-			this.connector = connector;
-			this.requestDocument = requestDocument;
-			this.soapAction = soapAction;
-		}
-
-		@Override
-		public Document run() throws Exception {
-			return connector.int_sendMessage(requestDocument, soapAction);
-		}
-
-		public Document getRequestDocument() {
-			return requestDocument;
-		}
-	}
-
-	/**
-	 * Perform the JAAS login and run the command within a privileged scope.
-	 *
-	 * @param privilegedSendMessage the PrivilegedSendMessage
-	 *
-	 * @return The result Document
-	 */
-	private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
-		final CallbackHandler handler = new ProvidedAuthCallback(username, password);
-		final Document result;
-		try {
-			final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(debugKerberosAuth));
-			lc.login();
-
-			result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
-		} catch (LoginException e) {
-			throw new WinRMRuntimeIOException("Login failure sending message on " + getTargetURL() + " error: "+e.getMessage(),
-				privilegedSendMessage.getRequestDocument(), null,
-				e);
-		} catch (PrivilegedActionException e) {
-			throw new WinRMRuntimeIOException("Failure sending message on " + getTargetURL() + " error: " + e
-				.getMessage(),
-				privilegedSendMessage.getRequestDocument(), null,
-				e);
-		}
-		return result;
-	}
-
-	private static class KerberosJaasConfiguration extends Configuration {
-
-		private boolean debug;
-
-		private KerberosJaasConfiguration(boolean debug) {
-			this.debug = debug;
-		}
-
-		@Override
-		public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
-			final HashMap<String, String> options = new HashMap<String, String>();
-			options.put("client", "true");
-			options.put("useTicketCache", "false");
-			options.put("useKeyTab", "false");
-			options.put("doNotPrompt", "false");
-			if(debug) {
-				options.put("debug", "true");
-			}
-			return new AppConfigurationEntry[] {new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-				AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
-		}
-
-	}
-
-
-	/**
 	 * Override the sendMessage method to use custom authentication over HTTP
 	 */
 	@Override
 	public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
 		return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
 	}
+
+	/**
+     * Perform the JAAS login and run the command within a privileged scope.
+     *
+     * @param privilegedSendMessage the PrivilegedSendMessage
+     *
+     * @return The result Document
+     */
+    private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
+        final CallbackHandler handler = new ProvidedAuthCallback(username, password);
+        Document result;
+        try {
+            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(debugKerberosAuth));
+            lc.login();
+
+            result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
+        } catch (LoginException e) {
+            throw new WinRMRuntimeIOException("Login failure sending message on " + getTargetURL() + " error: "+e.getMessage(),
+                privilegedSendMessage.getRequestDocument(), null,
+                e);
+        } catch (PrivilegedActionException e) {
+            throw new WinRMRuntimeIOException("Failure sending message on " + getTargetURL() + " error: " + e
+                .getMessage(),
+                privilegedSendMessage.getRequestDocument(), null,
+                e.getException());
+        }
+        return result;
+    }
+
+    /**
+     * CallbackHandler that uses provided username/password credentials.
+     */
+    private static class ProvidedAuthCallback implements CallbackHandler {
+
+        private String username;
+        private String password;
+
+        ProvidedAuthCallback(final String username, final String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+            for (final Callback callback : callbacks) {
+                if (callback instanceof NameCallback) {
+                    final NameCallback nc = (NameCallback) callback;
+                    nc.setName(username);
+                } else if (callback instanceof PasswordCallback) {
+                    final PasswordCallback pc = (PasswordCallback) callback;
+                    pc.setPassword(password.toCharArray());
+                } else {
+                    throw new UnsupportedCallbackException
+                        (callback, "Unrecognized Callback");
+                }
+            }
+        }
+    }
+
+    private static class KerberosJaasConfiguration extends Configuration {
+
+        private boolean debug;
+
+        private KerberosJaasConfiguration(boolean debug) {
+            this.debug = debug;
+        }
+
+        @Override
+        public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
+            final HashMap<String, String> options = new HashMap<String, String>();
+            options.put("client", "true");
+            options.put("useTicketCache", "false");
+            options.put("useKeyTab", "false");
+            options.put("doNotPrompt", "false");
+            if(debug) {
+                options.put("debug", "true");
+            }
+            return new AppConfigurationEntry[] {new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
+                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
+        }
+
+    }
+
+    /**
+     * PrivilegedActionException that wraps the internal sendMessage
+     */
+    private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
+        Kb5HttpConnector connector;
+        private Document requestDocument;
+        SoapAction soapAction;
+
+        private PrivilegedSendMessage(final Kb5HttpConnector connector, final Document requestDocument,
+                                      final SoapAction soapAction) {
+            this.connector = connector;
+            this.requestDocument = requestDocument;
+            this.soapAction = soapAction;
+        }
+
+        @Override
+        public Document run() throws Exception {
+            return connector.int_sendMessage(requestDocument, soapAction);
+        }
+
+        public Document getRequestDocument() {
+            return requestDocument;
+        }
+    }
 
 	/**
 	 * Internal sendMessage, performs the HTTP request and returns the result document.
