@@ -7,73 +7,102 @@
 */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import com.google.common.io.Closeables;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
-import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
-import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEBUG_KERBEROS_AUTH;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.HTTPS_CERTIFICATE_TRUST_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.HTTPS_HOSTNAME_VERIFY_STRATEGY;
+import static org.apache.http.auth.AuthScope.ANY_HOST;
+import static org.apache.http.auth.AuthScope.ANY_PORT;
+import static org.apache.http.auth.AuthScope.ANY_REALM;
+import static org.apache.http.auth.AuthScope.ANY_SCHEME;
+import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
+import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+import static org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.login.AppConfigurationEntry;
+import javax.security.auth.login.Configuration;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.auth.AuthScope;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.*;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.KerberosSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.*;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
-import java.io.*;
-import java.net.URL;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
+import com.google.common.io.Closeables;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.cifs.winrm.HttpConnector;
+import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
-
-/**
- * Kb5HttpConnector enables Kerberos authentication over HTTP(S).
- *
- * @author Greg Schueler <a href="mailto:greg@dtosolutions.com">greg@dtosolutions.com</a>
- */
-public class Kb5HttpConnector extends JdkHttpConnector {
-	private static Logger logger = LoggerFactory.getLogger(Kb5HttpConnector.class);
+public class ApacheComponentsHttpClientHttpConnector implements HttpConnector {
+	private static Logger logger = LoggerFactory.getLogger(ApacheComponentsHttpClientHttpConnector.class);
 	ConnectionOptions options;
-	private String httpsCertTrustStrategy;
-	private String httpsHostnameVerifyStrategy;
-	private String username;
-	private String password;
-	private boolean debugKerberosAuth;
+	private final URL targetURL;
+	private final String httpsCertTrustStrategy;
+	private final String httpsHostnameVerifyStrategy;
+	private final String username;
+	private final String password;
+	private final boolean debugKerberosAuth;
 
-	public Kb5HttpConnector(final URL targetURL, final ConnectionOptions options) {
-		super(targetURL, null);
+	public ApacheComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
+	    this.targetURL = targetURL;
 		this.options = options;
-		this.httpsCertTrustStrategy = options.getOptional(CifsConnectionBuilder.HTTPS_CERTIFICATE_TRUST_STRATEGY);
-		this.httpsHostnameVerifyStrategy = options.getOptional(CifsConnectionBuilder.HTTPS_HOSTNAME_VERIFY_STRATEGY);
-		this.username = options.getOptional(USERNAME);
-		this.password = options.getOptional(PASSWORD);
-		this.debugKerberosAuth = options.<Boolean>get(CifsConnectionBuilder.DEBUG_KERBEROS_AUTH, false);
+		this.httpsCertTrustStrategy = options.getOptional(HTTPS_CERTIFICATE_TRUST_STRATEGY);
+		this.httpsHostnameVerifyStrategy = options.getOptional(HTTPS_HOSTNAME_VERIFY_STRATEGY);
+		this.username = options.get(USERNAME);
+		this.password = options.get(PASSWORD);
+		this.debugKerberosAuth = options.getBoolean(DEBUG_KERBEROS_AUTH, false);
 	}
 
 	/**
@@ -159,8 +188,8 @@ public class Kb5HttpConnector extends JdkHttpConnector {
             if(debug) {
                 options.put("debug", "true");
             }
-            return new AppConfigurationEntry[] {new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
+            return new AppConfigurationEntry[] { new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
+                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options) };
         }
 
     }
@@ -169,11 +198,11 @@ public class Kb5HttpConnector extends JdkHttpConnector {
      * PrivilegedActionException that wraps the internal sendMessage
      */
     private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
-        Kb5HttpConnector connector;
+        ApacheComponentsHttpClientHttpConnector connector;
         private Document requestDocument;
         SoapAction soapAction;
 
-        private PrivilegedSendMessage(final Kb5HttpConnector connector, final Document requestDocument,
+        private PrivilegedSendMessage(final ApacheComponentsHttpClientHttpConnector connector, final Document requestDocument,
                                       final SoapAction soapAction) {
             this.connector = connector;
             this.requestDocument = requestDocument;
@@ -257,19 +286,17 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 	 * Configure auth schemes to use for the HttpClient.
 	 */
 	protected void configureAuthentication(final DefaultHttpClient httpclient) {
-		final Credentials use_jaas_creds = new Credentials() {
-			public String getPassword() {
+		httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, ANY_SCHEME), new Credentials() {
+            public Principal getUserPrincipal() {
+                return new KerberosPrincipal(username);
+            }
+
+            public String getPassword() {
 				return password;
 			}
+		});
 
-			public Principal getUserPrincipal() {
-				return new KerberosPrincipal(username);
-			}
-		};
-
-		httpclient.getCredentialsProvider().setCredentials(new AuthScope(null, -1, null), use_jaas_creds);
-
-		httpclient.getParams().setBooleanParameter(ClientPNames.HANDLE_AUTHENTICATION, true);
+		httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
 	}
 
 	/**
@@ -330,12 +357,12 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 			trustStrategy = null;
 		}
 		if ("all".equals(httpsHostnameVerifyStrategy)) {
-			hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+			hostnameVerifier = ALLOW_ALL_HOSTNAME_VERIFIER;
 		} else if ("strict".equals(httpsHostnameVerifyStrategy)) {
-			hostnameVerifier = SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+			hostnameVerifier = STRICT_HOSTNAME_VERIFIER;
 		} else {
 			//"browser-compatible"
-			hostnameVerifier = SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+			hostnameVerifier = BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
 		}
 		if (null != trustStrategy || null != hostnameVerifier) {
 			if (logger.isDebugEnabled()) {
@@ -348,10 +375,27 @@ public class Kb5HttpConnector extends JdkHttpConnector {
 		}
 	}
 
+    protected static String toString(Document doc) {
+        StringWriter stringWriter = new StringWriter();
+        XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
+        try {
+            xmlWriter.write(doc);
+            xmlWriter.close();
+        } catch (IOException e) {
+            throw new WinRMRuntimeIOException("Cannnot convert XML to String ", e);
+        }
+        return stringWriter.toString();
+    }
+
 	/**
 	 * Create the HttpEntity to send in the request.
 	 */
 	protected HttpEntity createEntity(final String requestDocAsString) throws UnsupportedEncodingException {
 		return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
 	}
+	
+    protected URL getTargetURL() {
+        return targetURL;
+    }
+
 }
