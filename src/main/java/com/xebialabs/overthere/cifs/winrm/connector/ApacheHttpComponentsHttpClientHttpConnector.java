@@ -85,8 +85,8 @@ import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeExcept
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 
-public class ApacheComponentsHttpClientHttpConnector implements HttpConnector {
-	private static Logger logger = LoggerFactory.getLogger(ApacheComponentsHttpClientHttpConnector.class);
+public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
+	private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
 	ConnectionOptions options;
 	private final URL targetURL;
 	private final String httpsCertTrustStrategy;
@@ -95,7 +95,7 @@ public class ApacheComponentsHttpClientHttpConnector implements HttpConnector {
 	private final String password;
 	private final boolean debugKerberosAuth;
 
-	public ApacheComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
+	public ApacheHttpComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
 	    this.targetURL = targetURL;
 		this.options = options;
 		this.httpsCertTrustStrategy = options.getOptional(HTTPS_CERTIFICATE_TRUST_STRATEGY);
@@ -198,11 +198,11 @@ public class ApacheComponentsHttpClientHttpConnector implements HttpConnector {
      * PrivilegedActionException that wraps the internal sendMessage
      */
     private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
-        ApacheComponentsHttpClientHttpConnector connector;
+        ApacheHttpComponentsHttpClientHttpConnector connector;
         private Document requestDocument;
         SoapAction soapAction;
 
-        private PrivilegedSendMessage(final ApacheComponentsHttpClientHttpConnector connector, final Document requestDocument,
+        private PrivilegedSendMessage(final ApacheHttpComponentsHttpClientHttpConnector connector, final Document requestDocument,
                                       final SoapAction soapAction) {
             this.connector = connector;
             this.requestDocument = requestDocument;
