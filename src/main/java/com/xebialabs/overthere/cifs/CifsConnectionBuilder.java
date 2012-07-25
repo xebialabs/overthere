@@ -111,8 +111,6 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 			break;
 		case WINRM_HTTP:
 		case WINRM_HTTPS:
-		case WINRM_HTTP_KB5:
-		case WINRM_HTTPS_KB5:
 			connection = new CifsWinRmConnection(type, options, mapper);
 			break;
 		default:

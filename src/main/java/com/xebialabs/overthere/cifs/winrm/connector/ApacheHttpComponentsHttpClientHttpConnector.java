@@ -110,7 +110,11 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 	 */
 	@Override
 	public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
-		return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
+	    if(username.contains("@")) {
+	        return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
+	    } else {
+	        return int_sendMessage(requestDocument, soapAction);
+	    }
 	}
 
 	/**

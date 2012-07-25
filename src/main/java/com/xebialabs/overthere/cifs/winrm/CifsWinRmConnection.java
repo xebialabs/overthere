@@ -12,7 +12,6 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP_KB5;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,7 +21,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.winrm.connector.ApacheComponentsHttpClientHttpConnector;
+import com.xebialabs.overthere.cifs.winrm.connector.ApacheHttpComponentsHttpClientHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
@@ -48,7 +47,7 @@ public class CifsWinRmConnection extends CifsConnection {
 		checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
 
 		URL targetURL = getTargetURL(options);
-		HttpConnector httpConnector = new ApacheComponentsHttpClientHttpConnector(targetURL, options);
+		HttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(targetURL, options);
 
 		winRmClient = new WinRmClient(httpConnector, targetURL);
 		winRmClient.setTimeout(options.get(TIMEMOUT, DEFAULT_TIMEOUT));
@@ -57,7 +56,7 @@ public class CifsWinRmConnection extends CifsConnection {
 	}
 
 	private URL getTargetURL(ConnectionOptions options) {
-		String scheme = cifsConnectionType == WINRM_HTTP || cifsConnectionType == WINRM_HTTP_KB5 ? "http" : "https";
+		String scheme = cifsConnectionType == WINRM_HTTP ? "http" : "https";
 		String context = options.get(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		try {
 			return new URL(scheme, address, port, context);

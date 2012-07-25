@@ -89,10 +89,8 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 		case TELNET:
 			return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
 		case WINRM_HTTP:
-		case WINRM_HTTP_KB5:
 			return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
 		case WINRM_HTTPS:
-		case WINRM_HTTPS_KB5:
 			return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 		default:
 			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);	

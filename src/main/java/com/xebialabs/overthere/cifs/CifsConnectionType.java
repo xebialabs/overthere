@@ -20,15 +20,4 @@ public enum CifsConnectionType {
 	 */
 	WINRM_HTTPS,
 
-	/**
-	 * A CIFS Connection that uses WinRM over HTTP with Kerberos Authentication to execute commands, to a windows
-	 * host.
-	 */
-	WINRM_HTTP_KB5,
-
-	/**
-	 * A CIFS Connection that uses WinRM over HTTPS with Kerberos Authentication to execute commands, to a windows host.
-	 */
-	WINRM_HTTPS_KB5,
-
 }
