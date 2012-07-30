@@ -1,5 +1,9 @@
 package com.xebialabs.overthere.cifs;
 
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
+import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
+
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -10,8 +14,6 @@ import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
-
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
  * Builds CIFS connections.
@@ -66,39 +68,85 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 	 */
 	public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
-	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
-	 */	
-	public static final String CONTEXT = "winrmContext";
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
+     */
+    public static final String CONTEXT = "winrmContext";
 
-	/**
-	 * Default value (/wsman) of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
-	 */	
-	public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
+    /**
+     * Default value (/wsman) of the {@link ConnectionOptions connection option} used to specify the context (URI) used
+     * by WinRM.
+     */
+    public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
 
-	public static final String TIMEMOUT = "winrmTimeout";
-	public static final String DEFAULT_TIMEOUT = "PT60.000S";
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM timeout in <a
+     * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
+     */
+    public static final String TIMEMOUT = "winrmTimeout";
 
-	public static final String ENVELOP_SIZE = "winrmEnvelopSize";
-	public static final int DEFAULT_ENVELOP_SIZE = 153600;
+    /**
+     * Default value (PT60.000S) of the {@link ConnectionOptions connection option} used to specify the WinRM timeout.
+     */
+    public static final String DEFAULT_TIMEOUT = "PT60.000S";
 
-	public static final String LOCALE = "winrmLocale";
-	public static final String DEFAULT_LOCALE = "en-US";
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size in bytes to use.
+     */
+    public static final String ENVELOP_SIZE = "winrmEnvelopSize";
 
+    /**
+     * Default value (153600) of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size
+     * in bytes to use.
+     */
+    public static final int DEFAULT_ENVELOP_SIZE = 153600;
 
-	/**
-	 * Kerberos JAAS option to enable debug output.
-	 */
-	public static final String DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
+     */
+    public static final String LOCALE = "winrmLocale";
 
-	/**
-	 * Specify strategy to trust certificates: "all", "self-signed", or "default" or null for default.
-	 */
-	public static final String HTTPS_CERTIFICATE_TRUST_STRATEGY = "winrmHttpsCertificateTrustStrategy";
-	/**
-	 * Specify the strategy to verify hostnames: "all" (trust all), or "default" or null for default
-	 */
-	public static final String HTTPS_HOSTNAME_VERIFY_STRATEGY = "winrmHttpsHostnameVerifyStrategy";
+    /**
+     * Default value (en-US) of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
+     */
+    public static final String DEFAULT_LOCALE = "en-US";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether to enable debug output for
+     * Kerberos JAAS authentication.
+     */
+    public static final String DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
+
+    /**
+     * Default value (false) of the {@link ConnectionOptions connection option} used to specify whether to enable debug
+     * output for Kerberos JAAS authentication.
+     */
+    public static final boolean DEFAULT_DEBUG_KERBEROS_AUTH = false;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the
+     * {@link WinrmHttpsCertificateTrustStrategy} for WinRM HTTPS connections.
+     */
+    public static final String WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = "winrmHttpsCertificateTrustStrategy";
+
+    /**
+     * Default value ({@link WinrmHttpsCertificateTrustStrategy#STRICT}) of the {@link ConnectionOptions connection
+     * option} used to specify the {@link WinrmHttpsCertificateTrustStrategy} for WinRM HTTPS connections.
+     */
+    public static final WinrmHttpsCertificateTrustStrategy DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = STRICT;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the
+     * {@link WinrmHttpsHostnameVerificationStrategy} for WinRM HTTPS connections.
+     */
+    public static final String WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = "winrmHttpsHostnameVerificationStrategy";
+
+    /**
+     * Default value ({@link WinrmHttpsHostnameVerificationStrategy#BROWSER_COMPATIBLE}) of the
+     * {@link ConnectionOptions connection option} used to specify the {@link WinrmHttpsHostnameVerificationStrategy}
+     * for WinRM HTTPS connections.
+     */
+    public static final WinrmHttpsHostnameVerificationStrategy DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = BROWSER_COMPATIBLE;
 
 	private OverthereConnection connection;
 
