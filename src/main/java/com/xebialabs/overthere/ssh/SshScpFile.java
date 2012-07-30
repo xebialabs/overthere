@@ -156,7 +156,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 			return false;
 		}
 
-		logger.debug("Parsing ls output line [%s]", outputLine);
+		logger.debug("Parsing ls output line [{}]", outputLine);
 		outputTokens.nextToken(); // inodelinks
 		outputTokens.nextToken(); // owner
 		outputTokens.nextToken(); // group
