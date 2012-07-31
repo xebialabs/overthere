@@ -36,7 +36,7 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 
     private final StringBuilder receivedOutputBuffer = new StringBuilder();
 
-    private boolean onFirstLine = true;
+    private boolean sentPassword = false;
 
     protected SshInteractiveSudoPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password, String passwordPromptRegex) {
         super(remoteStdout);
@@ -68,17 +68,18 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
     }
 
     private void handleChar(char c) {
-        if (onFirstLine) {
+        if (!sentPassword) {
             logger.trace("Received: {}", c);
             if (c == '\n') {
-                onFirstLine = false;
+                receivedOutputBuffer.setLength(0);
             } else {
                 receivedOutputBuffer.append(c);
 
                 if (c == passwordRegex.charAt(passwordRegex.length() - 1)) {
                     String receivedOutput = receivedOutputBuffer.toString();
                     if (passwordPattern.matcher(receivedOutput).matches()) {
-                        logger.info("Found password prompt in first line of output: {}", receivedOutput);
+                        logger.info("Found password prompt in output: {}", receivedOutput);
+                        sentPassword = true;
                         try {
                             remoteStdin.write(passwordBytes);
                             remoteStdin.flush();
