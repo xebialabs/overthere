@@ -44,7 +44,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0-beta-1</version>
+			<version>2.0.0-beta-4</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 <a name="building_overthere"/>
 ## Building Overthere
 
-1. Install [Gradle 1.0-milestone-7](http://www.gradle.org/).
+1. Install [Gradle 1.0](http://www.gradle.org/).
 2. Clone the Overthere repository.
 3. Run the command `gradle clean build`.
 
@@ -425,21 +425,26 @@ Overthere supports the tunnelling of every protocol over SSH. This can be used t
 When using a jumpstation to connect to the remote host, Overthere will dynamically allocate an available local port to use for the connection to the end station. Using an additional connection option, you can configure from which port onwards Overthere starts the allocation.
 
 
-
 <table>
 <tr>
 	<th align="left" valign="top"><a name="portAllocationRangeStart"/>portAllocationRangeStart</th>
-	<td>At which port Overthere starts finding an available local port for connecting to the end station. The default value is: <code>1025</code>.</td>
+	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is: <code>1025</code>.</td>
 </tr>
 </table>
 
 <a name="release_history"/>
 # Release History
 
+* Overthere 2.0.0-beta-4 (19-Jun-2012)
+    * Fixed issue #42.
+    * Moved itest-support project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
+    * Updated documentation.
+* Overthere 2.0.0-beta-3 (27-Mar-2012)
+    * Updated documentation.
 * Overthere 2.0.0-beta-2 (23-Mar-2012)
-	* Fixed issues #39 and #40
-	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels
-	* Set default pty to true in case of interactive sudo and no pty set
+	* Fixed issues #39 and #40.
+	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels.
+	* Set default pty to true in case of interactive sudo and no pty set.
 * Overthere 2.0.0-beta-1 (5-Mar-2012)
     * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
     * Ported Overthere tests to use TestNG instead of JUnit.
