@@ -35,25 +35,25 @@ public class UnixFactoryItest {
     @Factory
     public Object[] createItests() throws Exception {
         List<Object> itests = newArrayList();
-        itests.add(testSshSftp());
-        itests.add(testSshScp());
-        itests.add(testSshSudo());
-        itests.add(testSshInteractiveSudo());
+        itests.add(sshSftp());
+        itests.add(sshScp());
+        itests.add(sshSudo());
+        itests.add(sshInteractiveSudo());
         return itests.toArray(new Object[itests.size()]);
     }
 
-    private OverthereConnectionItest testSshSftp() throws Exception {
+    private OverthereConnectionItest sshSftp() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SFTP);
         options.set(PORT, 22);
         options.set(USERNAME, "overthere");
         options.set(PASSWORD, "overhere");
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSftp", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftp", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
     }
 
-    private OverthereConnectionItest testSshScp() throws Exception, IOException {
+    private OverthereConnectionItest sshScp() throws Exception, IOException {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SCP);
@@ -91,11 +91,11 @@ public class UnixFactoryItest {
         // AAAAB3NzaC1yc2EAAAADAQABAAABAQDSuXwO9Pvcde3onMWQ+ek3zYq38XOU/vcHgy0sr1yjeGqt8H2WQZOjW4wfpKs5TVhfjMoL4Znw6uSV7UHqsDw3K5lnI/3jV+SwiPry4DlMQ+wNoNCTZUBxhRWWK6AwFrkOGfH7JwTgzUvwxgoxi67jP+G5sCiAux2NHnkQCX4wq8O5bygHS5FgTVAPqKrkGBPZVDBGhi2VmEsFeUZQEFhe8Vb3ywk2O6hLWANmevpfTSdS/7tgcoxV13HJuC/KvdWnsCw+/CCV6QIY0+u23zcHL3uQi9Ytl4s5jQBfuO4L5L/TQm1U9X8a4Tx8WAtnUh7o2MwYFGgarw0mGN11M7sn
         // overthere@overthere
         options.set(PASSPHRASE, "letmein");
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshScp", SSH_PROTOCOL, options, "com.xebialabs.overthere.ssh.SshScpConnection",
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshScp", SSH_PROTOCOL, options, "com.xebialabs.overthere.ssh.SshScpConnection",
             "overthere-unix");
     }
 
-    private OverthereConnectionItest testSshSudo() throws Exception, IOException {
+    private OverthereConnectionItest sshSudo() throws Exception, IOException {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SUDO);
@@ -125,7 +125,8 @@ public class UnixFactoryItest {
                 + "KZDDbGroO79W0TMIqrxfYnffREhC05pp3ZBYiqVTJQ/CutTMbSxB5VzMSY55+I51\r\n"
                 + "i96U0OuJQ83rVXat6g/fm6uOQ3tqxULCnsjIvgNPUBNwoyWXYHvOJkeGVtCmFBFB\r\n"
                 + "YcF4rQb3AoGBAJ7Ekj7G0qDD+gJQ3JnWfWJNHHDU1LclntuZlzrLhKEAku9y7Q5I\r\n"
-                + "tygMnR1DYrWKTZPDtrCb1NJqPntPp8A4VMnkZ89AY11CexWrtDx9VDy4MJFr8uCx\r\n" + "c05G9exoAKHonnFcWxOg+xIgofdfic3/vTg/aGPp1I2urqLzv00vPyeX\r\n"
+                + "tygMnR1DYrWKTZPDtrCb1NJqPntPp8A4VMnkZ89AY11CexWrtDx9VDy4MJFr8uCx\r\n"
+                + "c05G9exoAKHonnFcWxOg+xIgofdfic3/vTg/aGPp1I2urqLzv00vPyeX\r\n"
                 + "-----END RSA PRIVATE KEY-----\r\n").getPath());
         // Corresponding public key:
         // ssh-rsa
@@ -133,11 +134,12 @@ public class UnixFactoryItest {
         // overthere@overthere
         options.set(SUDO_USERNAME, "overthere");
         options.set(ALLOCATE_DEFAULT_PTY, true);
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSudo", SSH_PROTOCOL, options, "com.xebialabs.overthere.ssh.SshSudoConnection",
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSudo", SSH_PROTOCOL, options,
+            "com.xebialabs.overthere.ssh.SshSudoConnection",
             "overthere-unix");
     }
 
-    private OverthereConnectionItest testSshInteractiveSudo() throws Exception {
+    private OverthereConnectionItest sshInteractiveSudo() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
@@ -148,7 +150,7 @@ public class UnixFactoryItest {
         options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
         options.set(ALLOCATE_DEFAULT_PTY, true);
         options.set(SUDO_OVERRIDE_UMASK, true);
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshInteractiveSudo", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshInteractiveSudo", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix");
     }
 

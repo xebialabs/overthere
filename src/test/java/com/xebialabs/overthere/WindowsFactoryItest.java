@@ -49,18 +49,18 @@ public class WindowsFactoryItest {
     @Factory
     public Object[] createWindowsTests() throws Exception {
         List<Object> itests = newArrayList();
-        itests.add(testCifsTelnetWithAdministrativeUser());
-        itests.add(testCifsTelnetWithRegularUser());
-        itests.add(testCifsWinRmHttpWithAdministrativeUser());
-        itests.add(testCifsWinRmHttpsWithAdministrativeUser());
-        itests.add(testSshSftpCygwinWithAdministrativeUser());
-        itests.add(testSshSftpCygwinWithRegularUser());
-        itests.add(testSshSftpWinSshdWithAdministrativeUser());
-        itests.add(testSshSftpWinSshdWithRegularUser());
+        itests.add(cifsTelnetWithAdministrativeUser());
+        itests.add(cifsTelnetWithRegularUser());
+        itests.add(cifsWinRmHttpWithAdministrativeUser());
+        itests.add(cifsWinRmHttpsWithAdministrativeUser());
+        itests.add(sshSftpCygwinWithAdministrativeUser());
+        itests.add(sshSftpCygwinWithRegularUser());
+        itests.add(sshSftpWinSshdWithAdministrativeUser());
+        itests.add(sshSftpWinSshdWithRegularUser());
         return itests.toArray(new Object[itests.size()]);
     }
 
-    private OverthereConnectionItest testCifsTelnetWithAdministrativeUser() throws Exception {
+    private OverthereConnectionItest cifsTelnetWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
@@ -69,11 +69,11 @@ public class WindowsFactoryItest {
         options.set(PORT, DEFAULT_TELNET_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testCifsTelnetWithAdministrativeUser", CIFS_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_cifsTelnetWithAdministrativeUser", CIFS_PROTOCOL, options,
             "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testCifsTelnetWithRegularUser() throws Exception {
+    private OverthereConnectionItest cifsTelnetWithRegularUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
@@ -84,11 +84,11 @@ public class WindowsFactoryItest {
         options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\tmp");
         options.set(PATH_SHARE_MAPPINGS, ImmutableMap.of("C:\\overthere", "sharethere"));
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testCifsTelnetWithRegularUser", CIFS_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_cifsTelnetWithRegularUser", CIFS_PROTOCOL, options,
             "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testCifsWinRmHttpWithAdministrativeUser() throws Exception {
+    private OverthereConnectionItest cifsWinRmHttpWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_HTTP);
@@ -98,11 +98,11 @@ public class WindowsFactoryItest {
         options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testCifsWinRmHttpWithAdministrativeUser", CIFS_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_cifsWinRmHttpWithAdministrativeUser", CIFS_PROTOCOL, options,
             "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testCifsWinRmHttpsWithAdministrativeUser() throws Exception {
+    private OverthereConnectionItest cifsWinRmHttpsWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_HTTPS);
@@ -114,11 +114,11 @@ public class WindowsFactoryItest {
         options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
         options.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testCifsWinRmHttpsWithAdministrativeUser", CIFS_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_cifsWinRmHttpsWithAdministrativeUser", CIFS_PROTOCOL, options,
             "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testSshSftpCygwinWithAdministrativeUser() throws Exception {
+    private OverthereConnectionItest sshSftpCygwinWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_CYGWIN);
@@ -126,11 +126,11 @@ public class WindowsFactoryItest {
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSftpCygwinWithAdministrativeUser", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpCygwinWithAdministrativeUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testSshSftpCygwinWithRegularUser() throws Exception {
+    private OverthereConnectionItest sshSftpCygwinWithRegularUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_CYGWIN);
@@ -138,11 +138,11 @@ public class WindowsFactoryItest {
         options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
         options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSftpCygwinWithRegularUser", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpCygwinWithRegularUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testSshSftpWinSshdWithAdministrativeUser() throws Exception {
+    private OverthereConnectionItest sshSftpWinSshdWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
@@ -150,11 +150,11 @@ public class WindowsFactoryItest {
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSftpWinSshdWithAdministrativeUser", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpWinSshdWithAdministrativeUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
     }
 
-    private OverthereConnectionItest testSshSftpWinSshdWithRegularUser() throws Exception {
+    private OverthereConnectionItest sshSftpWinSshdWithRegularUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
@@ -163,7 +163,7 @@ public class WindowsFactoryItest {
         options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
         options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
         options.set(JUMPSTATION, createPartialTunnelOptions());
-        return new OverthereConnectionItest(this.getClass().getName() + ".testSshSftpWinSshdWithRegularUser", SSH_PROTOCOL, options,
+        return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpWinSshdWithRegularUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
     }
 
