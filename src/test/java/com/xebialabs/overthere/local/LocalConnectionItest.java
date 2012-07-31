@@ -42,6 +42,11 @@ import com.xebialabs.overthere.util.OverthereUtils;
 public class LocalConnectionItest extends OverthereConnectionItestBase {
 
     @Override
+    public String getTestName() {
+        return LocalConnectionItest.class.getName();
+    }
+
+    @Override
 	protected void doInitHost() {
 	}
 
@@ -51,7 +56,7 @@ public class LocalConnectionItest extends OverthereConnectionItestBase {
 
 	@Override
 	protected void setTypeAndOptions() {
-		type = LOCAL_PROTOCOL;
+		protocol = LOCAL_PROTOCOL;
 		options = new ConnectionOptions();
 		options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
 		expectedConnectionClassName = LocalConnection.class.getName();

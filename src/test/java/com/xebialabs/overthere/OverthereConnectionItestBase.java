@@ -53,6 +53,7 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -71,13 +72,13 @@ import com.xebialabs.overthere.util.OverthereUtils;
  * Base class for all Overthere connection itests.
  */
 @Listeners(AssumptionListener.class)
-public abstract class OverthereConnectionItestBase {
+public abstract class OverthereConnectionItestBase implements ITest {
 
 	private static final int NR_OF_SMALL_FILES = 100;
 	public static final int SMALL_FILE_SIZE = 10 * 1024;
 	public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
 
-	protected String type;
+	protected String protocol;
 	protected ConnectionOptions options;
 	protected String expectedConnectionClassName;
 	protected OverthereConnection connection;
@@ -97,7 +98,7 @@ public abstract class OverthereConnectionItestBase {
 		host = CloudHostHolder.getHost(hostname);
 		temp.create();
 		setTypeAndOptions();
-		connection = Overthere.getConnection(type, options);
+		connection = Overthere.getConnection(protocol, options);
 	}
 
 	@AfterClass
@@ -128,7 +129,7 @@ public abstract class OverthereConnectionItestBase {
 	    ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
 	    incorrectUserNameOptions.set("username", "an-incorrect-username");
 		try {
-			Overthere.getConnection(type, incorrectUserNameOptions);
+			Overthere.getConnection(protocol, incorrectUserNameOptions);
 			fail("Expected not to be able to connect with an incorrect username");
 		} catch (RuntimeIOException expected) {
 		}
@@ -140,7 +141,7 @@ public abstract class OverthereConnectionItestBase {
 	    ConnectionOptions incorrectPasswordOptions = new ConnectionOptions(options);
 	    incorrectPasswordOptions.set("password", "an-incorrect-password");
 		try {
-			Overthere.getConnection(type, incorrectPasswordOptions);
+			Overthere.getConnection(protocol, incorrectPasswordOptions);
 			fail("Expected not to be able to connect with an incorrect password");
 		} catch (RuntimeIOException expected) {
 		}
@@ -274,7 +275,7 @@ public abstract class OverthereConnectionItestBase {
 		CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
 		int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig", "/all"));
 		assertThat(res, equalTo(0));
-		assertThat(capturingHandler.getOutput(), containsString("DHCP Server"));
+		assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
 	}
 
 	@Test
@@ -656,11 +657,11 @@ public abstract class OverthereConnectionItestBase {
     }
 
 	public boolean notLocal() {
-		return !type.equals(LOCAL_PROTOCOL);
+		return !protocol.equals(LOCAL_PROTOCOL);
 	}
 
 	public boolean notCifs() {
-		return !type.equals(CIFS_PROTOCOL);
+		return !protocol.equals(CIFS_PROTOCOL);
 	}
 
 	public boolean withPassword() {

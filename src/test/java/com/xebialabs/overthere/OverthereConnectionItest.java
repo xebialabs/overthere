@@ -15,13 +15,15 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 
 	protected final ConnectionOptions partialOptions;
 	private static final Map<String, AtomicInteger> timesHostNeeded = newHashMap();
+    private final String testName;
 
-	public OverthereConnectionItest(String type, ConnectionOptions partialOptions, String expectedConnectionClassName, String host) throws Exception {
-		hostname = host;
-		registerHostNeeded(host);
-		this.type = type;
+	public OverthereConnectionItest(String testName, String protocol, ConnectionOptions partialOptions, String expectedConnectionClassName, String host) throws Exception {
+		this.testName = testName;
+		this.protocol = protocol;
 		this.partialOptions = partialOptions;
 		this.expectedConnectionClassName = expectedConnectionClassName;
+        this.hostname = host;
+        registerHostNeeded(host);
 	}
 
 	private static void registerHostNeeded(String host) {
@@ -31,7 +33,12 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 		timesHostNeeded.get(host).incrementAndGet();
 	}
 
-	@Override
+    @Override
+    public String getTestName() {
+        return testName;
+    }
+
+    @Override
 	protected void doInitHost() {
 		CloudHostHolder.setupHost(hostname);
 	}
