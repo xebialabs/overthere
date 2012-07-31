@@ -182,10 +182,11 @@ public abstract class OverthereConnectionItestBase {
         int res = connection.execute(multiHandler(consoleHandler(), captured),
             CmdLine.build("echo", "-n", "line", "that", "does", "not", "end", "in", "a", "newline"));
         assertThat(res, equalTo(0));
-        if (captured.getOutputLines().size() == 2) {
-            // When using ssh_interactive_sudo, the first line may contain a password prompt.
-            assertThat(captured.getOutputLines().get(0), containsString("assword"));
-            assertThat(captured.getOutputLines().get(1), containsString("line that does not end in a newline"));
+        if (captured.getOutputLines().size() > 1) {
+            // When using ssh_interactive_sudo, the output may be proceeded by the password prompt and possibly even the
+            // sudo warning message.
+            assertThat(captured.getOutputLines().get(captured.getOutputLines().size() - 2), containsString("assword"));
+            assertThat(captured.getOutputLines().get(captured.getOutputLines().size() - 1), containsString("line that does not end in a newline"));
         } else {
             assertThat(captured.getOutputLines().size(), equalTo(1));
             assertThat(captured.getOutput(), containsString("line that does not end in a newline"));
