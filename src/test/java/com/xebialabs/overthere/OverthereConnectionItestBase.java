@@ -53,7 +53,6 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.ITest;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
@@ -72,7 +71,7 @@ import com.xebialabs.overthere.util.OverthereUtils;
  * Base class for all Overthere connection itests.
  */
 @Listeners(AssumptionListener.class)
-public abstract class OverthereConnectionItestBase implements ITest {
+public abstract class OverthereConnectionItestBase {
 
 	private static final int NR_OF_SMALL_FILES = 100;
 	public static final int SMALL_FILE_SIZE = 10 * 1024;

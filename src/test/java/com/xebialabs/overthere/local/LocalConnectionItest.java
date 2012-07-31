@@ -42,11 +42,6 @@ import com.xebialabs.overthere.util.OverthereUtils;
 public class LocalConnectionItest extends OverthereConnectionItestBase {
 
     @Override
-    public String getTestName() {
-        return LocalConnectionItest.class.getName();
-    }
-
-    @Override
 	protected void doInitHost() {
 	}
 

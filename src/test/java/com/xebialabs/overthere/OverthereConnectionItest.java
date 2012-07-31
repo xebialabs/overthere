@@ -7,11 +7,13 @@ import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.testng.ITest;
+
 /**
  * Base class for all parametrized Overthere connection itests that use a
  * {@link com.xebialabs.overcast.CloudHost}.
  */
-public class OverthereConnectionItest extends OverthereConnectionItestBase {
+public class OverthereConnectionItest extends OverthereConnectionItestBase implements ITest {
 
 	protected final ConnectionOptions partialOptions;
 	private static final Map<String, AtomicInteger> timesHostNeeded = newHashMap();
