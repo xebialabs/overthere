@@ -21,28 +21,28 @@ package com.xebialabs.overthere;
  */
 public interface OverthereProcessOutputHandler {
 
-	/**
-	 * Invoked when an executed command generates a single character of output (stdout).
-	 * 
-	 * @param c
-	 *            the character of output generated.
-	 */
-	void handleOutput(char c);
+    /**
+     * Invoked when an executed command generates a single character of output (stdout).
+     * 
+     * @param c
+     *            the character of output generated.
+     */
+    void handleOutput(char c);
 
-	/**
-	 * Invoked when an executed command generated a line of output (stdout).
-	 * 
-	 * @param line
-	 *            the line of output generated.
-	 */
-	void handleOutputLine(String line);
+    /**
+     * Invoked when an executed command generated a line of output (stdout).
+     * 
+     * @param line
+     *            the line of output generated.
+     */
+    void handleOutputLine(String line);
 
-	/**
-	 * Invoked when an executed command generated a line of error (stderr).
-	 * 
-	 * @param line
-	 *            the line of output generated.
-	 */
-	void handleErrorLine(String line);
+    /**
+     * Invoked when an executed command generated a line of error (stderr).
+     * 
+     * @param line
+     *            the line of output generated.
+     */
+    void handleErrorLine(String line);
 
 }

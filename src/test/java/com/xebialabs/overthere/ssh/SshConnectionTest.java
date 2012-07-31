@@ -58,13 +58,13 @@ import org.testng.annotations.Test;
  */
 public class SshConnectionTest {
 
-	@Mock MockitoFriendlySSHClient client;
+    @Mock MockitoFriendlySSHClient client;
 
-	private ConnectionOptions connectionOptions;
+    private ConnectionOptions connectionOptions;
 
     @BeforeMethod
     public void init() {
-	    MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.initMocks(this);
         connectionOptions = new ConnectionOptions();
         connectionOptions.set(CONNECTION_TYPE, SFTP);
         connectionOptions.set(OPERATING_SYSTEM, UNIX);
@@ -86,7 +86,7 @@ public class SshConnectionTest {
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
         newConnectionWithClient(client).connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider> anyVararg());
     }
 
     @Test
@@ -96,69 +96,68 @@ public class SshConnectionTest {
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
         newConnectionWithClient(client).connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider> anyVararg());
         verify(client, never()).authPassword(anyString(), anyString());
     }
 
-	@Test
-	public void shouldNotAllocateDefaultPty() throws IOException {
-		Session session = mock(Session.class);
-		when(client.startSession()).thenReturn(session);
-		connectionOptions.set(ALLOCATE_DEFAULT_PTY, false);
-
-		SshConnection connection = newConnectionWithClient(client);
-		connection.connect();
-		connection.startProcess(CmdLine.build("dummy"));
-
-		verify(session, times(0)).allocateDefaultPTY();
-	}
-
-	@Test
-	public void shouldAllocateDefaultPty() throws IOException {
-		Session session = mock(Session.class);
-		when(client.startSession()).thenReturn(session);
-		connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
-
-		SshConnection connection = newConnectionWithClient(client);
-		connection.connect();
-		connection.startProcess(CmdLine.build("dummy"));
-
-		verify(session).allocateDefaultPTY();
-	}
-
-	@SuppressWarnings("unchecked")
     @Test
-	public void shouldAllocatePty() throws IOException {
-		Session session = mock(Session.class);
-		when(client.startSession()).thenReturn(session);
-		connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
+    public void shouldNotAllocateDefaultPty() throws IOException {
+        Session session = mock(Session.class);
+        when(client.startSession()).thenReturn(session);
+        connectionOptions.set(ALLOCATE_DEFAULT_PTY, false);
 
-		SshConnection connection = newConnectionWithClient(client);
-		connection.connect();
-		connection.startProcess(CmdLine.build("dummy"));
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+        connection.startProcess(CmdLine.build("dummy"));
 
-		verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
-	}
+        verify(session, times(0)).allocateDefaultPTY();
+    }
 
-	@SuppressWarnings("unchecked")
     @Test
-	public void allocatePtyShouldOverrideAllocateDefaultPty() throws IOException {
-		Session session = mock(Session.class);
-		when(client.startSession()).thenReturn(session);
-		connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
-		connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
+    public void shouldAllocateDefaultPty() throws IOException {
+        Session session = mock(Session.class);
+        when(client.startSession()).thenReturn(session);
+        connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
 
-		SshConnection connection = newConnectionWithClient(client);
-		connection.connect();
-		connection.startProcess(CmdLine.build("dummy"));
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+        connection.startProcess(CmdLine.build("dummy"));
 
-		verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
-		verify(session, times(0)).allocateDefaultPTY();
-	}
+        verify(session).allocateDefaultPTY();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void shouldAllocatePty() throws IOException {
+        Session session = mock(Session.class);
+        when(client.startSession()).thenReturn(session);
+        connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
+
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+        connection.startProcess(CmdLine.build("dummy"));
+
+        verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void allocatePtyShouldOverrideAllocateDefaultPty() throws IOException {
+        Session session = mock(Session.class);
+        when(client.startSession()).thenReturn(session);
+        connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
+        connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
+
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+        connection.startProcess(CmdLine.build("dummy"));
+
+        verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
+        verify(session, times(0)).allocateDefaultPTY();
+    }
 
     private SshConnection newConnectionWithClient(SSHClient client) {
         return new PresetClientSshConnection(connectionOptions, client);
     }
 
 }
-

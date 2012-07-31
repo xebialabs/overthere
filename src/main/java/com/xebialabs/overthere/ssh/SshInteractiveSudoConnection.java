@@ -1,16 +1,16 @@
 /*
  * This file is part of Overthere.
- * 
+ *
  * Overthere is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Overthere is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,19 +36,19 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PRO
  */
 class SshInteractiveSudoConnection extends SshSudoConnection {
 
-	private String passwordPromptRegex;
+    private String passwordPromptRegex;
 
-	public SshInteractiveSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		super(type, options, mapper);
-		passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
-		checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
-		checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
-		checkArgument(password != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
-		if (!allocateDefaultPty && allocatePty == null) {
-			logger.warn("SSH Interactive Sudo requires a PTY, allocating a default one.");
-			allocateDefaultPty = true;
-		}
-	}
+    public SshInteractiveSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        super(type, options, mapper);
+        passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
+        checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
+        checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
+        checkArgument(password != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
+        if (!allocateDefaultPty && allocatePty == null) {
+            logger.warn("SSH Interactive Sudo requires a PTY, allocating a default one.");
+            allocateDefaultPty = true;
+        }
+    }
 
     @Override
     protected SshProcess createProcess(final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
@@ -59,6 +59,6 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
             }
         };
     }
-	
-	private static final Logger logger = LoggerFactory.getLogger(SshInteractiveSudoConnection.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(SshInteractiveSudoConnection.class);
 }

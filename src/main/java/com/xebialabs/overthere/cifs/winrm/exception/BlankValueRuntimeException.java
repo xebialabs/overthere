@@ -19,7 +19,7 @@ package com.xebialabs.overthere.cifs.winrm.exception;
 @SuppressWarnings("serial")
 public class BlankValueRuntimeException extends RuntimeException {
 
-	public BlankValueRuntimeException(String message) {
-		super(message);
-	}
+    public BlankValueRuntimeException(String message) {
+        super(message);
+    }
 }

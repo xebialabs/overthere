@@ -19,35 +19,36 @@ package com.xebialabs.overthere.util;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 /**
- * Implementation of the {@link OverthereProcessOutputHandler} interface that prints the output to the console ({@link System#out} and {@link System#err}).
+ * Implementation of the {@link OverthereProcessOutputHandler} interface that prints the output to the console (
+ * {@link System#out} and {@link System#err}).
  */
 public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
-	private ConsoleOverthereProcessOutputHandler() {
-	}
+    private ConsoleOverthereProcessOutputHandler() {
+    }
 
-	@Override
-	public void handleOutputLine(final String line) {
-		System.out.println(line);
-	}
+    @Override
+    public void handleOutputLine(final String line) {
+        System.out.println(line);
+    }
 
-	@Override
-	public void handleErrorLine(final String line) {
-		System.err.println(line);
-	}
+    @Override
+    public void handleErrorLine(final String line) {
+        System.err.println(line);
+    }
 
-	@Override
-	public void handleOutput(final char c) {
-		// no-op
-	}
+    @Override
+    public void handleOutput(final char c) {
+        // no-op
+    }
 
-	/**
-	 * Creates a {@link ConsoleOverthereProcessOutputHandler}.
-	 * 
-	 * @return the created {@link ConsoleOverthereProcessOutputHandler}.
-	 */
-	public static ConsoleOverthereProcessOutputHandler consoleHandler() {
-		return new ConsoleOverthereProcessOutputHandler();
-	}
+    /**
+     * Creates a {@link ConsoleOverthereProcessOutputHandler}.
+     * 
+     * @return the created {@link ConsoleOverthereProcessOutputHandler}.
+     */
+    public static ConsoleOverthereProcessOutputHandler consoleHandler() {
+        return new ConsoleOverthereProcessOutputHandler();
+    }
 
 }

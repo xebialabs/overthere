@@ -75,9 +75,9 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public static final String PTY_PATTERN = "(\\w+):(\\d+):(\\d+):(\\d+):(\\d+)";
 
-	public static final String NOCD_PSEUDO_COMMAND = "nocd";
+    public static final String NOCD_PSEUDO_COMMAND = "nocd";
 
-	protected final SshConnectionType sshConnectionType;
+    protected final SshConnectionType sshConnectionType;
 
     protected final String host;
 
@@ -101,18 +101,17 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
-	@VisibleForTesting
-    protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
+    @VisibleForTesting protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
         public SSHClient create() {
             return new SSHClient();
         }
     };
 
-	public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
+    public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
         this.sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
-        InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String>get(ADDRESS), options.getInteger(PORT, SSH_PORT_DEFAULT)));
+        InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String> get(ADDRESS), options.getInteger(PORT, SSH_PORT_DEFAULT)));
         this.host = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
@@ -138,8 +137,9 @@ abstract class SshConnection extends BaseOverthereConnection {
 
             if (privateKeyFile != null) {
                 if (password != null) {
-					logger.warn("The " + PRIVATE_KEY_FILE + " and " + PASSWORD + " connection options have both been set for the connection {}. Ignoring " + PASSWORD
-					        + " and using " + PRIVATE_KEY_FILE + ".", this);
+                    logger.warn("The " + PRIVATE_KEY_FILE + " and " + PASSWORD + " connection options have both been set for the connection {}. Ignoring "
+                        + PASSWORD
+                        + " and using " + PRIVATE_KEY_FILE + ".", this);
                 }
                 KeyProvider keys;
                 try {
@@ -153,9 +153,9 @@ abstract class SshConnection extends BaseOverthereConnection {
                 }
                 client.authPublickey(username, keys);
             } else if (password != null) {
-	            PasswordFinder passwordFinder = getPasswordFinder();
-	            client.auth(username, new AuthPassword(passwordFinder),
-			            new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
+                PasswordFinder passwordFinder = getPasswordFinder();
+                client.auth(username, new AuthPassword(passwordFinder),
+                    new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
             }
             sshClient = client;
         } catch (SSHException e) {
@@ -163,28 +163,28 @@ abstract class SshConnection extends BaseOverthereConnection {
         }
     }
 
-	private PasswordFinder getPasswordFinder() {
-		return new PasswordFinder() {
+    private PasswordFinder getPasswordFinder() {
+        return new PasswordFinder() {
 
-			@Override
-			public char[] reqPassword(Resource<?> resource) {
-				return password.toCharArray();
-			}
+            @Override
+            public char[] reqPassword(Resource<?> resource) {
+                return password.toCharArray();
+            }
 
-			@Override
-			public boolean shouldRetry(Resource<?> resource) {
-				return false;
-			}
-		};
-	}
+            @Override
+            public boolean shouldRetry(Resource<?> resource) {
+                return false;
+            }
+        };
+    }
 
-	@Override
+    @Override
     public void doClose() {
-    	checkState(sshClient != null, "Already disconnected");
+        checkState(sshClient != null, "Already disconnected");
         try {
             sshClient.disconnect();
         } catch (Exception e) {
-        	// Even though we get an exception, we expect the connection to have been closed, so we are ignoring 
+            // Even though we get an exception, we expect the connection to have been closed, so we are ignoring
             logger.error("Unexpected exception received while disconnecting from " + this, e);
         } finally {
             sshClient = null;
@@ -197,18 +197,18 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     @Override
-	public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
+    public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
         return getFile(hostPath, false);
     }
 
     @Override
-	public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+    public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
         return getFile(parent, child, false);
     }
 
     @Override
     protected final OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-    	return getFile(parent, name, true);
+        return getFile(parent, name, true);
     }
 
     protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
@@ -224,33 +224,34 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     @Override
-	public OverthereProcess startProcess(final CmdLine commandLine) {
-		checkNotNull(commandLine, "Cannot execute null command line");
-		checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
+    public OverthereProcess startProcess(final CmdLine commandLine) {
+        checkNotNull(commandLine, "Cannot execute null command line");
+        checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
 
-		CmdLine cmd = processCommandLine(commandLine);
+        CmdLine cmd = processCommandLine(commandLine);
         try {
-        	Session session = getSshClient().startSession();
-        	if(allocatePty != null && !allocatePty.isEmpty()) {
-        		if(allocateDefaultPty) {
-					logger.warn("The " + ALLOCATE_PTY + " and " + ALLOCATE_DEFAULT_PTY + " connection options have both been set for the connection {}. Ignoring "
-					        + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
-        		}
-        		Matcher matcher = ptyPattern.matcher(allocatePty);
-        		checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
+            Session session = getSshClient().startSession();
+            if (allocatePty != null && !allocatePty.isEmpty()) {
+                if (allocateDefaultPty) {
+                    logger.warn("The " + ALLOCATE_PTY + " and " + ALLOCATE_DEFAULT_PTY
+                        + " connection options have both been set for the connection {}. Ignoring "
+                        + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
+                }
+                Matcher matcher = ptyPattern.matcher(allocatePty);
+                checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
 
-        		String term = matcher.group(1);
-        		int cols = Integer.valueOf(matcher.group(2));
-        		int rows = Integer.valueOf(matcher.group(3));
-        		int width = Integer.valueOf(matcher.group(4));
-        		int height = Integer.valueOf(matcher.group(5));
-        		logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[] { term, cols, rows, width, height});
-        		session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer>emptyMap());
-        	} else if(allocateDefaultPty) {
-        		logger.debug("Allocating default PTY");
-        		session.allocateDefaultPTY();
-        	}
-			return createProcess(session, cmd);
+                String term = matcher.group(1);
+                int cols = Integer.valueOf(matcher.group(2));
+                int rows = Integer.valueOf(matcher.group(3));
+                int width = Integer.valueOf(matcher.group(4));
+                int height = Integer.valueOf(matcher.group(5));
+                logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[] { term, cols, rows, width, height });
+                session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer> emptyMap());
+            } else if (allocateDefaultPty) {
+                logger.debug("Allocating default PTY");
+                session.allocateDefaultPTY();
+            }
+            return createProcess(session, cmd);
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot execute remote command \"" + cmd.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
         }
@@ -258,37 +259,38 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     protected CmdLine processCommandLine(final CmdLine commandLine) {
-		if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
-			logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND + " pseudo command was present, but the pseudo command will be stripped");
-			logger.trace("Replacing: {}", commandLine);
-			CmdLine cmd = stripPrefixedPseudoCommand(commandLine);
-			logger.trace("With     : {}", cmd);
-			return cmd;
-		} else if(getWorkingDirectory() != null) {
-			logger.trace("Prefixing command line with cd statement because the current working directory was set");
-			logger.trace("Replacing: {}", commandLine);
-    		CmdLine cmd = new CmdLine();
-    		cmd.addArgument("cd");
-    		cmd.addArgument(workingDirectory.getPath());
-    		cmd.addRaw(os.getCommandSeparator());
-    		for (CmdLineArgument a : commandLine.getArguments()) {
-    			cmd.add(a);
-    		}
-			logger.trace("With     : {}", cmd);
-    		return cmd;
+        if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
+            logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND
+                + " pseudo command was present, but the pseudo command will be stripped");
+            logger.trace("Replacing: {}", commandLine);
+            CmdLine cmd = stripPrefixedPseudoCommand(commandLine);
+            logger.trace("With     : {}", cmd);
+            return cmd;
+        } else if (getWorkingDirectory() != null) {
+            logger.trace("Prefixing command line with cd statement because the current working directory was set");
+            logger.trace("Replacing: {}", commandLine);
+            CmdLine cmd = new CmdLine();
+            cmd.addArgument("cd");
+            cmd.addArgument(workingDirectory.getPath());
+            cmd.addRaw(os.getCommandSeparator());
+            for (CmdLineArgument a : commandLine.getArguments()) {
+                cmd.add(a);
+            }
+            logger.trace("With     : {}", cmd);
+            return cmd;
         } else {
-			logger.trace("Not prefixing command line with cd statement because the current working directory was not set");
-			logger.trace("Keeping  : {}", commandLine);
-        	return commandLine;
+            logger.trace("Not prefixing command line with cd statement because the current working directory was not set");
+            logger.trace("Keeping  : {}", commandLine);
+            return commandLine;
         }
     }
 
     protected boolean startsWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {
-    	return commandLine.getArguments().size() >= 2 && commandLine.getArguments().get(0).toString(os, false).equals(pseudoCommand);
+        return commandLine.getArguments().size() >= 2 && commandLine.getArguments().get(0).toString(os, false).equals(pseudoCommand);
     }
 
-	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
-    	return new SshProcess(this, os, session, commandLine);
+    protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
+        return new SshProcess(this, os, session, commandLine);
     }
 
     @Override
@@ -297,17 +299,15 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     protected static CmdLine stripPrefixedPseudoCommand(final CmdLine commandLine) {
-		return new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
-	}
-
-	protected static CmdLine prefixWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {
-	    CmdLine nosudoCommandLine = new CmdLine();
-		nosudoCommandLine.addArgument(pseudoCommand);
-		nosudoCommandLine.add(commandLine.getArguments());
-	    return nosudoCommandLine;
+        return new CmdLine().add(commandLine.getArguments().subList(1, commandLine.getArguments().size()));
     }
 
-
+    protected static CmdLine prefixWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {
+        CmdLine nosudoCommandLine = new CmdLine();
+        nosudoCommandLine.addArgument(pseudoCommand);
+        nosudoCommandLine.add(commandLine.getArguments());
+        return nosudoCommandLine;
+    }
 
     private static Logger logger = LoggerFactory.getLogger(SshConnection.class);
 

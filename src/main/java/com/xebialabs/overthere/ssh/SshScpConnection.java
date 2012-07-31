@@ -30,14 +30,15 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
  */
 class SshScpConnection extends SshConnection {
 
-	public SshScpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		super(type, options, mapper);
-		checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
-	}
+    public SshScpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        super(type, options, mapper);
+        checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString()
+            .toLowerCase());
+    }
 
-	@Override
-	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshScpFile(this, hostPath);
-	}
+    @Override
+    protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+        return new SshScpFile(this, hostPath);
+    }
 
 }

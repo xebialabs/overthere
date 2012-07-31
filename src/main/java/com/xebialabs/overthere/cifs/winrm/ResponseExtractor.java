@@ -23,32 +23,31 @@ import org.jaxen.SimpleNamespaceContext;
 
 public enum ResponseExtractor {
 
-	COMMAND_ID("CommandId"),
-	EXIT_CODE("ExitCode"),
-	SHELL_ID("Selector[@Name='ShellId']", Namespaces.NS_WSMAN_DMTF),
-	STDOUT("Stream[@Name='stdout']"),
-	STDERR("Stream[@Name='stderr']"),
-	STREAM_DONE("CommandState[@State='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done']");
+    COMMAND_ID("CommandId"),
+    EXIT_CODE("ExitCode"),
+    SHELL_ID("Selector[@Name='ShellId']", Namespaces.NS_WSMAN_DMTF),
+    STDOUT("Stream[@Name='stdout']"),
+    STDERR("Stream[@Name='stderr']"),
+    STREAM_DONE("CommandState[@State='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done']");
 
-	private final String expr;
-	private final Namespace ns;
-	private final SimpleNamespaceContext namespaceContext;
+    private final String expr;
+    private final Namespace ns;
+    private final SimpleNamespaceContext namespaceContext;
 
-	ResponseExtractor(String expr) {
-		this(expr, Namespaces.NS_WIN_SHELL);
-	}
+    ResponseExtractor(String expr) {
+        this(expr, Namespaces.NS_WIN_SHELL);
+    }
 
+    ResponseExtractor(String expr, Namespace ns) {
+        this.expr = expr;
+        this.ns = ns;
+        namespaceContext = new SimpleNamespaceContext();
+        namespaceContext.addNamespace(ns.getPrefix(), ns.getURI());
+    }
 
-	ResponseExtractor(String expr, Namespace ns) {
-		this.expr = expr;
-		this.ns = ns;
-		namespaceContext = new SimpleNamespaceContext();
-		namespaceContext.addNamespace(ns.getPrefix(), ns.getURI());
-	}
-
-	public XPath getXPath() {
-		final XPath xPath = DocumentHelper.createXPath("//" + ns.getPrefix() + ":" + expr);
-		xPath.setNamespaceContext(namespaceContext);
-		return xPath;
-	}
+    public XPath getXPath() {
+        final XPath xPath = DocumentHelper.createXPath("//" + ns.getPrefix() + ":" + expr);
+        xPath.setNamespaceContext(namespaceContext);
+        return xPath;
+    }
 }

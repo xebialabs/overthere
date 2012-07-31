@@ -24,17 +24,16 @@ import java.util.List;
  */
 public enum OptionSet {
 
-	OPEN_SHELL(Lists.newArrayList(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437"))),
-	RUN_COMMAND(Lists.newArrayList(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE")));
+    OPEN_SHELL(Lists.newArrayList(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437"))),
+    RUN_COMMAND(Lists.newArrayList(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE")));
 
-	private final List<KeyValuePair> keyValuePairs;
+    private final List<KeyValuePair> keyValuePairs;
 
+    OptionSet(List<KeyValuePair> keyValuePairs) {
+        this.keyValuePairs = keyValuePairs;
+    }
 
-	OptionSet(List<KeyValuePair> keyValuePairs) {
-		this.keyValuePairs = keyValuePairs;
-	}
-
-	public List<KeyValuePair> getKeyValuePairs() {
-		return keyValuePairs;
-	}
+    public List<KeyValuePair> getKeyValuePairs() {
+        return keyValuePairs;
+    }
 }

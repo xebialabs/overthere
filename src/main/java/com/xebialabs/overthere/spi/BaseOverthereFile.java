@@ -23,56 +23,57 @@ import com.xebialabs.overthere.util.OverthereFileCopier;
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
- * A file system object (file, directory, etc.) on a remote system that is accessible through an {@link com.xebialabs.overthere.OverthereConnection}.
+ * A file system object (file, directory, etc.) on a remote system that is accessible through an
+ * {@link com.xebialabs.overthere.OverthereConnection}.
  */
 public abstract class BaseOverthereFile<C extends BaseOverthereConnection> implements OverthereFile {
 
-	protected C connection;
+    protected C connection;
 
-	protected BaseOverthereFile() {
-		this.connection = null;
-	}
+    protected BaseOverthereFile() {
+        this.connection = null;
+    }
 
-	protected BaseOverthereFile(C connection) {
-		this.connection = connection;
-	}
+    protected BaseOverthereFile(C connection) {
+        this.connection = connection;
+    }
 
-	@Override
-	public C getConnection() {
-		return connection;
-	}
+    @Override
+    public C getConnection() {
+        return connection;
+    }
 
-	@Override
-	public OverthereFile getFile(String child) {
-		return getConnection().getFile(this, child);
-	}
+    @Override
+    public OverthereFile getFile(String child) {
+        return getConnection().getFile(this, child);
+    }
 
-	@Override
-	public void deleteRecursively() throws RuntimeIOException {
-		if (isDirectory()) {
-			for (OverthereFile each : listFiles()) {
-				each.deleteRecursively();
-			}
-		}
+    @Override
+    public void deleteRecursively() throws RuntimeIOException {
+        if (isDirectory()) {
+            for (OverthereFile each : listFiles()) {
+                each.deleteRecursively();
+            }
+        }
 
-		delete();
-	}
+        delete();
+    }
 
-	@Override
-	public final void copyTo(final OverthereFile dest) {
-		checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
+    @Override
+    public final void copyTo(final OverthereFile dest) {
+        checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
 
-		((BaseOverthereFile<?>) dest).copyFrom(this);
-	}
+        ((BaseOverthereFile<?>) dest).copyFrom(this);
+    }
 
-	protected void copyFrom(OverthereFile source) {
-		OverthereFileCopier.copy(source, this);
-	}
+    protected void copyFrom(OverthereFile source) {
+        OverthereFileCopier.copy(source, this);
+    }
 
-	/**
-	 * Subclasses MUST implement toString properly.
-	 */
-	@Override
-	public abstract String toString();
+    /**
+     * Subclasses MUST implement toString properly.
+     */
+    @Override
+    public abstract String toString();
 
 }

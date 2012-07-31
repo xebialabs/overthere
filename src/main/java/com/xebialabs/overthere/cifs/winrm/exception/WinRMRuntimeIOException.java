@@ -28,43 +28,43 @@ import com.xebialabs.overthere.RuntimeIOException;
 @SuppressWarnings("serial")
 public class WinRMRuntimeIOException extends RuntimeIOException {
 
-	final Document in;
-	final Document out;
+    final Document in;
+    final Document out;
 
-	public WinRMRuntimeIOException(String message, Document in, Document out, Throwable cause) {
-		super(message, cause);
-		this.in = in;
-		this.out = out;
-	}
+    public WinRMRuntimeIOException(String message, Document in, Document out, Throwable cause) {
+        super(message, cause);
+        this.in = in;
+        this.out = out;
+    }
 
-	public WinRMRuntimeIOException(String message) {
-		this(message, null, null, null);
+    public WinRMRuntimeIOException(String message) {
+        this(message, null, null, null);
 
-	}
+    }
 
-	public WinRMRuntimeIOException(String message, Throwable throwable) {
-		this(message, null, null, throwable);
-	}
+    public WinRMRuntimeIOException(String message, Throwable throwable) {
+        this(message, null, null, throwable);
+    }
 
-	@Override
-	public String getMessage() {
-		return String.format("%s, document in %s, document out %s,", super.getMessage(), toString(in), toString(out));
-	}
+    @Override
+    public String getMessage() {
+        return String.format("%s, document in %s, document out %s,", super.getMessage(), toString(in), toString(out));
+    }
 
-	private static String toString(Document doc) {
-		if (doc == null) {
-			return "[EMPTY]";
-		}
+    private static String toString(Document doc) {
+        if (doc == null) {
+            return "[EMPTY]";
+        }
 
-		StringWriter stringWriter = new StringWriter();
-		XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
-		try {
-			xmlWriter.write(doc);
-			xmlWriter.close();
-		} catch (IOException e) {
-			throw new RuntimeException("error ", e);
-		}
-		return stringWriter.toString();
-	}
+        StringWriter stringWriter = new StringWriter();
+        XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
+        try {
+            xmlWriter.write(doc);
+            xmlWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException("error ", e);
+        }
+        return stringWriter.toString();
+    }
 
 }

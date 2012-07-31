@@ -23,12 +23,13 @@ class SshProcess implements OverthereProcess {
     private final String encodedCommandLine;
     private final Session.Command command;
 
-    SshProcess(final SshConnection connection, final OperatingSystemFamily os, final Session session, final CmdLine commandLine) throws TransportException, ConnectionException {
+    SshProcess(final SshConnection connection, final OperatingSystemFamily os, final Session session, final CmdLine commandLine) throws TransportException,
+        ConnectionException {
         this.connection = connection;
         this.session = session;
         this.encodedCommandLine = commandLine.toCommandLine(os, true);
         logger.debug("Executing command {} on {}", encodedCommandLine, connection);
-		this.command = session.exec(commandLine.toCommandLine(os, false));
+        this.command = session.exec(commandLine.toCommandLine(os, false));
     }
 
     @Override
@@ -52,14 +53,15 @@ class SshProcess implements OverthereProcess {
             command.join();
             Integer exitStatus = command.getExitStatus();
             logger.info("Command {} on {} returned {}", new Object[] { encodedCommandLine, connection, exitStatus });
-	        closeSession();
-	        if(exitStatus == null) {
-				logger.warn("Command {} on {} could not be started. This may be caused by the connection option " + ALLOCATE_DEFAULT_PTY + " being set to true.", new Object[] {
-				        encodedCommandLine, connection });
-	        	return -1;
-	        } else {
-	        	return exitStatus;
-	        }
+            closeSession();
+            if (exitStatus == null) {
+                logger.warn("Command {} on {} could not be started. This may be caused by the connection option " + ALLOCATE_DEFAULT_PTY
+                    + " being set to true.", new Object[] {
+                    encodedCommandLine, connection });
+                return -1;
+            } else {
+                return exitStatus;
+            }
         } catch (ConnectionException e) {
             throw new RuntimeIOException("Caught exception while awaiting end of process", e);
         }
@@ -67,25 +69,25 @@ class SshProcess implements OverthereProcess {
 
     @Override
     public void destroy() {
-	    try {
-		    command.signal(Signal.KILL);
-	    } catch (TransportException e) {
-		    logger.warn("Could not send the KILL signal to the command, closing the session.", e);
-	    } finally {
-		    closeSession();
-	    }
+        try {
+            command.signal(Signal.KILL);
+        } catch (TransportException e) {
+            logger.warn("Could not send the KILL signal to the command, closing the session.", e);
+        } finally {
+            closeSession();
+        }
     }
 
-	private void closeSession() {
-		if (session.isOpen()) {
-		    try {
-		        session.close();
-		    } catch (SSHException e) {
-		        throw new RuntimeIOException("Could not close the SSH session", e);
-		    }
-		}
-	}
+    private void closeSession() {
+        if (session.isOpen()) {
+            try {
+                session.close();
+            } catch (SSHException e) {
+                throw new RuntimeIOException("Could not close the SSH session", e);
+            }
+        }
+    }
 
-	private static Logger logger = LoggerFactory.getLogger(SshProcess.class);
+    private static Logger logger = LoggerFactory.getLogger(SshProcess.class);
 
 }

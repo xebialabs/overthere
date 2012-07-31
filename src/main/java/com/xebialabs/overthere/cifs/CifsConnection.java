@@ -44,109 +44,111 @@ import org.slf4j.LoggerFactory;
  * 
  * Limitations:
  * <ul>
- * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator access is needed.</li>
+ * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
+ * access is needed.</li>
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */
 public abstract class CifsConnection extends BaseOverthereConnection {
 
-	protected CifsConnectionType cifsConnectionType;
+    protected CifsConnectionType cifsConnectionType;
 
-	protected String address;
-	
-	protected int cifsPort;
-	
-	protected int port;
+    protected String address;
 
-	protected String username;
+    protected int cifsPort;
 
-	protected String password;
-	
-	protected PathEncoder encoder;
+    protected int port;
 
-	protected NtlmPasswordAuthentication authentication;
+    protected String username;
 
-	/**
-	 * Creates a {@link CifsConnection}. Don't invoke directly. Use {@link Overthere#getConnection(String, ConnectionOptions)} instead.
-	 */
-	public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
-		super(protocol, options, mapper, canStartProcess);
-		this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
-		String address = options.get(ADDRESS);
-		InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort())));
-		this.address = addressPort.getHostName();
-		this.port = addressPort.getPort();
-		this.username = options.get(USERNAME);
-		this.password = options.get(PASSWORD);
-		InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
-		this.cifsPort = addressCifsPort.getPort();
-		this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
-		this.authentication = new NtlmPasswordAuthentication(null, username, password);
-	}
+    protected String password;
 
-	private Integer getDefaultPort() {
-		switch(cifsConnectionType) {
-		case TELNET:
-			return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
-		case WINRM_HTTP:
-			return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
-		case WINRM_HTTPS:
-			return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
-		default:
-			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);	
-		}
-	}
+    protected PathEncoder encoder;
 
-	@Override
-	public void doClose() {
-		// no-op
-	}
+    protected NtlmPasswordAuthentication authentication;
 
-	@Override
-	public OverthereFile getFile(String hostPath) throws RuntimeIOException {
-		try {
-			SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath), authentication);
-			return new CifsFile(this, smbFile);
-		} catch (IOException exc) {
-			throw new RuntimeIOException(exc);
-		}
-	}
+    /**
+     * Creates a {@link CifsConnection}. Don't invoke directly. Use
+     * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
+     */
+    public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
+        super(protocol, options, mapper, canStartProcess);
+        this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        String address = options.get(ADDRESS);
+        InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort())));
+        this.address = addressPort.getHostName();
+        this.port = addressPort.getPort();
+        this.username = options.get(USERNAME);
+        this.password = options.get(PASSWORD);
+        InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
+        this.cifsPort = addressCifsPort.getPort();
+        this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
+        this.authentication = new NtlmPasswordAuthentication(null, username, password);
+    }
 
-	@Override
-	public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
-		StringBuilder childPath = new StringBuilder();
-		childPath.append(parent.getPath());
-		if(!parent.getPath().endsWith(getHostOperatingSystem().getFileSeparator())) {
-			childPath.append(getHostOperatingSystem().getFileSeparator());
-		}
-		childPath.append(child.replace('\\', '/'));
-		return getFile(childPath.toString());
-	}
+    private Integer getDefaultPort() {
+        switch (cifsConnectionType) {
+        case TELNET:
+            return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
+        case WINRM_HTTP:
+            return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+        case WINRM_HTTPS:
+            return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
+        default:
+            throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
+        }
+    }
 
-	@Override
-	protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-		return getFile(parent, name);
-	}
+    @Override
+    public void doClose() {
+        // no-op
+    }
 
-	private String encodeAsSmbUrl(String hostPath) {
-		try {
-			String smbUrl = encoder.toSmbUrl(hostPath);
-			logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, maskSmbUrl(smbUrl));
-			return smbUrl;
-		} catch (IllegalArgumentException exception) {
-			throw new RuntimeIOException(exception);
-		}
-	}
+    @Override
+    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+        try {
+            SmbFile smbFile = new SmbFile(encodeAsSmbUrl(hostPath), authentication);
+            return new CifsFile(this, smbFile);
+        } catch (IOException exc) {
+            throw new RuntimeIOException(exc);
+        }
+    }
 
-	private String maskSmbUrl(String smbUrl) {
-		return smbUrl.replace(password, "********");
-	}
+    @Override
+    public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+        StringBuilder childPath = new StringBuilder();
+        childPath.append(parent.getPath());
+        if (!parent.getPath().endsWith(getHostOperatingSystem().getFileSeparator())) {
+            childPath.append(getHostOperatingSystem().getFileSeparator());
+        }
+        childPath.append(child.replace('\\', '/'));
+        return getFile(childPath.toString());
+    }
 
-	@Override
-	public String toString() {
-		return "cifs:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + address + ":" + cifsPort + ":" + port;
-	}
+    @Override
+    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+        return getFile(parent, name);
+    }
 
-	private static Logger logger = LoggerFactory.getLogger(CifsConnection.class);
+    private String encodeAsSmbUrl(String hostPath) {
+        try {
+            String smbUrl = encoder.toSmbUrl(hostPath);
+            logger.trace("Encoded Windows host path {} to SMB URL {}", hostPath, maskSmbUrl(smbUrl));
+            return smbUrl;
+        } catch (IllegalArgumentException exception) {
+            throw new RuntimeIOException(exception);
+        }
+    }
+
+    private String maskSmbUrl(String smbUrl) {
+        return smbUrl.replace(password, "********");
+    }
+
+    @Override
+    public String toString() {
+        return "cifs:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + address + ":" + cifsPort + ":" + port;
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(CifsConnection.class);
 
 }

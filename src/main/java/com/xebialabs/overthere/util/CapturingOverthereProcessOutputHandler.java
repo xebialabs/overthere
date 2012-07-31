@@ -29,93 +29,93 @@ import static java.util.Collections.unmodifiableList;
  */
 public final class CapturingOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
-	private final List<String> outputLines = new ArrayList<String>();
+    private final List<String> outputLines = new ArrayList<String>();
 
-	private final List<String> errorLines = new ArrayList<String>();
+    private final List<String> errorLines = new ArrayList<String>();
 
-	private final List<String> allLines = new ArrayList<String>();
+    private final List<String> allLines = new ArrayList<String>();
 
-	private CapturingOverthereProcessOutputHandler() {
-	}
+    private CapturingOverthereProcessOutputHandler() {
+    }
 
-	@Override
-	public void handleOutputLine(final String line) {
-		outputLines.add(line);
-		allLines.add(line);
-	}
+    @Override
+    public void handleOutputLine(final String line) {
+        outputLines.add(line);
+        allLines.add(line);
+    }
 
-	@Override
-	public void handleErrorLine(final String line) {
-		errorLines.add(line);
-		allLines.add(line);
-	}
+    @Override
+    public void handleErrorLine(final String line) {
+        errorLines.add(line);
+        allLines.add(line);
+    }
 
-	@Override
-	public void handleOutput(final char c) {
-		// no-op
-	}
+    @Override
+    public void handleOutput(final char c) {
+        // no-op
+    }
 
-	/**
-	 * Returns the captured regular output lines.
-	 * 
-	 * @return a list of captured regular output lines.
-	 */
-	public List<String> getOutputLines() {
-		return unmodifiableList(outputLines);
-	}
+    /**
+     * Returns the captured regular output lines.
+     * 
+     * @return a list of captured regular output lines.
+     */
+    public List<String> getOutputLines() {
+        return unmodifiableList(outputLines);
+    }
 
-	/**
-	 * Returns the captured regular output, with the lines separated by "\n".
-	 * 
-	 * @return the captured regular output as one string.
-	 */
-	public String getOutput() {
-		return on('\n').join(outputLines);
-	}
+    /**
+     * Returns the captured regular output, with the lines separated by "\n".
+     * 
+     * @return the captured regular output as one string.
+     */
+    public String getOutput() {
+        return on('\n').join(outputLines);
+    }
 
-	/**
-	 * Returns the captured error output lines.
-	 * 
-	 * @return a list of captured error output lines.
-	 */
-	public List<String> getErrorLines() {
-		return unmodifiableList(errorLines);
-	}
+    /**
+     * Returns the captured error output lines.
+     * 
+     * @return a list of captured error output lines.
+     */
+    public List<String> getErrorLines() {
+        return unmodifiableList(errorLines);
+    }
 
-	/**
-	 * Returns the captured error output, with the lines separated by "\n".
-	 * 
-	 * @return the captured error output as one string.
-	 */
-	public String getError() {
-		return on('\n').join(errorLines);
-	}
+    /**
+     * Returns the captured error output, with the lines separated by "\n".
+     * 
+     * @return the captured error output as one string.
+     */
+    public String getError() {
+        return on('\n').join(errorLines);
+    }
 
-	/**
-	 * Returns the captured regular and error output lines.
-	 * 
-	 * @return a list of captured error regular and output lines.
-	 */
-	public List<String> getAllLines() {
-		return unmodifiableList(allLines);
-	}
+    /**
+     * Returns the captured regular and error output lines.
+     * 
+     * @return a list of captured error regular and output lines.
+     */
+    public List<String> getAllLines() {
+        return unmodifiableList(allLines);
+    }
 
-	/**
-	 * Returns the captured regular and error output, with the lines separated by "\n".
-	 * 
-	 * @return the captured regular and error output as one string.
-	 */
-	public String getAll() {
-		return on('\n').join(allLines);
-	}
+    /**
+     * Returns the captured regular and error output, with the lines separated by "\n".
+     * 
+     * @return the captured regular and error output as one string.
+     */
+    public String getAll() {
+        return on('\n').join(allLines);
+    }
 
-	/**
-	 * Creates a {@link CapturingOverthereProcessOutputHandler}.
-	 * 
-	 * @return the created {@link CapturingOverthereProcessOutputHandler}.
-	 */
-	public static CapturingOverthereProcessOutputHandler capturingHandler() {
-		return new CapturingOverthereProcessOutputHandler();
-	}
+    /**
+     * Creates a {@link CapturingOverthereProcessOutputHandler}.
+     * 
+     * @return the created {@link CapturingOverthereProcessOutputHandler}.
+     */
+    public static CapturingOverthereProcessOutputHandler capturingHandler() {
+        return new CapturingOverthereProcessOutputHandler();
+    }
 
 }

@@ -18,15 +18,15 @@ package com.xebialabs.overthere.cifs.winrm.soap;
 
 public enum SoapAction {
 
-	COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
+    COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
 
-	private final String value;
+    private final String value;
 
-	SoapAction(String value) {
-		this.value = value;
-	}
+    SoapAction(String value) {
+        this.value = value;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+        return value;
+    }
 }

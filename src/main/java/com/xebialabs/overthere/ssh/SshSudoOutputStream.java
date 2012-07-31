@@ -26,37 +26,37 @@ import java.io.OutputStream;
  */
 class SshSudoOutputStream extends OutputStream {
 
-	private SshSudoFile destFile;
+    private SshSudoFile destFile;
 
-	private OverthereFile tempFile;
+    private OverthereFile tempFile;
 
-	private OutputStream tempFileOutputStream;
+    private OutputStream tempFileOutputStream;
 
-	public SshSudoOutputStream(SshSudoFile destFile, OverthereFile tempFile) {
-		this.destFile = destFile;
-		this.tempFile = tempFile;
-		tempFileOutputStream = tempFile.getOutputStream();
-	}
+    public SshSudoOutputStream(SshSudoFile destFile, OverthereFile tempFile) {
+        this.destFile = destFile;
+        this.tempFile = tempFile;
+        tempFileOutputStream = tempFile.getOutputStream();
+    }
 
-	@Override
-	public void write(int b) throws IOException {
-		tempFileOutputStream.write(b);
-	}
+    @Override
+    public void write(int b) throws IOException {
+        tempFileOutputStream.write(b);
+    }
 
-	@Override
-	public void write(byte[] b, int off, int len) throws IOException {
-		tempFileOutputStream.write(b, off, len);
-	}
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+        tempFileOutputStream.write(b, off, len);
+    }
 
-	@Override
-	public void write(byte[] b) throws IOException {
-		tempFileOutputStream.write(b);
-	}
+    @Override
+    public void write(byte[] b) throws IOException {
+        tempFileOutputStream.write(b);
+    }
 
-	@Override
-	public void close() throws IOException {
-		tempFileOutputStream.close();
-		destFile.copyfromTempFile(tempFile);
-	}
+    @Override
+    public void close() throws IOException {
+        tempFileOutputStream.close();
+        destFile.copyfromTempFile(tempFile);
+    }
 
 }

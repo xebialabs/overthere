@@ -21,52 +21,58 @@ import com.xebialabs.overthere.spi.Protocol;
 @Protocol(name = CIFS_PROTOCOL)
 public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 
-	/**
-	 * Name of the protocol handled by this connection builder, i.e. "cifs".
-	 */
-	public static final String CIFS_PROTOCOL = "cifs";
-	
-	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the {@link CifsConnectionType CIFS connection type} to use.
-	 */
-	public static final String CONNECTION_TYPE = "connectionType";
-	
-	/**
-	 * Default port (23) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link {@link CifsConnectionType#TELNET TELNET}.
-	 */
-	public static final int DEFAULT_TELNET_PORT = 23;
+    /**
+     * Name of the protocol handled by this connection builder, i.e. "cifs".
+     */
+    public static final String CIFS_PROTOCOL = "cifs";
 
-	/**
-	 * Default port (5985) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link {@link CifsConnectionType#WINRM_HTTP WINRM_HTTP}.
-	 */
-	public static final int DEFAULT_WINRM_HTTP_PORT = 5985;
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the {@link CifsConnectionType CIFS
+     * connection type} to use.
+     */
+    public static final String CONNECTION_TYPE = "connectionType";
 
-	/**
-	 * Default port (5986) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link {@link CifsConnectionType#WINRM_HTTPS WINRM_HTTPS}.
-	 */
-	public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
+    /**
+     * Default port (23) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * {@link CifsConnectionType#TELNET TELNET}.
+     */
+    public static final int DEFAULT_TELNET_PORT = 23;
 
-	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the CIFS port to connect to.
-	 */
-	public static final String CIFS_PORT = "cifsPort";
+    /**
+     * Default port (5985) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * {@link CifsConnectionType#WINRM_HTTP WINRM_HTTP}.
+     */
+    public static final int DEFAULT_WINRM_HTTP_PORT = 5985;
 
-	/**
-	 * Default value (445) for the {@link ConnectionOptions connection option} used to specify the CIFS port to connect to.
-	 */
-	public static final int DEFAULT_CIFS_PORT = 445;
+    /**
+     * Default port (5986) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * {@link CifsConnectionType#WINRM_HTTPS WINRM_HTTPS}.
+     */
+    public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
 
-	/**
-	 * Name of the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for CIFS, specified as a
-	 * <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not explicitly mapped to a share the administrative
-	 * share will be used..
-	 */
-	public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the CIFS port to connect to.
+     */
+    public static final String CIFS_PORT = "cifsPort";
 
-	/**
-	 * Default value (empty map) for the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for CIFS.
-	 */
-	public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
+    /**
+     * Default value (445) for the {@link ConnectionOptions connection option} used to specify the CIFS port to connect
+     * to.
+     */
+    public static final int DEFAULT_CIFS_PORT = 445;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for
+     * CIFS, specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not
+     * explicitly mapped to a share the administrative share will be used..
+     */
+    public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
+
+    /**
+     * Default value (empty map) for the {@link ConnectionOptions connection option} used to specify the path to share
+     * mappings to use for CIFS.
+     */
+    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
@@ -148,32 +154,32 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final WinrmHttpsHostnameVerificationStrategy DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = BROWSER_COMPATIBLE;
 
-	private OverthereConnection connection;
+    private OverthereConnection connection;
 
-	public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+    public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
 
-		switch(cifsConnectionType) {
-		case TELNET:
-			connection = new CifsTelnetConnection(type, options, mapper);
-			break;
-		case WINRM_HTTP:
-		case WINRM_HTTPS:
-			connection = new CifsWinRmConnection(type, options, mapper);
-			break;
-		default:
-			throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
-		}
-	}
+        switch (cifsConnectionType) {
+        case TELNET:
+            connection = new CifsTelnetConnection(type, options, mapper);
+            break;
+        case WINRM_HTTP:
+        case WINRM_HTTPS:
+            connection = new CifsWinRmConnection(type, options, mapper);
+            break;
+        default:
+            throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
+        }
+    }
 
-	@Override
-	public OverthereConnection connect() {
-		return connection;
-	}
+    @Override
+    public OverthereConnection connect() {
+        return connection;
+    }
 
-	@Override
-	public String toString() {
-		return connection.toString();
-	}
+    @Override
+    public String toString() {
+        return connection.toString();
+    }
 
 }

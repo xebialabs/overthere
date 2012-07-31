@@ -28,26 +28,26 @@ import org.testng.annotations.Test;
  */
 public class PathMapperTest {
     private PathMapper mapper;
-    
+
     @Test
     public void usesExplicitMappingForSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"));
         assertThat(mapper.toSharedPath("c:\\Windows\\Temp"), is("windows-share\\Temp"));
     }
-    
+
     @Test
     public void ignoresCaseInLocalPath() {
         mapper = new PathMapper(ImmutableMap.of("C:\\Windows", "windows-share"));
         assertThat(mapper.toSharedPath("c:\\windows\\Temp"), is("windows-share\\Temp"));
     }
-    
+
     @Test
     public void usesLongestExplicitMappingForSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share",
-                "c:\\Windows\\Temp", "temp-share", "c:", "c-share"));
+            "c:\\Windows\\Temp", "temp-share", "c:", "c-share"));
         assertThat(mapper.toSharedPath("c:\\Windows\\Temp\\file.txt"), is("temp-share\\file.txt"));
     }
-    
+
     @Test
     public void fallsBackToAdminSharesForSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"));
@@ -57,33 +57,33 @@ public class PathMapperTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedOrAdminShare() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
-        .toLocalPath("temp-share\\file.txt");
+            .toLocalPath("temp-share\\file.txt");
     }
-    
+
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedAndTooShort() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
-        .toLocalPath("s");
+            .toLocalPath("s");
     }
-    
+
     @Test
     public void handlesExplicitMappingInSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"));
         assertThat(mapper.toLocalPath("windows-share\\Temp"), is("c:\\Windows\\Temp"));
     }
-    
+
     @Test
     public void handlesShortExplicitMappingInSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "w"));
         assertThat(mapper.toLocalPath("w\\Temp"), is("c:\\Windows\\Temp"));
     }
-    
+
     @Test
     public void ignoresCaseInSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"));
         assertThat(mapper.toLocalPath("Windows-Share\\Temp"), is("c:\\Windows\\Temp"));
     }
-    
+
     @Test
     public void handlesAdminSharesInSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows\\Temp", "temp-share"));

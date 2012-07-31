@@ -45,82 +45,83 @@ import com.xebialabs.overthere.util.DefaultAddressPortMapper;
  */
 @SuppressWarnings("unchecked")
 public class Overthere {
-	// The "logger" field has to be declared and defined at the top so that the static initializer below can access it
-	private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
+    // The "logger" field has to be declared and defined at the top so that the static initializer below can access it
+    private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
 
-	private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
-	        new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
+    private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
+        new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
 
-	static {
-		final Scannit scannit = new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner()));
-		final Set<Class<?>> protocolClasses = scannit.getTypesAnnotatedWith(Protocol.class);
-		for (Class<?> protocol : protocolClasses) {
-			if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
-				final String name = protocol.getAnnotation(Protocol.class).name();
-				Overthere.protocols.get().put(name, (Class<? extends OverthereConnectionBuilder>) protocol);
-			} else {
-				logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
-			}
-		}
-	}
+    static {
+        final Scannit scannit = new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner()));
+        final Set<Class<?>> protocolClasses = scannit.getTypesAnnotatedWith(Protocol.class);
+        for (Class<?> protocol : protocolClasses) {
+            if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
+                final String name = protocol.getAnnotation(Protocol.class).name();
+                Overthere.protocols.get().put(name, (Class<? extends OverthereConnectionBuilder>) protocol);
+            } else {
+                logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
+            }
+        }
+    }
 
     private Overthere() {
         // should not instantiate
     }
 
     /**
-	 * Creates a connection.
-	 * 
-	 * @param protocol
-	 *            The protocol to use, e.g. "local".
-	 * @param options
-	 *            A set of options to use for the connection.
-	 * @return the connection.
-	 */
-	public static OverthereConnection getConnection(String protocol, final ConnectionOptions options) {
-		if (!protocols.get().containsKey(protocol)) {
-			throw new IllegalArgumentException("Unknown connection protocol " + protocol);
-		}
+     * Creates a connection.
+     * 
+     * @param protocol
+     *            The protocol to use, e.g. "local".
+     * @param options
+     *            A set of options to use for the connection.
+     * @return the connection.
+     */
+    public static OverthereConnection getConnection(String protocol, final ConnectionOptions options) {
+        if (!protocols.get().containsKey(protocol)) {
+            throw new IllegalArgumentException("Unknown connection protocol " + protocol);
+        }
 
         logger.trace("Connection for protocol {} requested with the following connection options: {}", protocol, options);
 
-		ConnectionOptions jumpstationOptions = options.get(JUMPSTATION, null);
-		AddressPortMapper mapper = new DefaultAddressPortMapper();
-		if (jumpstationOptions != null) {
-			mapper = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, jumpstationOptions);
-		}
-		try {
-			return buildConnection(protocol, options, mapper);
-		} catch(RuntimeException exc) {
-			Closeables.closeQuietly(mapper);
-			throw exc;
-		}
-	}
+        ConnectionOptions jumpstationOptions = options.get(JUMPSTATION, null);
+        AddressPortMapper mapper = new DefaultAddressPortMapper();
+        if (jumpstationOptions != null) {
+            mapper = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, jumpstationOptions);
+        }
+        try {
+            return buildConnection(protocol, options, mapper);
+        } catch (RuntimeException exc) {
+            Closeables.closeQuietly(mapper);
+            throw exc;
+        }
+    }
 
-	private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
-		final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
-		try {
-			final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortMapper.class);
-			OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
-			logger.info("Connecting to {}", connectionBuilder);
-			OverthereConnection connection = connectionBuilder.connect();
-			logger.trace("Connected to {}", connection);
-			return connection;
-		} catch (NoSuchMethodException exc) {
-			throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
-		} catch (IllegalArgumentException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-		} catch (InstantiationException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-		} catch (IllegalAccessException exc) {
-			throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-		} catch (InvocationTargetException exc) {
-			if (exc.getCause() instanceof RuntimeException) {
-				throw (RuntimeException) exc.getCause();
-			} else {
-				throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-			}
-		}
-	}
+    private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
+        final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
+        try {
+            final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class,
+                AddressPortMapper.class);
+            OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
+            logger.info("Connecting to {}", connectionBuilder);
+            OverthereConnection connection = connectionBuilder.connect();
+            logger.trace("Connected to {}", connection);
+            return connection;
+        } catch (NoSuchMethodException exc) {
+            throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
+        } catch (IllegalArgumentException exc) {
+            throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+        } catch (InstantiationException exc) {
+            throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+        } catch (IllegalAccessException exc) {
+            throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+        } catch (InvocationTargetException exc) {
+            if (exc.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) exc.getCause();
+            } else {
+                throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+            }
+        }
+    }
 
 }

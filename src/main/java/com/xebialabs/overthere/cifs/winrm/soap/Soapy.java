@@ -12,38 +12,38 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Soapy {
-	private Soapy() {
-	}
+    private Soapy() {
+    }
 
-	public static SoapMessageBuilder newMessage() {
-		return new SoapMessageBuilder();
-	}
+    public static SoapMessageBuilder newMessage() {
+        return new SoapMessageBuilder();
+    }
 
-	static Element mustUnderstand(Element e) {
-		return e.addAttribute("mustUnderstand", "true");
-	}
+    static Element mustUnderstand(Element e) {
+        return e.addAttribute("mustUnderstand", "true");
+    }
 
-	static Element needNotUnderstand(Element e) {
-		return e.addAttribute("mustUnderstand", "false");
-	}
+    static Element needNotUnderstand(Element e) {
+        return e.addAttribute("mustUnderstand", "false");
+    }
 
-	public static String toString(Document doc) {
-		StringWriter stringWriter = new StringWriter();
-		XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
-		try {
-			xmlWriter.write(doc);
-			xmlWriter.close();
-		} catch (IOException e) {
-			throw new WinRMRuntimeIOException("Cannnot convert XML to String ", e);
-		}
-		return stringWriter.toString();
-	}
+    public static String toString(Document doc) {
+        StringWriter stringWriter = new StringWriter();
+        XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
+        try {
+            xmlWriter.write(doc);
+            xmlWriter.close();
+        } catch (IOException e) {
+            throw new WinRMRuntimeIOException("Cannnot convert XML to String ", e);
+        }
+        return stringWriter.toString();
+    }
 
-	static URI getUri(String uri) {
-		try {
-			return new URI(uri);
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+    static URI getUri(String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 }

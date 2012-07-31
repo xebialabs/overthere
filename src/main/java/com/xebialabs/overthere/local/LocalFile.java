@@ -1,16 +1,16 @@
 /*
  * This file is part of Overthere.
- * 
+ *
  * Overthere is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Overthere is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Overthere.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,178 +33,180 @@ import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 @SuppressWarnings("serial")
 public class LocalFile extends BaseOverthereFile<LocalConnection> implements Serializable {
 
-	protected File file;
+    protected File file;
 
-	public LocalFile(LocalConnection connection, File file) {
-		super(connection);
-		this.file = file;
-	}
-
-	@Override
-	public final LocalConnection getConnection() {
-		if(connection == null) {
-			connection = createConnection();
-		}
-
-		return connection;
-	}
-
-	private static LocalConnection createConnection() {
-	    // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from appearing
-		LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
-		// FIXME: Creating a LocalConnection on the fly does not honour the original TEMPORARY_DIRECTORY_PATH (tmp) setting
-	    return localConnectionThatWillNeverBeDisconnected;
+    public LocalFile(LocalConnection connection, File file) {
+        super(connection);
+        this.file = file;
     }
 
-	public File getFile() {
-		return file;
-	}
+    @Override
+    public final LocalConnection getConnection() {
+        if (connection == null) {
+            connection = createConnection();
+        }
 
-	@Override
-	public String getPath() {
-		return file.getPath();
-	}
+        return connection;
+    }
 
-	@Override
-	public String getName() {
-		return file.getName();
-	}
+    private static LocalConnection createConnection() {
+        // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from
+        // appearing
+        LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
+        // FIXME: Creating a LocalConnection on the fly does not honour the original TEMPORARY_DIRECTORY_PATH (tmp)
+        // setting
+        return localConnectionThatWillNeverBeDisconnected;
+    }
 
-	@Override
-	public OverthereFile getParentFile() {
-		return getConnection().getFile(file.getParent());
-	}
+    public File getFile() {
+        return file;
+    }
 
-	@Override
+    @Override
+    public String getPath() {
+        return file.getPath();
+    }
+
+    @Override
+    public String getName() {
+        return file.getName();
+    }
+
+    @Override
+    public OverthereFile getParentFile() {
+        return getConnection().getFile(file.getParent());
+    }
+
+    @Override
     public long lastModified() {
-	    return file.lastModified();
+        return file.lastModified();
     }
 
-	@Override
-	public long length() {
-		return file.length();
-	}
+    @Override
+    public long length() {
+        return file.length();
+    }
 
-	@Override
-	public boolean exists() {
-		return file.exists();
-	}
+    @Override
+    public boolean exists() {
+        return file.exists();
+    }
 
-	@Override
-	public boolean isFile() {
-		return file.isFile();
-	}
+    @Override
+    public boolean isFile() {
+        return file.isFile();
+    }
 
-	@Override
-	public boolean isDirectory() {
-		return file.isDirectory();
-	}
-	
-	@Override
-	public boolean isHidden() {
-		return file.isHidden();
-	}
+    @Override
+    public boolean isDirectory() {
+        return file.isDirectory();
+    }
 
-	@Override
-	public boolean canRead() {
-		return file.canRead();
-	}
+    @Override
+    public boolean isHidden() {
+        return file.isHidden();
+    }
 
-	@Override
-	public boolean canWrite() {
-		return file.canWrite();
-	}
+    @Override
+    public boolean canRead() {
+        return file.canRead();
+    }
 
-	@Override
-	public boolean canExecute() {
-		return file.canExecute();
-	}
+    @Override
+    public boolean canWrite() {
+        return file.canWrite();
+    }
 
-	@Override
+    @Override
+    public boolean canExecute() {
+        return file.canExecute();
+    }
+
+    @Override
     public void setExecutable(boolean executable) {
-		file.setExecutable(executable);
+        file.setExecutable(executable);
     }
 
-	@Override
-	public void delete() {
-		if (!file.delete()) {
-			throw new RuntimeIOException("Cannot delete " + this);
-		}
-	}
+    @Override
+    public void delete() {
+        if (!file.delete()) {
+            throw new RuntimeIOException("Cannot delete " + this);
+        }
+    }
 
-	@Override
-	public void mkdir() {
-		if (!file.mkdir()) {
-			throw new RuntimeIOException("Cannot mkdir " + this);
-		}
-	}
+    @Override
+    public void mkdir() {
+        if (!file.mkdir()) {
+            throw new RuntimeIOException("Cannot mkdir " + this);
+        }
+    }
 
-	@Override
-	public void mkdirs() {
-		if (!file.mkdirs()) {
-			throw new RuntimeIOException("Cannot mkdir " + this);
-		}
-	}
+    @Override
+    public void mkdirs() {
+        if (!file.mkdirs()) {
+            throw new RuntimeIOException("Cannot mkdir " + this);
+        }
+    }
 
-	@Override
-	public List<OverthereFile> listFiles() {
-		List<OverthereFile> list = newArrayList();
-		for (File each : file.listFiles()) {
-			list.add(new LocalFile(connection, each));
-		}
-		return list;
-	}
+    @Override
+    public List<OverthereFile> listFiles() {
+        List<OverthereFile> list = newArrayList();
+        for (File each : file.listFiles()) {
+            list.add(new LocalFile(connection, each));
+        }
+        return list;
+    }
 
-	@Override
-	public void renameTo(OverthereFile dest) {
-		if (!(dest instanceof LocalFile)) {
-			throw new RuntimeIOException("Destination is not a " + LocalFile.class.getName());
-		}
+    @Override
+    public void renameTo(OverthereFile dest) {
+        if (!(dest instanceof LocalFile)) {
+            throw new RuntimeIOException("Destination is not a " + LocalFile.class.getName());
+        }
 
-		if (!file.renameTo(((LocalFile) dest).file)) {
-			throw new RuntimeIOException("Cannot rename " + this + " to " + dest);
-		}
+        if (!file.renameTo(((LocalFile) dest).file)) {
+            throw new RuntimeIOException("Cannot rename " + this + " to " + dest);
+        }
 
-	}
+    }
 
-	@Override
-	public InputStream getInputStream() {
-		try {
-			return new FileInputStream(file);
-		} catch (FileNotFoundException exc) {
-			throw new RuntimeIOException("Cannot open " + this + " for reading", exc);
-		}
-	}
+    @Override
+    public InputStream getInputStream() {
+        try {
+            return new FileInputStream(file);
+        } catch (FileNotFoundException exc) {
+            throw new RuntimeIOException("Cannot open " + this + " for reading", exc);
+        }
+    }
 
-	@Override
-	public OutputStream getOutputStream() {
-		try {
-			return new FileOutputStream(file);
-		} catch (FileNotFoundException exc) {
-			throw new RuntimeIOException("Cannot open " + this + " for writing", exc);
-		}
-	}
+    @Override
+    public OutputStream getOutputStream() {
+        try {
+            return new FileOutputStream(file);
+        } catch (FileNotFoundException exc) {
+            throw new RuntimeIOException("Cannot open " + this + " for writing", exc);
+        }
+    }
 
-	@Override
-	public boolean equals(Object that) {
-		if (!(that instanceof LocalFile))
-			return false;
+    @Override
+    public boolean equals(Object that) {
+        if (!(that instanceof LocalFile))
+            return false;
 
-		return this.file.equals(((LocalFile) that).file);
-	}
+        return this.file.equals(((LocalFile) that).file);
+    }
 
-	@Override
-	public int hashCode() {
-		return file.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return file.hashCode();
+    }
 
-	@Override
-	public String toString() {
-		return LOCAL_PROTOCOL + ":" + file;
-	}
+    @Override
+    public String toString() {
+        return LOCAL_PROTOCOL + ":" + file;
+    }
 
-	public static OverthereFile valueOf(File f) {
-		return new LocalFile(createConnection(), f);
-	}
+    public static OverthereFile valueOf(File f) {
+        return new LocalFile(createConnection(), f);
+    }
 
 }

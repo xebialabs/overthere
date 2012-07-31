@@ -20,19 +20,19 @@ import java.net.URI;
 
 public enum Action {
 
-	WS_ACTION("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"),
-	WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
-	WS_RECEIVE("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive"),
-	WS_SIGNAL("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal"),
-	WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
+    WS_ACTION("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"),
+    WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
+    WS_RECEIVE("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive"),
+    WS_SIGNAL("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal"),
+    WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
 
-	private String uri;
+    private String uri;
 
-	Action(String uri) {
-		this.uri = uri;
-	}
+    Action(String uri) {
+        this.uri = uri;
+    }
 
-	public URI getUri() {
-		return Soapy.getUri(uri);
-	}
+    public URI getUri() {
+        return Soapy.getUri(uri);
+    }
 }

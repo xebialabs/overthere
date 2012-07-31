@@ -20,137 +20,137 @@ import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatin
  */
 public class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
-	private String path;
+    private String path;
 
-	private byte[] contents;
+    private byte[] contents;
 
-	public ByteArrayFile(String path, byte[] contents) {
-		super(createConnection());
-		this.path = path;
-		this.contents = contents;
-	}
-
-	private static ByteArrayConnection createConnection() {
-		ConnectionOptions options = new ConnectionOptions();
-		OperatingSystemFamily os = getLocalHostOperatingSystemFamily();
-		options.set(OPERATING_SYSTEM, os);
-		options.set(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
-	    return new ByteArrayConnection("byte_array", options);
+    public ByteArrayFile(String path, byte[] contents) {
+        super(createConnection());
+        this.path = path;
+        this.contents = contents;
     }
 
-	@Override
-	public String getPath() {
-		return path;
-	}
+    private static ByteArrayConnection createConnection() {
+        ConnectionOptions options = new ConnectionOptions();
+        OperatingSystemFamily os = getLocalHostOperatingSystemFamily();
+        options.set(OPERATING_SYSTEM, os);
+        options.set(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
+        return new ByteArrayConnection("byte_array", options);
+    }
 
-	@Override
-	public String getName() {
-		return OverthereUtils.getName(path);
-	}
+    @Override
+    public String getPath() {
+        return path;
+    }
 
-	@Override
-	public OverthereFile getParentFile() {
-		return null;
-	}
+    @Override
+    public String getName() {
+        return OverthereUtils.getName(path);
+    }
 
-	@Override
-	public OverthereFile getFile(String child) {
-		return null;
-	}
+    @Override
+    public OverthereFile getParentFile() {
+        return null;
+    }
 
-	@Override
-	public boolean exists() {
-		return true;
-	}
+    @Override
+    public OverthereFile getFile(String child) {
+        return null;
+    }
 
-	@Override
-	public boolean canRead() {
-		return true;
-	}
+    @Override
+    public boolean exists() {
+        return true;
+    }
 
-	@Override
-	public boolean canWrite() {
-		return false;
-	}
+    @Override
+    public boolean canRead() {
+        return true;
+    }
 
-	@Override
-	public boolean canExecute() {
-		return false;
-	}
+    @Override
+    public boolean canWrite() {
+        return false;
+    }
 
-	@Override
-	public boolean isFile() {
-		return true;
-	}
+    @Override
+    public boolean canExecute() {
+        return false;
+    }
 
-	@Override
-	public boolean isDirectory() {
-		return false;
-	}
+    @Override
+    public boolean isFile() {
+        return true;
+    }
 
-	@Override
-	public boolean isHidden() {
-		return false;
-	}
+    @Override
+    public boolean isDirectory() {
+        return false;
+    }
 
-	@Override
-	public long lastModified() {
-		return 0;
-	}
+    @Override
+    public boolean isHidden() {
+        return false;
+    }
 
-	@Override
-	public long length() {
-		return contents.length;
-	}
+    @Override
+    public long lastModified() {
+        return 0;
+    }
 
-	@Override
-	public InputStream getInputStream() {
-		return new ByteArrayInputStream(contents);
-	}
+    @Override
+    public long length() {
+        return contents.length;
+    }
 
-	@Override
-	public OutputStream getOutputStream() {
-		throw new UnsupportedOperationException("Cannot write to a byte array file");
-	}
+    @Override
+    public InputStream getInputStream() {
+        return new ByteArrayInputStream(contents);
+    }
 
-	@Override
+    @Override
+    public OutputStream getOutputStream() {
+        throw new UnsupportedOperationException("Cannot write to a byte array file");
+    }
+
+    @Override
     public void setExecutable(boolean executable) {
-		throw new UnsupportedOperationException("Cannot set permission of a byte array file");
+        throw new UnsupportedOperationException("Cannot set permission of a byte array file");
     }
 
-	@Override
-	public void delete() {
-		throw new UnsupportedOperationException("Cannot delete a byte array file");
-	}
+    @Override
+    public void delete() {
+        throw new UnsupportedOperationException("Cannot delete a byte array file");
+    }
 
-	@Override
-	public void deleteRecursively() {
-		throw new UnsupportedOperationException("Cannot delete a byte array file");
-	}
+    @Override
+    public void deleteRecursively() {
+        throw new UnsupportedOperationException("Cannot delete a byte array file");
+    }
 
-	@Override
-	public List<OverthereFile> listFiles() {
-		return newArrayList();
-	}
+    @Override
+    public List<OverthereFile> listFiles() {
+        return newArrayList();
+    }
 
-	@Override
-	public void mkdir() {
-		throw new UnsupportedOperationException("Cannot mkdir a byte array file");
-	}
+    @Override
+    public void mkdir() {
+        throw new UnsupportedOperationException("Cannot mkdir a byte array file");
+    }
 
-	@Override
-	public void mkdirs() {
-		throw new UnsupportedOperationException("Cannot mkdirs a byte array file");
-	}
+    @Override
+    public void mkdirs() {
+        throw new UnsupportedOperationException("Cannot mkdirs a byte array file");
+    }
 
-	@Override
-	public void renameTo(OverthereFile dest) {
-		throw new UnsupportedOperationException("Cannot rename a byte array file");
-	}
+    @Override
+    public void renameTo(OverthereFile dest) {
+        throw new UnsupportedOperationException("Cannot rename a byte array file");
+    }
 
-	@Override
-	public String toString() {
-		return "byte_array://" + path;
-	}
+    @Override
+    public String toString() {
+        return "byte_array://" + path;
+    }
 
 }

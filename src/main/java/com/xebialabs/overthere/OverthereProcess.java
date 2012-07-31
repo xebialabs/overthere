@@ -24,40 +24,41 @@ import java.io.OutputStream;
  */
 public interface OverthereProcess {
 
-	/**
-	 * Returns an output stream that is connected to the standard input stream (stdin) of the running command.
-	 * 
-	 * @return the input stream
-	 */
-	OutputStream getStdin();
+    /**
+     * Returns an output stream that is connected to the standard input stream (stdin) of the running command.
+     * 
+     * @return the input stream
+     */
+    OutputStream getStdin();
 
-	/**
-	 * Returns an input stream that is connected to the standard output stream (stdout) of the running command.
-	 * 
-	 * @return the output stream
-	 */
-	InputStream getStdout();
+    /**
+     * Returns an input stream that is connected to the standard output stream (stdout) of the running command.
+     * 
+     * @return the output stream
+     */
+    InputStream getStdout();
 
-	/**
-	 * Returns an input stream that is connected to the standard error stream (stderr) of the running command.
-	 * 
-	 * @return the output stream
-	 */
-	InputStream getStderr();
+    /**
+     * Returns an input stream that is connected to the standard error stream (stderr) of the running command.
+     * 
+     * @return the output stream
+     */
+    InputStream getStderr();
 
-	/**
-	 * Waits for the command to complete its execution. Note that {@link #destroy()} still needs to be invoked to clean up any resources that may be left!
-	 * 
-	 * @return the exit value of the executed command
-	 * 
-	 * @throws InterruptedException
-	 *             if this method was interrupted
-	 */
-	int waitFor() throws InterruptedException;
+    /**
+     * Waits for the command to complete its execution. Note that {@link #destroy()} still needs to be invoked to clean
+     * up any resources that may be left!
+     * 
+     * @return the exit value of the executed command
+     * 
+     * @throws InterruptedException
+     *             if this method was interrupted
+     */
+    int waitFor() throws InterruptedException;
 
-	/**
-	 * Destroys the executing process.
-	 */
-	void destroy();
+    /**
+     * Destroys the executing process.
+     */
+    void destroy();
 
 }

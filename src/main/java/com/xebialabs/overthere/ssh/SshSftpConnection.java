@@ -33,26 +33,26 @@ import static com.google.common.base.Preconditions.checkState;
  */
 abstract class SshSftpConnection extends SshConnection {
 
-	private SFTPClient sharedSftpClient;
+    private SFTPClient sharedSftpClient;
 
-	public SshSftpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-		super(type, options, mapper);
-	}
+    public SshSftpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        super(type, options, mapper);
+    }
 
-	@Override
-	protected void connect() {
-		super.connect();
-		
-	    logger.debug("Opening SFTP client to {}", this);
-	    try {
-	        sharedSftpClient = getSshClient().newSFTPClient();
-	    } catch (IOException e) {
-	        throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
-	    }
-	}
+    @Override
+    protected void connect() {
+        super.connect();
 
-	@Override
-	public void doClose() {
+        logger.debug("Opening SFTP client to {}", this);
+        try {
+            sharedSftpClient = getSshClient().newSFTPClient();
+        } catch (IOException e) {
+            throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
+        }
+    }
+
+    @Override
+    public void doClose() {
         checkState(sharedSftpClient != null, "Not connected to SFTP");
 
         logger.debug("Closing SFTP client to {}", this);
@@ -64,18 +64,18 @@ abstract class SshSftpConnection extends SshConnection {
 
         sharedSftpClient = null;
         super.doClose();
-	}
+    }
 
     protected SFTPClient getSharedSftpClient() {
-		return sharedSftpClient;
-	}
+        return sharedSftpClient;
+    }
 
-	@Override
-	public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		return new SshSftpFile(this, hostPath);
-	}
+    @Override
+    public OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+        return new SshSftpFile(this, hostPath);
+    }
 
-	protected abstract String pathToSftpPath(String path);
+    protected abstract String pathToSftpPath(String path);
 
     private Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);
 

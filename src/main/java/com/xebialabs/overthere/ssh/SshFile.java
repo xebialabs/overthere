@@ -29,103 +29,103 @@ import com.xebialabs.overthere.spi.BaseOverthereFile;
  */
 abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
-	protected String path;
+    protected String path;
 
-	/**
-	 * Constructs an SshOverthereFile
-	 * 
-	 * @param connection
-	 *            the connection to the host
-	 * @param path
-	 *            the path of the file on the host
-	 */
-	SshFile(C connection, String path) {
-		super(connection);
-		if(connection.getHostOperatingSystem() != WINDOWS) {
-			this.path = path;
-		} else {
-			this.path = path.replace('/', '\\');
-		}
-	}
+    /**
+     * Constructs an SshOverthereFile
+     * 
+     * @param connection
+     *            the connection to the host
+     * @param path
+     *            the path of the file on the host
+     */
+    SshFile(C connection, String path) {
+        super(connection);
+        if (connection.getHostOperatingSystem() != WINDOWS) {
+            this.path = path;
+        } else {
+            this.path = path.replace('/', '\\');
+        }
+    }
 
-	@Override
-	public String getPath() {
-		return path;
-	}
+    @Override
+    public String getPath() {
+        return path;
+    }
 
-	@Override
-	public boolean isHidden() {
-		return getName().startsWith(".");
-	}
+    @Override
+    public boolean isHidden() {
+        return getName().startsWith(".");
+    }
 
-	@Override
-	public String getName() {
-		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
-		int lastFileSepPos = path.lastIndexOf(fileSep);
-		if (lastFileSepPos < 0) {
-			return path;
-		} else {
-			return path.substring(lastFileSepPos + 1);
-		}
-	}
+    @Override
+    public String getName() {
+        String fileSep = connection.getHostOperatingSystem().getFileSeparator();
+        int lastFileSepPos = path.lastIndexOf(fileSep);
+        if (lastFileSepPos < 0) {
+            return path;
+        } else {
+            return path.substring(lastFileSepPos + 1);
+        }
+    }
 
-	@Override
-	public OverthereFile getParentFile() {
-		String fileSep = connection.getHostOperatingSystem().getFileSeparator();
-		int lastFileSepPos = path.lastIndexOf(fileSep);
-		if (lastFileSepPos < 0 || path.equals(fileSep)) {
-			return null;
-		} else if (lastFileSepPos == 0) {
-			// the parent of something in the root directory is the root
-			// directory itself.
-			return connection.getFile(fileSep);
-		} else {
-			return connection.getFile(path.substring(0, lastFileSepPos));
-		}
+    @Override
+    public OverthereFile getParentFile() {
+        String fileSep = connection.getHostOperatingSystem().getFileSeparator();
+        int lastFileSepPos = path.lastIndexOf(fileSep);
+        if (lastFileSepPos < 0 || path.equals(fileSep)) {
+            return null;
+        } else if (lastFileSepPos == 0) {
+            // the parent of something in the root directory is the root
+            // directory itself.
+            return connection.getFile(fileSep);
+        } else {
+            return connection.getFile(path.substring(0, lastFileSepPos));
+        }
 
-	}
+    }
 
-	@Override
-	public void delete() throws RuntimeIOException {
-		if (exists()) {
-			if (isDirectory()) {
-				deleteDirectory();
-			} else {
-				deleteFile();
-			}
-		}
-	}
+    @Override
+    public void delete() throws RuntimeIOException {
+        if (exists()) {
+            if (isDirectory()) {
+                deleteDirectory();
+            } else {
+                deleteFile();
+            }
+        }
+    }
 
-	protected abstract void deleteFile();
+    protected abstract void deleteFile();
 
-	protected abstract void deleteDirectory();
+    protected abstract void deleteDirectory();
 
-	protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
-		return connection.execute(handler, commandLine);
-	}
+    protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
+        return connection.execute(handler, commandLine);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof SshFile)) {
-			return false;
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SshFile)) {
+            return false;
+        }
 
-		return path.equals(((SshFile<?>) obj).getPath());
-	}
+        return path.equals(((SshFile<?>) obj).getPath());
+    }
 
-	@Override
-	public int hashCode() {
-		return path.hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return path.hashCode();
+    }
 
-	@Override
-	public String toString() {
-		String p = getPath();
-		if(p.length() >= 1 && p.charAt(0) == '/') {
-			return getConnection() + p;
-		} else {
-			return getConnection() + "/" + p;
-		}
-	}
+    @Override
+    public String toString() {
+        String p = getPath();
+        if (p.length() >= 1 && p.charAt(0) == '/') {
+            return getConnection() + p;
+        } else {
+            return getConnection() + "/" + p;
+        }
+    }
 
 }

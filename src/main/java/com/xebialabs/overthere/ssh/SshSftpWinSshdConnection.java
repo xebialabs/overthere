@@ -17,25 +17,26 @@ import com.xebialabs.overthere.RuntimeIOException;
  */
 class SshSftpWinSshdConnection extends SshSftpConnection {
 
-	public SshSftpWinSshdConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-	    super(type, options, mapper);
-		checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a non-Windows operating system", sshConnectionType.toString().toLowerCase());
+    public SshSftpWinSshdConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        super(type, options, mapper);
+        checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a non-Windows operating system", sshConnectionType.toString()
+            .toLowerCase());
     }
 
-	@Override
+    @Override
     protected String pathToSftpPath(String path) {
-		String translatedPath;
-		if(path.length() >= 2 && path.charAt(1) == ':') {
-			char driveLetter = toUpperCase(path.charAt(0));
-			String pathInDrive = path.substring(2).replace('\\', '/');
-			translatedPath = "/" + driveLetter + pathInDrive;
-		} else {
-			throw new RuntimeIOException("Cannot translate path " + path + " because it is not a Windows path");
-		}
-		logger.trace("Translated path {} to sftp path {}", path, translatedPath);
-		return translatedPath;
+        String translatedPath;
+        if (path.length() >= 2 && path.charAt(1) == ':') {
+            char driveLetter = toUpperCase(path.charAt(0));
+            String pathInDrive = path.substring(2).replace('\\', '/');
+            translatedPath = "/" + driveLetter + pathInDrive;
+        } else {
+            throw new RuntimeIOException("Cannot translate path " + path + " because it is not a Windows path");
+        }
+        logger.trace("Translated path {} to sftp path {}", path, translatedPath);
+        return translatedPath;
     }
 
-	private Logger logger = LoggerFactory.getLogger(SshSftpWinSshdConnection.class);
+    private Logger logger = LoggerFactory.getLogger(SshSftpWinSshdConnection.class);
 
 }

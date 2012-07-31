@@ -36,55 +36,55 @@ import static java.net.InetSocketAddress.createUnresolved;
  */
 public class SshTunnelConnection extends SshConnection implements AddressPortMapper {
 
-	private static final Monitor M = new Monitor();
-	static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
-	private static final int MAX_PORT = 65536;
+    private static final Monitor M = new Monitor();
+    static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
+    private static final int MAX_PORT = 65536;
 
-	private Map<InetSocketAddress, InetSocketAddress> localPortForwards = newHashMap();
-	
-	private List<PortForwarder> portForwarders = newArrayList();
+    private Map<InetSocketAddress, InetSocketAddress> localPortForwards = newHashMap();
 
-	private Integer startPortRange;
+    private List<PortForwarder> portForwarders = newArrayList();
 
-	public SshTunnelConnection(final String protocol, final ConnectionOptions options, AddressPortMapper mapper) {
-		super(protocol, options, mapper);
-		this.startPortRange = options.get(PORT_ALLOCATION_RANGE_START, PORT_ALLOCATION_RANGE_START_DEFAULT);
-	}
+    private Integer startPortRange;
 
-	@Override
-	protected void connect() {
-		super.connect();
-		checkState(sshClient != null, "Should have set an SSH client when connected");
-	}
+    public SshTunnelConnection(final String protocol, final ConnectionOptions options, AddressPortMapper mapper) {
+        super(protocol, options, mapper);
+        this.startPortRange = options.get(PORT_ALLOCATION_RANGE_START, PORT_ALLOCATION_RANGE_START_DEFAULT);
+    }
 
-	@Override
-	public void doClose() {
-		logger.debug("Closing tunnel.");
-		for (PortForwarder portForwarder : portForwarders) {
-			Closeables.closeQuietly(portForwarder);
-		}
+    @Override
+    protected void connect() {
+        super.connect();
+        checkState(sshClient != null, "Should have set an SSH client when connected");
+    }
 
-		super.doClose();
-	}
+    @Override
+    public void doClose() {
+        logger.debug("Closing tunnel.");
+        for (PortForwarder portForwarder : portForwarders) {
+            Closeables.closeQuietly(portForwarder);
+        }
 
-	@Override
-	public InetSocketAddress map(InetSocketAddress address) {
-		M.enter();
-		try {
-			if (localPortForwards.containsKey(address)) {
-				return localPortForwards.get(address);
-			}
+        super.doClose();
+    }
 
-			ServerSocket serverSocket = PORT_MANAGER.get().leaseNewPort(startPortRange);
+    @Override
+    public InetSocketAddress map(InetSocketAddress address) {
+        M.enter();
+        try {
+            if (localPortForwards.containsKey(address)) {
+                return localPortForwards.get(address);
+            }
+
+            ServerSocket serverSocket = PORT_MANAGER.get().leaseNewPort(startPortRange);
             portForwarders.add(startForwarder(address, serverSocket));
 
             InetSocketAddress localAddress = createUnresolved("localhost", serverSocket.getLocalPort());
             localPortForwards.put(address, localAddress);
             return localAddress;
-		} finally {
-			M.leave();
-		}
-	}
+        } finally {
+            M.leave();
+        }
+    }
 
     private PortForwarder startForwarder(InetSocketAddress remoteAddress, ServerSocket serverSocket) {
         PortForwarder forwarderThread = new PortForwarder(sshClient, remoteAddress, serverSocket);
@@ -98,136 +98,136 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         return forwarderThread;
     }
 
-	@Override
-	protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-		throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
-	}
+    @Override
+    protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+        throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
+    }
 
-	@Override
-	protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
-		throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
-	}
+    @Override
+    protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+        throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
+    }
 
-	@Override
-	public OverthereProcess startProcess(CmdLine commandLine) {
-		throw new UnsupportedOperationException("Cannot start a process on the tunnel.");
-	}
+    @Override
+    public OverthereProcess startProcess(CmdLine commandLine) {
+        throw new UnsupportedOperationException("Cannot start a process on the tunnel.");
+    }
 
-	@Override
-	protected CmdLine processCommandLine(CmdLine commandLine) {
-		throw new UnsupportedOperationException("Cannot process a command line for the tunnel.");
-	}
+    @Override
+    protected CmdLine processCommandLine(CmdLine commandLine) {
+        throw new UnsupportedOperationException("Cannot process a command line for the tunnel.");
+    }
 
-	@Override
-	protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
-		throw new UnsupportedOperationException("Cannot create a process in the tunnel.");
-	}
+    @Override
+    protected SshProcess createProcess(Session session, CmdLine commandLine) throws TransportException, ConnectionException {
+        throw new UnsupportedOperationException("Cannot create a process in the tunnel.");
+    }
 
-	@Override
-	public void setWorkingDirectory(OverthereFile workingDirectory) {
-		throw new UnsupportedOperationException("Cannot set a working directory on the tunnel.");
-	}
+    @Override
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+        throw new UnsupportedOperationException("Cannot set a working directory on the tunnel.");
+    }
 
-	@Override
-	public OverthereFile getWorkingDirectory() {
-		throw new UnsupportedOperationException("Cannot get a working directory from the tunnel.");
-	}
+    @Override
+    public OverthereFile getWorkingDirectory() {
+        throw new UnsupportedOperationException("Cannot get a working directory from the tunnel.");
+    }
 
-	@Override
-	public int execute(OverthereProcessOutputHandler handler, CmdLine commandLine) {
-		throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
-	}
+    @Override
+    public int execute(OverthereProcessOutputHandler handler, CmdLine commandLine) {
+        throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
+    }
 
-	private static final Logger logger = LoggerFactory.getLogger(SshTunnelConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(SshTunnelConnection.class);
 
-	private static class PortForwarder extends Thread implements Closeable {
-		private final SSHClient sshClient;
-		private final InetSocketAddress remoteAddress;
+    private static class PortForwarder extends Thread implements Closeable {
+        private final SSHClient sshClient;
+        private final InetSocketAddress remoteAddress;
         private final ServerSocket localSocket;
-		private CountDownLatch latch = new CountDownLatch(1);
+        private CountDownLatch latch = new CountDownLatch(1);
 
-		public PortForwarder(SSHClient sshClient, InetSocketAddress remoteAddress, ServerSocket localSocket) {
-			super(buildName(remoteAddress, localSocket.getLocalPort()));
-			this.sshClient = sshClient;
-			this.remoteAddress = remoteAddress;
+        public PortForwarder(SSHClient sshClient, InetSocketAddress remoteAddress, ServerSocket localSocket) {
+            super(buildName(remoteAddress, localSocket.getLocalPort()));
+            this.sshClient = sshClient;
+            this.remoteAddress = remoteAddress;
             this.localSocket = localSocket;
         }
 
-		private static String buildName(InetSocketAddress remoteAddress, Integer localPort) {
-			return format("SSH local port forward thread [%d:%s]", localPort, remoteAddress.toString());
-		}
+        private static String buildName(InetSocketAddress remoteAddress, Integer localPort) {
+            return format("SSH local port forward thread [%d:%s]", localPort, remoteAddress.toString());
+        }
 
-		@Override
-		public void run() {
-			LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(), remoteAddress.getHostName(), remoteAddress.getPort());
-			LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, localSocket);
-			try {
-				latch.countDown();
-				forwarder.listen();
-			} catch (IOException ignore) {
-				// OK.
-			}
-		}
-		
-		@Override
-		public void close() throws IOException {
-			localSocket.close();
-			PORT_MANAGER.get().returnPort(localSocket);
-			try {
-				this.join();
-			} catch (InterruptedException e) {
-				// OK.
-			}
-		}
-	}
+        @Override
+        public void run() {
+            LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(), remoteAddress.getHostName(),
+                remoteAddress.getPort());
+            LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, localSocket);
+            try {
+                latch.countDown();
+                forwarder.listen();
+            } catch (IOException ignore) {
+                // OK.
+            }
+        }
 
-	static class TunnelPortManager {
-		private static final Set<Integer> portsHandedOut = newHashSet();
-		private static Monitor M = new Monitor();
+        @Override
+        public void close() throws IOException {
+            localSocket.close();
+            PORT_MANAGER.get().returnPort(localSocket);
+            try {
+                this.join();
+            } catch (InterruptedException e) {
+                // OK.
+            }
+        }
+    }
 
-		ServerSocket leaseNewPort(Integer startFrom) {
-			M.enter();
-			try {
-				for (int port = startFrom; port < MAX_PORT; port++) {
-					if (isLeased(port)) {
-						continue;
-					}
+    static class TunnelPortManager {
+        private static final Set<Integer> portsHandedOut = newHashSet();
+        private static Monitor M = new Monitor();
 
-					ServerSocket socket = tryBind(port);
-					if (socket != null) {
-						portsHandedOut.add(port);
-						return socket;
-					}
-				}
-				throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
-			} finally {
-				M.leave();
-			}
-		}
+        ServerSocket leaseNewPort(Integer startFrom) {
+            M.enter();
+            try {
+                for (int port = startFrom; port < MAX_PORT; port++) {
+                    if (isLeased(port)) {
+                        continue;
+                    }
 
-		synchronized void returnPort(ServerSocket socket) {
-			M.enter();
-			try {
-				portsHandedOut.remove(socket.getLocalPort());
-			} finally {
-				M.leave();
-			}
-		}
+                    ServerSocket socket = tryBind(port);
+                    if (socket != null) {
+                        portsHandedOut.add(port);
+                        return socket;
+                    }
+                }
+                throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
+            } finally {
+                M.leave();
+            }
+        }
 
-		private boolean isLeased(int port) {
-			return portsHandedOut.contains(port);
-		}
+        synchronized void returnPort(ServerSocket socket) {
+            M.enter();
+            try {
+                portsHandedOut.remove(socket.getLocalPort());
+            } finally {
+                M.leave();
+            }
+        }
 
-		protected ServerSocket tryBind(int localPort) {
-			try {
-				ServerSocket ss = new ServerSocket();
-				ss.setReuseAddress(true);
-				ss.bind(new InetSocketAddress("localhost", localPort));
-				return ss;
-			} catch (IOException e) {
-				return null;
-			}
-		}
-	}
+        private boolean isLeased(int port) {
+            return portsHandedOut.contains(port);
+        }
+
+        protected ServerSocket tryBind(int localPort) {
+            try {
+                ServerSocket ss = new ServerSocket();
+                ss.setReuseAddress(true);
+                ss.bind(new InetSocketAddress("localhost", localPort));
+                return ss;
+            } catch (IOException e) {
+                return null;
+            }
+        }
+    }
 }
-

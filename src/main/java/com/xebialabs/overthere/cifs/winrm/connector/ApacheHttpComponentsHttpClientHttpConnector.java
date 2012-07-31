@@ -1,10 +1,10 @@
 /*
-* Kb5HttpConnector.java
-* 
-* User: Greg Schueler <a href="mailto:greg@dtosolutions.com">greg@dtosolutions.com</a>
-* Created: 5/23/12 3:08 PM
-* 
-*/
+ * Kb5HttpConnector.java
+ * 
+ * User: Greg Schueler <a href="mailto:greg@dtosolutions.com">greg@dtosolutions.com</a>
+ * Created: 5/23/12 3:08 PM
+ * 
+ */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -91,43 +91,46 @@ import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 
 public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
-	private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
-	ConnectionOptions options;
-	private final URL targetURL;
-	private final WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
-	private final WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
-	private final String username;
-	private final String password;
-	private final boolean debugKerberosAuth;
+    private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
+    ConnectionOptions options;
+    private final URL targetURL;
+    private final WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
+    private final WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
+    private final String username;
+    private final String password;
+    private final boolean debugKerberosAuth;
 
-	public ApacheHttpComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
-	    this.targetURL = targetURL;
-		this.options = options;
-		// FIXME: Don't get the values here, but get them sooner!
-		this.debugKerberosAuth = options.getBoolean(DEBUG_KERBEROS_AUTH, DEFAULT_DEBUG_KERBEROS_AUTH);
-		this.httpsCertTrustStrategy = options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY);
-		this.httpsHostnameVerifyStrategy = options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY);
-		this.username = options.get(USERNAME);
-		this.password = options.get(PASSWORD);
-	}
+    public ApacheHttpComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
+        this.targetURL = targetURL;
+        this.options = options;
+        // FIXME: Don't get the values here, but get them sooner!
+        this.debugKerberosAuth = options.getBoolean(DEBUG_KERBEROS_AUTH, DEFAULT_DEBUG_KERBEROS_AUTH);
+        this.httpsCertTrustStrategy = options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class,
+            DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY);
+        this.httpsHostnameVerifyStrategy = options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
+            DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY);
+        this.username = options.get(USERNAME);
+        this.password = options.get(PASSWORD);
+    }
 
-	/**
-	 * Override the sendMessage method to use custom authentication over HTTP
-	 */
-	@Override
-	public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
-	    if(username.contains("@")) {
-	        return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
-	    } else {
-	        return int_sendMessage(requestDocument, soapAction);
-	    }
-	}
+    /**
+     * Override the sendMessage method to use custom authentication over HTTP
+     */
+    @Override
+    public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
+        if (username.contains("@")) {
+            return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
+        } else {
+            return int_sendMessage(requestDocument, soapAction);
+        }
+    }
 
-	/**
+    /**
      * Perform the JAAS login and run the command within a privileged scope.
-     *
-     * @param privilegedSendMessage the PrivilegedSendMessage
-     *
+     * 
+     * @param privilegedSendMessage
+     *            the PrivilegedSendMessage
+     * 
      * @return The result Document
      */
     private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
@@ -139,7 +142,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
             result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
         } catch (LoginException e) {
-            throw new WinRMRuntimeIOException("Login failure sending message on " + getTargetURL() + " error: "+e.getMessage(),
+            throw new WinRMRuntimeIOException("Login failure sending message on " + getTargetURL() + " error: " + e.getMessage(),
                 privilegedSendMessage.getRequestDocument(), null,
                 e);
         } catch (PrivilegedActionException e) {
@@ -194,7 +197,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
             options.put("useTicketCache", "false");
             options.put("useKeyTab", "false");
             options.put("doNotPrompt", "false");
-            if(debug) {
+            if (debug) {
                 options.put("debug", "true");
             }
             return new AppConfigurationEntry[] { new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
@@ -212,7 +215,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         SoapAction soapAction;
 
         private PrivilegedSendMessage(final ApacheHttpComponentsHttpClientHttpConnector connector, final Document requestDocument,
-                                      final SoapAction soapAction) {
+            final SoapAction soapAction) {
             this.connector = connector;
             this.requestDocument = requestDocument;
             this.soapAction = soapAction;
@@ -228,91 +231,91 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         }
     }
 
-	/**
-	 * Internal sendMessage, performs the HTTP request and returns the result document.
-	 */
-	private Document int_sendMessage(final Document requestDocument, final SoapAction soapAction) {
-		final DefaultHttpClient client = new DefaultHttpClient();
-		try {
-			configureHttpClient(client);
-			final HttpContext context = new BasicHttpContext();
-			final HttpPost request = new HttpPost(getTargetURL().toURI());
+    /**
+     * Internal sendMessage, performs the HTTP request and returns the result document.
+     */
+    private Document int_sendMessage(final Document requestDocument, final SoapAction soapAction) {
+        final DefaultHttpClient client = new DefaultHttpClient();
+        try {
+            configureHttpClient(client);
+            final HttpContext context = new BasicHttpContext();
+            final HttpPost request = new HttpPost(getTargetURL().toURI());
 
-			if (soapAction != null) {
-				request.setHeader("SOAPAction", soapAction.getValue());
-			}
+            if (soapAction != null) {
+                request.setHeader("SOAPAction", soapAction.getValue());
+            }
 
-			final String requestDocAsString = toString(requestDocument);
-			logger.trace("Sending request to {}", getTargetURL());
-			logger.trace("Request body: {} {}", getTargetURL(), requestDocAsString);
+            final String requestDocAsString = toString(requestDocument);
+            logger.trace("Sending request to {}", getTargetURL());
+            logger.trace("Request body: {} {}", getTargetURL(), requestDocAsString);
 
-			final HttpEntity entity = createEntity(requestDocAsString);
-			request.setEntity(entity);
+            final HttpEntity entity = createEntity(requestDocAsString);
+            request.setEntity(entity);
 
-			final HttpResponse response = client.execute(request, context);
+            final HttpResponse response = client.execute(request, context);
 
-			if (logger.isTraceEnabled()) {
-				for (final Header header : response.getAllHeaders()) {
-					logger.trace("Header {}: {}", header.getName(), header.getValue());
-				}
-			}
+            if (logger.isTraceEnabled()) {
+                for (final Header header : response.getAllHeaders()) {
+                    logger.trace("Header {}: {}", header.getName(), header.getValue());
+                }
+            }
 
-			if (response.getStatusLine().getStatusCode() != 200) {
-				throw new WinRMRuntimeIOException(
-					"Response code was " + response.getStatusLine().getStatusCode());
-			}
-			final String text = handleResponse(response, context);
-			EntityUtils.consume(response.getEntity());
-			logger.trace("Response body: {}", text);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new WinRMRuntimeIOException(
+                    "Response code was " + response.getStatusLine().getStatusCode());
+            }
+            final String text = handleResponse(response, context);
+            EntityUtils.consume(response.getEntity());
+            logger.trace("Response body: {}", text);
 
-			return DocumentHelper.parseText(text);
-		} catch (BlankValueRuntimeException bvrte) {
-			throw bvrte;
-		} catch (InvalidFilePathRuntimeException ifprte) {
-			throw ifprte;
-		} catch (Exception e) {
-			throw new WinRMRuntimeIOException("Send message on " + getTargetURL() + " error ", requestDocument, null,
-				e);
-		} finally {
-			client.getConnectionManager().shutdown();
-		}
-	}
+            return DocumentHelper.parseText(text);
+        } catch (BlankValueRuntimeException bvrte) {
+            throw bvrte;
+        } catch (InvalidFilePathRuntimeException ifprte) {
+            throw ifprte;
+        } catch (Exception e) {
+            throw new WinRMRuntimeIOException("Send message on " + getTargetURL() + " error ", requestDocument, null,
+                e);
+        } finally {
+            client.getConnectionManager().shutdown();
+        }
+    }
 
-	/**
-	 * Configure the httpclient for use in all requests.
-	 */
-	private void configureHttpClient(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
-		KeyManagementException,
-		KeyStoreException,
-		UnrecoverableKeyException {
+    /**
+     * Configure the httpclient for use in all requests.
+     */
+    private void configureHttpClient(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
+        KeyManagementException,
+        KeyStoreException,
+        UnrecoverableKeyException {
 
-		configureTrust(httpclient);
+        configureTrust(httpclient);
 
-		configureAuthentication(httpclient);
-	}
+        configureAuthentication(httpclient);
+    }
 
-	/**
-	 * Configure auth schemes to use for the HttpClient.
-	 */
-	protected void configureAuthentication(final DefaultHttpClient httpclient) {
-		httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, ANY_SCHEME), new Credentials() {
+    /**
+     * Configure auth schemes to use for the HttpClient.
+     */
+    protected void configureAuthentication(final DefaultHttpClient httpclient) {
+        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, ANY_SCHEME), new Credentials() {
             public Principal getUserPrincipal() {
                 return new UserPrincipal(username);
             }
 
             public String getPassword() {
-				return password;
-			}
-		});
+                return password;
+            }
+        });
 
-		httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
-	}
+        httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
+    }
 
-	/**
-	 * Handle the httpResponse and return the SOAP XML String.
-	 */
-	protected String handleResponse(final HttpResponse response, final HttpContext context) throws IOException {
-		final HttpEntity entity = response.getEntity();
+    /**
+     * Handle the httpResponse and return the SOAP XML String.
+     */
+    protected String handleResponse(final HttpResponse response, final HttpContext context) throws IOException {
+        final HttpEntity entity = response.getEntity();
         if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith(
             "application/soap+xml")) {
             throw new WinRMRuntimeIOException(
@@ -320,71 +323,71 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
                     .getContentType());
         }
 
-		final InputStream is = entity.getContent();
-		final Writer writer = new StringWriter();
-		final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-		try {
-			int n;
-			final char[] buffer = new char[1024];
-			while ((n = reader.read(buffer)) != -1) {
-				writer.write(buffer, 0, n);
-			}
-		} finally {
-			Closeables.closeQuietly(reader);
-			Closeables.closeQuietly(is);
-		}
+        final InputStream is = entity.getContent();
+        final Writer writer = new StringWriter();
+        final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        try {
+            int n;
+            final char[] buffer = new char[1024];
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } finally {
+            Closeables.closeQuietly(reader);
+            Closeables.closeQuietly(is);
+        }
 
-		return writer.toString();
-	}
+        return writer.toString();
+    }
 
-	/**
-	 * Configure certificate trust strategy and hostname verifier strategy for the HttpClient
-	 */
-	private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
-		KeyManagementException,
-		KeyStoreException, UnrecoverableKeyException {
-		if (!"https".equalsIgnoreCase(getTargetURL().getProtocol())) {
-			return;
-		}
+    /**
+     * Configure certificate trust strategy and hostname verifier strategy for the HttpClient
+     */
+    private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
+        KeyManagementException,
+        KeyStoreException, UnrecoverableKeyException {
+        if (!"https".equalsIgnoreCase(getTargetURL().getProtocol())) {
+            return;
+        }
 
-		final TrustStrategy trustStrategy;
-		switch(httpsCertTrustStrategy) {
-		case ALLOW_ALL:
-			trustStrategy = new TrustStrategy() {
-				@Override
-				public boolean isTrusted(final X509Certificate[] chain, final String authType) throws
-					CertificateException {
-					return true;
-				}
-			};
-			break;
-		case SELF_SIGNED:
-			trustStrategy = new TrustSelfSignedStrategy();
-			break;
-		case STRICT:
-		default:
-			trustStrategy = null;
-			break;
-		}
+        final TrustStrategy trustStrategy;
+        switch (httpsCertTrustStrategy) {
+        case ALLOW_ALL:
+            trustStrategy = new TrustStrategy() {
+                @Override
+                public boolean isTrusted(final X509Certificate[] chain, final String authType) throws
+                    CertificateException {
+                    return true;
+                }
+            };
+            break;
+        case SELF_SIGNED:
+            trustStrategy = new TrustSelfSignedStrategy();
+            break;
+        case STRICT:
+        default:
+            trustStrategy = null;
+            break;
+        }
 
-		final X509HostnameVerifier hostnameVerifier;
-		switch(httpsHostnameVerifyStrategy) {
-		case ALLOW_ALL:
-			hostnameVerifier = ALLOW_ALL_HOSTNAME_VERIFIER;
-			break;
-		case BROWSER_COMPATIBLE:
-			hostnameVerifier = BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-			break;
+        final X509HostnameVerifier hostnameVerifier;
+        switch (httpsHostnameVerifyStrategy) {
+        case ALLOW_ALL:
+            hostnameVerifier = ALLOW_ALL_HOSTNAME_VERIFIER;
+            break;
+        case BROWSER_COMPATIBLE:
+            hostnameVerifier = BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+            break;
         case STRICT:
         default:
             hostnameVerifier = STRICT_HOSTNAME_VERIFIER;
             break;
-		}
+        }
 
         final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
         final Scheme sch = new Scheme("https", 443, socketFactory);
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
-	}
+    }
 
     protected static String toString(Document doc) {
         StringWriter stringWriter = new StringWriter();
@@ -398,13 +401,13 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         return stringWriter.toString();
     }
 
-	/**
-	 * Create the HttpEntity to send in the request.
-	 */
-	protected HttpEntity createEntity(final String requestDocAsString) throws UnsupportedEncodingException {
-		return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
-	}
-	
+    /**
+     * Create the HttpEntity to send in the request.
+     */
+    protected HttpEntity createEntity(final String requestDocAsString) throws UnsupportedEncodingException {
+        return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
+    }
+
     protected URL getTargetURL() {
         return targetURL;
     }

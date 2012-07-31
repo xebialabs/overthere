@@ -1,61 +1,60 @@
 package com.xebialabs.overthere.util;
 
-
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 import java.io.IOException;
 import java.util.List;
+
 /**
- * Abstract class that walks through a directory hierarchy and provides
- * subclasses with convenient hooks to add specific behaviour.
+ * Abstract class that walks through a directory hierarchy and provides subclasses with convenient hooks to add specific
+ * behaviour.
  * <p>
- * This class operates with a maximum depth to
- * limit the files and direcories visited.
+ * This class operates with a maximum depth to limit the files and direcories visited.
  * <p>
  * The following sections describe:
- *   <ul>
- *      <li><a href="#example">1. Example Implementation</a> - example
- *          <code>FileCleaner</code> implementation.</li>
- *   </ul>
- *
+ * <ul>
+ * <li><a href="#example">1. Example Implementation</a> - example <code>FileCleaner</code> implementation.</li>
+ * </ul>
+ * 
  * <a name="example"></a>
  * <h3>1. Example Implementation</h3>
- *
- * There are many possible extensions, for example, to delete all
- * files and '.svn' directories
+ * 
+ * There are many possible extensions, for example, to delete all files and '.svn' directories
+ * 
  * <pre>
- *  public class FileCleaner extends OverthereFileDirectoryWalker {
- *    private List<OverthereFile> results = new ArrayList<OverthereFile>();
- *    public FileCleaner() {
- *      super();
- *    }
- *
- *    public List clean(OverthereFile startDirectory) {
- *      results.clear();
- *      walk(startDirectory, results);
- *      return results;
- *    }
- *
- *    protected boolean handleDirectory(OverthereFile directory, int depth) {
- *      // delete svn directories and then skip
- *      if (".svn".equals(directory.getName())) {
- *        directory.delete();
- *        return false;
- *      } else {
- *        return true;
- *      }
- *
- *    }
- *
- *    protected void handleFile(OverthereFile file, int depth) {
- *      // delete file and add to list of deleted
- *      file.delete();
- *      results.add(file);
- *    }
- *  }
+ * public class FileCleaner extends OverthereFileDirectoryWalker {
+ *     private List&lt;OverthereFile&gt; results = new ArrayList&lt;OverthereFile&gt;();
+ * 
+ *     public FileCleaner() {
+ *         super();
+ *     }
+ * 
+ *     public List clean(OverthereFile startDirectory) {
+ *         results.clear();
+ *         walk(startDirectory, results);
+ *         return results;
+ *     }
+ * 
+ *     protected boolean handleDirectory(OverthereFile directory, int depth) {
+ *         // delete svn directories and then skip
+ *         if (&quot;.svn&quot;.equals(directory.getName())) {
+ *             directory.delete();
+ *             return false;
+ *         } else {
+ *             return true;
+ *         }
+ * 
+ *     }
+ * 
+ *     protected void handleFile(OverthereFile file, int depth) {
+ *         // delete file and add to list of deleted
+ *         file.delete();
+ *         results.add(file);
+ *     }
+ * }
  * </pre>
- *
+ * 
  * Adapted from the DirectoryWalker class in Common IO.
  * 
  * FIXME: Move to its proper place
@@ -63,7 +62,7 @@ import java.util.List;
 public abstract class OverthereFileDirectoryWalker {
 
     /**
-     *  The directory level representing the starting directory = 0
+     * The directory level representing the starting directory = 0
      */
     public static final int ROOT = 0;
 
@@ -82,9 +81,9 @@ public abstract class OverthereFileDirectoryWalker {
     /**
      * Construct an instance with limit the <i>depth</i> navigated to.
      * <p/>
-     *
-     * @param depthLimit controls how <i>deep</i> the hierarchy is
-     *                   navigated to (less than 0 means unlimited)
+     * 
+     * @param depthLimit
+     *            controls how <i>deep</i> the hierarchy is navigated to (less than 0 means unlimited)
      */
     protected OverthereFileDirectoryWalker(int depthLimit) {
         this.depthLimit = depthLimit;
@@ -93,16 +92,18 @@ public abstract class OverthereFileDirectoryWalker {
     /**
      * Internal method that walks the directory hierarchy in a depth-first manner.
      * <p/>
-     * Users of this class do not need to call this method. This method will
-     * be called automatically by another (public) method on the specific subclass.
+     * Users of this class do not need to call this method. This method will be called automatically by another (public)
+     * method on the specific subclass.
      * <p/>
-     * Writers of subclasses should call this method to start the directory walk.
-     * Once called, this method will emit events as it walks the hierarchy.
-     * The event methods have the prefix <code>handle</code>.
-     *
-     * @param startDirectory the directory to start from, not null
-     * @throws NullPointerException if the start directory is null
-     * @throws RuntimeIOException   if an I/O Error occurs
+     * Writers of subclasses should call this method to start the directory walk. Once called, this method will emit
+     * events as it walks the hierarchy. The event methods have the prefix <code>handle</code>.
+     * 
+     * @param startDirectory
+     *            the directory to start from, not null
+     * @throws NullPointerException
+     *             if the start directory is null
+     * @throws RuntimeIOException
+     *             if an I/O Error occurs
      */
     protected final void walk(OverthereFile startDirectory) throws RuntimeIOException {
         try {
@@ -120,10 +121,13 @@ public abstract class OverthereFileDirectoryWalker {
 
     /**
      * Main recursive method to examine the directory hierarchy.
-     *
-     * @param directory the directory to examine, not null
-     * @param depth     the directory level (starting directory = 0)
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param directory
+     *            the directory to examine, not null
+     * @param depth
+     *            the directory level (starting directory = 0)
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     private void walk(OverthereFile directory, int depth) throws IOException {
         if (handleDirectory(directory, depth)) {
@@ -150,8 +154,9 @@ public abstract class OverthereFileDirectoryWalker {
 
     /**
      * Lists the files in the directory.
-     *
-     * @param directory in which to list files.
+     * 
+     * @param directory
+     *            in which to list files.
      * @return all the files in the directory as filtering.
      */
     protected List<OverthereFile> listFiles(OverthereFile directory) {
@@ -162,9 +167,11 @@ public abstract class OverthereFileDirectoryWalker {
      * Overridable callback method invoked at the start of processing.
      * <p/>
      * This implementation does nothing.
-     *
-     * @param startDirectory the directory to start from
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param startDirectory
+     *            the directory to start from
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleStart(OverthereFile startDirectory) throws IOException {
         // do nothing - overridable by subclass
@@ -173,29 +180,35 @@ public abstract class OverthereFileDirectoryWalker {
     /**
      * Overridable callback method invoked to determine if a directory should be processed.
      * <p/>
-     * This method returns a boolean to indicate if the directory should be examined or not.
-     * If you return false, the entire directory and any subdirectories will be skipped.
+     * This method returns a boolean to indicate if the directory should be examined or not. If you return false, the
+     * entire directory and any subdirectories will be skipped.
      * <p/>
      * This implementation does nothing and returns true.
-     *
-     * @param directory the current directory being processed
-     * @param depth     the current directory level (starting directory = 0)
+     * 
+     * @param directory
+     *            the current directory being processed
+     * @param depth
+     *            the current directory level (starting directory = 0)
      * @return true to process this directory, false to skip this directory
-     * @throws IOException if an I/O Error occurs
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected boolean handleDirectory(OverthereFile directory, int depth) throws IOException {
         // do nothing - overridable by subclass
-        return true;  // process directory
+        return true; // process directory
     }
 
     /**
      * Overridable callback method invoked at the start of processing each directory.
      * <p/>
      * This implementation does nothing.
-     *
-     * @param directory the current directory being processed
-     * @param depth     the current directory level (starting directory = 0)
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param directory
+     *            the current directory being processed
+     * @param depth
+     *            the current directory level (starting directory = 0)
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleDirectoryStart(OverthereFile directory, int depth) throws IOException {
         // do nothing - overridable by subclass
@@ -205,10 +218,13 @@ public abstract class OverthereFileDirectoryWalker {
      * Overridable callback method invoked for each (non-directory) file.
      * <p/>
      * This implementation does nothing.
-     *
-     * @param file  the current file being processed
-     * @param depth the current directory level (starting directory = 0)
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param file
+     *            the current file being processed
+     * @param depth
+     *            the current directory level (starting directory = 0)
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleFile(OverthereFile file, int depth) throws IOException {
         // do nothing - overridable by subclass
@@ -218,10 +234,13 @@ public abstract class OverthereFileDirectoryWalker {
      * Overridable callback method invoked for each restricted directory.
      * <p/>
      * This implementation does nothing.
-     *
-     * @param directory the restricted directory
-     * @param depth     the current directory level (starting directory = 0)
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param directory
+     *            the restricted directory
+     * @param depth
+     *            the current directory level (starting directory = 0)
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleRestricted(OverthereFile directory, int depth) throws IOException {
         // do nothing - overridable by subclass
@@ -231,10 +250,13 @@ public abstract class OverthereFileDirectoryWalker {
      * Overridable callback method invoked at the end of processing each directory.
      * <p/>
      * This implementation does nothing.
-     *
-     * @param directory the directory being processed
-     * @param depth     the current directory level (starting directory = 0)
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @param directory
+     *            the directory being processed
+     * @param depth
+     *            the current directory level (starting directory = 0)
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleDirectoryEnd(OverthereFile directory, int depth) throws IOException {
         // do nothing - overridable by subclass
@@ -244,8 +266,9 @@ public abstract class OverthereFileDirectoryWalker {
      * Overridable callback method invoked at the end of processing.
      * <p/>
      * This implementation does nothing.
-     *
-     * @throws IOException if an I/O Error occurs
+     * 
+     * @throws IOException
+     *             if an I/O Error occurs
      */
     protected void handleEnd() throws IOException {
         // do nothing - overridable by subclass

@@ -21,15 +21,15 @@ import java.net.URISyntaxException;
 
 public enum ResourceURI {
 
-	RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
+    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
 
-	private final String uri;
+    private final String uri;
 
-	ResourceURI(String uri) {
-		this.uri = uri;
-	}
+    ResourceURI(String uri) {
+        this.uri = uri;
+    }
 
-	public URI getUri() throws URISyntaxException {
-		return Soapy.getUri(uri);
-	}
+    public URI getUri() throws URISyntaxException {
+        return Soapy.getUri(uri);
+    }
 }

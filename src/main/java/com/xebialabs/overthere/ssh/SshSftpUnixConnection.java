@@ -12,14 +12,15 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
  */
 class SshSftpUnixConnection extends SshSftpConnection {
 
-	public SshSftpUnixConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-	    super(type, options, mapper);
-		checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
+    public SshSftpUnixConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        super(type, options, mapper);
+        checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString()
+            .toLowerCase());
     }
 
-	@Override
-	protected String pathToSftpPath(String path) {
-	    return path;
+    @Override
+    protected String pathToSftpPath(String path) {
+        return path;
     }
 
 }

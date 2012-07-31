@@ -8,11 +8,12 @@ import java.net.InetSocketAddress;
  */
 public interface AddressPortMapper extends Closeable {
 
-	InetSocketAddress map(InetSocketAddress address);
+    InetSocketAddress map(InetSocketAddress address);
 
-	/**
-	 * Closes the mapper. Does not throw {@link java.io.IOException} but can throw {@link com.xebialabs.overthere.RuntimeIOException}
-	 */
-	@Override
-	void close();
+    /**
+     * Closes the mapper. Does not throw {@link java.io.IOException} but can throw
+     * {@link com.xebialabs.overthere.RuntimeIOException}
+     */
+    @Override
+    void close();
 }
