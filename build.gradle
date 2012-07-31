@@ -66,8 +66,8 @@ dependencies {
 	testCompile 'org.hamcrest:hamcrest-core:1.2.1'
 	testCompile 'org.hamcrest:hamcrest-library:1.2.1'
 	testCompile 'org.mockito:mockito-core:1.8.5'
-	testCompile 'nl.javadude.assumeng:assumeng:1.1.0'
 	testCompile 'org.testng:testng:5.14.10'
+	testCompile 'nl.javadude.assumeng:assumeng:1.2.2'
 
 	testRuntime 'ch.qos.logback:logback-classic:0.9.30'
 	testRuntime('org.uncommons:reportng:1.1.2') {

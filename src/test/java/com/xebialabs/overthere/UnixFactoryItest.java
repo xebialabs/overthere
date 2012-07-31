@@ -1,5 +1,6 @@
 package com.xebialabs.overthere;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import org.testng.annotations.Factory;
 
@@ -32,12 +34,12 @@ public class UnixFactoryItest {
 
 	@Factory
 	public Object[] createItests() throws Exception {
-		Object[] objects = new Object[4];
-		objects[0] = new OverthereConnectionItest(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix");
-		objects[1] = new OverthereConnectionItest(SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection", "overthere-unix");
-		objects[2] = new OverthereConnectionItest(SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection", "overthere-unix");
-		objects[3] = new OverthereConnectionItest(SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix");
-		return objects;
+		List<Object> itests = newArrayList();
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSftpOptions(), "com.xebialabs.overthere.ssh.SshSftpUnixConnection", "overthere-unix"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createScpOptions(), "com.xebialabs.overthere.ssh.SshScpConnection", "overthere-unix"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSudoOptions(), "com.xebialabs.overthere.ssh.SshSudoConnection", "overthere-unix"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createInteractiveSudoOptions(), "com.xebialabs.overthere.ssh.SshInteractiveSudoConnection", "overthere-unix"));
+		return itests.toArray(new Object[itests.size()]);
 	}
 
 	private static ConnectionOptions createSftpOptions() {

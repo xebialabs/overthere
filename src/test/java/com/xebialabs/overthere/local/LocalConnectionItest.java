@@ -30,9 +30,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import nl.javadude.assumeng.AssumptionListener;
-
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.CmdLine;
@@ -42,9 +39,9 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-@Listeners(AssumptionListener.class)
 public class LocalConnectionItest extends OverthereConnectionItestBase {
-	@Override
+
+    @Override
 	protected void doInitHost() {
 	}
 

@@ -16,34 +16,6 @@
  */
 package com.xebialabs.overthere;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Random;
-
-import nl.javadude.assumeng.Assumption;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.OutputSupplier;
-import com.xebialabs.overcast.CloudHost;
-import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import com.xebialabs.overthere.util.OverthereUtils;
-
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -65,9 +37,40 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.startsWith;
 import static org.testng.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.List;
+import java.util.Random;
+
+import nl.javadude.assumeng.Assumption;
+import nl.javadude.assumeng.AssumptionListener;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.OutputSupplier;
+import com.xebialabs.overcast.CloudHost;
+import com.xebialabs.overthere.local.LocalFile;
+import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.OverthereUtils;
+
 /**
  * Base class for all Overthere connection itests.
  */
+@Listeners(AssumptionListener.class)
 public abstract class OverthereConnectionItestBase {
 
 	private static final int NR_OF_SMALL_FILES = 100;
@@ -91,7 +94,6 @@ public abstract class OverthereConnectionItestBase {
 	@BeforeClass
 	public void setupHost() throws Exception {
 		doInitHost();
-		logger.error("****************************Running before class!*******************************");
 		host = CloudHostHolder.getHost(hostname);
 		temp.create();
 		setTypeAndOptions();
@@ -635,7 +637,6 @@ public abstract class OverthereConnectionItestBase {
 			}
 		});
 	}
-
 
 	protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
 		byte[] randomBytes = generateRandomBytes(size);

@@ -1,11 +1,6 @@
 package com.xebialabs.overthere;
 
-import org.testng.annotations.Factory;
-
-import com.google.common.collect.ImmutableMap;
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-import com.xebialabs.overthere.ssh.SshConnectionType;
-
+import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -22,6 +17,8 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
@@ -31,6 +28,20 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
 
+import java.util.List;
+
+import nl.javadude.assumeng.AssumptionListener;
+
+import org.testng.annotations.Factory;
+import org.testng.annotations.Listeners;
+
+import com.google.common.collect.ImmutableMap;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshConnectionType;
+
+@Listeners(AssumptionListener.class)
 public class WindowsFactoryItest {
 	private static final String ADMINISTRATIVE_USER_ITEST_USERNAME = "Administrator";
 	private static final String ADMINISTRATIVE_USER_ITEST_PASSWORD = "iW8tcaM0d";
@@ -41,16 +52,16 @@ public class WindowsFactoryItest {
 
 	@Factory
 	public Object[] createWindowsTests() throws Exception {
-		Object[] objects = new Object[8];
-		objects[0] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
-		objects[1] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithRegularUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
-		objects[2] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
-		objects[3] = new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpsWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows");
-		objects[4] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
-		objects[5] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows");
-		objects[6] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
-		objects[7] = new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
-		return objects;
+        List<Object> itests = newArrayList();
+		itests.add(new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(CIFS_PROTOCOL, createCifsTelnetWithRegularUserOptions(), "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(CIFS_PROTOCOL, createCifsWinRmHttpsWithAdministrativeUserOptions(), "com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpCygwinWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpCygwinConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithAdministrativeUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows"));
+		itests.add(new OverthereConnectionItest(SSH_PROTOCOL, createSshSftpWinSshdWithRegularUserOptions(), "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows"));
+		return itests.toArray(new Object[itests.size()]);
 	}
 
 	private static ConnectionOptions createCifsTelnetWithAdministrativeUserOptions() {
@@ -101,6 +112,8 @@ public class WindowsFactoryItest {
 		partialOptions.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
 		partialOptions.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
 		partialOptions.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+		partialOptions.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
+		partialOptions.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);
 		partialOptions.set(JUMPSTATION, createPartialTunnelOptions());
 		return partialOptions;
 	}
@@ -159,4 +172,5 @@ public class WindowsFactoryItest {
 		tunnelOptions.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
 		return tunnelOptions;
 	}
+
 }

@@ -1,21 +1,16 @@
 package com.xebialabs.overthere;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import nl.javadude.assumeng.AssumptionListener;
-
-import org.testng.annotations.Listeners;
-
 import static com.google.common.collect.Maps.newHashMap;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
+
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class for all parametrized Overthere connection itests that use a
  * {@link com.xebialabs.overcast.CloudHost}.
  */
-@Listeners({ AssumptionListener.class })
 public class OverthereConnectionItest extends OverthereConnectionItestBase {
 
 	protected final ConnectionOptions partialOptions;
@@ -58,4 +53,5 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase {
 			tunnelOptions.set(ADDRESS, host.getHostName());
 		}
 	}
+
 }
