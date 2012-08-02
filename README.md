@@ -5,6 +5,7 @@
 	* [Depending on Overthere](#depending_on_overthere)
 	* [Building Overthere](#building_overthere)
 	* [Running the Examples](#running_the_examples)
+* [Programming Overthere](#programming_overthere) 
 * [Configuring Overthere](#configuring_overthere)
 	* [Protocols](#protocols)
 	* [Connection options](#common_connection_options)
@@ -62,6 +63,13 @@ Binary releases of Overthere are not provided here, but you can download it [str
 3. Go into the `examples` directory and run the command `mvn eclipse:eclipse`.
 4. Import the `examples` project into Eclipse.
 5. Change the login details in the example classes (address, username and password) and run them!
+
+<a name="programming_overthere"/>
+# Programming Overthere
+
+To program Overthere, browse the source code, check the examples and browse the Overthere <a href="http://docs.xebialabs.com/overthere/javadoc/">Javadoc</a>.
+
+For a more thorough introduction to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands (in English).
 
 <a name="configuring_overthere"/>
 # Configuring Overthere
