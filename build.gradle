@@ -72,7 +72,7 @@ dependencies {
   compile 'commons-codec:commons-codec:1.5'
 
   // Test dependencies
-  testCompile 'com.xebialabs.cloud:overcast:1.0.0'
+  testCompile 'com.xebialabs.cloud:overcast:1.1.0'
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'
   testCompile 'org.mockito:mockito-core:1.8.5'
