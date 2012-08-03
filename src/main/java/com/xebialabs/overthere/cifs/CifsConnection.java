@@ -30,12 +30,12 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE_MAPPINGS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE_MAPPINGS_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static java.net.InetSocketAddress.createUnresolved;
 
@@ -99,7 +99,7 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.password = options.get(PASSWORD);
         InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
         this.cifsPort = addressCifsPort.getPort();
-        this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(CIFS_PATH_SHARE_MAPPINGS, CIFS_PATH_SHARE_MAPPINGS_DEFAULT));
+        this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
         this.authentication = new NtlmPasswordAuthentication(null, username, password);
     }
 

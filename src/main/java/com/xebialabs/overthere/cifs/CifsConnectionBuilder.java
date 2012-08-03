@@ -88,13 +88,13 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      * CIFS, specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not
      * explicitly mapped to a share the administrative share will be used..
      */
-    public static final String CIFS_PATH_SHARE_MAPPINGS = "cifsPathShareMappings";
+    public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
 
     /**
      * Default value (empty map) for the {@link ConnectionOptions connection option} used to specify the path to share
      * mappings to use for CIFS.
      */
-    public static final Map<String, String> CIFS_PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
+    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether to use HTTPS for WinRM.
