@@ -34,7 +34,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-5%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-6%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -44,7 +44,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0-beta-5</version>
+			<version>2.0.0-beta-6</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -435,7 +435,9 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"/>
 # Release History
 
-* Overthere 2.0.0-beta-5 (2-Aug-2012)
+* Overthere 2.0.0-beta-6 (02-Aug-2012)
+    * Renamed CIFS_PATH_SHARE_MAPPING back to PATH_SHARE_MAPPINGS.
+* Overthere 2.0.0-beta-5 (02-Aug-2012)
     * Added support for Windows domain accounts to CIFS and WinRM connection methods.
     * Renamed a few options.
     * Fixed bug in SSH tunnel port allocation code that caused the same local port to be allocated multiple times on Windows.
@@ -450,7 +452,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 	* Fixed issues #39 and #40.
 	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels.
 	* Set default pty to true in case of interactive sudo and no pty set.
-* Overthere 2.0.0-beta-1 (5-Mar-2012)
+* Overthere 2.0.0-beta-1 (05-Mar-2012)
     * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
     * Ported Overthere tests to use TestNG instead of JUnit.
 * Overthere 1.0.16 (23-Feb-2012)
