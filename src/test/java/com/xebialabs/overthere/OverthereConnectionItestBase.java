@@ -133,6 +133,19 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
+    @Assumption(methods = { "onWindows" })
+    public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccount() {
+        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
+        incorrectUserNameOptions.set("username", "DOMAIN\\user");
+        try {
+            Overthere.getConnection(protocol, incorrectUserNameOptions);
+            fail("Expected not to be able to connect with an old-style Windows domain account");
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString("Cannot connect with an old-style Windows domain account"));
+        }
+    }
+
+    @Test
     @Assumption(methods = "onUnix")
     public void shouldExecuteSimpleCommandOnUnix() {
         CapturingOverthereProcessOutputHandler captured = capturingHandler();

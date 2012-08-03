@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -36,14 +37,18 @@ import static java.net.InetSocketAddress.createUnresolved;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import com.xebialabs.overthere.spi.AddressPortMapper;
 import jcifs.smb.NtlmPasswordAuthentication;
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import jcifs.smb.SmbFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 /**
  * Base class for connections to a Windows host using CIFS.
@@ -85,6 +90,7 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.address = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
+        checkArgument(!username.contains("\\"), "Cannot connect with an old-style Windows domain account [%s], use USER@DOMAIN instead.", username);
         this.password = options.get(PASSWORD);
         InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
         this.cifsPort = addressCifsPort.getPort();
