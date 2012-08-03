@@ -133,7 +133,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
-    @Assumption(methods = { "onWindows" })
+    @Assumption(methods = { "onWindows", "onlyCifs" })
     public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccount() {
         ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
         incorrectUserNameOptions.set("username", "DOMAIN\\user");
@@ -676,6 +676,10 @@ public abstract class OverthereConnectionItestBase {
 
     public boolean onWindows() {
         return connection.getHostOperatingSystem().equals(WINDOWS);
+    }
+
+    public boolean onlyCifs() {
+        return protocol == CIFS_PROTOCOL;
     }
 
     public boolean notSftpCygwin() {

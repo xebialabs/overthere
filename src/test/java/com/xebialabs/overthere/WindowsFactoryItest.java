@@ -18,11 +18,11 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_C
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
@@ -91,7 +91,7 @@ public class WindowsFactoryItest {
     private OverthereConnectionItest cifsWinRmHttpWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_HTTP);
+        options.set(CONNECTION_TYPE, WINRM);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
@@ -105,12 +105,13 @@ public class WindowsFactoryItest {
     private OverthereConnectionItest cifsWinRmHttpsWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_HTTPS);
+        options.set(CONNECTION_TYPE, WINRM);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
         options.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+        options.set(WINRM_ENABLE_HTTPS, true);
         options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
         options.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);
         options.set(JUMPSTATION, createPartialTunnelOptions());

@@ -97,6 +97,16 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final Map<String, String> CIFS_PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
     /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether to use HTTPS for WinRM.
+     */
+    public static final String WINRM_ENABLE_HTTPS = "winrmEnableHttps";
+
+    /**
+     * Default value (false) of the {@link ConnectionOptions connection option} used to specify whether to use HTTPS for WinRM.
+     */
+    public static final boolean DEFAULT_WINRM_ENABLE_HTTPS = false;
+
+    /**
      * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
      */
     public static final String WINRM_CONTEXT = "winrmContext";
@@ -185,8 +195,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
         case TELNET:
             connection = new CifsTelnetConnection(type, options, mapper);
             break;
-        case WINRM_HTTP:
-        case WINRM_HTTPS:
+        case WINRM:
             connection = new CifsWinRmConnection(type, options, mapper);
             break;
         default:

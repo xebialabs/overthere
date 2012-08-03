@@ -32,6 +32,11 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE_MAPPINGS_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static java.net.InetSocketAddress.createUnresolved;
 
 import java.io.IOException;
@@ -86,7 +91,7 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         super(protocol, options, mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         String address = options.get(ADDRESS);
-        InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort())));
+        InetSocketAddress addressPort = mapper.map(createUnresolved(address, options.get(PORT, getDefaultPort(options))));
         this.address = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
@@ -98,14 +103,17 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.authentication = new NtlmPasswordAuthentication(null, username, password);
     }
 
-    private Integer getDefaultPort() {
+    private int getDefaultPort(ConnectionOptions options) {
         switch (cifsConnectionType) {
         case TELNET:
-            return CifsConnectionBuilder.DEFAULT_TELNET_PORT;
-        case WINRM_HTTP:
-            return CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
-        case WINRM_HTTPS:
-            return CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
+            return DEFAULT_TELNET_PORT;
+        case WINRM:
+            if (!options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS)) {
+                return DEFAULT_WINRM_HTTP_PORT;
+            }
+            else {
+                return DEFAULT_WINRM_HTTPS_PORT;
+            }
         default:
             throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
         }

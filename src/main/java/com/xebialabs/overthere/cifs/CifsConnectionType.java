@@ -33,12 +33,8 @@ public enum CifsConnectionType {
     TELNET,
 
     /**
-     * A CIFS connection that uses WinRM over HTTP to execute commands, to a Windows host.
+     * A CIFS connection that uses WinRM to execute commands, to a Windows host.
      */
-    WINRM_HTTP,
+    WINRM,
 
-    /**
-     * A CIFS connection that uses WinRM over HTTPS to execute commands, to a Windows host.
-     */
-    WINRM_HTTPS,
 }
