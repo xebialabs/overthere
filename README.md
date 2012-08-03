@@ -34,7 +34,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-5%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -44,7 +44,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0-beta-4</version>
+			<version>2.0.0-beta-5</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -435,6 +435,11 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"/>
 # Release History
 
+* Overthere 2.0.0-beta-5 (2-Aug-2012)
+    * Added support for Windows domain accounts to CIFS and WinRM connection methods.
+    * Renamed a few options.
+    * Fixed bug in SSH tunnel port allocation code that caused the same local port to be allocated multiple times on Windows.
+    * Changed license to GPLv2 with XebiaLabs FLOSS License Exception.
 * Overthere 2.0.0-beta-4 (19-Jun-2012)
     * Fixed issue #42.
     * Moved itest-support project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
