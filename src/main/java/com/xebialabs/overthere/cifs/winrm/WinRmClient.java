@@ -138,7 +138,7 @@ public class WinRmClient {
             if (chunk == 0) {
                 try {
                     exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
-                    logger.info("exit code {}", exitCode);
+                    logger.debug("exit code {}", exitCode);
                 } catch (Exception e) {
                     logger.debug("not found");
                 }

@@ -25,7 +25,6 @@ package com.xebialabs.overthere.cifs.winrm.connector;
 import static org.apache.http.auth.AuthScope.ANY_HOST;
 import static org.apache.http.auth.AuthScope.ANY_PORT;
 import static org.apache.http.auth.AuthScope.ANY_REALM;
-import static org.apache.http.auth.AuthScope.ANY_SCHEME;
 import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
 import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
@@ -66,6 +65,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.BasicUserPrincipal;
 import org.apache.http.auth.Credentials;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
@@ -87,7 +87,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
-import com.sun.security.auth.UserPrincipal;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.cifs.winrm.HttpConnector;
@@ -116,10 +115,11 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      */
     @Override
     public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
-        if (username.contains("@")) {
+        boolean isDomainUser = username.contains("@");
+        if (isDomainUser) {
             return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
         } else {
-            return int_sendMessage(requestDocument, soapAction);
+            return doSendMessage(requestDocument, soapAction);
         }
     }
 
@@ -221,7 +221,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
         @Override
         public Document run() throws Exception {
-            return connector.int_sendMessage(requestDocument, soapAction);
+            return connector.doSendMessage(requestDocument, soapAction);
         }
 
         public Document getRequestDocument() {
@@ -232,7 +232,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     /**
      * Internal sendMessage, performs the HTTP request and returns the result document.
      */
-    private Document int_sendMessage(final Document requestDocument, final SoapAction soapAction) {
+    private Document doSendMessage(final Document requestDocument, final SoapAction soapAction) {
         final DefaultHttpClient client = new DefaultHttpClient();
         try {
             configureHttpClient(client);
@@ -296,9 +296,9 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      * Configure auth schemes to use for the HttpClient.
      */
     protected void configureAuthentication(final DefaultHttpClient httpclient) {
-        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, ANY_SCHEME), new Credentials() {
+        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "basic"), new Credentials() {
             public Principal getUserPrincipal() {
-                return new UserPrincipal(username);
+                return new BasicUserPrincipal(username);
             }
 
             public String getPassword() {
@@ -405,7 +405,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     protected HttpEntity createEntity(final String requestDocAsString) throws UnsupportedEncodingException {
         return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
     }
-
+    
     public URL getTargetURL() {
         return targetURL;
     }
