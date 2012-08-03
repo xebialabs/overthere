@@ -79,7 +79,7 @@ dependencies {
   testCompile 'org.testng:testng:5.14.10'
   testCompile 'nl.javadude.assumeng:assumeng:1.2.2'
 
-  testRuntime 'ch.qos.logback:logback-classic:0.9.30'
+  testRuntime 'ch.qos.logback:logback-classic:1.0.6'
   testRuntime('org.uncommons:reportng:1.1.2') {
     exclude group: 'org.testng', module: 'testng'
   }
