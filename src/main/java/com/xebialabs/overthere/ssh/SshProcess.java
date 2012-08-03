@@ -22,22 +22,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.connection.channel.direct.Signal;
 import net.schmizz.sshj.transport.TransportException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
 
 class SshProcess implements OverthereProcess {
     private SshConnection connection;
@@ -77,9 +77,7 @@ class SshProcess implements OverthereProcess {
             logger.info("Command {} on {} returned {}", new Object[] { encodedCommandLine, connection, exitStatus });
             closeSession();
             if (exitStatus == null) {
-                logger.warn("Command {} on {} could not be started. This may be caused by the connection option " + ALLOCATE_DEFAULT_PTY
-                    + " being set to true.", new Object[] {
-                    encodedCommandLine, connection });
+                logger.warn("Command {} on {} could not be started. Returning exit code -1", encodedCommandLine, connection);
                 return -1;
             } else {
                 return exitStatus;
