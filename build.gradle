@@ -161,8 +161,8 @@ uploadArchives {
 
         licenses {
           license {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            name 'GPLv2 with XebiaLabs FLOSS License Exception'
+            url 'https://github.com/xebialabs/overthere/blob/master/LICENSE'
             distribution 'repo'
           }
         }
