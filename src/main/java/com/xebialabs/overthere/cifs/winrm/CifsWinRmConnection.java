@@ -25,7 +25,6 @@ package com.xebialabs.overthere.cifs.winrm;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEBUG_KERBEROS_AUTH;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_DEBUG_KERBEROS_AUTH;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
@@ -37,6 +36,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_H
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
@@ -95,7 +95,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
     private URL getTargetURL(ConnectionOptions options) {
         String scheme = cifsConnectionType == WINRM_HTTP ? "http" : "https";
-        String context = options.get(CONTEXT, DEFAULT_WINRM_CONTEXT);
+        final String context = options.get(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
         try {
             return new URL(scheme, address, port, context);
         } catch (MalformedURLException e) {

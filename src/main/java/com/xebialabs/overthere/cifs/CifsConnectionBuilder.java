@@ -99,7 +99,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
      */
-    public static final String CONTEXT = "winrmContext";
+    public static final String WINRM_CONTEXT = "winrmContext";
 
     /**
      * Default value (/wsman) of the {@link ConnectionOptions connection option} used to specify the context (URI) used

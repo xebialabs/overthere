@@ -12,12 +12,12 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
@@ -94,7 +94,7 @@ public class WindowsFactoryItest {
         options.set(CONNECTION_TYPE, WINRM_HTTP);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
-        options.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
+        options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
         options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
         options.set(JUMPSTATION, createPartialTunnelOptions());
@@ -108,7 +108,7 @@ public class WindowsFactoryItest {
         options.set(CONNECTION_TYPE, WINRM_HTTPS);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
-        options.set(CONTEXT, DEFAULT_WINRM_CONTEXT);
+        options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
         options.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
         options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
