@@ -22,14 +22,6 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEBUG_KERBEROS_AUTH;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_DEBUG_KERBEROS_AUTH;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static org.apache.http.auth.AuthScope.ANY_HOST;
 import static org.apache.http.auth.AuthScope.ANY_PORT;
 import static org.apache.http.auth.AuthScope.ANY_REALM;
@@ -96,7 +88,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
 import com.sun.security.auth.UserPrincipal;
-import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.cifs.winrm.HttpConnector;
@@ -107,25 +98,17 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 
 public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
     private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
-    ConnectionOptions options;
-    private final URL targetURL;
-    private final WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
-    private final WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
     private final String username;
     private final String password;
-    private final boolean debugKerberosAuth;
+    private final URL targetURL;
+    private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
+    private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
+    private boolean debugKerberosAuth;
 
-    public ApacheHttpComponentsHttpClientHttpConnector(final URL targetURL, final ConnectionOptions options) {
+    public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
+        this.username = username;
+        this.password = password;
         this.targetURL = targetURL;
-        this.options = options;
-        // FIXME: Don't get the values here, but get them sooner!
-        this.debugKerberosAuth = options.getBoolean(DEBUG_KERBEROS_AUTH, DEFAULT_DEBUG_KERBEROS_AUTH);
-        this.httpsCertTrustStrategy = options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class,
-            DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY);
-        this.httpsHostnameVerifyStrategy = options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
-            DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY);
-        this.username = options.get(USERNAME);
-        this.password = options.get(PASSWORD);
     }
 
     /**
@@ -423,8 +406,40 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
     }
 
-    protected URL getTargetURL() {
+    public URL getTargetURL() {
         return targetURL;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    public WinrmHttpsCertificateTrustStrategy getHttpsCertTrustStrategy() {
+        return httpsCertTrustStrategy;
+    }
+
+    public void setHttpsCertTrustStrategy(WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy) {
+        this.httpsCertTrustStrategy = httpsCertTrustStrategy;
+    }
+
+    public WinrmHttpsHostnameVerificationStrategy getHttpsHostnameVerifyStrategy() {
+        return httpsHostnameVerifyStrategy;
+    }
+
+    public void setHttpsHostnameVerifyStrategy(WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy) {
+        this.httpsHostnameVerifyStrategy = httpsHostnameVerifyStrategy;
+    }
+
+    public boolean isDebugKerberosAuth() {
+        return debugKerberosAuth;
+    }
+
+    public void setDebugKerberosAuth(boolean debugKerberosAuth) {
+        this.debugKerberosAuth = debugKerberosAuth;
     }
 
 }

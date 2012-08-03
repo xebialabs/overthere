@@ -26,13 +26,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEBUG_KERBEROS_AUTH;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_DEBUG_KERBEROS_AUTH;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TIMEOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_HTTP;
 
 import java.net.MalformedURLException;
@@ -43,6 +49,8 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.cifs.winrm.connector.ApacheHttpComponentsHttpClientHttpConnector;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
@@ -72,7 +80,12 @@ public class CifsWinRmConnection extends CifsConnection {
             .toLowerCase());
 
         URL targetURL = getTargetURL(options);
-        HttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(targetURL, options);
+        ApacheHttpComponentsHttpClientHttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(username, password, targetURL);
+        httpConnector.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class,
+            DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
+        httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
+            DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
+        httpConnector.setDebugKerberosAuth(options.getBoolean(DEBUG_KERBEROS_AUTH, DEFAULT_DEBUG_KERBEROS_AUTH));
 
         winRmClient = new WinRmClient(httpConnector, targetURL);
         winRmClient.setTimeout(options.get(TIMEMOUT, DEFAULT_TIMEOUT));
