@@ -8,6 +8,7 @@ import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
@@ -17,7 +18,6 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
@@ -82,7 +82,7 @@ public class WindowsFactoryItest {
         options.set(PORT, DEFAULT_TELNET_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
         options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\tmp");
-        options.set(PATH_SHARE_MAPPINGS, ImmutableMap.of("C:\\overthere", "sharethere"));
+        options.set(CIFS_PATH_SHARE_MAPPINGS, ImmutableMap.of("C:\\overthere", "sharethere"));
         options.set(JUMPSTATION, createPartialTunnelOptions());
         return new OverthereConnectionItest(this.getClass().getSimpleName() + "_cifsTelnetWithRegularUser", CIFS_PROTOCOL, options,
             "com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection", "overthere-windows");
