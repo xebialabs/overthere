@@ -92,7 +92,7 @@ class SshSudoConnection extends SshScpConnection {
         return super.processCommandLine(cmd);
     }
 
-    protected CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
+    /* package-scope for unit test */ CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
         CmdLine commandLineWithSudo = new CmdLine();
         addSudoStatement(commandLineWithSudo);
         if (sudoQuoteCommand) {
@@ -108,7 +108,7 @@ class SshSudoConnection extends SshScpConnection {
         return commandLineWithSudo;
     }
 
-    protected void addSudoStatement(CmdLine sudoCommandLine) {
+    private void addSudoStatement(CmdLine sudoCommandLine) {
         String prefix = MessageFormat.format(sudoCommandPrefix, sudoUsername);
         for (String arg : prefix.split("\\s+")) {
             sudoCommandLine.addArgument(arg);
