@@ -34,7 +34,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-6%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-7%7Cjar) if you want to.
 
 <a name="depending_on_overthere"/>
 ## Depending on Overthere
@@ -44,7 +44,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0-beta-6</version>
+			<version>2.0.0-beta-7</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -435,6 +435,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"/>
 # Release History
 
+* Overthere 2.0.0-beta-7 (02-Aug-2012)
+    * Fixed bug in WinRM implementation: It was not sending individual stdout chars to OverthereProcessOutputHandler.handleOutput.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
     * Renamed CIFS_PATH_SHARE_MAPPING back to PATH_SHARE_MAPPINGS.
 * Overthere 2.0.0-beta-5 (02-Aug-2012)
