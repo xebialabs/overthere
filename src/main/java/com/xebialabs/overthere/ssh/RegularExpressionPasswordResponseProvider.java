@@ -56,7 +56,7 @@ class RegularExpressionPasswordResponseProvider implements ChallengeResponseProv
     @Override
     public void init(Resource resource, String name, String instruction) {
         this.resource = resource;
-        logger.debug("Challenge - name=`{}`; instruction=`{}`", name, instruction);
+        logger.debug("Initializing - name=[{}], instruction=[{}]", name, instruction);
     }
 
     @Override

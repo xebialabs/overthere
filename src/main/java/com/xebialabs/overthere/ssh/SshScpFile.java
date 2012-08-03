@@ -51,6 +51,7 @@ import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static java.lang.String.format;
 
 /**
  * A file on a host connected through SSH w/ SCP.
@@ -140,10 +141,9 @@ class SshScpFile extends SshFile<SshScpConnection> {
             results.exists = false;
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Listed file " + this + ": exists=" + results.exists + ", isDirectory=" + results.isDirectory + ", length=" + results.length
-                + ", canRead=" + results.canRead + ", canWrite=" + results.canWrite + ", canExecute=" + results.canExecute);
-        }
+        logger.debug("Listed file [{}]: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[] { this, results.exists,
+            results.isDirectory, results.length
+            , results.canRead, results.canWrite, results.canExecute });
 
         return results;
     }
@@ -301,7 +301,8 @@ class SshScpFile extends SshFile<SshScpConnection> {
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
         int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), commandLine);
         if (errno != 0) {
-            throw new RuntimeIOException("Cannot create directory or -ies " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+            throw new RuntimeIOException(
+                format("Cannot create directory or -ies %s: %s (errno=%d)", this, capturedOutput.getError(), errno));
         }
 
         if (logger.isDebugEnabled()) {

@@ -48,6 +48,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static java.lang.String.format;
 
 /**
  * A connection to a Windows host using CIFS and Telnet.
@@ -136,8 +137,7 @@ public class CifsTelnetConnection extends CifsConnection {
                         int postamblePos = outputBufStr.indexOf(ERRORLEVEL_POSTAMBLE);
                         if (preamblePos >= 0 && postamblePos >= 0) {
                             String errorlevelString = outputBufStr.substring(preamblePos + ERRORLEVEL_PREAMBLE.length(), postamblePos);
-                            if (logger.isDebugEnabled())
-                                logger.debug("Errorlevel string found: " + errorlevelString);
+                            logger.debug("Errorlevel string found: {}", errorlevelString);
 
                             try {
                                 result[0] = Integer.parseInt(errorlevelString);
@@ -246,19 +246,15 @@ public class CifsTelnetConnection extends CifsConnection {
             if (unexpectedString != null && outputBufStr.length() >= unexpectedString.length()) {
                 String s = outputBufStr.substring(outputBufStr.length() - unexpectedString.length(), outputBufStr.length());
                 if (s.equals(unexpectedString)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Unexpected string \"" + unexpectedString + "\" found in Windows Telnet output");
-                    }
-                    throw new IOException("Unexpected string \"" + unexpectedString + "\" found in Windows Telnet output");
+                    logger.debug("Unexpected string [{}] found in Windows Telnet output", unexpectedString);
+                    throw new IOException(format("Unexpected string [%s] found in Windows Telnet output", unexpectedString));
                 }
             }
 
             if (outputBufStr.length() >= expectedString.length()) {
                 String s = outputBufStr.substring(outputBufStr.length() - expectedString.length(), outputBufStr.length());
                 if (s.equals(expectedString)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Expected string \"" + expectedString + "\" found in Windows Telnet output");
-                    }
+                    logger.debug("Expected string [{}] found in Windows Telnet output", expectedString);
                     return;
                 }
             }
