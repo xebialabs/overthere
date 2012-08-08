@@ -56,6 +56,7 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
@@ -98,6 +99,7 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
     private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
     private final String username;
+    private final boolean useKerberos;
     private final String password;
     private final URL targetURL;
     private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
@@ -106,6 +108,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
     public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
         this.username = username;
+        this.useKerberos = username.contains("@");
         this.password = password;
         this.targetURL = targetURL;
     }
@@ -115,8 +118,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      */
     @Override
     public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
-        boolean isDomainUser = username.contains("@");
-        if (isDomainUser) {
+        if (useKerberos) {
             return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
         } else {
             return doSendMessage(requestDocument, soapAction);
@@ -296,7 +298,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      * Configure auth schemes to use for the HttpClient.
      */
     protected void configureAuthentication(final DefaultHttpClient httpclient) {
-        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "basic"), new Credentials() {
+        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "Basic"), new Credentials() {
             public Principal getUserPrincipal() {
                 return new BasicUserPrincipal(username);
             }
@@ -305,6 +307,18 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
                 return password;
             }
         });
+
+        if (useKerberos) {
+            httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "Kerberos"), new Credentials() {
+                public Principal getUserPrincipal() {
+                    return new KerberosPrincipal(username);
+                }
+
+                public String getPassword() {
+                    return password;
+                }
+            });
+        }
 
         httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
     }
