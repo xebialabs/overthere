@@ -25,22 +25,22 @@ package com.xebialabs.overthere.cifs.winrm;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEBUG_KERBEROS_AUTH;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_DEBUG_KERBEROS_AUTH;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TIMEOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_DEBUG_KERBEROS_AUTH;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.ENVELOP_SIZE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.LOCALE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.TIMEMOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_LOCALE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_TIMEOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_DEBUG_KERBEROS_AUTH;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -101,15 +101,15 @@ public class CifsWinRmConnection extends CifsConnection {
             DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
         httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
             DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
-        httpConnector.setDebugKerberosAuth(options.getBoolean(DEBUG_KERBEROS_AUTH, DEFAULT_DEBUG_KERBEROS_AUTH));
+        httpConnector.setDebugKerberosAuth(options.getBoolean(WINRM_DEBUG_KERBEROS_AUTH, DEFAULT_WINRM_DEBUG_KERBEROS_AUTH));
         return httpConnector;
     }
 
     private WinRmClient createWinrmClient(URL targetURL, ApacheHttpComponentsHttpClientHttpConnector httpConnector, ConnectionOptions options) {
         final WinRmClient client = new WinRmClient(httpConnector, targetURL);
-        client.setTimeout(options.get(TIMEMOUT, DEFAULT_TIMEOUT));
-        client.setEnvelopSize(options.get(ENVELOP_SIZE, DEFAULT_ENVELOP_SIZE));
-        client.setLocale(options.get(LOCALE, DEFAULT_LOCALE));
+        client.setTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
+        client.setEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
+        client.setLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
         return client;
     }
 

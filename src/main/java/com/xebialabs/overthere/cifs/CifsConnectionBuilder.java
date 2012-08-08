@@ -121,45 +121,45 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      * Name of the {@link ConnectionOptions connection option} used to specify the WinRM timeout in <a
      * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
      */
-    public static final String TIMEMOUT = "winrmTimeout";
+    public static final String WINRM_TIMEMOUT = "winrmTimeout";
 
     /**
      * Default value (PT60.000S) of the {@link ConnectionOptions connection option} used to specify the WinRM timeout.
      */
-    public static final String DEFAULT_TIMEOUT = "PT60.000S";
+    public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size in bytes to use.
      */
-    public static final String ENVELOP_SIZE = "winrmEnvelopSize";
+    public static final String WINRM_ENVELOP_SIZE = "winrmEnvelopSize";
 
     /**
      * Default value (153600) of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size
      * in bytes to use.
      */
-    public static final int DEFAULT_ENVELOP_SIZE = 153600;
+    public static final int DEFAULT_WINRM_ENVELOP_SIZE = 153600;
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
      */
-    public static final String LOCALE = "winrmLocale";
+    public static final String WINRM_LOCALE = "winrmLocale";
 
     /**
      * Default value (en-US) of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
      */
-    public static final String DEFAULT_LOCALE = "en-US";
+    public static final String DEFAULT_WINRM_LOCALE = "en-US";
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether to enable debug output for
      * Kerberos JAAS authentication.
      */
-    public static final String DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
+    public static final String WINRM_DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
 
     /**
      * Default value (false) of the {@link ConnectionOptions connection option} used to specify whether to enable debug
      * output for Kerberos JAAS authentication.
      */
-    public static final boolean DEFAULT_DEBUG_KERBEROS_AUTH = false;
+    public static final boolean DEFAULT_WINRM_DEBUG_KERBEROS_AUTH = false;
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the
