@@ -13,6 +13,7 @@
 	* [SSH](#ssh)
 	* [CIFS](#cifs) (includes Telnet and WinRM)
 	* [Tunnelling](#tunnelling)
+* [Troubleshooting Overthere](#troubleshooting)
 * [Release History](#release_history)
 
 
@@ -99,7 +100,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="address"></a>address</th>
-	<td>The address of the remote host, either an IP address or a DNS name.</td>
+	<td>The address of the remote host, either an IP address or a DNS name. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="port"></a>port</th>
@@ -107,15 +108,15 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="username"></a>username</th>
-	<td>The username to use when connecting to the remote host.</td>
+	<td>The username to use when connecting to the remote host. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="password"></a>password</th>
-	<td>The password to use.</td>
+	<td>The password to use. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmp"></a>tmp</th>
-	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory. By default the connection temporary directory is removed when the connection is closed.</td>
+	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory. The default value is <code>tmp</code> for UNIX hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmpFileCreationRetries"></a>tmpFileCreationRetries</th>
@@ -131,7 +132,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
-	<td>The connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>)</td>
+	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
 </tr>
 </table>
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
@@ -139,7 +140,7 @@ Apart from these common connection options, some protocols define additional pro
 <a name="local"></a>
 ## LOCAL
 
-The local protocol implementation uses the local file manipulation and local process execution capabilities built-in to Java. The __os__ connection property is hardcoded to the operating system of the local host and the `tmp` property defaults to the system temporary directory as specified by the `java.io.tmpdir` [system property](http://docs.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()). There are no protocol-specific connection properties.
+The local protocol implementation uses the local file manipulation and local process execution capabilities built-in to Java. The [__os__](#os) connection option is hardcoded to the operating system of the local host and the [__tmp__](#tmp) connection option defaults to the system temporary directory as specified by the `java.io.tmpdir` <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()">system property</a>. There are no protocol-specific connection options.
 
 <a name="ssh"></a>
 ## SSH
@@ -151,7 +152,7 @@ See the [section on the host setup](#ssh_host_setup) for more information on how
 <a name="ssh_connection_options"></a>
 ### Connection options
 
-The SSH protocol implementation of Overthere defines a number of additional connection properties, in addition to the [common connection options](#common_connection_options).
+The SSH protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
 
 <table>
 <tr>
@@ -161,8 +162,8 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 		<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
 		<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
 		<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
-		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection property is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
-	<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <code>SUDO</code> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
+		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection option is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
+	<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <strong>SUDO</strong> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
 	</ul></td>
 </tr>
 <tr>
@@ -187,7 +188,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocatePty"></a>allocatePty</th>
-	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><code>allocateDefaultPty</code></a> option. The default value is unset.
+	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option. The default value is unset.
 	</td>
 </tr>
 <tr>
@@ -273,23 +274,31 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 * WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
-By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the target CIFS machine. These shares are only accessible for users that are part of the __Administrators__ on the target machine. If you want to access the target machine using a regular account, use the <a href="#cifs_pathShareMappings">pathShareMapping</a> connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
-
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
+### Domain accounts
+Windows domain accounts are support for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
+
+__N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source machine](#cifs_host_setup_krb5) and [the target machines](#cifs_host_setup_spn).
+
+### Administrative shares
+By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the target CIFS machine. These shares are only accessible for users that are part of the __Administrators__ on the target machine. If you want to access the target machine using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
+
 __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
+
+
 
 <a name="cifs_connection_options"></a>
 ### Connection options
 
-The CIFS protocol implementation of Overthere defines a number of additional connection properties, in addition to the [common connection options](#common_connection_options).
+The CIFS protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
 
 <table>
 <tr>
 	<th align="left" valign="top"><a name="cifs_connectionType"></a>connectionType</th>
 	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:<ul>
-		<li><strong><a href="#cifs_host_setup_winrm">WINRM</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS.</li>
-		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS.</li>
+		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
 	</ul></td>
 </tr>
 <tr>
@@ -298,7 +307,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_pathShareMappings"></a>pathShareMappings</a></th>
-	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -> <code>WebSphere</code>. If a path is not explicitly mapped to a share the administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
+	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -> <code>WebSphere</code>. If a path is not explicitly mapped to a share, an administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmEnableHttps"></a>winrmEnableHttps</th>
@@ -330,18 +339,18 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 		<li><strong>SELF_SIGNED</strong> - self-signed certificates are allowed (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/TrustSelfSignedStrategy.html">TrustSelfSignedStrategy</a>)</li>
 		<li><strong>ALLOW_ALL</strong> - trust all certificates.</li>
 	</ul>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a name="#cifs_winrmEnableHttps">winrmEnableHttps</a> is set to <code>true</code>.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerificationStrategy"></a>winrmHttpsHostnameVerificationStrategy</th>
 	<td>The hostname verification strategy for WinRM HTTPS connections. One of the following values can be set:<ul>
 		<li><strong>STRICT</strong> - strict verification (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/StrictHostnameVerifier.html">StrictHostnameVerifier</a>)</li>
-		<li><strong>BROWSER_COMPATIBLE</strong> (default) - wilcards in certifactes are matched (see <a href=""http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/BrowserCompatHostnameVerifier.html">BrowserCompatHostnameVerifier.html</a>)</li>
+		<li><strong>BROWSER_COMPATIBLE</strong> (default) - wilcards in certifactes are matched (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/BrowserCompatHostnameVerifier.html">BrowserCompatHostnameVerifier.html</a>)</li>
 		<li><strong>ALLOW_ALL</strong> - trust all hostnames (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/AllowAllHostnameVerifier.html">AllowAllHostnameVerifier</a>)</li>
 	</ul>
 	See the <a href="http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e535">Apache HttpComponent HttpClient documentation</a> for more information about the hostname verifications strategies.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a name="#cifs_winrmEnableHttps">winrmEnableHttps</a> is set to <code>true</code>.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
@@ -360,25 +369,21 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <a name="cifs_host_setup"></a>
 ### Host setup
 
-<a name="cifs_host_setup_windows_accounts"></a>
-#### Windows domain accounts
-Windows domain accounts are support for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
-
-__N.B.:__ Using Kerberos requires you to configure Kerberos on your client machine. Please see [the section on Kerberos configuration](#cifs_host_setup_krb5) below.
-
 <a name="cifs_host_setup_cifs"></a>
 #### CIFS
-To connect to a remote host using the __CIFS__ protocol, make sure the host is reachable on port 445.
+To connect to a remote host using the __CIFS__ protocol, ensure the host is reachable on port 445.
+
+If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#cifs_pathShareMappings) connection option is configured accordingly.
 
 <a name="cifs_host_setup_telnet"></a>
 #### TELNET
 
-To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
+To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the Telnet server 	according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
 
-When the Telnet server is enabled any user that is in the <strong>Administrators</strong> group or that is in the <strong>TelnetClients</strong> group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
+When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
 <a name="cifs_host_setup_winrm"></a>
-#### WINRM_HTTP
+#### WINRM
 
 _For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
 
@@ -406,11 +411,11 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
 
-7. To use the __WINRM__ connection type with [winrmEnableHttps](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
+7. To use the __WINRM__ connection type with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
 
 		winrm create winrm/config/listener?Address=*+Transport=HTTP
 
-8. To use the __WINRM__ connection type with [winrmEnableHttps](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
+8. To use the __WINRM__ connection type with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
 	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
@@ -495,12 +500,16 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <table>
 <tr>
 	<th align="left" valign="top"><a name="tunneling_portAllocationRangeStart"></a>portAllocationRangeStart</th>
-	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is: <code>1025</code>.</td>
+	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is <code>1025</code>.</td>
 </tr>
 </table>
 
-# Troubleshooting
+<a name="troubleshooting"></a>
+# Troubleshooting Overthere
 
+This section lists a number of common configuration errors that can occur when using Overthere. Please let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls) if you have run into other connectivity issues when using Overthere.
+
+<a name="troubleshooting_ssh"></a>
 ## SSH
 
 #### Cannot start a process on an SSH server because the server disconnects immediately.
@@ -523,6 +532,7 @@ This may be caused by the sudo command waiting for the user to enter his passwor
 3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 
 
+<a name="troubleshooting_cifs"></a>
 ## CIFS
 
 #### CIFS connections are very slow to set up.
@@ -534,12 +544,14 @@ Set the following Java system property to prevent JCIFS from sending DFS query p
 
 See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
 
+<a name="troubleshooting_telnet"></a>
 ## Telnet
 
 #### Telnet connection fails with the message `VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).`
 
 The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
 
+<a name="troubleshooting_krb"></a>
 ## Kerberos
 
 #### Kerberos authentication fails with the message `Cannot get kdc for realm …`
