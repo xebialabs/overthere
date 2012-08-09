@@ -23,7 +23,7 @@ Overthere is a Java library to manipulate files and execute processes on remote 
 
 Overthere is available under the [GPLv2 with XebiaLabs FLOSS License Exception](https://raw.github.com/xebialabs/overthere/master/LICENSE).
 
-**P.S.:** Check the [Overthere Ohloh page](http://www.ohloh.net/p/overthere) for some interesting code analysis statistics. If you use Overthere, don't forget to tell Ohloh! And while you're at it, you might want to vote for Overthere on the [Overthere Freecode page](http://freecode.com/projects/overthere) too! ;-)
+__P.S.:__ Check the [Overthere Ohloh page](http://www.ohloh.net/p/overthere) for some interesting code analysis statistics. If you use Overthere, don't forget to tell Ohloh! And while you're at it, you might want to vote for Overthere on the [Overthere Freecode page](http://freecode.com/projects/overthere) too! ;-)
 
 <a name="getting_overthere"></a>
 # Getting Overthere
@@ -134,7 +134,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	<td>The connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>)</td>
 </tr>
 </table>
-Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the protocol.
+Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
 
 <a name="local"></a>
 ## LOCAL
@@ -156,19 +156,20 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 <table>
 <tr>
 	<th align="left" valign="top"><a name="ssh_connectionType"></a>connectionType</th>
-	<td>Specifies how the SSH protocol is used. One of the following values must be set:
-<ul>
-<li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix hosts.</li>
-<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
-<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
-<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
-<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection property is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
-<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <code>SUDO</code> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
-</ul></td>
+	<td>Specifies how the SSH protocol is used. One of the following values must be set:<ul>
+		<li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix hosts.</li>
+		<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
+		<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
+		<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
+		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection property is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
+	<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <code>SUDO</code> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
+	</ul></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoUsername"></a>sudoUsername</th>
-	<td>The username of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>The username of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_privateKeyFile"></a>privateKeyFile</th>
@@ -180,35 +181,42 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocateDefaultPty"></a>allocateDefaultPty</th>
-	<td>If set to <code>true</code>, the SSH server is requested to allocate a pty (pseudo terminal) for the process, as if the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option were set to the value <code>dummy:80:24:0:0</code>. The default value is <code>false</code>.
-	<br/><strong>N.B.:</strong> This option is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output otherwise). 
-	<br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notably OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
+	<td>If set to <code>true</code>, the SSH server is requested to allocate a default pty for the process, as if the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option were set to the value <code>dummy:80:24:0:0</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option has been deprecated in favour of the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option.
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocatePty"></a>allocatePty</th>
-	<td>If set to a non-null value, the SSH server is requested to allocate a pty (pseudo terminal) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><code>allocateDefaultPty</code></a> option. The default value is <code>null</code>.
-	<br/><strong>N.B.:</strong> This option is needed for some commands when they perform interaction with the user, most notably many implementations of `sudo` (the error message <code>sorry, you must have a tty to run sudo</code> will appear in the output otherwise). 
-	<br/><strong>N.B.:</strong> Some SSH servers will crash when they are requested to allocate a pty, most notably OpenSSH on AIX. To verify the behaviour of your SSH server, you can manually execute the <code>ssh</code> command with the <code>-T</code> (disable pty allocation) or <code>-t</code> (force pty allocation) flags.</td>
+	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><code>allocateDefaultPty</code></a> option. The default value is unset.
+	</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_interactiveKeyboardAuthRegex"></a>interactiveKeyboardAuthRegex</th>
-	<td>The regular expression to look for in keyboard-interactive prompts before sending the password. The default value is <code>.*Password:[ ]?</code>. When the SSH server is configured to not allow <a href="http://www.ietf.org/rfc/rfc4252.txt">password authentication</a> but is configured to allow <a href="http://www.ietf.org/rfc/rfc4256.txt">keyboard-interactive authentication</a> using passwords, Overthere will compare the interactive-keyboard prompt against this regular expression and send the `password` when they match.</td>
+	<td>The regular expression to look for in keyboard-interactive prompts before sending the password. The default value is <code>.*Password:[ ]?</code>. When the SSH server is configured to not allow <a href="http://www.ietf.org/rfc/rfc4252.txt">password authentication</a> but is configured to allow <a href="http://www.ietf.org/rfc/rfc4256.txt">keyboard-interactive authentication</a> using passwords, Overthere will compare the interactive-keyboard prompt against this regular expression and send the value of the <strong>password</strong> option when they match. The default value is <code>.*Password:[ ]?</code></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"></a>sudoCommandPrefix</th>
-	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoOverrideUmask"></a>sudoOverrideUmask</th>
-	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with scp. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with scp. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoPasswordPromptRegex"></a>sudoPasswordPromptRegex</th>
-	<td>The regular expression to be used when looking for sudo password prompts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
+	<td>The regular expression to be used when looking for sudo password prompts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoQuoteCommand"></a>sudoQuoteCommand</th>
-	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>. This connection options is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 </table>
 
@@ -254,18 +262,22 @@ To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have 
 * `chmod`
 * Any other command that you want to execute.
     
-The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, the first line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent. <br/>If the __sudoPasswordPromptRegex__ was set incorrectly, the most common symptom is for the command to appear to hang. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
+The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
 
 <a name="cifs"></a>
 ## CIFS
 
-The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [Telnet](http://en.wikipedia.org/wiki/Telnet) or [WinRM](http://en.wikipedia.org/wiki/WS-Management) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
+The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
 
 * The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
+* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
-* WinRM is available on Windows Server 2008 and up. 
+
+By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the target CIFS machine. These shares are only accessible for users that are part of the __Administrators__ on the target machine. If you want to access the target machine using a regular account, use the <a href="#cifs_pathShareMappings">pathShareMapping</a> connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
 
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
+
+__N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
 
 <a name="cifs_connection_options"></a>
 ### Connection options
@@ -275,12 +287,9 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <table>
 <tr>
 	<th align="left" valign="top"><a name="cifs_connectionType"></a>connectionType</th>
-	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set: <ul>
+	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:<ul>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS.</li>
 		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
-		<li><strong><a href="#cifs_host_setup_winrm_http">WINRM_HTTP</a></strong> - uses WinRM over HTTP to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
-		<li><strong><a href="#cifs_host_setup_winrm_https">WINRM_HTTPS</a></strong> - uses WinRM over HTTPS to execute remote commands. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
-		<li><strong><a href="#cifs_host_setup_winrm_http_kb5">WINRM_HTTP_KB5</a></strong> - uses WinRM over HTTP to execute remote commands, using Kerberos authentication. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5985</code>.</li>
-		<li><strong><a href="#cifs_host_setup_winrm_https_kb5">WINRM_HTTPS_KB5</a></strong> - uses WinRM over HTTPS to execute remote commands, using Kerberos authentication. The <strong>port</strong> connection property specifies the Telnet port to connect to. The default value is <code>5986</code>.</li>
 	</ul></td>
 </tr>
 <tr>
@@ -292,41 +301,74 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -> <code>WebSphere</code>. If a path is not explicitly mapped to a share the administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="cifs_winrmEnableHttps"></a>winrmEnableHttps</th>
+	<td>If set to <code>true</code>, HTTPS is used to connect to the WinRM server. Otherwise HTTP is used. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+<tr>
 	<th align="left" valign="top"><a name="cifs_winrmContext"></a>winrmContext</th>
-	<td>The context used by the WinRM server. The default value is <code>/wsman</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
-	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
-	<td>The WinRM locale to use. The default value is <code>en-US</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="cifs_winrmTimeout"></a>winrmTimeout</th>
-	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>. This connection options is only applicable for the <strong>WINRM_HTTP</strong> and <strong>WINRM_HTTPS</strong> connection types.</td>
+	<td>The context used by the WinRM server. The default value is <code>/wsman</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmDebugKerberosAuth"></a>winrmDebugKerberosAuth</th>
-	<td>If true, turns on debug output for the [JAAS](https://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service)-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>. This connection options is only applicable for the <strong>WINRM_HTTP_KB5</strong> and <strong>WINRM_HTTPS_KB5</strong> connection types.</td>
+	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
+	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmHttpsCertificateTrustStrategy"></a>winrmHttpsCertificateTrustStrategy</th>
-	<td>Set the HTTPS certificate trust strategy, which can be "all" (trust all certs), "self-signed" (trust self-signed certs in addition to normally trusted certs), or "default" (use Java's trusted certificate chains). The default value is "default". This connection option is only applicable for the <strong>WINRM_HTTPS_KB5</strong> connection type.</td>
+	<td>The certificate trust strategy for WinRM HTTPS connections. One of the following values can be set:<ul>
+		<li><strong>STRICT</strong> (default) - use Java's trusted certificate chains.</li>
+		<li><strong>SELF_SIGNED</strong> - self-signed certificates are allowed (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/TrustSelfSignedStrategy.html">TrustSelfSignedStrategy</a>)</li>
+		<li><strong>ALLOW_ALL</strong> - trust all certificates.</li>
+	</ul>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a name="#cifs_winrmEnableHttps">winrmEnableHttps</a> is set to <code>true</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerifyStrategy"></a>winrmHttpsHostnameVerifyStrategy</th>
-	<td>Set the HTTPS hostname verification strategy, which can be "all" (allow all hostnames without verification), "browser-compatible" (verify hostnames as a web-browser would), "strict" (strict verification). The default value is "browser-compatible". This connection option is only applicable for the <strong>WINRM_HTTPS_KB5</strong> connection type.</td>
+	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerificationStrategy"></a>winrmHttpsHostnameVerificationStrategy</th>
+	<td>The hostname verification strategy for WinRM HTTPS connections. One of the following values can be set:<ul>
+		<li><strong>STRICT</strong> - strict verification (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/StrictHostnameVerifier.html">StrictHostnameVerifier</a>)</li>
+		<li><strong>BROWSER_COMPATIBLE</strong> (default) - wilcards in certifactes are matched (see <a href=""http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/BrowserCompatHostnameVerifier.html">BrowserCompatHostnameVerifier.html</a>)</li>
+		<li><strong>ALLOW_ALL</strong> - trust all hostnames (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/AllowAllHostnameVerifier.html">AllowAllHostnameVerifier</a>)</li>
+	</ul>
+	See the <a href="http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e535">Apache HttpComponent HttpClient documentation</a> for more information about the hostname verifications strategies.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a name="#cifs_winrmEnableHttps">winrmEnableHttps</a> is set to <code>true</code>.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
+	<td>The WinRM locale to use. The default value is <code>en-US</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmTimeout"></a>winrmTimeout</th>
+	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
 </tr>
 </table>
 
 <a name="cifs_host_setup"></a>
 ### Host setup
 
+<a name="cifs_host_setup_windows_accounts"></a>
+#### Windows domain accounts
+Windows domain accounts are support for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
+
+__N.B.:__ Using Kerberos requires you to configure Kerberos on your client machine. Please see [the section on Kerberos configuration](#cifs_host_setup_krb5) below.
+
 <a name="cifs_host_setup_cifs"></a>
 #### CIFS
-To connect to a remote host using the __CIFS__ protocol, make sure the host is reachable on port 445 and add the __username__ you are using to connect to the __Administrators__ group so that that user can access the [__administrative shares__](http://en.wikipedia.org/wiki/Administrative_share).<br/>If you have set up <a href="#cifs_pathShareMappings">path to share mappings</a> for all paths Overthere will be connecting to, access to the administrative shares is not required. Instead, the __username__ only needs to be able to access the shares used in the mapping.<br/>__N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. <code>smb://<strong>username</strong>:<strong>password</strong>@<strong>hostname</strong>/C$/Program%20Files/IBM/WebSphere/AppServer</code> (which corresponds to the UNC path <code>\\<strong>hostname</strong>\C$\Program Files\IBM\WebSphere\AppServer</code>), so that your code can use Windows style paths. 
+To connect to a remote host using the __CIFS__ protocol, make sure the host is reachable on port 445.
 
 <a name="cifs_host_setup_telnet"></a>
 #### TELNET
@@ -335,37 +377,42 @@ To use the __TELNET__ connection type, enable the Telnet Server Service accordin
 
 When the Telnet server is enabled any user that is in the <strong>Administrators</strong> group or that is in the <strong>TelnetClients</strong> group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
-<a name="cifs_host_setup_winrm_http"></a>
-<a name="cifs_host_setup_winrm_https"></a>
-#### WINRM_HTTP and WINRM_HTTPS
+<a name="cifs_host_setup_winrm"></a>
+#### WINRM_HTTP
 
 _For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
 
-To use the __WINRM_HTTP__ or the __WINRM_HTTPS__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
+To use the __WINRM__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
 
 1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRm under the section __Management and Monitoring Tools__.
 
 2. On the remote host, as the Administrator user, open a Command Prompt and follow the steps below.
 
-3. Configure WinRM to allow basic authentication:
+3. (Optional) If you wish to use local accounts to access the system, configure WinRM to allow basic authentication:
 
 		winrm set winrm/config/service/Auth @{Basic="true"}
 
-4. Configure WinRM to allow unencrypted SOAP messages:
+4. (Optional) If you do not with to use domain accounts to access the system and you are not going to configure Kerberos on your client machine, configure WinRM to not allow Kerberos authentication:
+
+		winrm set winrm/config/service/Auth @{Kerberos="false"}
+
+	__N.B.__ Do not disallow Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
+	
+5. Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 
-5. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
+6. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
 
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
 
-6. To use the __WINRM_HTTP__ connection type, create an HTTP WinRM listener:
+7. To use the __WINRM__ connection type with [winrmEnableHttps](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
 
 		winrm create winrm/config/listener?Address=*+Transport=HTTP
 
-7. To use the __WINRM_HTTPS__ connection type, follow the steps below:
+8. To use the __WINRM__ connection type with [winrmEnableHttps](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
-	1. (optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
+	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
         	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
         	Microsoft (R) SelfSSL Version 1.0
@@ -396,7 +443,7 @@ To use the __WINRM_HTTP__ or the __WINRM_HTTPS__ connection type, you'll need to
 			[Thumbprint]
 			  5C36B638BC31F505EF7F693D9A60C01551DD486F
 
-	3. Create an HTTPS WinRM listener for the remote host using the certificate you've just found:
+	3. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
 
 			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
 
@@ -410,33 +457,118 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
 
-<a name="cifs_host_setup_winrm_http_kb5"></a>
-<a name="cifs_host_setup_winrm_https_kb5"></a>
-#### WINRM Kerberos Authentication
+<a name="cifs_host_setup_krb5"></a>
+#### Kerberos - source machine
 
-In addition to the setup requirements mentioned in the <a href="#cifs_host_setup_winrm_http">WINRM_HTTP and WINRM_HTTPS</a> section, Kerberos authentication requires that you follow the <a href="http://docs.oracle.com/javase/1.4.2/docs/guide/security/jgss/tutorials/KerberosReq.html">Kerberos Requirements</a> for Java. 
+In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the machine from which the Overthere connections are initiated, i.e. the source machine.
 
-The simplest configuration is with a single domain/realm, and involves adding these Java System properties to your commandline: <code>-Djava.security.krb5.realm=&lt;example.com&gt; -Djava.security.krb5.kdc=&lt;kdc.example.com&gt;</code>.  Replace the values with the name of your domain/realm and the hostname of your domain controller.
+The simplest configuration is with a single domain/realm, and involves adding the following Java system properties to your commandline: `-Djava.security.krb5.realm=EXAMPLE.COM; -Djava.security.krb5.kdc=KDC.EXAMPLE.COM`. Replace the values with the name of your domain/realm and the hostname of your domain controller.
+
+For a more complex setup, e.g. one involving multiple domains, create a file called `krb5.conf` with at least the following content: 
+
+<pre>
+[realms]
+EXAMPLE.COM = {
+    kdc = KDC.EXAMPLE.COM
+}
+</pre>
+and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the `krb5.conf` file you just created. Multiple entries can be added to allow the Overthere source machine to connect to multiple domains.
+
+<a name="cifs_host_setup_spn"></a>
+#### Kerberos - target machines
+
+In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you add <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal names</a> for the WinRM servers you want to connect to, i.e. the target machines.
+
+This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any machine in the domain, as follows:
+<pre>
+setspn -A HTTP/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
+</pre>
+where `ADRESS` is the <a href="#address"><strong>address</strong></a> used to connect to the target machine, `PORT` is the <a href="#port"><strong>port</strong></a> used to connect to the target machine (usually 5985 or 5986), and `WINDOWS-HOST` is the short Windows hostname, i.e. the _CN_, of the target machine.
 
 <a name="tunnelling"></a>
-# Tunnelling
+## Tunnelling
 
 Overthere supports the tunnelling of every protocol over SSH. This can be used to reach hosts that live in a DMZ which can only be reached by connecting to a different host first. This in-between host is called the jump station. In order to configure an SSH tunnel, you need to provide a set of nested connection options specifying which host is used as the jump station.
 
 When using a jumpstation to connect to the remote host, Overthere will dynamically allocate an available local port to use for the connection to the end station. Using an additional connection option, you can configure from which port onwards Overthere starts the allocation.
 
-
 <table>
 <tr>
-	<th align="left" valign="top"><a name="portAllocationRangeStart"></a>portAllocationRangeStart</th>
+	<th align="left" valign="top"><a name="tunneling_portAllocationRangeStart"></a>portAllocationRangeStart</th>
 	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is: <code>1025</code>.</td>
 </tr>
 </table>
 
+# Troubleshooting
+
+## SSH
+
+#### Cannot start a process on an SSH server because the server disconnects immediately.
+
+If the terminal type requested using the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option is not recognized by the SSH server, the connection will be dropped. Specifically, the `dummy` terminal type configured by [__allocateDefaultPty__] connection option, will cause OpenSSH on AIX and WinSSHD to drop the connection. Try a safe terminal type such as `vt220` instead.
+
+To verify the behaviour of your SSH server with respect to pty allocation, you can manually execute the <code>ssh</code> command with the `-T` (disable pty allocation) or `-t` (force pty allocation) flags.
+
+
+#### Command executed using SUDO or INTERACTIVE_SUDO fails with the message ` sudo: sorry, you must have a tty to run sudo`
+
+The `sudo` command requires a tty to run. Set the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option to ask the SSH server allocate a pty.
+
+#### Command executed using SUDO or INTERACTIVE_SUDO appears to hang.
+
+This may be caused by the sudo command waiting for the user to enter his password to confirm his identity. There are two ways to solve this:
+
+1. Use the [`NOPASSWD`](http://www.gratisoft.us/sudo/sudoers.man.html#nopasswd_and_passwd) tag in your `/etc/sudoers` file.
+2. Use the [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo) connection type instead of the [__SUDO__](ssh_host_setup_sudo) connection type.
+3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
+
+
+## CIFS
+
+#### CIFS connections are very slow to set up.
+
+The [JCIFS library](http://jcifs.samba.org), which Overthere uses to connect to CIFS shares, will try and query the Windows domain controller to resolve the hostname in SMB URLs. JCIFS will send packets over port 139 (one of the [NetBIOS over TCP/IP] ports) to query the <a href="http://en.wikipedia.org/wiki/Distributed_File_System_(Microsoft)">DFS</a>. If that port is blocked by a firewall, JCIFS will only fall back to using regular hostname resolution after a timeout has occurred.
+
+Set the following Java system property to prevent JCIFS from sending DFS query packets:
+`-Djcifs.smb.client.dfs.disabled=true`.
+
+See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
+
+## Telnet
+
+#### Telnet connection fails with the message `VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).`
+
+The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
+
+## Kerberos
+
+#### Kerberos authentication fails with the message `Cannot get kdc for realm …`
+
+The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name is case sensitive. Does the case match the case in the `krb5.conf` file?
+
+#### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
+
+The service principal name for the target machine has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for target machines](#cifs_host_setup_spn)?
+
+#### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
+
+The username or the password supplied was invalid. Did you supply the correct credentials?
+
+#### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
+
+The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5)?
+
+#### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
+
+The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
+
 <a name="release_history"></a>
 # Release History
 
-* Overthere 2.0.0-beta-7 (02-Aug-2012)
+* Overthere 2.0.0-beta-8
+	* Added description of WinRM options and how to set up Kerberos authentication.
+	* Added troubleshooting section.
+    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.* Overthere 2.0.0-beta-7 (02-Aug-2012)
     * Fixed bug in WinRM implementation: It was not sending individual stdout chars to OverthereProcessOutputHandler.handleOutput.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
     * Renamed CIFS_PATH_SHARE_MAPPING back to PATH_SHARE_MAPPINGS.
