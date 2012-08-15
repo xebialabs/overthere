@@ -116,7 +116,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmp"></a>tmp</th>
-	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory. The default value is <code>tmp</code> for UNIX hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol.</td>
+	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory, e.g. <code>/tmp/overthere-20111128T132600-7234435.tmp</code>, to store temporary files for the duration of the connection.<br/>The default value is <code>tmp</code> for UNIX hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol where the default is the value of the <code>java.io.tmpdir</code> system property.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmpFileCreationRetries"></a>tmpFileCreationRetries</th>
