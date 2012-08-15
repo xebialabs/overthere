@@ -61,7 +61,7 @@ class SshSudoConnection extends SshScpConnection {
         super(type, options, mapper);
         this.sudoUsername = options.get(SUDO_USERNAME);
         this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
-        this.sudoQuoteCommand = options.get(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
+        this.sudoQuoteCommand = options.getBoolean(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
         this.sudoOverrideUmask = options.get(SUDO_OVERRIDE_UMASK, SUDO_OVERRIDE_UMASK_DEFAULT);
     }
 
