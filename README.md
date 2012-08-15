@@ -20,7 +20,7 @@
 <a name="introduction"></a>
 # Introduction
 
-Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". It was originally developed for and is still used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking at it is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
+Overthere is a Java library to manipulate files and execute processes on remote hosts, i.e. do stuff "over there". Overthere was originally developed for and is used in the [XebiaLabs](http://xebialabs.com/) deployment automation product Deployit as a way to perform tasks on remote hosts, e.g. copy configuration files, install EAR files or restart web servers. Another way of looking at it is to say that Overthere gives you `java.io.File` and `java.lang.Process` as they should've been: as interfaces, created by a factory and extensible through an SPI mechanism.
 
 Overthere is available under the [GPLv2 with XebiaLabs FLOSS License Exception](https://raw.github.com/xebialabs/overthere/master/LICENSE).
 
@@ -519,7 +519,7 @@ If the terminal type requested using the [__allocatePty__](#ssh_allocatePty) con
 To verify the behaviour of your SSH server with respect to pty allocation, you can manually execute the <code>ssh</code> command with the `-T` (disable pty allocation) or `-t` (force pty allocation) flags.
 
 
-#### Command executed using SUDO or INTERACTIVE_SUDO fails with the message ` sudo: sorry, you must have a tty to run sudo`
+#### Command executed using SUDO or INTERACTIVE_SUDO fails with the message `sudo: sorry, you must have a tty to run sudo`
 
 The `sudo` command requires a tty to run. Set the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option to ask the SSH server allocate a pty.
 
@@ -577,27 +577,27 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
-* Overthere 2.0.0-beta-8
+* Overthere TBD
 	* Added description of WinRM options and how to set up Kerberos authentication.
 	* Added troubleshooting section.
     * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
 * Overthere 2.0.0-beta-7 (02-Aug-2012)
-    * Fixed bug in WinRM implementation: It was not sending individual stdout chars to OverthereProcessOutputHandler.handleOutput.
+    * Fixed bug in WinRM implementation: It was not sending individual stdout chars to `OverthereProcessOutputHandler.handleOutput()`.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
-    * Renamed CIFS_PATH_SHARE_MAPPING back to PATH_SHARE_MAPPINGS.
+    * Renamed `CIFS_PATH_SHARE_MAPPING` back to `PATH_SHARE_MAPPINGS`.
 * Overthere 2.0.0-beta-5 (02-Aug-2012)
     * Added support for Windows domain accounts to CIFS and WinRM connection methods.
     * Renamed a few options.
     * Fixed bug in SSH tunnel port allocation code that caused the same local port to be allocated multiple times on Windows.
     * Changed license to GPLv2 with XebiaLabs FLOSS License Exception.
 * Overthere 2.0.0-beta-4 (19-Jun-2012)
-    * Fixed issue #42.
-    * Moved itest-support project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
+    * Fixed [issue #42](https://github.com/xebialabs/overthere/issues/42).
+    * Moved the `itest-support` sub project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
     * Updated documentation.
 * Overthere 2.0.0-beta-3 (27-Mar-2012)
     * Updated documentation.
 * Overthere 2.0.0-beta-2 (23-Mar-2012)
-	* Fixed issues #39 and #40.
+	* Fixed issues [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
 	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels.
 	* Set default pty to true in case of interactive sudo and no pty set.
 * Overthere 2.0.0-beta-1 (05-Mar-2012)
@@ -607,20 +607,20 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
     * Reverted changes made to support SSH tunnels in 1.0.14 and 1.0.15 because it did not work as well as we hoped. We are reimplementing it for Overthere 2.0 to be released early March.
     * Fixed command line encoding bugs for SSH/CYGWIN on Windows:
         * Now transforming the first element of the command line to a Cygwin path so that batch files (and executables) in specific directories (instead of on the PATH) can be executed.
-        * Encoding the command line as if the target OS is UNIX because OpenSSH on Cygwin uses Windows encoding.
+        * Encoding the command line as if the target OS is UNIX because OpenSSH on Cygwin uses Unix encoding.
 * Overthere 1.0.15 (21-Feb-2012)
-    * Added explicit close() method to the new OverthereConnection interface (it was a class in 1.0.13) that does not throw java.io.IOException.
+    * Added explicit close() method to the new `com.xebialabs.overthere.OverthereConnection` interface (it was a class in 1.0.13) that does not throw `java.io.IOException`.
 * Overthere 1.0.14 (20-Feb-2012)
     * Added support for SSH tunnels to jumpstations.
     * Added support for NTLM authentication.
     * Upgraded to SSH/J 0.7.0.
 * Overthere 1.0.13 (18-Jan-2012)
     * Masked passwords in logging.
-    * Made ItestHostFactory also look for itest.properties in ~/.itest (in addition to the classpath and the current working directory).
+    * Made ItestHostFactory also look for itest.properties in `~/.itest` (in addition to the classpath and the current working directory).
 * Overthere 1.0.12 (12-Jan-2012)
-    * Allowed forward slashes (/) to be used in Windows paths.
-    * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the <a href="#cifs_pathShareMappings"><strong>pathShareMappings</strong></a> connection option.
-    * Added the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> connection option to specify an explicit pseudo terminal to use.
+    * Allowed forward slashes (`/`) to be used in Windows paths.
+    * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the [__pathShareMappings__](#cifs_pathShareMappings) connection option.
+    * Added the [__allocatePty__](#ssh_allocatePty) connection option to specify an explicit pseudo terminal to use.
 * Overthere 1.0.11 (09-Dec-2011)
     * Fixes to the SSH/WinSSHD implementation and a few other little fixes.
     * Added a lot of documentation.
