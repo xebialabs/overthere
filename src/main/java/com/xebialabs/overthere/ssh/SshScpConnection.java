@@ -38,8 +38,7 @@ class SshScpConnection extends SshConnection {
 
     public SshScpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString()
-            .toLowerCase());
+        checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
     }
 
     @Override
