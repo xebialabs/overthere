@@ -123,9 +123,11 @@ class SshScpFile extends SshFile<SshScpConnection> {
      *             if an I/O exception occurs
      */
     public LsResults getFileInfo() throws RuntimeIOException {
+        CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "ls", "-ld", getPath());
+
         LsResults results = new LsResults();
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(capturedOutput, CmdLine.build(NOCD_PSEUDO_COMMAND, "ls", "-ld", getPath()));
+        int errno = executeCommand(capturedOutput, lsCmdLine);
         if (errno == 0) {
             for (int i = capturedOutput.getOutputLines().size() - 1; i >= 0; i--) {
                 if (parseLsOutputLine(results, capturedOutput.getOutputLines().get(i))) {
@@ -260,11 +262,12 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public List<OverthereFile> listFiles() {
         logger.debug("Listing directory {}", this);
 
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
         // Yes, this *is* meant to be 'el es minus one'! Each file should go one a separate line, even if we create a
-        // pseudo-tty. Long format is NOT what we
-        // want here.
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), build(NOCD_PSEUDO_COMMAND, "ls", "-1", getPath()));
+        // pseudo-tty. Long format is NOT what we want here.
+        CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND, "ls", "-1", getPath());
+
+        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), lsCmdLine);
         if (errno != 0) {
             throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
         }
@@ -292,14 +295,14 @@ class SshScpFile extends SshFile<SshScpConnection> {
     }
 
     protected void mkdir(String... mkdirOptions) throws RuntimeIOException {
-        CmdLine commandLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "mkdir");
+        CmdLine mkdirCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "mkdir");
         for (String opt : mkdirOptions) {
-            commandLine.addArgument(opt);
+            mkdirCmdLine.addArgument(opt);
         }
-        commandLine.addArgument(getPath());
+        mkdirCmdLine.addArgument(getPath());
 
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), commandLine);
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), mkdirCmdLine);
         if (errno != 0) {
             throw new RuntimeIOException(
                 format("Cannot create directory or -ies %s: %s (errno=%d)", this, capturedOutput.getError(), errno));
@@ -317,9 +320,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
         if (dest instanceof SshScpFile) {
             SshScpFile sshScpDestFile = (SshScpFile) dest;
             if (sshScpDestFile.getConnection() == getConnection()) {
+                CmdLine mvCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "mv", getPath(), sshScpDestFile.getPath());
+
                 CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-                int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput),
-                    CmdLine.build(NOCD_PSEUDO_COMMAND, "mv", getPath(), sshScpDestFile.getPath()));
+                int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), mvCmdLine);
                 if (errno != 0) {
                     throw new RuntimeIOException("Cannot rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
                 }
@@ -339,12 +343,12 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public void setExecutable(boolean executable) {
         logger.debug("Setting execute permission on {} to {}", this, executable);
 
+        CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", executable ? "a+x" : "a-x", getPath());
+
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput),
-            CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", executable ? "a+x" : "a-x", getPath()));
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), chmodCmdLine);
         if (errno != 0) {
-            throw new RuntimeIOException("Cannot set execute permission on file " + this + " to " + executable + ": " + capturedOutput.getError() + " (errno="
-                + errno + ")");
+            throw new RuntimeIOException("Cannot set execute permission on file " + this + " to " + executable + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
         }
     }
 
@@ -352,8 +356,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
     protected void deleteDirectory() {
         logger.debug("Deleting directory {}", this);
 
+        CmdLine rmdirCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rmdir", getPath());
+
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rmdir", getPath()));
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmdirCmdLine);
         if (errno != 0) {
             throw new RuntimeIOException("Cannot delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
         }
@@ -363,8 +369,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
     protected void deleteFile() {
         logger.debug("Deleting file {}", this);
 
+        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-f", getPath());
+
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-f", getPath()));
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmCmdLine);
         if (errno != 0) {
             throw new RuntimeIOException("Cannot delete file " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
         }
@@ -374,8 +382,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public void deleteRecursively() throws RuntimeIOException {
         logger.debug("Recursively deleting file or directory {}", this);
 
+        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-rf", getPath());
+
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-rf", getPath()));
+        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmCmdLine);
         if (errno != 0) {
             throw new RuntimeIOException("Cannot recursively delete file or directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
         }
