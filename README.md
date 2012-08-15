@@ -488,7 +488,7 @@ This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us
 <pre>
 setspn -A HTTP/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
 </pre>
-where `ADRESS` is the <a href="#address"><strong>address</strong></a> used to connect to the target machine, `PORT` is the <a href="#port"><strong>port</strong></a> used to connect to the target machine (usually 5985 or 5986), and `WINDOWS-HOST` is the short Windows hostname, i.e. the _CN_, of the target machine.
+where `ADDRESS` is the <a href="#address"><strong>address</strong></a> used to connect to the target machine, `PORT` is the <a href="#port"><strong>port</strong></a> used to connect to the target machine (usually 5985 or 5986), and `WINDOWS-HOST` is the short Windows hostname, i.e. the _CN_, of the target machine.
 
 <a name="tunnelling"></a>
 ## Tunnelling
