@@ -126,6 +126,9 @@ abstract class SshConnection extends BaseOverthereConnection {
         this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         this.passphrase = options.getOptional(PASSPHRASE);
         this.allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
+        if (this.allocateDefaultPty) {
+            logger.warn("The " + ALLOCATE_DEFAULT_PTY + " connection option has been deprecated in favour of the " + ALLOCATE_PTY + " option. See https://github.com/xebialabs/overthere#ssh_allocatePty");
+        }
         this.allocatePty = options.get(ALLOCATE_PTY, ALLOCATE_PTY_DEFAULT);
     }
 

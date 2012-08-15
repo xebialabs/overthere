@@ -184,11 +184,11 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<th align="left" valign="top"><a name="ssh_allocateDefaultPty"></a>allocateDefaultPty</th>
 	<td>If set to <code>true</code>, the SSH server is requested to allocate a default pty for the process, as if the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option were set to the value <code>dummy:80:24:0:0</code>. The default value is <code>false</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option has been deprecated in favour of the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> option.
+	<strong>N.B.:</strong> This connection option has been deprecated in favour of the <a href="#ssh_allocatePty"><strong>allocatePty</strong></a> connection option because it allows the user to specify _what_ pty is allocated.
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocatePty"></a>allocatePty</th>
-	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option. The default value is unset.
+	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>vt220:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option. The default value is unset.
 	</td>
 </tr>
 <tr>
