@@ -580,7 +580,8 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 * Overthere 2.0.0-beta-8
 	* Added description of WinRM options and how to set up Kerberos authentication.
 	* Added troubleshooting section.
-    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.* Overthere 2.0.0-beta-7 (02-Aug-2012)
+    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
+* Overthere 2.0.0-beta-7 (02-Aug-2012)
     * Fixed bug in WinRM implementation: It was not sending individual stdout chars to OverthereProcessOutputHandler.handleOutput.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
     * Renamed CIFS_PATH_SHARE_MAPPING back to PATH_SHARE_MAPPINGS.
