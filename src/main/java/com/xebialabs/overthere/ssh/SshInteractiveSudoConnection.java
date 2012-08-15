@@ -44,6 +44,8 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
 
     private String passwordPromptRegex;
 
+    private static final String OVERRIDE_ALLOCATE_PTY = "vt220:80:24:0:0";
+
     public SshInteractiveSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
         passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
@@ -51,8 +53,8 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
         checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
         checkArgument(password != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
         if (!allocateDefaultPty && allocatePty == null) {
-            logger.warn("SSH Interactive Sudo requires a PTY, allocating a default one.");
-            allocateDefaultPty = true;
+            logger.warn("An ssh:{}: connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY +"].", sshConnectionType.toString().toLowerCase());
+            allocatePty = OVERRIDE_ALLOCATE_PTY;
         }
     }
 

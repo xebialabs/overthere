@@ -99,9 +99,9 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected final String passphrase;
 
-    protected boolean allocateDefaultPty;
+    protected final boolean allocateDefaultPty;
 
-    protected final String allocatePty;
+    protected String allocatePty;
 
     protected SSHClient sshClient;
 
