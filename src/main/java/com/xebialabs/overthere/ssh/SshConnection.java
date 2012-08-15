@@ -65,7 +65,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
@@ -129,7 +128,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         if (this.allocateDefaultPty) {
             logger.warn("The " + ALLOCATE_DEFAULT_PTY + " connection option has been deprecated in favour of the " + ALLOCATE_PTY + " option. See https://github.com/xebialabs/overthere#ssh_allocatePty");
         }
-        this.allocatePty = options.get(ALLOCATE_PTY, ALLOCATE_PTY_DEFAULT);
+        this.allocatePty = options.getOptional(ALLOCATE_PTY);
     }
 
     protected void connect() {

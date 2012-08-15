@@ -42,6 +42,28 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SSH_PROTOCOL = "ssh";
 
     /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty (
+     * <code>dummy:80:24:0:0</code>) should be allocated when executing a command. All sudo implementations require it
+     * for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably OpenSSH on
+     * AIX 5.3) crash when it is allocated.
+     */
+    public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
+
+    /**
+     * Default value of the {@link ConnectionOptions connection option} used to specify whether a default pty should be
+     * allocated when executing a command.
+     */
+    public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify a specific pty that should be allocated
+     * when executing a command. The format is TERM:COLS:ROWS:WIDTH:HEIGTH e.g. <code>xterm:80:24:0:0</code>. If
+     * <code>null</code> or an empty string is specified, no pty is allocated. Overrides the
+     * {@link #ALLOCATE_DEFAULT_PTY} option.
+     */
+    public static final String ALLOCATE_PTY = "allocatePty";
+
+    /**
      * Name of the {@link ConnectionOptions connection option} used to specify the {@link SshConnectionType SSH
      * connection type} to use.
      */
@@ -65,6 +87,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
 
     /**
+     * Name of the {@link ConnectionOptions connection option} use to specify the passphrase of the private key.
+     */
+    public static final String PASSPHRASE = "passphrase";
+
+    /**
      * Name of the {@link ConnectionOptions connection option} used to specify the private key file to use. <b>N.B.:</b>
      * Private keys cannot be used when the SSH connection type is {@link SshConnectionType#INTERACTIVE_SUDO
      * INTERACTIVE_SUDO} because the password is needed for the password prompts.
@@ -72,44 +99,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String PRIVATE_KEY_FILE = "privateKeyFile";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} use to specify the passphrase of the private key.
+     * Name of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate an empty
+     * port for a local port forward in an {@link SshTunnelConnection tunnel}
      */
-    public static final String PASSPHRASE = "passphrase";
+    public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether a default pty (
-     * <code>dummy:80:24:0:0</code>) should be allocated when executing a command. All sudo implementations require it
-     * for interactive sudo, some even require it for normal sudo. Some SSH server implementations (notably OpenSSH on
-     * AIX 5.3) crash when it is allocated.
+     * Default value of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate
+     * an empty port for a local port forward in an {@link SshTunnelConnection tunnel}
      */
-    public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
-
-    /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify whether a default pty should be
-     * allocated when executing a command.
-     */
-    public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
-
-    /**
-     * Name of the {@link ConnectionOptions connection option} used to specify a specific pty that should be allocated
-     * when executing a command. The format is TERM:COLS:ROWS:WIDTH:HEIGTH e.g. <code>xterm:80:24:0:0</code>. If
-     * <code>null</code> or an empty string is specified, no pty is allocated. Overrides the
-     * {@link #ALLOCATE_DEFAULT_PTY} option.
-     */
-    public static final String ALLOCATE_PTY = "allocatePty";
-
-    /**
-     * Default value (<code>null</code>) of the {@link ConnectionOptions connection option} used to specify a specific
-     * pty that should be allocated when executing a command.
-     */
-    public static final String ALLOCATE_PTY_DEFAULT = null;
-
-    /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for
-     * {@link SshConnectionType#SUDO SUDO} and {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH
-     * connections.
-     */
-    public static final String SUDO_USERNAME = "sudoUsername";
+    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1025;
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the sudo command to prefix. The
@@ -123,16 +122,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_COMMAND_PREFIX_DEFAULT = "sudo -u {0}";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether or not to quote the original
-     * command when it is prefixed with {@link #SUDO_COMMAND_PREFIX}.
+     * Name of the {@link ConnectionOptions connection option} used to specify the username to sudo to for
+     * {@link SshConnectionType#SUDO SUDO} and {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH
+     * connections.
      */
-    public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
-
-    /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to quote the
-     * original command.
-     */
-    public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
+    public static final String SUDO_USERNAME = "sudoUsername";
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the
@@ -159,16 +153,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate an empty
-     * port for a local port forward in an {@link SshTunnelConnection tunnel}
+     * Name of the {@link ConnectionOptions connection option} used to specify whether or not to quote the original
+     * command when it is prefixed with {@link #SUDO_COMMAND_PREFIX}.
      */
-    public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
+    public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify from what port onwards to locate
-     * an empty port for a local port forward in an {@link SshTunnelConnection tunnel}
+     * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to quote the
+     * original command.
      */
-    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1025;
+    public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
 
     protected SshConnection connection;
 
