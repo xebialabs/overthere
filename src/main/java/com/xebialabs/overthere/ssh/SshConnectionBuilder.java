@@ -138,7 +138,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly
      * change the permissions with go+rX after uploading a file with scp.
      */
-    public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = false;
+    public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = true;
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify which regular expression to look for in
