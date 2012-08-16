@@ -188,7 +188,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocatePty"></a>allocatePty</th>
-	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>vt220:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option. The default value is unset.
+	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option.<br/>If the <a href="#ssh_host_setup_interactive_sudo"><strong>INTERACTIVE_SUDO</strong></a> connection type is used, the default value is <code>vt220:80:24:0:0</code>. Otherwise the default value is unset.
 	</td>
 </tr>
 <tr>
@@ -578,9 +578,10 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 # Release History
 
 * Overthere TBD
+    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
+    * Changed default value of [__sudoOverrideUmask__](#ssh_sudoOverrideUmask) to `true`.
 	* Added description of WinRM options and how to set up Kerberos authentication.
 	* Added troubleshooting section.
-    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
 * Overthere 2.0.0-beta-7 (02-Aug-2012)
     * Fixed bug in WinRM implementation: It was not sending individual stdout chars to `OverthereProcessOutputHandler.handleOutput()`.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
