@@ -55,19 +55,19 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String CONNECTION_TYPE = "connectionType";
 
     /**
-     * Default port (23) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * Default port (<code>23</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
      * {@link CifsConnectionType#TELNET TELNET}.
      */
     public static final int DEFAULT_TELNET_PORT = 23;
 
     /**
-     * Default port (5985) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * Default port (<code>5985</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
      * {@link CifsConnectionType#WINRM_HTTP WINRM_HTTP}.
      */
     public static final int DEFAULT_WINRM_HTTP_PORT = 5985;
 
     /**
-     * Default port (5986) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
+     * Default port (<code>5986</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
      * {@link CifsConnectionType#WINRM_HTTPS WINRM_HTTPS}.
      */
     public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
@@ -78,8 +78,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String CIFS_PORT = "cifsPort";
 
     /**
-     * Default value (445) for the {@link ConnectionOptions connection option} used to specify the CIFS port to connect
-     * to.
+     * Default value (<code>445</code>) for the {@link ConnectionOptions connection option} used to specify the CIFS
+     * port to connect to.
      */
     public static final int DEFAULT_CIFS_PORT = 445;
 
@@ -102,7 +102,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_ENABLE_HTTPS = "winrmEnableHttps";
 
     /**
-     * Default value (false) of the {@link ConnectionOptions connection option} used to specify whether to use HTTPS for WinRM.
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
+     * use HTTPS for WinRM.
      */
     public static final boolean DEFAULT_WINRM_ENABLE_HTTPS = false;
 
@@ -112,8 +113,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_CONTEXT = "winrmContext";
 
     /**
-     * Default value (/wsman) of the {@link ConnectionOptions connection option} used to specify the context (URI) used
-     * by WinRM.
+     * Default value (<code>/wsman</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * context (URI) used by WinRM.
      */
     public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
 
@@ -124,7 +125,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_TIMEMOUT = "winrmTimeout";
 
     /**
-     * Default value (PT60.000S) of the {@link ConnectionOptions connection option} used to specify the WinRM timeout.
+     * Default value (<code>PT60.000S</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * WinRM timeout.
      */
     public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
@@ -134,8 +136,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_ENVELOP_SIZE = "winrmEnvelopSize";
 
     /**
-     * Default value (153600) of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size
-     * in bytes to use.
+     * Default value (<code>153600</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
+     * envelop size in bytes to use.
      */
     public static final int DEFAULT_WINRM_ENVELOP_SIZE = 153600;
 
@@ -145,7 +147,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_LOCALE = "winrmLocale";
 
     /**
-     * Default value (en-US) of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
+     * Default value (<code>en-US</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
+     * locale to use.
      */
     public static final String DEFAULT_WINRM_LOCALE = "en-US";
 
@@ -156,8 +159,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
 
     /**
-     * Default value (false) of the {@link ConnectionOptions connection option} used to specify whether to enable debug
-     * output for Kerberos JAAS authentication.
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
+     * enable debug output for Kerberos JAAS authentication.
      */
     public static final boolean DEFAULT_WINRM_DEBUG_KERBEROS_AUTH = false;
 

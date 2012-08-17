@@ -55,20 +55,20 @@ public class ConnectionOptions {
     public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmpDeleteOnDisconnect";
 
     /**
-     * Default value (true) for the connection option that specifies whether to delete the connection-scope temporary
-     * directory when the connection is closed.
+     * Default value (<code>true</code>) for the connection option that specifies whether to delete the connection-scope
+     * temporary directory when the connection is closed.
      */
     public static final boolean DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = true;
 
     /**
-     * Connection option (int) for most protocol that specifies how many times to retry creating a unique temporary file
+     * Connection option (Integer) for most protocol that specifies how many times to retry creating a unique temporary file
      * name before giving up.
      */
     public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmpFileCreationRetries";
 
     /**
-     * Defalut value (100) for connection option that specifies how many times to retry creating a unique temporary file
-     * name before giving up.
+     * Defalut value (<code>100</code>) for connection option that specifies how many times to retry creating a unique
+     * temporary file name before giving up.
      */
     public static final int DEFAULT_TEMPORARY_FILE_CREATION_RETRIES = 100;
 
@@ -78,7 +78,8 @@ public class ConnectionOptions {
     public static final String CONNECTION_TIMEOUT_MILLIS = "connectionTimeoutMillis";
 
     /**
-     * Default value (120000) for the connection option that specifies the connection timeout in milliseconds to use.
+     * Default value (<code>120000</code>) for the connection option that specifies the connection timeout in
+     * milliseconds to use.
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 120000;
 

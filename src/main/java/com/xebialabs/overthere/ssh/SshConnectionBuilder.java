@@ -50,8 +50,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify whether a default pty should be
-     * allocated when executing a command.
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether a
+     * default pty should be allocated when executing a command.
      */
     public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
 
@@ -70,7 +70,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String CONNECTION_TYPE = "connectionType";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify the port to connect to.
+     * Default value (<code>22</code>) of the {@link ConnectionOptions connection option} used to specify the port to
+     * connect to.
      */
     public static final int SSH_PORT_DEFAULT = 22;
 
@@ -81,8 +82,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look
-     * for in keyboard-interactive prompts before sending the password.
+     * Default value (<code>.*Password:[ ]?</code>) of the {@link ConnectionOptions connection option} used to specify
+     * which regular expression to look for in keyboard-interactive prompts before sending the password.
      */
     public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
 
@@ -117,7 +118,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_COMMAND_PREFIX = "sudoCommandPrefix";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify the sudo command to prefix.
+     * Default value (<code>sudo -u {0}</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * sudo command to prefix.
      */
     public static final String SUDO_COMMAND_PREFIX_DEFAULT = "sudo -u {0}";
 
@@ -135,8 +137,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly
-     * change the permissions with go+rX after uploading a file with scp.
+     * Default value (<code>true</code>) of the {@link ConnectionOptions connection option} used to specify whether or
+     * not to explicitly change the permissions with go+rX after uploading a file with scp.
      */
     public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = true;
 
@@ -147,8 +149,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify which regular expression to look
-     * for in interactive sudo before sending the password.
+     * Default value (<code>.*[Pp]assword.*:</code>) of the {@link ConnectionOptions connection option} used to specify
+     * which regular expression to look for in interactive sudo before sending the password.
      */
     public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
@@ -159,8 +161,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
 
     /**
-     * Default value of the {@link ConnectionOptions connection option} used to specify whether or not to quote the
-     * original command.
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether or
+     * not to quote the original command.
      */
     public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
 
