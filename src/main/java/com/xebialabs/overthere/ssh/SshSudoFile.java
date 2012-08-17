@@ -152,7 +152,8 @@ class SshSudoFile extends SshScpFile {
     }
 
     private void overrideUmask(OverthereFile remoteFile) {
-        if (((SshSudoConnection) connection).sudoOverrideUmask) {
+        boolean sudoOverrideUmask = ((SshSudoConnection) connection).sudoOverrideUmask;
+        if (sudoOverrideUmask) {
             logger.debug("Overriding umask by recursively setting permissions on files and/or directories copied with scp to be readable and executable (if needed) by group and other");
 
             CmdLine chmodCmdLine = CmdLine.build(NOSUDO_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND, "chmod", "-R", "go+rX", remoteFile.getPath());
@@ -168,7 +169,8 @@ class SshSudoFile extends SshScpFile {
     void copyToTempFile(OverthereFile tempFile) {
         logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
 
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", "-pr", this.getPath(), tempFile.getPath());
+        boolean sudoPreserveAttributesOnCopyToTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile;
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", sudoPreserveAttributesOnCopyToTempFile ? "-pr" : "-r", this.getPath(), tempFile.getPath());
 
         CapturingOverthereProcessOutputHandler cpCapturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cpCmdLine);
@@ -191,7 +193,8 @@ class SshSudoFile extends SshScpFile {
     void copyfromTempFile(OverthereFile tempFile) {
         logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
 
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", "-pr");
+        boolean sudoPreserveAttributesOnCopyFromTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile;
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", sudoPreserveAttributesOnCopyFromTempFile ? "-pr" : "-r");
 
         CapturingOverthereProcessOutputHandler cpCapturedOutput = capturingHandler();
         String sourcePath = tempFile.getPath();

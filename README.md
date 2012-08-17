@@ -214,6 +214,18 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="ssh_sudoPreserveAttributesOnCopyFromTempFile"></a>sudoPreserveAttributesOnCopyFromTempFile</th>
+	<td>If set to <code>true</code>, files are copied <strong>from</strong> the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command. The default value is <code>true</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoPreserveAttributesOnCopyToTempFile"></a>sudoPreserveAttributesOnCopyFromTempFile</th>
+	<td>If set to <code>true</code>, files are copied <strong>to****</strong> the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command. The default value is <code>true</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="ssh_sudoQuoteCommand"></a>sudoQuoteCommand</th>
 	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>.
 	<br/>

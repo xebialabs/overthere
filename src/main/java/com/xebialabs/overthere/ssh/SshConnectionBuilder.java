@@ -155,6 +155,32 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
 
     /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether files are copied <em>from</em>
+     * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
+     */
+    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE = "sudoPreserveAttributesOnCopyFromTempFile";
+
+    /**
+     * Default value (<code>true</code>) of the {@link ConnectionOptions connection option} used to specify whether
+     * files are copied <em>from</em> the connection temporary directory using the <code>-p</code> flag to the
+     * <code>cp</code> command.
+     */
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = true;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether files are copied <em>to</em>
+     * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
+     */
+    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE = "sudoPreserveAttributesOnCopyToTempFile";
+
+    /**
+     * Default value (<code>true</code>) of the {@link ConnectionOptions connection option} used to specify whether
+     * files are copied <em>to</em> the connection temporary directory using the <code>-p</code> flag to the
+     * <code>cp</code> command.
+     */
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = true;
+
+    /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether or not to quote the original
      * command when it is prefixed with {@link #SUDO_COMMAND_PREFIX}.
      */

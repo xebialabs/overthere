@@ -26,6 +26,10 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREF
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
@@ -49,19 +53,25 @@ class SshSudoConnection extends SshScpConnection {
 
     public static final String NOSUDO_PSEUDO_COMMAND = "nosudo";
 
-    protected String sudoUsername;
+    protected final String sudoUsername;
 
-    protected String sudoCommandPrefix;
+    protected final String sudoCommandPrefix;
 
-    protected boolean sudoQuoteCommand;
+    protected final boolean sudoQuoteCommand;
 
-    protected boolean sudoOverrideUmask;
+    protected final boolean sudoPreserveAttributesOnCopyFromTempFile;
+    
+    protected final boolean sudoPreserveAttributesOnCopyToTempFile;
+
+    protected final boolean sudoOverrideUmask;
 
     public SshSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
         this.sudoUsername = options.get(SUDO_USERNAME);
         this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
         this.sudoQuoteCommand = options.getBoolean(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
+        this.sudoPreserveAttributesOnCopyFromTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT);
+        this.sudoPreserveAttributesOnCopyToTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT);
         this.sudoOverrideUmask = options.get(SUDO_OVERRIDE_UMASK, SUDO_OVERRIDE_UMASK_DEFAULT);
     }
 
