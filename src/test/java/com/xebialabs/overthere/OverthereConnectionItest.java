@@ -18,8 +18,7 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase imple
     private static final Map<String, AtomicInteger> timesHostNeeded = newHashMap();
     private final String testName;
 
-    public OverthereConnectionItest(String testName, String protocol, ConnectionOptions partialOptions, String expectedConnectionClassName, String host)
-        throws Exception {
+    public OverthereConnectionItest(String testName, String protocol, ConnectionOptions partialOptions, String expectedConnectionClassName, String host) throws Exception {
         this.testName = testName;
         this.protocol = protocol;
         this.partialOptions = partialOptions;

@@ -1,5 +1,6 @@
 package com.xebialabs.overthere;
 
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -112,7 +113,7 @@ public abstract class OverthereConnectionItestBase {
     @Assumption(methods = { "notLocal", "notCifs" })
     public void shouldNotConnectWithIncorrectUsername() {
         ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
-        incorrectUserNameOptions.set("username", "an-incorrect-username");
+        incorrectUserNameOptions.set(USERNAME, "an-incorrect-username");
         try {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with an incorrect username");
@@ -121,27 +122,27 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
-    @Assumption(methods = { "notLocal", "notCifs", "withPassword" })
-    public void shouldNotConnectWithIncorrectPassword() {
-        ConnectionOptions incorrectPasswordOptions = new ConnectionOptions(options);
-        incorrectPasswordOptions.set("password", "an-incorrect-password");
-        try {
-            Overthere.getConnection(protocol, incorrectPasswordOptions);
-            fail("Expected not to be able to connect with an incorrect password");
-        } catch (RuntimeIOException expected) {
-        }
-    }
-
-    @Test
     @Assumption(methods = { "onWindows", "onlyCifs" })
     public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccount() {
         ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
-        incorrectUserNameOptions.set("username", "DOMAIN\\user");
+        incorrectUserNameOptions.set(USERNAME, "DOMAIN\\user");
         try {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with an old-style Windows domain account");
         } catch (IllegalArgumentException expected) {
             assertThat(expected.getMessage(), containsString("Cannot connect with an old-style Windows domain account"));
+        }
+    }
+
+    @Test
+    @Assumption(methods = { "notLocal", "notCifs", "withPassword" })
+    public void shouldNotConnectWithIncorrectPassword() {
+        ConnectionOptions incorrectPasswordOptions = new ConnectionOptions(options);
+        incorrectPasswordOptions.set(PASSWORD, "an-incorrect-password");
+        try {
+            Overthere.getConnection(protocol, incorrectPasswordOptions);
+            fail("Expected not to be able to connect with an incorrect password");
+        } catch (RuntimeIOException expected) {
         }
     }
 
