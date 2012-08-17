@@ -52,12 +52,13 @@ public class SshInteractiveSudoConnectionOptionsTest {
     }
 
     @Test
-    public void shouldSetAllocateDefaultPtyIfNoPtySet() throws NoSuchFieldException, IllegalAccessException {
+    public void shouldSetAllocatePtyIfNoDefaultPtyAndNoPtySet() throws NoSuchFieldException, IllegalAccessException {
         ConnectionOptions options = new ConnectionOptions(connectionOptions);
         options.set(ALLOCATE_DEFAULT_PTY, false);
+        options.set(ALLOCATE_PTY, null);
         SshInteractiveSudoConnection sshInteractiveSudoConnection = new SshInteractiveSudoConnection(SSH_PROTOCOL, options, new DefaultAddressPortMapper());
-        Field allocateDefaultPty = SshConnection.class.getDeclaredField("allocateDefaultPty");
-        allocateDefaultPty.setAccessible(true);
-        assertThat((Boolean) allocateDefaultPty.get(sshInteractiveSudoConnection), equalTo(true));
+        Field allocatePty = SshConnection.class.getDeclaredField("allocatePty");
+        allocatePty.setAccessible(true);
+        assertThat((String) allocatePty.get(sshInteractiveSudoConnection), equalTo("vt220:80:24:0:0"));
     }
 }
