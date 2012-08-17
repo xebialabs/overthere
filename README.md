@@ -36,7 +36,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-beta-7%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0-rc-1%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -46,7 +46,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0-beta-7</version>
+			<version>2.0.0-rc-1</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -589,11 +589,13 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
-* Overthere TBD
-    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
+* Overthere 2.0.0-rc-1 (17-Aug-2012)
+    * Added [__sudoPreserveAttributesOnCopyFromTempFile__](#ssh_sudoPreserveAttributesOnCopyFromTempFile) and [__sudoPreserveAttributesOnCopyToTempFile__](#ssh_sudoPreserveAttributesOnCopyToTempFile) to specify whether `-p` should be used to copy files from and to the connection temporary directory when the connection type is [__SUDO__](#ssh_host_setup_sudo) or [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo). 
     * Changed default value of [__sudoOverrideUmask__](#ssh_sudoOverrideUmask) to `true`.
-	* Added description of WinRM options and how to set up Kerberos authentication.
-	* Added troubleshooting section.
+    * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
+    * Upgraded to SSH/J 0.8.1.
+	* Added description of WinRM options and how to set up Kerberos authentication to the documentation.
+	* Added troubleshooting section to the documentation.
 * Overthere 2.0.0-beta-7 (02-Aug-2012)
     * Fixed bug in WinRM implementation: It was not sending individual stdout chars to `OverthereProcessOutputHandler.handleOutput()`.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
