@@ -220,7 +220,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="ssh_sudoPreserveAttributesOnCopyToTempFile"></a>sudoPreserveAttributesOnCopyFromTempFile</th>
+	<th align="left" valign="top"><a name="ssh_sudoPreserveAttributesOnCopyToTempFile"></a>sudoPreserveAttributesOnCopyToTempFile</th>
 	<td>If set to <code>true</code>, files are copied <strong>to****</strong> the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command. The default value is <code>true</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
