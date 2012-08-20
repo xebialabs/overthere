@@ -266,11 +266,11 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
         configureTrust(httpclient);
 
+        configureAuthentication(httpclient, "Basic", new BasicUserPrincipal(username));
         if (useKerberos) {
             configureAuthentication(httpclient, "Kerberos", new KerberosPrincipal(username));
-        } else {
-            configureAuthentication(httpclient, "Basic", new BasicUserPrincipal(username));
         }
+        httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
     }
 
     /**
@@ -286,8 +286,6 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
                 return password;
             }
         });
-
-        httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
     }
 
     /**
@@ -323,15 +321,14 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      * Configure certificate trust strategy and hostname verifier strategy for the HttpClient
      */
     private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
-        KeyManagementException,
-        KeyStoreException, UnrecoverableKeyException {
+        KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+
         if (!"https".equalsIgnoreCase(getTargetURL().getProtocol())) {
             return;
         }
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
         final X509HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
-
         final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
         final Scheme sch = new Scheme("https", 443, socketFactory);
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
