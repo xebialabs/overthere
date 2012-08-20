@@ -22,8 +22,21 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+
 public enum WinrmHttpsHostnameVerificationStrategy {
-    STRICT,
-    BROWSER_COMPATIBLE,
-    ALLOW_ALL,
+    STRICT(SSLSocketFactory.STRICT_HOSTNAME_VERIFIER),
+    BROWSER_COMPATIBLE(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER),
+    ALLOW_ALL(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+    private X509HostnameVerifier verifier;
+
+    private WinrmHttpsHostnameVerificationStrategy(X509HostnameVerifier verifier) {
+        this.verifier = verifier;
+    }
+
+    public X509HostnameVerifier getVerifier() {
+        return verifier;
+    }
 }

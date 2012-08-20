@@ -22,46 +22,17 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import static org.apache.http.auth.AuthScope.ANY_HOST;
-import static org.apache.http.auth.AuthScope.ANY_PORT;
-import static org.apache.http.auth.AuthScope.ANY_REALM;
-import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
-import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-import static org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.*;
 import java.util.HashMap;
-
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.auth.callback.*;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -71,7 +42,6 @@ import org.apache.http.auth.Credentials;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
@@ -86,8 +56,8 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
+
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.cifs.winrm.HttpConnector;
@@ -95,6 +65,11 @@ import com.xebialabs.overthere.cifs.winrm.exception.BlankValueRuntimeException;
 import com.xebialabs.overthere.cifs.winrm.exception.InvalidFilePathRuntimeException;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
+
+import static org.apache.http.auth.AuthScope.ANY_HOST;
+import static org.apache.http.auth.AuthScope.ANY_PORT;
+import static org.apache.http.auth.AuthScope.ANY_REALM;
+import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
 
 public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
     private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
@@ -207,7 +182,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     }
 
     /**
-     * PrivilegedActionException that wraps the internal sendMessage
+     * PrivilegedExceptionAction that wraps the internal sendMessage
      */
     private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
         ApacheHttpComponentsHttpClientHttpConnector connector;
@@ -291,34 +266,26 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
         configureTrust(httpclient);
 
-        configureAuthentication(httpclient);
+        if (useKerberos) {
+            configureAuthentication(httpclient, "Kerberos", new KerberosPrincipal(username));
+        } else {
+            configureAuthentication(httpclient, "Basic", new BasicUserPrincipal(username));
+        }
     }
 
     /**
      * Configure auth schemes to use for the HttpClient.
      */
-    protected void configureAuthentication(final DefaultHttpClient httpclient) {
-        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "Basic"), new Credentials() {
+    protected void configureAuthentication(final DefaultHttpClient httpclient, final String scheme, final Principal principal) {
+        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, scheme), new Credentials() {
             public Principal getUserPrincipal() {
-                return new BasicUserPrincipal(username);
+                return principal;
             }
 
             public String getPassword() {
                 return password;
             }
         });
-
-        if (useKerberos) {
-            httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, "Kerberos"), new Credentials() {
-                public Principal getUserPrincipal() {
-                    return new KerberosPrincipal(username);
-                }
-
-                public String getPassword() {
-                    return password;
-                }
-            });
-        }
 
         httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
     }
@@ -362,39 +329,8 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
             return;
         }
 
-        final TrustStrategy trustStrategy;
-        switch (httpsCertTrustStrategy) {
-        case ALLOW_ALL:
-            trustStrategy = new TrustStrategy() {
-                @Override
-                public boolean isTrusted(final X509Certificate[] chain, final String authType) throws
-                    CertificateException {
-                    return true;
-                }
-            };
-            break;
-        case SELF_SIGNED:
-            trustStrategy = new TrustSelfSignedStrategy();
-            break;
-        case STRICT:
-        default:
-            trustStrategy = null;
-            break;
-        }
-
-        final X509HostnameVerifier hostnameVerifier;
-        switch (httpsHostnameVerifyStrategy) {
-        case ALLOW_ALL:
-            hostnameVerifier = ALLOW_ALL_HOSTNAME_VERIFIER;
-            break;
-        case BROWSER_COMPATIBLE:
-            hostnameVerifier = BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-            break;
-        case STRICT:
-        default:
-            hostnameVerifier = STRICT_HOSTNAME_VERIFIER;
-            break;
-        }
+        final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
+        final X509HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
 
         final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
         final Scheme sch = new Scheme("https", 443, socketFactory);
@@ -432,16 +368,8 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         return password;
     }
 
-    public WinrmHttpsCertificateTrustStrategy getHttpsCertTrustStrategy() {
-        return httpsCertTrustStrategy;
-    }
-
     public void setHttpsCertTrustStrategy(WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy) {
         this.httpsCertTrustStrategy = httpsCertTrustStrategy;
-    }
-
-    public WinrmHttpsHostnameVerificationStrategy getHttpsHostnameVerifyStrategy() {
-        return httpsHostnameVerifyStrategy;
     }
 
     public void setHttpsHostnameVerifyStrategy(WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy) {

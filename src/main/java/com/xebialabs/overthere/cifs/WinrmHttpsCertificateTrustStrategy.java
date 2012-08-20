@@ -22,8 +22,28 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
+
 public enum WinrmHttpsCertificateTrustStrategy {
-    STRICT,
-    SELF_SIGNED,
-    ALLOW_ALL,
+    STRICT(null),
+    SELF_SIGNED(new TrustSelfSignedStrategy()),
+    ALLOW_ALL(new TrustStrategy() {
+        @Override
+        public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {
+            return true;
+        }
+    });
+
+    private TrustStrategy strategy;
+
+    private WinrmHttpsCertificateTrustStrategy(TrustStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public TrustStrategy getStrategy() {
+        return strategy;
+    }
 }
