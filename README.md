@@ -582,6 +582,10 @@ The username or the password supplied was invalid. Did you supply the correct cr
 
 The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5)?
 
+#### Kerberos authentication fails with a 401 response code
+
+The Kerberos ticket is not accepted by the target machine. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for target machines](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
+
 #### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
 
 The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
