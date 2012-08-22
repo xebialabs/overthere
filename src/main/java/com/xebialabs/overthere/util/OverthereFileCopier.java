@@ -149,7 +149,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
         if (dstFile.exists())
             logger.debug("About to overwrite existing file {}", dstFile);
-        logger.debug("Copying file{} to {}", srcFile, dstFile);
+        logger.debug("Copying file {} to {}", srcFile, dstFile);
 
         try {
             ByteStreams.copy(new InputSupplier<InputStream>() {
