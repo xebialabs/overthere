@@ -622,6 +622,8 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 	* Fixed issues [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
 	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels.
 	* Set default pty to true in case of interactive sudo and no pty set.
+* Overthere 1.0.17 (20-Mar-2012)
+    * Fixed issues [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
 * Overthere 2.0.0-beta-1 (05-Mar-2012)
     * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
     * Ported Overthere tests to use TestNG instead of JUnit.
