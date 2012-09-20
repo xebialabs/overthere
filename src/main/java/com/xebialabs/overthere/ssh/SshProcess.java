@@ -39,56 +39,76 @@ import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 
+import static java.lang.String.format;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 class SshProcess implements OverthereProcess {
     private SshConnection connection;
     private final Session session;
-    private final String encodedCommandLine;
+    private final String obfuscatedCommandLine;
     private final Session.Command command;
+    private int exitValue = -1;
 
     SshProcess(final SshConnection connection, final OperatingSystemFamily os, final Session session, final CmdLine commandLine) throws TransportException,
         ConnectionException {
         this.connection = connection;
         this.session = session;
-        this.encodedCommandLine = commandLine.toCommandLine(os, true);
-        logger.debug("Executing command {} on {}", encodedCommandLine, connection);
+        this.obfuscatedCommandLine = commandLine.toCommandLine(os, true);
+        logger.debug("Executing command {} on {}", obfuscatedCommandLine, connection);
         this.command = session.exec(commandLine.toCommandLine(os, false));
     }
 
     @Override
-    public OutputStream getStdin() {
+    public synchronized OutputStream getStdin() {
+        checkArgument(command != null, "Process for command line [{}] is not running", obfuscatedCommandLine);
+
         return command.getOutputStream();
     }
 
     @Override
-    public InputStream getStdout() {
+    public synchronized InputStream getStdout() {
+        checkArgument(command != null, "Process for command line [{}] is not running", obfuscatedCommandLine);
+
         return command.getInputStream();
     }
 
     @Override
-    public InputStream getStderr() {
+    public synchronized InputStream getStderr() {
+        checkArgument(command != null, "Process for command line [{}] is not running", obfuscatedCommandLine);
+
         return command.getErrorStream();
     }
 
     @Override
-    public int waitFor() {
+    public synchronized int waitFor() {
+        if(command == null) {
+            return exitValue;
+        }
+
         try {
             command.join();
             Integer exitStatus = command.getExitStatus();
-            logger.info("Command {} on {} returned {}", new Object[] { encodedCommandLine, connection, exitStatus });
+            logger.info("Command [{}] on [{}] returned exit code [{}]", new Object[] { obfuscatedCommandLine, connection, exitStatus });
             closeSession();
             if (exitStatus == null) {
-                logger.warn("Command {} on {} could not be started. Returning exit code -1", encodedCommandLine, connection);
-                return -1;
+                logger.warn("Command [{}] on [{}] could not be started. Returning exit code -1", obfuscatedCommandLine, connection);
+                exitValue = -1;
             } else {
-                return exitStatus;
+                exitValue = exitStatus;
             }
+            return exitValue;
         } catch (ConnectionException e) {
-            throw new RuntimeIOException("Caught exception while awaiting end of process", e);
+            throw new RuntimeIOException(format("Caught exception while awaiting end of process for command [%s] on [%s]", obfuscatedCommandLine, connection), e);
         }
     }
 
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
+        if(command == null) {
+            return;
+        }
+
         try {
             command.signal(Signal.KILL);
         } catch (TransportException e) {
@@ -96,6 +116,15 @@ class SshProcess implements OverthereProcess {
         } finally {
             closeSession();
         }
+    }
+    
+    @Override
+    public synchronized int exitValue() {
+        if(command != null) {
+            throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine, connection));
+        }
+
+        return exitValue;
     }
 
     private void closeSession() {

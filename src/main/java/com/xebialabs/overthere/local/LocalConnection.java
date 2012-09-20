@@ -140,6 +140,11 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
                 public void destroy() {
                     p.destroy();
                 }
+                
+                @Override
+                public int exitValue() {
+                    return p.exitValue();
+                }
             };
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot start process for " + commandLine, exc);

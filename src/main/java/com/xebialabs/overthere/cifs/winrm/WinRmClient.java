@@ -22,9 +22,8 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import com.xebialabs.overthere.cifs.winrm.soap.*;
 import org.apache.commons.codec.binary.Base64;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -44,12 +42,21 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.soap.Action;
+import com.xebialabs.overthere.cifs.winrm.soap.BodyBuilder;
+import com.xebialabs.overthere.cifs.winrm.soap.HeaderBuilder;
+import com.xebialabs.overthere.cifs.winrm.soap.OptionSet;
+import com.xebialabs.overthere.cifs.winrm.soap.ResourceURI;
+import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
+import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
+import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
 
 import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WIN_SHELL;
 
+/**
+ * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
+ */
 public class WinRmClient {
 
     private final URL targetURL;
@@ -59,9 +66,9 @@ public class WinRmClient {
     private int envelopSize;
     private String locale;
 
-    private String exitCode;
     private String shellId;
     private String commandId;
+    private int exitValue;
 
     private int chunk = 0;
 
@@ -70,134 +77,30 @@ public class WinRmClient {
         this.targetURL = targetURL;
     }
 
-    public void runCmd(String command, OverthereProcessOutputHandler handler) {
-        try {
-            shellId = openShell();
-            commandId = runCommand(command);
-            getCommandOutput(handler);
-        } finally {
-            cleanUp();
-            closeShell();
-        }
+    public void startCmd(String command) {
+        shellId = createShell();
+        commandId = executeCommand(command);
     }
+    
+    private String createShell() {
+        logger.debug("createShell");
 
-    private void closeShell() {
-        if (shellId == null)
-            return;
-        logger.debug("closeShell shellId {}", shellId);
-        final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, shellId, null);
-        sendMessage(requestDocument, null);
-    }
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Shell", NS_WIN_SHELL));
+        bodyContent.addElement(QName.get("InputStreams", NS_WIN_SHELL)).addText("stdin");
+        bodyContent.addElement(QName.get("OutputStreams", NS_WIN_SHELL)).addText("stdout stderr");
 
-    private void cleanUp() {
-        if (commandId == null)
-            return;
-        logger.debug("cleanUp shellId {} commandId {} ", shellId, commandId);
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", NS_WIN_SHELL)).addAttribute("CommandId", commandId);
-        bodyContent.addElement(QName.get("Code", NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
-        final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
-        sendMessage(requestDocument, SoapAction.SIGNAL);
-    }
+        final Document requestDocument = getRequestDocument(Action.WS_ACTION, ResourceURI.RESOURCE_URI_CMD, OptionSet.OPEN_SHELL, null, bodyContent);
+        Document responseDocument = sendMessage(requestDocument, SoapAction.SHELL);
 
-    private void getCommandOutput(OverthereProcessOutputHandler handler) {
-        logger.debug("getCommandOutput shellId {} commandId {} ", shellId, commandId);
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", NS_WIN_SHELL));
-        bodyContent.addElement(QName.get("DesiredStream", NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
-        final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
-
-        for (;;) {
-            Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
-            String stdout = handleStream(responseDocument, ResponseExtractor.STDOUT);
-            BufferedReader stdoutReader = new BufferedReader(new StringReader(stdout));
-            try {
-                for (;;) {
-                    String line = stdoutReader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    for(int i = 0; i < line.length(); i++) {
-                        handler.handleOutput(line.charAt(i));
-                    }
-                    handler.handleOutput('\r');
-                    handler.handleOutput('\n');
-                    handler.handleOutputLine(line);
-                }
-            } catch (IOException exc) {
-                throw new RuntimeIOException("Unexpected I/O exception while reading stdout", exc);
-            }
-
-            String stderr = handleStream(responseDocument, ResponseExtractor.STDERR);
-            BufferedReader stderrReader = new BufferedReader(new StringReader(stderr));
-            try {
-                for (;;) {
-                    String line = stderrReader.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    handler.handleErrorLine(line);
-                }
-            } catch (IOException exc) {
-                throw new RuntimeIOException("Unexpected I/O exception while reading stderr", exc);
-            }
-
-            if (chunk == 0) {
-                try {
-                    exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
-                    logger.debug("exit code {}", exitCode);
-                } catch (Exception e) {
-                    logger.debug("not found");
-                }
-            }
-            chunk++;
-
-            /*
-             * We may need to get additional output if the stream has not finished. The CommandState will change from
-             * Running to Done like so:
-             * 
-             * @example
-             * 
-             * from... <rsp:CommandState CommandId="..."
-             * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Running"/> to...
-             * <rsp:CommandState CommandId="..."
-             * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done">
-             * <rsp:ExitCode>0</rsp:ExitCode> </rsp:CommandState>
-             */
-            final List<?> list = ResponseExtractor.STREAM_DONE.getXPath().selectNodes(responseDocument);
-            if (!list.isEmpty()) {
-                exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
-                logger.info("exit code {}", exitCode);
-                break;
-            }
-        }
-
-        logger.debug("all the command output has been fetched (chunk={})", chunk);
+        return getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
 
     }
 
-    private static String handleStream(Document responseDocument, ResponseExtractor stream) {
-        StringBuffer buffer = new StringBuffer();
-        @SuppressWarnings("unchecked") final List<Element> streams = stream.getXPath().selectNodes(responseDocument);
-        if (!streams.isEmpty()) {
-            final Base64 base64 = new Base64();
-            Iterator<Element> itStreams = streams.iterator();
-            while (itStreams.hasNext()) {
-                Element e = itStreams.next();
-                // TODO check performance with http://www.iharder.net/current/java/base64/
-                final byte[] decode = base64.decode(e.getText());
-                buffer.append(new String(decode));
-            }
-        }
-        logger.debug("handleStream {} buffer {}", stream, buffer);
-        return buffer.toString();
-
-    }
-
-    private String runCommand(String command) {
+    private String executeCommand(String command) {
         logger.debug("runCommand shellId {} command {}", shellId, command);
         final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", NS_WIN_SHELL));
 
-        String encoded = command;
-        encoded = "\"" + encoded + "\"";
+        String encoded = "\"" + command + "\"";
 
         logger.info("Encoded command is {}", encoded);
 
@@ -209,6 +112,91 @@ public class WinRmClient {
         return getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
     }
 
+
+    public boolean receiveOutput(OutputStream stdout, OutputStream stderr) throws IOException {
+        logger.debug("receiveOutput shellId {} commandId {} ", shellId, commandId);
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", NS_WIN_SHELL));
+        bodyContent.addElement(QName.get("DesiredStream", NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
+        final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
+
+        Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
+        handleStream(responseDocument, ResponseExtractor.STDOUT, stdout);
+        handleStream(responseDocument, ResponseExtractor.STDERR, stderr);
+
+        if (chunk == 0) {
+            parseExitCode(responseDocument);
+        }
+        chunk++;
+
+        /*
+         * We may need to get additional output if the stream has not finished. The CommandState will change from
+         * Running to Done like so:
+         * 
+         * @example
+         * 
+         * from... <rsp:CommandState CommandId="..."
+         * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Running"/> to...
+         * <rsp:CommandState CommandId="..."
+         * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done">
+         * <rsp:ExitCode>0</rsp:ExitCode> </rsp:CommandState>
+         */
+        final List<?> list = ResponseExtractor.STREAM_DONE.getXPath().selectNodes(responseDocument);
+        if (!list.isEmpty()) {
+            parseExitCode(responseDocument);
+            return false;
+        }
+
+        return true;
+    }
+
+    public void signal() {
+        if (commandId == null)
+            return;
+        logger.debug("Signal shellId {} commandId {} ", shellId, commandId);
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", NS_WIN_SHELL)).addAttribute("CommandId", commandId);
+        bodyContent.addElement(QName.get("Code", NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
+        final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
+        sendMessage(requestDocument, SoapAction.SIGNAL);
+    }
+
+    public void deleteShell() {
+        if (shellId == null)
+            return;
+        logger.debug("DeleteShell shellId {}", shellId);
+        final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, shellId, null);
+        sendMessage(requestDocument, null);
+    }
+
+    private void parseExitCode(Document responseDocument) {
+        try {
+            String exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
+            logger.debug("exit code {}", exitCode);
+            try {
+                exitValue = Integer.parseInt(exitCode);
+            } catch(NumberFormatException exc) {
+                logger.error("Cannot parse exit code [{}], setting it to -1", exc);
+                exitValue = -1;
+            }
+        } catch (Exception exc) {
+            logger.debug("Exit code not found, not processing it");
+        }
+    }
+
+    private static void handleStream(Document responseDocument, ResponseExtractor stream, OutputStream out) throws IOException {
+        @SuppressWarnings("unchecked") final List<Element> streams = stream.getXPath().selectNodes(responseDocument);
+        if (!streams.isEmpty()) {
+            final Base64 base64 = new Base64();
+            Iterator<Element> itStreams = streams.iterator();
+            while (itStreams.hasNext()) {
+                Element e = itStreams.next();
+                // TODO check performance with http://www.iharder.net/current/java/base64/
+                final byte[] decode = base64.decode(e.getText());
+                out.write(decode);
+            }
+        }
+
+    }
+
     private static String getFirstElement(Document doc, ResponseExtractor extractor) {
         @SuppressWarnings("unchecked") final List<Element> nodes = extractor.getXPath().selectNodes(doc);
         if (nodes.isEmpty())
@@ -216,20 +204,6 @@ public class WinRmClient {
 
         final Element next = nodes.iterator().next();
         return next.getText();
-    }
-
-    private String openShell() {
-        logger.debug("openShell");
-
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Shell", NS_WIN_SHELL));
-        bodyContent.addElement(QName.get("InputStreams", NS_WIN_SHELL)).addText("stdin");
-        bodyContent.addElement(QName.get("OutputStreams", NS_WIN_SHELL)).addText("stdout stderr");
-
-        final Document requestDocument = getRequestDocument(Action.WS_ACTION, ResourceURI.RESOURCE_URI_CMD, OptionSet.OPEN_SHELL, null, bodyContent);
-        Document responseDocument = sendMessage(requestDocument, SoapAction.SHELL);
-
-        return getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
-
     }
 
     private Document sendMessage(Document requestDocument, SoapAction soapAction) {
@@ -286,8 +260,8 @@ public class WinRmClient {
         return "uuid:" + UUID.randomUUID().toString().toUpperCase();
     }
 
-    public int getExitCode() {
-        return Integer.parseInt(exitCode);
+    public int exitValue() {
+        return exitValue;
     }
 
     public String getTimeout() {

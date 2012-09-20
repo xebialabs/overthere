@@ -22,6 +22,29 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import com.google.common.io.Closeables;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.cifs.winrm.connector.ApacheHttpComponentsHttpClientHttpConnector;
+import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
@@ -41,20 +64,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CER
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
-import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.cifs.winrm.connector.ApacheHttpComponentsHttpClientHttpConnector;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import static java.lang.String.format;
 
 /**
  * A connection to a Windows host using CIFS and WinRM.
@@ -69,20 +79,24 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
  */
 public class CifsWinRmConnection extends CifsConnection {
 
-    private final WinRmClient winRmClient;
+    private ConnectionOptions options;
+
+    private URL targetURL;
+
+    private ApacheHttpComponentsHttpClientHttpConnector httpConnector;
 
     /**
      * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper, false);
+        super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString()
             .toLowerCase());
 
-        final URL targetURL = getTargetURL(options);
-        final ApacheHttpComponentsHttpClientHttpConnector httpConnector = createHttpConnector(targetURL, options);
-        winRmClient = createWinrmClient(targetURL, httpConnector, options);
+        this.options = options;
+        targetURL = getTargetURL(options);
+        httpConnector = createHttpConnector(targetURL, options);
     }
 
     private URL getTargetURL(ConnectionOptions options) {
@@ -114,13 +128,105 @@ public class CifsWinRmConnection extends CifsConnection {
     }
 
     @Override
-    public int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
+    public OverthereProcess startProcess(final CmdLine commandLine) {
+        final String obfuscatedCommandLine = commandLine.toCommandLine(getHostOperatingSystem(), true);
+
         String cmd = commandLine.toCommandLine(getHostOperatingSystem(), false);
         if (workingDirectory != null) {
             cmd = "CD " + workingDirectory.getPath() + " & " + cmd;
         }
-        winRmClient.runCmd(cmd, handler);
-        return winRmClient.getExitCode();
+
+        final WinRmClient winRmClient = createWinrmClient(targetURL, httpConnector, options);
+        try {
+            final PipedInputStream callersStdout = new PipedInputStream();
+            final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
+            final PipedInputStream callersStderr = new PipedInputStream();
+            final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
+
+            winRmClient.startCmd(cmd);
+
+            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine,
+                CifsWinRmConnection.this)) {
+                @Override
+                public void run() {
+                    try {
+                        for (;;) {
+                            if (!winRmClient.receiveOutput(toCallersStdout, toCallersStderr))
+                                break;
+                        }
+                    } catch (IOException exc) {
+                        throw new RuntimeIOException("Cannot start process " + commandLine, exc);
+                    } finally {
+                        Closeables.closeQuietly(toCallersStdout);
+                        Closeables.closeQuietly(toCallersStderr);
+                    }
+                }
+            };
+            processOutputReaderThread.start();
+
+            return new OverthereProcess() {
+                boolean processTerminated = false;
+
+                @Override
+                public synchronized OutputStream getStdin() {
+                    return new ByteArrayOutputStream();
+                }
+
+                @Override
+                public synchronized InputStream getStdout() {
+                    return callersStdout;
+                }
+
+                @Override
+                public synchronized InputStream getStderr() {
+                    return callersStderr;
+                }
+
+                @Override
+                public synchronized int waitFor() {
+                    if (processTerminated) {
+                        return exitValue();
+                    }
+
+                    try {
+                        try {
+                            processOutputReaderThread.join();
+                        } finally {
+                            winRmClient.deleteShell();
+                            processTerminated = true;
+                        }
+                        return exitValue();
+                    } catch (InterruptedException exc) {
+                        throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), exc);
+                    }
+                }
+
+                @Override
+                public synchronized void destroy() {
+                    if (processTerminated) {
+                        return;
+                    }
+
+                    winRmClient.signal();
+                    winRmClient.deleteShell();
+                    processTerminated = true;
+                }
+
+                @Override
+                public synchronized int exitValue() {
+                    if (!processTerminated) {
+                        throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine,
+                            CifsWinRmConnection.this));
+                    }
+
+                    return winRmClient.exitValue();
+                }
+            };
+
+        } catch (IOException exc) {
+            throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + this, exc);
+        }
+
     }
 
 }

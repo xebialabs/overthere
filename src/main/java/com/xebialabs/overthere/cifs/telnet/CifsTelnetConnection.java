@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -71,23 +72,17 @@ public class CifsTelnetConnection extends CifsConnection {
     private static final String ERRORLEVEL_POSTAMBLE = "ERRORLEVEL-POSTAMBLE";
 
     /**
-     * The exitcode returned when the errorlevel of the Windows command could not be determined.
-     */
-    public static final int EXITCODE_CANNOT_DETERMINE_ERRORLEVEL = -999999;
-
-    /**
      * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString()
-            .toLowerCase());
+        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
     }
 
     @Override
     public OverthereProcess startProcess(final CmdLine commandLine) {
-        final String commandLineForExecution = commandLine.toCommandLine(getHostOperatingSystem(), false);
+        final String obfuscatedCommandLine = commandLine.toCommandLine(getHostOperatingSystem(), true);
 
         try {
             final TelnetClient tc = new TelnetClient();
@@ -100,10 +95,10 @@ public class CifsTelnetConnection extends CifsConnection {
             final PipedInputStream callersStdout = new PipedInputStream();
             final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
             final ByteArrayOutputStream outputBuf = new ByteArrayOutputStream();
-            final int[] result = new int[1];
-            result[0] = EXITCODE_CANNOT_DETERMINE_ERRORLEVEL;
+            final int[] exitValue = new int[1];
+            exitValue[0] = -1;
 
-            final Thread processOutputReaderThread = new Thread("Process handler reader for command " + commandLine) {
+            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this)) {
                 @Override
                 public void run() {
                     try {
@@ -125,7 +120,7 @@ public class CifsTelnetConnection extends CifsConnection {
                             receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
                         }
 
-                        send(stdin, commandLineForExecution);
+                        send(stdin, commandLine.toCommandLine(getHostOperatingSystem(), false));
 
                         receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
 
@@ -140,7 +135,9 @@ public class CifsTelnetConnection extends CifsConnection {
                             logger.debug("Errorlevel string found: {}", errorlevelString);
 
                             try {
-                                result[0] = Integer.parseInt(errorlevelString);
+                                synchronized(exitValue) {
+                                    exitValue[0] = Integer.parseInt(errorlevelString);
+                                }
                             } catch (NumberFormatException exc) {
                                 logger.error("Cannot parse errorlevel in Windows output: " + outputBuf);
                             }
@@ -148,7 +145,7 @@ public class CifsTelnetConnection extends CifsConnection {
                             logger.error("Cannot find errorlevel in Windows output: " + outputBuf);
                         }
                     } catch (IOException exc) {
-                        throw new RuntimeIOException("Cannot start process " + commandLine, exc);
+                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this), exc);
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                     }
@@ -158,45 +155,66 @@ public class CifsTelnetConnection extends CifsConnection {
 
             return new OverthereProcess() {
                 @Override
-                public OutputStream getStdin() {
+                public synchronized OutputStream getStdin() {
                     return stdin;
                 }
 
                 @Override
-                public InputStream getStdout() {
+                public synchronized InputStream getStdout() {
                     return callersStdout;
                 }
 
                 @Override
-                public InputStream getStderr() {
+                public synchronized InputStream getStderr() {
                     return new ByteArrayInputStream(new byte[0]);
                 }
 
                 @Override
-                public int waitFor() {
+                public synchronized int waitFor() {
+                    if (!tc.isConnected()) {
+                        return exitValue[0];
+                    }
+
                     try {
                         try {
                             processOutputReaderThread.join();
                         } finally {
-                            destroy();
+                            disconnect();
                         }
-                        return result[0];
+                        return exitValue[0];
                     } catch (InterruptedException exc) {
-                        throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + address, exc);
+                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this), exc);
                     }
                 }
 
                 @Override
-                public void destroy() {
-                    if (tc.isConnected()) {
-                        try {
-                            tc.disconnect();
-                            logger.info("Disconnected from telnet://{}@{}", username, address);
+                public synchronized void destroy() {
+                    if (!tc.isConnected()) {
+                        return;
+                    }
 
-                            Closeables.closeQuietly(toCallersStdout);
-                        } catch (IOException exc) {
-                            throw new RuntimeIOException("Cannot disconnect from telnet://" + username + "@" + address, exc);
-                        }
+                    disconnect();
+                }
+
+                private synchronized void disconnect() {
+                    try {
+                        tc.disconnect();
+                        logger.info("Disconnected from [{}]", CifsTelnetConnection.this);
+
+                        Closeables.closeQuietly(toCallersStdout);
+                    } catch (IOException exc) {
+                        throw new RuntimeIOException(format("Cannot disconnect from [%s]", CifsTelnetConnection.this), exc);
+                    }
+                }
+                
+                @Override
+                public synchronized int exitValue() {
+                    if(tc.isConnected()) {
+                        throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine, CifsTelnetConnection.this));
+                    }
+
+                    synchronized(exitValue) {
+                        return exitValue[0];
                     }
                 }
             };

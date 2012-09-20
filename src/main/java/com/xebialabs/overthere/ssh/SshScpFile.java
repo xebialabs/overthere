@@ -228,8 +228,8 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
                 }
             };
-        } catch (IOException e) {
-            throw new RuntimeIOException("Cannot open " + this + " for reading: " + e.toString(), e);
+        } catch (IOException exc) {
+            throw new RuntimeIOException("Cannot open " + this + " for reading: " + exc.toString(), exc);
         }
     }
 
@@ -239,7 +239,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             final File tempFile = File.createTempFile("scp_upload", ".tmp");
             tempFile.deleteOnExit();
 
-            logger.debug("Opening output stream to temporary file {} to store contents to be uploaded to {} when the stream is closed", tempFile, this);
+            logger.debug("Opening output stream to temporary file {} to store contents to be uploaded to {} when the stream is closed", tempFile, SshScpFile.this);
             return new FileOutputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
@@ -251,7 +251,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 }
 
                 private void uploadAndDelete(File tempFile) throws IOException {
-                    logger.debug("Uploading contents of temporary file {} to to {}", tempFile, this);
+                    logger.debug("Uploading contents of temporary file {} to to {}", tempFile, SshScpFile.this);
                     try {
                         connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
                     } finally {
@@ -260,8 +260,8 @@ class SshScpFile extends SshFile<SshScpConnection> {
                     }
                 }
             };
-        } catch (IOException e) {
-            throw new RuntimeIOException("Cannot open " + this + " for reading: " + e.toString(), e);
+        } catch (IOException exc) {
+            throw new RuntimeIOException("Cannot open " + this + " for reading: " + exc.toString(), exc);
         }
     }
 

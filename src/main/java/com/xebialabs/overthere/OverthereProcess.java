@@ -31,31 +31,30 @@ import java.io.OutputStream;
 public interface OverthereProcess {
 
     /**
-     * Returns an output stream that is connected to the standard input stream (stdin) of the running command.
+     * Returns an output stream that is connected to the standard input stream (stdin) of the process.
      * 
      * @return the input stream
      */
     OutputStream getStdin();
 
     /**
-     * Returns an input stream that is connected to the standard output stream (stdout) of the running command.
+     * Returns an input stream that is connected to the standard output stream (stdout) of the process.
      * 
      * @return the output stream
      */
     InputStream getStdout();
 
     /**
-     * Returns an input stream that is connected to the standard error stream (stderr) of the running command.
+     * Returns an input stream that is connected to the standard error stream (stderr) of the process.
      * 
      * @return the output stream
      */
     InputStream getStderr();
 
     /**
-     * Waits for the command to complete its execution. Note that {@link #destroy()} still needs to be invoked to clean
-     * up any resources that may be left!
+     * Waits for the command to complete its execution. Returns immediately if the process has already terminated.
      * 
-     * @return the exit value of the executed command
+     * @return the exit value of the process
      * 
      * @throws InterruptedException
      *             if this method was interrupted
@@ -63,8 +62,17 @@ public interface OverthereProcess {
     int waitFor() throws InterruptedException;
 
     /**
-     * Destroys the executing process.
+     * Forcibly terminates the process. Returns immediately if the process has already terminated.
      */
     void destroy();
+
+    /**
+     * Returns the exit value for the process.
+     *
+     * @return the exit value of the process
+     * 
+     * @throws IllegalThreadStateException if the process has not yet terminated.
+     */
+    int exitValue() throws IllegalThreadStateException;
 
 }

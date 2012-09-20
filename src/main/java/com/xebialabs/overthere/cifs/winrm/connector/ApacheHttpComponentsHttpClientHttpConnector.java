@@ -138,13 +138,10 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
             result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
         } catch (LoginException e) {
             throw new WinRMRuntimeIOException("Login failure sending message on " + getTargetURL() + " error: " + e.getMessage(),
-                privilegedSendMessage.getRequestDocument(), null,
-                e);
+                privilegedSendMessage.getRequestDocument(), null, e);
         } catch (PrivilegedActionException e) {
-            throw new WinRMRuntimeIOException("Failure sending message on " + getTargetURL() + " error: " + e
-                .getMessage(),
-                privilegedSendMessage.getRequestDocument(), null,
-                e.getException());
+            throw new WinRMRuntimeIOException("Failure sending message on " + getTargetURL() + " error: " + e.getMessage(),
+                privilegedSendMessage.getRequestDocument(), null, e.getException());
         }
         return result;
     }
@@ -256,21 +253,19 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
             }
 
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new WinRMRuntimeIOException(
-                    "Response code was " + response.getStatusLine().getStatusCode());
+                throw new WinRMRuntimeIOException("Response code was " + response.getStatusLine().getStatusCode());
             }
             final String text = handleResponse(response, context);
             EntityUtils.consume(response.getEntity());
             logger.trace("Response body: {}", text);
 
             return DocumentHelper.parseText(text);
-        } catch (BlankValueRuntimeException bvrte) {
-            throw bvrte;
-        } catch (InvalidFilePathRuntimeException ifprte) {
-            throw ifprte;
-        } catch (Exception e) {
-            throw new WinRMRuntimeIOException("Send message on " + getTargetURL() + " error ", requestDocument, null,
-                e);
+        } catch (BlankValueRuntimeException exc) {
+            throw exc;
+        } catch (InvalidFilePathRuntimeException exc) {
+            throw exc;
+        } catch (Exception exc) {
+            throw new WinRMRuntimeIOException("Send message on " + getTargetURL() + " error ", requestDocument, null, exc);
         } finally {
             client.getConnectionManager().shutdown();
         }
