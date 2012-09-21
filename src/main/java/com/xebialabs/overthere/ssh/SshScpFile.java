@@ -40,11 +40,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.base.Predicates.or;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
@@ -59,6 +64,7 @@ import static java.lang.String.format;
 class SshScpFile extends SshFile<SshScpConnection> {
 
     private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}\\@?";
+    private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = not(or(equalTo("."), equalTo("..")));
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
@@ -264,7 +270,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         // Yes, this *is* meant to be 'el es minus one'! Each file should go one a separate line, even if we create a
         // pseudo-tty. Long format is NOT what we want here.
-        CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND, "ls", "-1", getPath());
+        CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND, "ls", "-a1", getPath());
 
         CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
         int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), lsCmdLine);
@@ -274,7 +280,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         List<OverthereFile> files = newArrayList();
         for (String lsLine : capturedOutput.getOutputLines()) {
-            files.add(connection.getFile(this, lsLine));
+            // Filter out the '.' and '..'
+            if (NOT_SELF_OR_PARENT_DIR.apply(lsLine)) {
+                files.add(connection.getFile(this, lsLine));
+            }
         }
 
         return files;

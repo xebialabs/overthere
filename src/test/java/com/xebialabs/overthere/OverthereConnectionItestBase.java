@@ -19,6 +19,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 import static org.testng.Assert.fail;
 
@@ -360,6 +361,23 @@ public abstract class OverthereConnectionItestBase {
 
         tempFile.delete();
         assertThat("Expected temporary file to no longer exist", tempFile.exists(), equalTo(false));
+    }
+
+    @Test
+    @Assumption(methods = "onUnix")
+    public void shouldCreateHiddenUnixFileAndBeAbleToListIt() {
+        final String prefix = "prefix";
+        final String suffix = "suffix";
+        OverthereFile tempDir = connection.getTempFile(prefix, suffix);
+        tempDir.mkdir();
+        byte[] contents = "Hey there, I'm a hidden file.".getBytes();
+        OverthereFile hiddenFile = tempDir.getFile(".imhidden");
+        OverthereUtils.write(contents, hiddenFile);
+        List<OverthereFile> overthereFiles = tempDir.listFiles();
+        assertThat("Expected dir listing to list hidden file.", overthereFiles, hasSize(2));
+        hiddenFile.delete();
+        assertThat("Should have removed hidden file", !hiddenFile.exists());
+        tempDir.delete();
     }
 
     @Test
