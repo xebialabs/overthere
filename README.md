@@ -36,7 +36,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.0.0%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.1.0-beta-1%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -46,7 +46,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0-beta-1</version>
 		</dependency>
 
 2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -593,6 +593,10 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.1.0-beta-1 (21-Sep-2012)
+    * Implemented `OverthereProcess.startProcess()` for CIFS/WinRM connections, fixes issue [#54](https://github.com/xebialabs/overthere/issues/54).
+    * Fixed issues [#53](https://github.com/xebialabs/overthere/issues/53) and [#55](https://github.com/xebialabs/overthere/issues/55).
+    * Some minor code and documentation fixes.
 * Overthere 2.0.0 (22-Aug-2012)
     * Stable release of Overthere 2.0.0.
     * Some minor code and documentation fixes.
@@ -613,7 +617,7 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
     * Fixed bug in SSH tunnel port allocation code that caused the same local port to be allocated multiple times on Windows.
     * Changed license to GPLv2 with XebiaLabs FLOSS License Exception.
 * Overthere 2.0.0-beta-4 (19-Jun-2012)
-    * Fixed [issue #42](https://github.com/xebialabs/overthere/issues/42).
+    * Fixed issue [#42](https://github.com/xebialabs/overthere/issues/42).
     * Moved the `itest-support` sub project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
     * Updated documentation.
 * Overthere 2.0.0-beta-3 (27-Mar-2012)
