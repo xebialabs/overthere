@@ -5,7 +5,7 @@
 		<classes>
 			<class name="com.xebialabs.overthere.WindowsFactoryItest" />
 			<class name="com.xebialabs.overthere.UnixFactoryItest" />
-			<class name="com.xebialabs.overthere.local.LocalConnectionItest" />
+			<class name="com.xebialabs.overthere.local.LocalConnectionTest" />
 		</classes>
 	</test>
 </suite>

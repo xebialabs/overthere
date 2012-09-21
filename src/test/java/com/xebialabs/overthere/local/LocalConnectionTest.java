@@ -23,7 +23,10 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-public class LocalConnectionItest extends OverthereConnectionItestBase {
+/**
+ * This is not an itest, because this can always run.
+ */
+public class LocalConnectionTest extends OverthereConnectionItestBase {
 
     @Override
     protected void doInitHost() {
