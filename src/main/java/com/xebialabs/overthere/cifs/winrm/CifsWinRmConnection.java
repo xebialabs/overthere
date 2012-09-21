@@ -133,7 +133,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
         String cmd = commandLine.toCommandLine(getHostOperatingSystem(), false);
         if (workingDirectory != null) {
-            cmd = "CD " + workingDirectory.getPath() + " & " + cmd;
+            cmd = "CD /D " + workingDirectory.getPath() + " & " + cmd;
         }
 
         final WinRmClient winRmClient = createWinrmClient(targetURL, httpConnector, options);

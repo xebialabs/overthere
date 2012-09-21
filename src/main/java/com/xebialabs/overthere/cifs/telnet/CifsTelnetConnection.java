@@ -116,7 +116,7 @@ public class CifsTelnetConnection extends CifsConnection {
                         receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
 
                         if (workingDirectory != null) {
-                            send(stdin, "CD " + workingDirectory.getPath());
+                            send(stdin, "CD /D " + workingDirectory.getPath());
                             receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
                         }
 
