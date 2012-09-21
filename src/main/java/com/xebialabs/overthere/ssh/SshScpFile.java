@@ -49,8 +49,6 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 
 import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.base.Predicates.or;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
