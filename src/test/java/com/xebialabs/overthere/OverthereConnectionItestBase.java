@@ -374,7 +374,7 @@ public abstract class OverthereConnectionItestBase {
         OverthereFile hiddenFile = tempDir.getFile(".imhidden");
         OverthereUtils.write(contents, hiddenFile);
         List<OverthereFile> overthereFiles = tempDir.listFiles();
-        assertThat("Expected dir listing to list hidden file.", overthereFiles, hasSize(2));
+        assertThat("Expected dir listing to list hidden file.", overthereFiles, hasSize(1));
         hiddenFile.delete();
         assertThat("Should have removed hidden file", !hiddenFile.exists());
         tempDir.delete();
