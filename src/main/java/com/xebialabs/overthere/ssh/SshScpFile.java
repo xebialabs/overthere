@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
@@ -64,7 +65,7 @@ import static java.lang.String.format;
 class SshScpFile extends SshFile<SshScpConnection> {
 
     private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}\\@?";
-    private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = not(or(equalTo("."), equalTo("..")));
+    private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = Predicates.<String>not(Predicates.<String>or(equalTo("."), equalTo("..")));
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
