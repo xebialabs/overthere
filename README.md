@@ -289,7 +289,7 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
 ### Domain accounts
-Windows domain accounts are support for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
+Windows domain accounts are supported for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
 __N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source machine](#cifs_host_setup_krb5) and [the target machines](#cifs_host_setup_spn).
 
