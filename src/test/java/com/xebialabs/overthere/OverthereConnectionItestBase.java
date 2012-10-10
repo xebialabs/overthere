@@ -471,6 +471,27 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
+    public void shouldCopyFileWithSpaceNameToNonTempLocation() throws IOException {
+        File fileWithSpaces = temp.newFile("I have spaces.txt");
+        writeRandomBytes(fileWithSpaces, 100);
+
+        OverthereFile dir = connection.getTempFile("dir");
+        OverthereFile targetDir = connection.getFile(dir.getPath() + "/newDir");
+        targetDir.mkdirs();
+
+        OverthereFile targetFile = connection.getFile(targetDir.getPath() + "/" + fileWithSpaces.getName());
+
+        LocalFile.valueOf(fileWithSpaces).copyTo(targetFile);
+        try {
+            assertThat(targetFile.exists(), is(true));
+        } finally {
+            // When using a sudo connection, the target folder has different rights to the temp folder it was created
+            // in.
+            targetDir.deleteRecursively();
+        }
+    }
+
+    @Test
     public void shouldCopyDirectoryWithManyFiles() throws IOException {
         File largeFolder = temp.newFolder("large.folder");
         for (int i = 0; i < NR_OF_SMALL_FILES; i++) {

@@ -201,7 +201,8 @@ class SshSudoFile extends SshScpFile {
         if (this.exists() && tempFile.isDirectory()) {
             sourcePath += "/*"; // FIXME: This will not copy hidden files!
         }
-        cpCmdLine.addRaw(sourcePath);
+        // Spaces in the command line need to be escaped.
+        cpCmdLine.addRaw(sourcePath.replace(" ", "\\ "));
         cpCmdLine.addArgument(this.getPath());
 
         int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cpCmdLine);
