@@ -101,7 +101,7 @@ task itest(type: Test) {
     listeners << 'org.uncommons.reportng.JUnitXMLReporter'
   }
 
-  includes = ['**/*Itest.*']
+  includes = ['**/*Itest.*', '**/LocalConnectionTest.*']
   testResultsDir = file("${buildDir}/itest-results")
   testReportDir = file("${buildDir}/reports/itests")
 
