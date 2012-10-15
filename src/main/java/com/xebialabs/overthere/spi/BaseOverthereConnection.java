@@ -156,7 +156,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
             suffix = ".tmp";
         } else {
             prefix = getBaseName(nameTemplate);
-            suffix = "." + getExtension(nameTemplate);
+            suffix = getExtension(nameTemplate);
         }
 
         return getTempFile(prefix, suffix);

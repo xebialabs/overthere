@@ -193,19 +193,19 @@ class SshSudoFile extends SshScpFile {
     void copyfromTempFile(OverthereFile tempFile) {
         logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
 
-        boolean sudoPreserveAttributesOnCopyFromTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile;
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", sudoPreserveAttributesOnCopyFromTempFile ? "-pr" : "-r");
+        String targetPath = this.getPath();
+        if (this.exists() && tempFile.isDirectory()) {
+            targetPath = this.getParentFile().getPath();
+        }
+
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp");
+        cpCmdLine.addArgument(((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile ? "-pr" : "-r");
+        cpCmdLine.addArgument(tempFile.getPath());
+        cpCmdLine.addArgument(targetPath);
 
         CapturingOverthereProcessOutputHandler cpCapturedOutput = capturingHandler();
-        String sourcePath = tempFile.getPath();
-        if (this.exists() && tempFile.isDirectory()) {
-            sourcePath += "/*"; // FIXME: This will not copy hidden files!
-        }
-        // Spaces in the command line need to be escaped.
-        cpCmdLine.addRaw(sourcePath.replace(" ", "\\ "));
-        cpCmdLine.addArgument(this.getPath());
-
         int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cpCmdLine);
+
         if (cpResult != 0) {
             String errorMessage = cpCapturedOutput.getAll();
             throw new RuntimeIOException("Cannot copy temporary file " + tempFile + " to actual file " + this + " after upload: " + errorMessage);

@@ -84,11 +84,11 @@ public class OverthereUtils {
     }
 
     /**
-     * Returns the extension of a name (not a path). The extension is the part after the last dot.
+     * Returns the base name of a name (not a path). The base name is the part before the last dot.
      *
      * @param name
      *            the name
-     * @return the extension.
+     * @return the base name.
      */
     public static String getBaseName(String name) {
         int dot = name.lastIndexOf('.');
@@ -99,18 +99,19 @@ public class OverthereUtils {
     }
 
     /**
-     * Returns the base name of a name (not a path). The base name is the part before the last dot.
+     * Returns the extension of a name (not a path). The extension is the part from the last dot in a name onwards.
+     * If there is no dot character in the name, this will return an empty string.
      *
      * @param name
      *            the name
-     * @return the base name.
+     * @return the extension.
      */
     public static String getExtension(String name) {
         int dot = name.lastIndexOf('.');
         if (dot >= 0) {
-            return name.substring(dot + 1);
+            return name.substring(dot);
         }
-        return name;
+        return "";
     }
 
 }
