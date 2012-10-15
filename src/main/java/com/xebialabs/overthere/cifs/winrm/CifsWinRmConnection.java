@@ -93,6 +93,7 @@ public class CifsWinRmConnection extends CifsConnection {
         super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString()
             .toLowerCase());
+        checkArgument(!username.contains("\\"), "Cannot connect using WINRM with an old-style Windows domain account [%s], use USER@DOMAIN instead.", username);
 
         this.options = options;
         targetURL = getTargetURL(options);

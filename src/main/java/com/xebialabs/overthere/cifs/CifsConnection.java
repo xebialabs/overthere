@@ -95,7 +95,6 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.address = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
-        checkArgument(!username.contains("\\"), "Cannot connect with an old-style Windows domain account [%s], use USER@DOMAIN instead.", username);
         this.password = options.get(PASSWORD);
         InetSocketAddress addressCifsPort = mapper.map(createUnresolved(address, options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT)));
         this.cifsPort = addressCifsPort.getPort();

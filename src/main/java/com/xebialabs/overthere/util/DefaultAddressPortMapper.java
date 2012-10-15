@@ -27,6 +27,8 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import java.net.InetSocketAddress;
 
 public class DefaultAddressPortMapper implements AddressPortMapper {
+    public static final AddressPortMapper INSTANCE = new DefaultAddressPortMapper();
+
     @Override
     public InetSocketAddress map(InetSocketAddress address) {
         return address;

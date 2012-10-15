@@ -91,7 +91,7 @@ public class Overthere {
         logger.trace("Connection for protocol {} requested with the following connection options: {}", protocol, options);
 
         ConnectionOptions jumpstationOptions = options.get(JUMPSTATION, null);
-        AddressPortMapper mapper = new DefaultAddressPortMapper();
+        AddressPortMapper mapper = DefaultAddressPortMapper.INSTANCE;
         if (jumpstationOptions != null) {
             mapper = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, jumpstationOptions);
         }
