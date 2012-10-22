@@ -32,7 +32,7 @@ __P.S.:__ Check the [Overthere Ohloh page](http://www.ohloh.net/p/overthere) for
 To get Overthere, you have two options:
 
 1. Add a dependency to Overthere to your project.
-2. Build Overthere yourself.
+1. Build Overthere yourself.
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
@@ -49,23 +49,23 @@ Binary releases of Overthere are not provided here, but you can download it [str
 			<version>2.1.0-beta-1</version>
 		</dependency>
 
-2. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
+1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
 
 <a name="building_overthere"></a>
 ## Building Overthere
 
 1. Install [Gradle 1.0](http://www.gradle.org/).
-2. Clone the Overthere repository.
-3. Run the command `gradle clean build`.
+1. Clone the Overthere repository.
+1. Run the command `gradle clean build`.
 
 <a name="running_the_examples"></a>
 ## Running the examples
 
 1. Install [Maven 2.2.1 or up](http://maven.apache.org/).
-2. Clone the Overthere repository.
-3. Go into the `examples` directory and run the command `mvn eclipse:eclipse`.
-4. Import the `examples` project into Eclipse.
-5. Change the login details in the example classes (address, username and password) and run them!
+1. Clone the Overthere repository.
+1. Go into the `examples` directory and run the command `mvn eclipse:eclipse`.
+1. Import the `examples` project into Eclipse.
+1. Change the login details in the example classes (address, username and password) and run them!
 
 <a name="programming_overthere"></a>
 # Programming Overthere
@@ -414,35 +414,37 @@ _For a PowerShell script to do what is described below in one go, check [Richard
 
 To use the __WINRM__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
 
-1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRm under the section __Management and Monitoring Tools__.
+1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRM under the section __Management and Monitoring Tools__.
 
-2. On the remote host, as the Administrator user, open a Command Prompt and follow the steps below.
+1. If the remote host is running Windows Vista or Windows 7, the __Windows Remote Management (WS-Management)__ service is not started by default. Start the service and change its Startup type to __Automatic (Delayed Start)__ before proceeding with the next steps.
 
-3. (Optional) If you wish to use local accounts to access the system, configure WinRM to allow basic authentication:
+1. On the remote host, as the Administrator user, open a Command Prompt and follow the steps below.
+
+1. (Optional) By default basic authentication is disabled in WinRM. Enable it if you are going to use local accounts to access the remote host:
 
 		winrm set winrm/config/service/Auth @{Basic="true"}
 
-4. (Optional) If you do not with to use domain accounts to access the system and you are not going to configure Kerberos on your client machine, configure WinRM to not allow Kerberos authentication:
+1. (Optional) By default Kerberos authentication is enabled in WinRM. Disable it if you are __not__ going to use domain accounts to access the remote host:
 
 		winrm set winrm/config/service/Auth @{Kerberos="false"}
 
-	__N.B.__ Do not disallow Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
+	__N.B.__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
 	
-5. Configure WinRM to allow unencrypted SOAP messages:
+1. Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 
-6. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
+1. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
 
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
 
-7. To use the __WINRM__ connection type with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
+1. To use the __WINRM__ connection type with HTTP, i.e. with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
 
 		winrm create winrm/config/listener?Address=*+Transport=HTTP
 
-8. To use the __WINRM__ connection type with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
+1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
-	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
+	a. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
         	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
         	Microsoft (R) SelfSSL Version 1.0
@@ -451,7 +453,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
         	Do you want to replace the SSL settings for site 1 (Y/N)?Y
         	The self signed certificate was successfully assigned to site 1.
 
-	2. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
+	a. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
 
 			PS C:\Windows\system32> Get-childItem cert:\LocalMachine\Root\ | Select-String -pattern HOSTNAME
 
@@ -473,7 +475,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 			[Thumbprint]
 			  5C36B638BC31F505EF7F693D9A60C01551DD486F
 
-	3. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
+	a. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
 
 			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
 
@@ -489,6 +491,8 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 
 <a name="cifs_host_setup_krb5"></a>
 #### Kerberos - source machine
+
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
 
 In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the machine from which the Overthere connections are initiated, i.e. the source machine.
 
@@ -506,6 +510,8 @@ and add the following Java system property to the command line: `-Djava.security
 
 <a name="cifs_host_setup_spn"></a>
 #### Kerberos - target machines
+
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
 
 In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you add <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal names</a> for the WinRM servers you want to connect to, i.e. the target machines.
 
