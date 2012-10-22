@@ -167,6 +167,30 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final boolean DEFAULT_WINRM_KERBEROS_DEBUG = false;
 
     /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether to use the <code>HTTP</code>
+     * protocol in the SPN for Kerberos authentication.
+     */
+    public static final String WINRM_KERBEROS_USE_HTTP_SPN = "winrmKerberosUseHttpSpn";
+
+    /**
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
+     * use the <code>HTTP</code> protocol in the SPN for Kerberos authentication.
+     */
+    public static final boolean DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN = false;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether to add the port to the SPN for
+     * Kerberos authentication.
+     */
+    public static final String WINRM_KERBEROS_ADD_PORT_TO_SPN = "winrmKerberosAddPortToSpn";
+    
+    /**
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
+     * add the port to the SPN for Kerberos authentication.
+     */
+    public static final boolean DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN = false;
+
+    /**
      * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
      */
     public static final String WINRM_LOCALE = "winrmLocale";

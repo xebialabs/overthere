@@ -38,17 +38,10 @@ import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.UnrecoverableKeyException;
-import java.util.HashMap;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
@@ -65,6 +58,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.KerberosSchemeFactory;
+import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -89,21 +84,26 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import static org.apache.http.auth.AuthScope.ANY_HOST;
 import static org.apache.http.auth.AuthScope.ANY_PORT;
 import static org.apache.http.auth.AuthScope.ANY_REALM;
+import static org.apache.http.client.params.AuthPolicy.BASIC;
+import static org.apache.http.client.params.AuthPolicy.KERBEROS;
+import static org.apache.http.client.params.AuthPolicy.SPNEGO;
 import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
 
 public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnector {
     private static Logger logger = LoggerFactory.getLogger(ApacheHttpComponentsHttpClientHttpConnector.class);
     private final String username;
-    private final boolean useKerberos;
+    private final boolean enableKerberos;
     private final String password;
     private final URL targetURL;
     private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
     private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
+    private boolean kerberosUseHttpSpn;
+    private boolean kerberosAddPortToSpn;
     private boolean kerberosDebug;
 
     public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
         this.username = username;
-        this.useKerberos = username.contains("@");
+        this.enableKerberos = username.contains("@");
         this.password = password;
         this.targetURL = targetURL;
     }
@@ -113,8 +113,8 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      */
     @Override
     public Document sendMessage(final Document requestDocument, final SoapAction soapAction) {
-        if (useKerberos) {
-            return runPrivileged(new PrivilegedSendMessage(this, requestDocument, soapAction));
+        if (enableKerberos) {
+            return runPrivileged(new PrivilegedSendMessage(requestDocument, soapAction));
         } else {
             return doSendMessage(requestDocument, soapAction);
         }
@@ -147,75 +147,20 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     }
 
     /**
-     * CallbackHandler that uses provided username/password credentials.
-     */
-    private static class ProvidedAuthCallback implements CallbackHandler {
-
-        private String username;
-        private String password;
-
-        ProvidedAuthCallback(final String username, final String password) {
-            this.username = username;
-            this.password = password;
-        }
-
-        public void handle(final Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (final Callback callback : callbacks) {
-                if (callback instanceof NameCallback) {
-                    final NameCallback nc = (NameCallback) callback;
-                    nc.setName(username);
-                } else if (callback instanceof PasswordCallback) {
-                    final PasswordCallback pc = (PasswordCallback) callback;
-                    pc.setPassword(password.toCharArray());
-                } else {
-                    throw new UnsupportedCallbackException(callback, "Unrecognized Callback");
-                }
-            }
-        }
-    }
-
-    private static class KerberosJaasConfiguration extends Configuration {
-
-        private boolean debug;
-
-        private KerberosJaasConfiguration(boolean debug) {
-            this.debug = debug;
-        }
-
-        @Override
-        public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
-            final HashMap<String, String> options = new HashMap<String, String>();
-            options.put("client", "true");
-            options.put("useTicketCache", "false");
-            options.put("useKeyTab", "false");
-            options.put("doNotPrompt", "false");
-            if (debug) {
-                options.put("debug", "true");
-            }
-            return new AppConfigurationEntry[] { new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options) };
-        }
-
-    }
-
-    /**
      * PrivilegedExceptionAction that wraps the internal sendMessage
      */
-    private static class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
-        ApacheHttpComponentsHttpClientHttpConnector connector;
+    private class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
         private Document requestDocument;
-        SoapAction soapAction;
+        private SoapAction soapAction;
 
-        private PrivilegedSendMessage(final ApacheHttpComponentsHttpClientHttpConnector connector, final Document requestDocument,
-            final SoapAction soapAction) {
-            this.connector = connector;
+        private PrivilegedSendMessage(final Document requestDocument, final SoapAction soapAction) {
             this.requestDocument = requestDocument;
             this.soapAction = soapAction;
         }
 
         @Override
         public Document run() throws Exception {
-            return connector.doSendMessage(requestDocument, soapAction);
+            return ApacheHttpComponentsHttpClientHttpConnector.this.doSendMessage(requestDocument, soapAction);
         }
 
         public Document getRequestDocument() {
@@ -281,10 +226,20 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
         configureTrust(httpclient);
 
-        configureAuthentication(httpclient, "Basic", new BasicUserPrincipal(username));
-        if (useKerberos) {
-            configureAuthentication(httpclient, "Kerberos", new KerberosPrincipal(username));
+        configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
+
+        if (enableKerberos) {
+            if (kerberosUseHttpSpn) {
+                httpclient.getAuthSchemes().register(KERBEROS, new KerberosSchemeFactory(!kerberosAddPortToSpn));
+                httpclient.getAuthSchemes().register(SPNEGO, new SPNegoSchemeFactory(!kerberosAddPortToSpn));
+            } else {
+                httpclient.getAuthSchemes().register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn));
+                httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn));
+            }
+            configureAuthentication(httpclient, KERBEROS, new KerberosPrincipal(username));
+            configureAuthentication(httpclient, SPNEGO, new KerberosPrincipal(username));
         }
+
         httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
     }
 
@@ -372,14 +327,6 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         return targetURL;
     }
 
-    public String getUsername() {
-        return username;
-    }
-    
-    public String getPassword() {
-        return password;
-    }
-
     public void setHttpsCertTrustStrategy(WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy) {
         this.httpsCertTrustStrategy = httpsCertTrustStrategy;
     }
@@ -388,8 +335,12 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         this.httpsHostnameVerifyStrategy = httpsHostnameVerifyStrategy;
     }
 
-    public boolean isKerberosDebug() {
-        return kerberosDebug;
+    public void setKerberosUseHttpSpn(boolean kerberosUseHttpSpn) {
+        this.kerberosUseHttpSpn = kerberosUseHttpSpn;
+    }
+
+    public void setKerberosAddPortToSpn(boolean kerberosAddPortToSpn) {
+        this.kerberosAddPortToSpn = kerberosAddPortToSpn;
     }
 
     public void setKerberosDebug(boolean kerberosDebug) {

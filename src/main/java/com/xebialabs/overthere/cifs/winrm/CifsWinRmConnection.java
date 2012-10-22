@@ -49,19 +49,23 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_KERBEROS_DEBUG;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_KERBEROS_DEBUG;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_TIMEOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_DEBUG;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_ADD_PORT_TO_SPN;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_DEBUG;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_USE_HTTP_SPN;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
 import static java.lang.String.format;
@@ -115,6 +119,8 @@ public class CifsWinRmConnection extends CifsConnection {
             DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
         httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
             DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
+        httpConnector.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
+        httpConnector.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
         httpConnector.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
         return httpConnector;
     }

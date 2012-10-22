@@ -77,7 +77,7 @@ For a more thorough introduction to Overthere, check the [presentation on Overth
 <a name="configuring_overthere"></a>
 # Configuring Overthere
 
-The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS, Telnet and WinRM, are existing protocols for which support is built into many platforms. As such you will not need to install any custom software on the target hosts. Nevertheless in some cases the target platforms have to be configured to correctly work with Overthere. Also, Overthere has a number of configuration features that allow you tweak the way it interfaces with the remote hosts.
+The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS, Telnet and WinRM, are existing protocols for which support is built into many platforms. As such you will not need to install any custom software on the remote hosts. Nevertheless in some cases the remote hosts have to be configured to correctly work with Overthere. Also, Overthere has a number of configuration features that allow you tweak the way it interfaces with the remote hosts.
 
 <a name="protocols"></a>
 ## Protocols
@@ -295,10 +295,10 @@ Windows domain accounts are supported by the CIFS+WinRM and CIFS+Telnet connecti
 * For the __TELNET__ connection type, domain accounts must be specified using the old-style domain synyax, e.g `DOMAIN\USER`.
 * For both connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
-__N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source machine](#cifs_host_setup_krb5) and [the target machines](#cifs_host_setup_spn).
+__N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
 
 ### Administrative shares
-By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the target CIFS machine. These shares are only accessible for users that are part of the __Administrators__ on the target machine. If you want to access the target machine using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
+By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
 
 __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
 
@@ -363,10 +363,22 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="cifs_winrmKerberosAddPortToSpn"></a>winrmKerberosAddPortToSpn</th>
+	<td>If set to <code>true</code>, the port number (e.g. 5985) will be added to the service principal name (SPN) for which a Kerberos ticket is requested. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td></td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="cifs_winrmKerberosDebug"></a>winrmKerberosDebug</th>
 	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmKerberosUseHttpSpn"></a>winrmKerberosUseHttpSpn</th>
+	<td>If set to <code>true</code>, the protocol <code>HTTP</code> will be used in the service principal name (SPN) for which a Kerberos ticket is requested. Otherwise the protocol <code>WSMAN</code> is used. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
@@ -484,17 +496,17 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 
 * Do a quickconfig for WinRM: `winrm qc`
 * Do a quickconfig for WinRM with HTTPS: `winrm qc -transport:https`
-* Dump the complete WinRM configuration: `winrm get winrm/config`
+* View the complete WinRM configuration: `winrm get winrm/config`
 * View the listeners that have been configured: `winrm enumerate winrm/config/listener`
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
 
 <a name="cifs_host_setup_krb5"></a>
-#### Kerberos - source machine
+#### Kerberos - source host
 
 __N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
 
-In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the machine from which the Overthere connections are initiated, i.e. the source machine.
+In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
 
 The simplest configuration is with a single domain/realm, and involves adding the following Java system properties to your commandline: `-Djava.security.krb5.realm=EXAMPLE.COM; -Djava.security.krb5.kdc=KDC.EXAMPLE.COM`. Replace the values with the name of your domain/realm and the hostname of your domain controller.
 
@@ -506,21 +518,33 @@ EXAMPLE.COM = {
     kdc = KDC.EXAMPLE.COM
 }
 </pre>
-and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the `krb5.conf` file you just created. Multiple entries can be added to allow the Overthere source machine to connect to multiple domains.
+and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the `krb5.conf` file you just created. Multiple entries can be added to allow the Overthere source host to connect to multiple domains.
 
 <a name="cifs_host_setup_spn"></a>
-#### Kerberos - target machines
+#### Kerberos - remote host
 
 __N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
 
-In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you add <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal names</a> for the WinRM servers you want to connect to, i.e. the target machines.
+By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#cifs_host_setup_winrm).
 
-This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any machine in the domain, as follows:
+If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
+
+This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any host in the domain, as follows:
 <pre>
-setspn -A HTTP/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
+setspn -A <em>PROTOCOL</em>/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
 </pre>
-where `ADDRESS` is the <a href="#address"><strong>address</strong></a> used to connect to the target machine, `PORT` is the <a href="#port"><strong>port</strong></a> used to connect to the target machine (usually 5985 or 5986), and `WINDOWS-HOST` is the short Windows hostname, i.e. the _CN_, of the target machine.
+where:
 
+* `PROTOCOL` is either `WSMAN` (default) or `HTTP` (if [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) has been set to `true`).
+* `ADDRESS` is the [__address__](#address) used to connect to the remote host,
+* `PORT` (optional) is the [__port__](#port) used to connect to the remote host (usually 5985 or 5986, only necessary if [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) has been set to `true`), and
+* `WINDOWS-HOST` is the short Windows hostname of the remote host.
+
+Some other useful commands:
+
+* List all service principal names configured for the domain: `setspn -Q */*` 
+* List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
+ 
 <a name="tunnelling"></a>
 ## Tunnelling
 
@@ -591,7 +615,7 @@ The Kerberos subsystem of Java cannot find the information for the realm in the 
 
 #### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
 
-The service principal name for the target machine has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for target machines](#cifs_host_setup_spn)?
+The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
 
 #### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
 
@@ -599,15 +623,15 @@ The username or the password supplied was invalid. Did you supply the correct cr
 
 #### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
 
-The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5)?
+The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
 
 #### Kerberos authentication fails with a 401 response code
 
-The Kerberos ticket is not accepted by the target machine. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for target machines](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
+The Kerberos ticket is not accepted by the remote hosts. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
 
 #### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
 
-The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source machine](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
+The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
 
 <a name="release_history"></a>
 # Release History
