@@ -99,7 +99,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     private final URL targetURL;
     private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
     private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
-    private boolean debugKerberosAuth;
+    private boolean kerberosDebug;
 
     public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
         this.username = username;
@@ -132,7 +132,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         final CallbackHandler handler = new ProvidedAuthCallback(username, password);
         Document result;
         try {
-            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(debugKerberosAuth));
+            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(kerberosDebug));
             lc.login();
 
             result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
@@ -388,12 +388,12 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         this.httpsHostnameVerifyStrategy = httpsHostnameVerifyStrategy;
     }
 
-    public boolean isDebugKerberosAuth() {
-        return debugKerberosAuth;
+    public boolean isKerberosDebug() {
+        return kerberosDebug;
     }
 
-    public void setDebugKerberosAuth(boolean debugKerberosAuth) {
-        this.debugKerberosAuth = debugKerberosAuth;
+    public void setKerberosDebug(boolean kerberosDebug) {
+        this.kerberosDebug = kerberosDebug;
     }
 
 }

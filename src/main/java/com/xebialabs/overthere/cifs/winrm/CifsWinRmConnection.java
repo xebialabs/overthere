@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_DEBUG_KERBEROS_AUTH;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_KERBEROS_DEBUG;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
@@ -57,7 +57,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_H
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_TIMEOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_DEBUG_KERBEROS_AUTH;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_DEBUG;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENVELOP_SIZE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
@@ -115,7 +115,7 @@ public class CifsWinRmConnection extends CifsConnection {
             DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
         httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
             DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
-        httpConnector.setDebugKerberosAuth(options.getBoolean(WINRM_DEBUG_KERBEROS_AUTH, DEFAULT_WINRM_DEBUG_KERBEROS_AUTH));
+        httpConnector.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
         return httpConnector;
     }
 

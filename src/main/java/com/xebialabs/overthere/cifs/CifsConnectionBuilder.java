@@ -119,18 +119,6 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM timeout in <a
-     * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
-     */
-    public static final String WINRM_TIMEMOUT = "winrmTimeout";
-
-    /**
-     * Default value (<code>PT60.000S</code>) of the {@link ConnectionOptions connection option} used to specify the
-     * WinRM timeout.
-     */
-    public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
-
-    /**
      * Name of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size in bytes to use.
      */
     public static final String WINRM_ENVELOP_SIZE = "winrmEnvelopSize";
@@ -140,29 +128,6 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      * envelop size in bytes to use.
      */
     public static final int DEFAULT_WINRM_ENVELOP_SIZE = 153600;
-
-    /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
-     */
-    public static final String WINRM_LOCALE = "winrmLocale";
-
-    /**
-     * Default value (<code>en-US</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
-     * locale to use.
-     */
-    public static final String DEFAULT_WINRM_LOCALE = "en-US";
-
-    /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether to enable debug output for
-     * Kerberos JAAS authentication.
-     */
-    public static final String WINRM_DEBUG_KERBEROS_AUTH = "winrmDebugKerberosAuth";
-
-    /**
-     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
-     * enable debug output for Kerberos JAAS authentication.
-     */
-    public static final boolean DEFAULT_WINRM_DEBUG_KERBEROS_AUTH = false;
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify the
@@ -188,6 +153,41 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      * for WinRM HTTPS connections.
      */
     public static final WinrmHttpsHostnameVerificationStrategy DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = BROWSER_COMPATIBLE;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether to enable debug output for
+     * Kerberos authentication.
+     */
+    public static final String WINRM_KERBEROS_DEBUG = "winrmKerberosDebug";
+
+    /**
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
+     * enable debug output for Kerberos authentication.
+     */
+    public static final boolean DEFAULT_WINRM_KERBEROS_DEBUG = false;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
+     */
+    public static final String WINRM_LOCALE = "winrmLocale";
+
+    /**
+     * Default value (<code>en-US</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
+     * locale to use.
+     */
+    public static final String DEFAULT_WINRM_LOCALE = "en-US";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM timeout in <a
+     * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
+     */
+    public static final String WINRM_TIMEMOUT = "winrmTimeout";
+
+    /**
+     * Default value (<code>PT60.000S</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * WinRM timeout.
+     */
+    public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
     private OverthereConnection connection;
 

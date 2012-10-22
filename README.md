@@ -337,12 +337,6 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmDebugKerberosAuth"></a>winrmDebugKerberosAuth</th>
-	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
-	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td>
-</tr>
-<tr>
 	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
 	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>.
 	<br/>
@@ -367,6 +361,12 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	See the <a href="http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e535">Apache HttpComponent HttpClient documentation</a> for more information about the hostname verifications strategies.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrmKerberosDebug"></a>winrmKerberosDebug</th>
+	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
