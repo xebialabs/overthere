@@ -78,7 +78,7 @@ public class CifsTelnetConnection extends CifsConnection {
     public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
-        checkArgument(!username.contains("@"), "Cannot connect using TELNET with an new-style Windows domain account [%s], use DOMAIN\\USER instead.", username);
+        checkArgument(!username.contains("@"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with a new-style Windows domain account [%s], use DOMAIN\\USER instead.", cifsConnectionType.toString().toLowerCase(), username);
     }
 
     @Override

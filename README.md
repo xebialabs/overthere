@@ -289,7 +289,11 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
 ### Domain accounts
-Windows domain accounts are supported for CIFS and WinRM connections. Domain accounts must be specified as `USER@FULL.DOMAIN` and not as <strike>`DOMAIN\USER`</strike>. Local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
+Windows domain accounts are supported by the CIFS+WinRM and CIFS+Telnet connection types, but the syntax of the username is different:
+
+* For the __WINRM__ connection type, domain accounts must be specified using the new-style domain syntax, e.g. `USER@FULL.DOMAIN`.
+* For the __TELNET__ connection type, domain accounts must be specified using the old-style domain synyax, e.g `DOMAIN\USER`.
+* For both connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
 __N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source machine](#cifs_host_setup_krb5) and [the target machines](#cifs_host_setup_spn).
 
@@ -390,9 +394,18 @@ If you will be connecting as an administrative user, ensure the administrative s
 <a name="cifs_host_setup_telnet"></a>
 #### TELNET
 
-To use the __TELNET__ connection type, enable the Telnet Server Service according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, you will have to install the Telnet server 	according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). After you have started the Telnet Server, open a command prompt as the __Administrator__ user and enter the command `tlntadmn config mode=stream` to enable stream mode.
+To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
 
-When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the "Allow logon locally" privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
+
+1. (Optional) If the Telnet Server is not already installed on the remote host, add it using the __Add Features Wizard__ in the __Server Manager__ console.
+
+1. (Optional) If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, install the Telnet server according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). 
+
+1. Enable the Telnet Server Service on the remote host according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. 
+
+2. After you have started the Telnet Server, open a command prompt as the __Administrator__ user on the remote host and enter the command `tlntadmn config mode=stream` to enable stream mode.
+
+When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the __Allow logon locally__ privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
 <a name="cifs_host_setup_winrm"></a>
 #### WINRM

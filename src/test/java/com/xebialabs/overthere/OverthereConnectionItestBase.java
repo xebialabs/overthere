@@ -1,28 +1,5 @@
 package com.xebialabs.overthere;
 
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
-import static junit.framework.Assert.assertFalse;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.startsWith;
-import static org.testng.Assert.fail;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -48,10 +25,37 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
+
 import com.xebialabs.overcast.CloudHost;
 import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
+
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
+import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static junit.framework.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.startsWith;
+import static org.testng.Assert.fail;
 
 /**
  * Base class for all Overthere connection itests.
@@ -123,7 +127,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
-    @Assumption(methods = { "onWindows", "onlyCifs" })
+    @Assumption(methods = { "onWindows", "onlyCifsWinrm" })
     public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccount() {
         ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
         incorrectUserNameOptions.set(USERNAME, "DOMAIN\\user");
@@ -131,7 +135,20 @@ public abstract class OverthereConnectionItestBase {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with an old-style Windows domain account");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot connect with an old-style Windows domain account"));
+            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + WINRM.toString().toLowerCase() + " connection with an old-style Windows domain account"));
+        }
+    }
+
+    @Test
+    @Assumption(methods = { "onWindows", "onlyCifsTelnet" })
+    public void shouldThrowValidationMessageWhenTryingToConnectWithNewStyleWindowsDomainAccount() {
+        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
+        incorrectUserNameOptions.set(USERNAME, "user@DOMAIN");
+        try {
+            Overthere.getConnection(protocol, incorrectUserNameOptions);
+            fail("Expected not to be able to connect with a new-style Windows domain account");
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account"));
         }
     }
 
@@ -720,6 +737,14 @@ public abstract class OverthereConnectionItestBase {
 
     public boolean onlyCifs() {
         return protocol == CIFS_PROTOCOL;
+    }
+
+    public boolean onlyCifsWinrm() {
+        return protocol == CIFS_PROTOCOL && options.get(CONNECTION_TYPE).equals(WINRM);
+    }
+
+    public boolean onlyCifsTelnet() {
+        return protocol == CIFS_PROTOCOL && options.get(CONNECTION_TYPE).equals(TELNET);
     }
 
     public boolean notSftpCygwin() {

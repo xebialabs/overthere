@@ -22,7 +22,6 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
