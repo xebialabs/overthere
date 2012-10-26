@@ -36,7 +36,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.1.0-beta-1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.1.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -46,7 +46,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.1.0-beta-1</version>
+			<version>2.1.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -640,6 +640,12 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.1.0 (26-Oct-2012)
+    * Re-enabled support for Windows domain accounts in CIFS/Telnet connections, fixes issue [#60](https://github.com/xebialabs/overthere/issues/60).
+    * Fixed Kerberos code to use WSMAN SPN by default, fixes [#58](https://github.com/xebialabs/overthere/issues/58).
+    * Added option to add the port to the SPN, fixes [#49](https://github.com/xebialabs/overthere/issues/49).
+    * Added support for Negotiate authentication (Kerberos only), fixes [#59](https://github.com/xebialabs/overthere/issues/59).
+    * Some minor code and documentation fixes.
 * Overthere 2.1.0-beta-1 (21-Sep-2012)
     * Implemented `OverthereProcess.startProcess()` for CIFS/WinRM connections, fixes issue [#54](https://github.com/xebialabs/overthere/issues/54).
     * Fixed issues [#53](https://github.com/xebialabs/overthere/issues/53) and [#55](https://github.com/xebialabs/overthere/issues/55).
