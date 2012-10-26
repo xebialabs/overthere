@@ -617,6 +617,10 @@ The Kerberos subsystem of Java cannot find the information for the realm in the 
 
 The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
 
+#### Kerberos authentication fails with the message `Message stream modified (41)`
+
+The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. In most cases this can be fixed by specifying the realm name in all caps.
+
 #### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
 
 The username or the password supplied was invalid. Did you supply the correct credentials?
