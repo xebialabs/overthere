@@ -58,7 +58,7 @@ import static java.lang.String.format;
  */
 class SshScpFile extends SshFile<SshScpConnection> {
 
-    private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}\\@?";
+    private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}[\\@\\.\\+]*";
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
