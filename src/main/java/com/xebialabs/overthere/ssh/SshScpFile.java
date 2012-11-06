@@ -62,8 +62,9 @@ import static java.lang.String.format;
  */
 class SshScpFile extends SshFile<SshScpConnection> {
 
-    private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}\\@?";
     private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = Predicates.<String>not(Predicates.<String>or(equalTo("."), equalTo("..")));
+
+    private static final String PERMISSIONS_TOKEN_PATTERN = "[d\\-]([r\\-][w\\-][xst\\-]){3}[\\@\\.\\+]*";
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
