@@ -45,6 +45,7 @@ dependencies {
   compile 'com.google.guava:guava:13.0'
   compile 'nl.javadude.scannit:scannit:1.0.2'
   compile 'org.slf4j:slf4j-api:1.6.3'
+  compile 'org.slf4j:jcl-over-slf4j:1.6.3'
 
   // SSH
   compile 'net.schmizz:sshj:0.8.1'
@@ -67,7 +68,9 @@ dependencies {
     exclude group: 'xerces', module: 'xmlParserAPIs'
     exclude group: 'xerces', module: 'xercesImpl'
   }
-  compile 'org.apache.httpcomponents:httpclient:4.2.1'
+  compile('org.apache.httpcomponents:httpclient:4.2.1') {
+    exclude group: 'commons-logging', module: 'commons-logging'
+  }
   compile 'org.apache.httpcomponents:httpcore:4.2.1'
   compile 'commons-codec:commons-codec:1.5'
 
