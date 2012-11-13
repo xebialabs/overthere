@@ -34,6 +34,7 @@ import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.connection.channel.direct.Session.Shell;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
@@ -263,9 +264,53 @@ abstract class SshConnection extends BaseOverthereConnection {
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot execute remote command \"" + cmd.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
         }
-
     }
 
+    @Override
+    public OverthereProcess startProcess(final CmdLine commandLine, boolean homeDirSafe) {
+        checkNotNull(commandLine, "Cannot execute null command line");
+        checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
+
+        CmdLine cmd = processCommandLine(commandLine);
+        try {
+          
+            // necessary to invoke PAM to create home dir
+            // Ozgur Demir <ozgurcd@gmail.com>
+            if (homeDirSafe) {
+              logger.debug("Attempting to create a shell to invoke home dir creation");
+              Shell shell = getSshClient().startSession().startShell();
+              logger.debug("Shell opened, now closing it");
+              shell.close();
+              logger.debug("Shell closed");
+            }
+            
+            Session session = getSshClient().startSession();
+            if (allocatePty != null && !allocatePty.isEmpty()) {
+                if (allocateDefaultPty) {
+                    logger.warn("The " + ALLOCATE_PTY + " and " + ALLOCATE_DEFAULT_PTY
+                        + " connection options have both been set for the connection {}. Ignoring "
+                        + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
+                }
+                Matcher matcher = ptyPattern.matcher(allocatePty);
+                checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
+
+                String term = matcher.group(1);
+                int cols = Integer.valueOf(matcher.group(2));
+                int rows = Integer.valueOf(matcher.group(3));
+                int width = Integer.valueOf(matcher.group(4));
+                int height = Integer.valueOf(matcher.group(5));
+                logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[] { term, cols, rows, width, height });
+                session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer> emptyMap());
+            } else if (allocateDefaultPty) {
+                logger.debug("Allocating default PTY");
+                session.allocateDefaultPTY();
+            }
+            return createProcess(session, cmd);
+        } catch (SSHException e) {
+            throw new RuntimeIOException("Cannot execute remote command \"" + cmd.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
+        }
+    }
+    
     protected CmdLine processCommandLine(final CmdLine commandLine) {
         if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
             logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND

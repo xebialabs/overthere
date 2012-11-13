@@ -114,6 +114,8 @@ public interface OverthereConnection extends Closeable {
      *         connection.
      */
     OverthereProcess startProcess(CmdLine commandLine);
+    
+    OverthereProcess startProcess(CmdLine commandLine, boolean homeDirSafe);
 
     /**
      * Checks whether a process can be started on this connection.
