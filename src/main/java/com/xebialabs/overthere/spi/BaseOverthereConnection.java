@@ -392,6 +392,13 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     public OverthereProcess startProcess(CmdLine commandLine) {
         throw new UnsupportedOperationException("Cannot start a process on " + this);
     }
+    
+    
+    public OverthereProcess startProcess(CmdLine commandLine,
+        boolean homeDirSafe) {
+      throw new UnsupportedOperationException("Cannot start a process on " + this);
+    }
+    
 
     /**
      * Checks whether a process can be started on this connection.
@@ -410,5 +417,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     public abstract String toString();
 
     private static Logger logger = LoggerFactory.getLogger(BaseOverthereConnection.class);
+
 
 }
