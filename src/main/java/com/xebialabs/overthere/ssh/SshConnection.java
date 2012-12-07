@@ -62,15 +62,7 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static java.net.InetSocketAddress.createUnresolved;
 
 /**
@@ -99,6 +91,8 @@ abstract class SshConnection extends BaseOverthereConnection {
     protected final String passphrase;
 
     protected final boolean allocateDefaultPty;
+
+    protected final boolean openShellBeforeExecute;
 
     protected String allocatePty;
 
@@ -129,6 +123,7 @@ abstract class SshConnection extends BaseOverthereConnection {
             logger.warn("The " + ALLOCATE_DEFAULT_PTY + " connection option has been deprecated in favour of the " + ALLOCATE_PTY + " option. See https://github.com/xebialabs/overthere#ssh_allocatePty");
         }
         this.allocatePty = options.getOptional(ALLOCATE_PTY);
+        this.openShellBeforeExecute = options.getBoolean(OPEN_SHELL_BEFORE_EXECUTE, OPEN_SHELL_BEFORE_EXECUTE_DEFAULT);
     }
 
     protected void connect() {
@@ -238,6 +233,12 @@ abstract class SshConnection extends BaseOverthereConnection {
 
         CmdLine cmd = processCommandLine(commandLine);
         try {
+            if (openShellBeforeExecute) {
+                logger.debug("Creating a temporary shell to allow for deferred home dir creation.");
+                Session.Shell shell = getSshClient().startSession().startShell();
+                shell.close();
+            }
+
             Session session = getSshClient().startSession();
             if (allocatePty != null && !allocatePty.isEmpty()) {
                 if (allocateDefaultPty) {

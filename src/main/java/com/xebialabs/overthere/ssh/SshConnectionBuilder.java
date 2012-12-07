@@ -192,6 +192,19 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
 
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify whether or not to open a shell directly
+     * before executing a remote command. This may be necessary in case a user does not yet have a home directory on a
+     * machine, and this is created for him when he opens a shell.
+     */
+    public static final String OPEN_SHELL_BEFORE_EXECUTE = "openShellBeforeExecute";
+
+    /**
+     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether or
+     * not to open a shell directory before executing a command.
+     */
+    public static final boolean OPEN_SHELL_BEFORE_EXECUTE_DEFAULT = false;
+
     protected SshConnection connection;
 
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
