@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.io.Closeables;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -234,9 +235,15 @@ abstract class SshConnection extends BaseOverthereConnection {
         CmdLine cmd = processCommandLine(commandLine);
         try {
             if (openShellBeforeExecute) {
-                logger.debug("Creating a temporary shell to allow for deferred home dir creation.");
-                Session.Shell shell = getSshClient().startSession().startShell();
-                shell.close();
+                Session session = null;
+                try {
+                    logger.debug("Creating a temporary shell to allow for deferred home dir creation.");
+                    session = getSshClient().startSession();
+                    Session.Shell shell = session.startShell();
+                    shell.close();
+                } finally {
+                    Closeables.closeQuietly(session);
+                }
             }
 
             Session session = getSshClient().startSession();
