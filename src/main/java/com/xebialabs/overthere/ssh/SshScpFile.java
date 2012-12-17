@@ -159,13 +159,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
     protected boolean parseLsOutputLine(LsResults results, String outputLine) {
         StringTokenizer outputTokens = new StringTokenizer(outputLine);
         if (outputTokens.countTokens() < 5) {
-            logger.debug("Not parsing ls output line [%s] because it has less than 5 tokens", outputLine);
+            logger.debug("Not parsing ls output line [{}] because it has less than 5 tokens", outputLine);
             return false;
         }
 
         String permissions = outputTokens.nextToken();
         if (!permissionsTokenPattern.matcher(permissions).matches()) {
-            logger.debug("Not parsing ls output line [%s] because it the first token does not match the pattern for permissions [" + PERMISSIONS_TOKEN_PATTERN
+            logger.debug("Not parsing ls output line [{}] because it the first token does not match the pattern for permissions [" + PERMISSIONS_TOKEN_PATTERN
                 + "]", outputLine);
             return false;
         }
