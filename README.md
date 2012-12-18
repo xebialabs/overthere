@@ -231,6 +231,10 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_openShellBeforeExecute"></a>openShellBeforeExecute</th>
+	<td>If set to <code>true</code>, Overthere will open and close a shell immediately before executing a command on an ssh host. This is useful when the connecting user does not yet have a homedir, but this is created for him on the fly on the host. A setup commonly seen when user management is done through LDAP.</td>
+</tr>
 </table>
 
 <a name="ssh_host_setup"></a>
@@ -640,6 +644,9 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.1.1 (17-Dec-2012)
+    * Fixed issues [#61](https://github.com/xebialabs/overthere/issues/61) and [#62](https://github.com/xebialabs/overthere/issues/62).
+    * Added connection option [__openShellBeforeExecute__](#ssh_openShellBeforeExecute), fixes [#63](https://github.com/xebialabs/overthere/issues/63).
 * Overthere 2.1.0 (26-Oct-2012)
     * Re-enabled support for Windows domain accounts in CIFS/Telnet connections, fixes issue [#60](https://github.com/xebialabs/overthere/issues/60).
     * Fixed Kerberos code to use WSMAN SPN by default, fixes [#58](https://github.com/xebialabs/overthere/issues/58).
