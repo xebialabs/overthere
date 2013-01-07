@@ -22,12 +22,7 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -72,7 +67,7 @@ import static java.lang.String.format;
 
 /**
  * A connection to a Windows host using CIFS and WinRM.
- * 
+ *
  * Limitations:
  * <ul>
  * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator

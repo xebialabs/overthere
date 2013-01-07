@@ -22,22 +22,9 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -122,10 +109,10 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
 
     /**
      * Perform the JAAS login and run the command within a privileged scope.
-     * 
+     *
      * @param privilegedSendMessage
      *            the PrivilegedSendMessage
-     * 
+     *
      * @return The result Document
      */
     private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
@@ -182,38 +169,68 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
                 request.setHeader("SOAPAction", soapAction.getValue());
             }
 
-            final String requestDocAsString = toString(requestDocument);
-            logger.trace("Sending request to {}", getTargetURL());
-            logger.trace("Request body: {} {}", getTargetURL(), requestDocAsString);
+            final String requestBody = toString(requestDocument);
+            logger.trace("Request:\nPOST {}\n{}", getTargetURL(), requestBody);
 
-            final HttpEntity entity = createEntity(requestDocAsString);
+            final HttpEntity entity = createEntity(requestBody);
             request.setEntity(entity);
 
             final HttpResponse response = client.execute(request, context);
 
-            if (logger.isTraceEnabled()) {
-                for (final Header header : response.getAllHeaders()) {
-                    logger.trace("Header {}: {}", header.getName(), header.getValue());
-                }
-            }
+            logResponseHeaders(response);
 
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new WinRMRuntimeIOException("Response code was " + response.getStatusLine().getStatusCode());
+                throw new WinRMRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
+                    getTargetURL(), response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
             }
-            final String text = handleResponse(response, context);
-            EntityUtils.consume(response.getEntity());
-            logger.trace("Response body: {}", text);
 
-            return DocumentHelper.parseText(text);
+            final String responseBody = handleResponse(response, context);
+            Document responseDocument = DocumentHelper.parseText(responseBody);
+
+            logDocument("Response body:", responseDocument);
+
+            return responseDocument;
         } catch (BlankValueRuntimeException exc) {
             throw exc;
         } catch (InvalidFilePathRuntimeException exc) {
             throw exc;
+        } catch (WinRMRuntimeIOException exc) {
+            throw exc;
         } catch (Exception exc) {
-            throw new WinRMRuntimeIOException("Send message on " + getTargetURL() + " error ", requestDocument, null, exc);
+            throw new WinRMRuntimeIOException("Error when sending request to " + getTargetURL(), requestDocument, null, exc);
         } finally {
             client.getConnectionManager().shutdown();
         }
+    }
+
+    private static void logResponseHeaders(final HttpResponse response) {
+        if (!logger.isTraceEnabled()) {
+            return;
+        }
+
+        StringBuilder headers = new StringBuilder();
+        for (final Header header : response.getAllHeaders()) {
+            headers.append(header.getName()).append(": ").append(header.getValue()).append("\n");
+        }
+
+        logger.trace("Response headers:\n{}", headers);
+    }
+
+    private static void logDocument(String caption, final Document document) {
+        if (!logger.isTraceEnabled()) {
+            return;
+        }
+
+        StringWriter text = new StringWriter();
+        try {
+            XMLWriter writer = new XMLWriter(text, OutputFormat.createPrettyPrint());
+            writer.write(document);
+            writer.close();
+        } catch (IOException e) {
+            logger.trace("{}\n{}", caption, e);
+        }
+
+        logger.trace("{}\n{}", caption, text);
     }
 
     /**
@@ -266,7 +283,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith(
             "application/soap+xml")) {
             throw new WinRMRuntimeIOException(
-                "Send message on " + getTargetURL() + " error: Unexpected content-type: " + entity
+                "Error when sending request to " + getTargetURL() + "; Unexpected content-type: " + entity
                     .getContentType());
         }
 
@@ -282,6 +299,7 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         } finally {
             Closeables.closeQuietly(reader);
             Closeables.closeQuietly(is);
+            EntityUtils.consume(response.getEntity());
         }
 
         return writer.toString();
@@ -319,10 +337,10 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     /**
      * Create the HttpEntity to send in the request.
      */
-    protected HttpEntity createEntity(final String requestDocAsString) throws UnsupportedEncodingException {
+    protected HttpEntity createEntity(final String requestDocAsString) {
         return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
     }
-    
+
     public URL getTargetURL() {
         return targetURL;
     }

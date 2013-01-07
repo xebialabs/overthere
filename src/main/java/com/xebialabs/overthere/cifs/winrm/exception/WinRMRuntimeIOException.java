@@ -54,7 +54,10 @@ public class WinRMRuntimeIOException extends RuntimeIOException {
 
     @Override
     public String getMessage() {
-        return String.format("%s, document in %s, document out %s,", super.getMessage(), toString(in), toString(out));
+        if (in == null && out == null) {
+            return super.getMessage();
+        }
+        return String.format("%s\nRequest:\n%s\nResponse:\n%s", super.getMessage(), toString(in), toString(out));
     }
 
     private static String toString(Document doc) {
