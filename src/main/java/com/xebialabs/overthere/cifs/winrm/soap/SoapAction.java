@@ -24,7 +24,7 @@ package com.xebialabs.overthere.cifs.winrm.soap;
 
 public enum SoapAction {
 
-    COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell");
+    COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SIGNAL("Signal"), SHELL("Shell"), SEND("Send");
 
     private final String value;
 
@@ -33,6 +33,11 @@ public enum SoapAction {
     }
 
     public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
         return value;
     }
 }

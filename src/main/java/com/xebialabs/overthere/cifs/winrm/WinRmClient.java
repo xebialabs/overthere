@@ -25,6 +25,7 @@ package com.xebialabs.overthere.cifs.winrm;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,14 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
-import com.xebialabs.overthere.cifs.winrm.soap.Action;
-import com.xebialabs.overthere.cifs.winrm.soap.BodyBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.HeaderBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.OptionSet;
-import com.xebialabs.overthere.cifs.winrm.soap.ResourceURI;
-import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
-import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
+import com.xebialabs.overthere.cifs.winrm.soap.*;
 
 import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WIN_SHELL;
 
@@ -81,7 +75,7 @@ public class WinRmClient {
         shellId = createShell();
         commandId = executeCommand(command);
     }
-    
+
     private String createShell() {
         logger.debug("createShell");
 
@@ -97,7 +91,7 @@ public class WinRmClient {
     }
 
     private String executeCommand(String command) {
-        logger.debug("runCommand shellId {} command {}", shellId, command);
+        logger.debug("Run command. ShellId: {}; Command: {}", shellId, command);
         final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", NS_WIN_SHELL));
 
         String encoded = "\"" + command + "\"";
@@ -114,7 +108,7 @@ public class WinRmClient {
 
 
     public boolean receiveOutput(OutputStream stdout, OutputStream stderr) throws IOException {
-        logger.debug("receiveOutput shellId {} commandId {} ", shellId, commandId);
+        logger.debug("Receiving output. ShellId {}; CommandId {} ", shellId, commandId);
         final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", NS_WIN_SHELL));
         bodyContent.addElement(QName.get("DesiredStream", NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
         final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
@@ -131,9 +125,9 @@ public class WinRmClient {
         /*
          * We may need to get additional output if the stream has not finished. The CommandState will change from
          * Running to Done like so:
-         * 
+         *
          * @example
-         * 
+         *
          * from... <rsp:CommandState CommandId="..."
          * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Running"/> to...
          * <rsp:CommandState CommandId="..."
@@ -147,6 +141,20 @@ public class WinRmClient {
         }
 
         return true;
+    }
+
+    public void sendInput(String input) {
+        logger.debug("Sending input. ShellId: {}; Input: {} ", shellId, input);
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Send", NS_WIN_SHELL));
+        bodyContent.addElement(QName.get("Stream", NS_WIN_SHELL)).addAttribute("Name", "stdin").addAttribute("CommandId", commandId);
+        try {
+            bodyContent.addText(Base64.encodeBase64String(input.getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("Can't encode String as UTF-8", e);
+        }
+        final Document requestDocument = getRequestDocument(Action.WS_SEND, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
+
+        Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
     }
 
     public void signal() {
