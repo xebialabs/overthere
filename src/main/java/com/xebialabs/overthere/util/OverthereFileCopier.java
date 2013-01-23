@@ -22,6 +22,8 @@
  */
 package com.xebialabs.overthere.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -155,12 +157,12 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
             ByteStreams.copy(new InputSupplier<InputStream>() {
                 @Override
                 public InputStream getInput() throws IOException {
-                    return srcFile.getInputStream();
+                    return new BufferedInputStream(srcFile.getInputStream());
                 }
             }, new OutputSupplier<OutputStream>() {
                 @Override
                 public OutputStream getOutput() throws IOException {
-                    return dstFile.getOutputStream();
+                    return new BufferedOutputStream(dstFile.getOutputStream());
                 }
             });
         } catch (IOException exc) {
