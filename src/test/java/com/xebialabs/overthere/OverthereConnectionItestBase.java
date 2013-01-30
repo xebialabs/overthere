@@ -28,7 +28,7 @@ import com.google.common.io.OutputSupplier;
 
 import com.xebialabs.overcast.CloudHost;
 import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -41,10 +41,12 @@ import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
 import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -167,8 +169,8 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = "onUnix")
     public void shouldExecuteSimpleCommandOnUnix() {
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("ls", "-ld", "/tmp/."));
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(), CmdLine.build("ls", "-ld", "/tmp/."));
         assertThat(res, equalTo(0));
         if (captured.getOutputLines().size() == 2) {
             // When using ssh_interactive_sudo, the first line may contain a password prompt.
@@ -185,8 +187,8 @@ public abstract class OverthereConnectionItestBase {
     public void shouldExecuteSimpleCommandInWorkingDirectoryOnUnix() {
 
         connection.setWorkingDirectory(connection.getFile("/etc"));
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(consoleHandler(), captured), CmdLine.build("pwd"));
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(), CmdLine.build("pwd"));
         assertThat(res, equalTo(0));
         assertThat(captured.getOutput(), containsString("/etc"));
     }
@@ -194,8 +196,8 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = "onUnix")
     public void shouldCaptureLastLineOfSimpleCommandOnUnix() {
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(consoleHandler(), captured),
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(),
             CmdLine.build("echo", "-n", "line", "that", "does", "not", "end", "in", "a", "newline"));
         assertThat(res, equalTo(0));
         if (captured.getOutputLines().size() > 1) {
@@ -235,8 +237,8 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = "onWindows")
     public void shouldExecuteSimpleCommandOnWindows() {
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("ipconfig"));
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), captured), loggingErrorHandler(logger), CmdLine.build("ipconfig"));
         assertThat(res, equalTo(0));
         assertThat(captured.getOutput(), not(containsString("ipconfig")));
         assertThat(captured.getOutput(), containsString("Windows IP Configuration"));
@@ -246,8 +248,8 @@ public abstract class OverthereConnectionItestBase {
     @Assumption(methods = { "onWindows", "notSftpCygwin" })
     public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsNotWithSftpCygwin() {
         connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("cd"));
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), captured), loggingErrorHandler(logger), CmdLine.build("cd"));
         assertThat(res, equalTo(0));
         assertThat(captured.getOutput().toUpperCase(), containsString("C:\\WINDOWS"));
     }
@@ -256,8 +258,8 @@ public abstract class OverthereConnectionItestBase {
     @Assumption(methods = { "onWindows", "onlySftpCygwin" })
     public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsWithSftpCygwin() {
         connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
-        CapturingOverthereProcessOutputHandler captured = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), captured), CmdLine.build("pwd"));
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), captured), loggingErrorHandler(logger), CmdLine.build("pwd"));
         assertThat(res, equalTo(0));
         assertThat(captured.getOutput().toLowerCase(), containsString("/cygdrive/c/windows"));
     }
@@ -289,8 +291,8 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = { "onWindows" })
     public void shouldExecuteCommandWithArgumentOnWindows() {
-        CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("ipconfig", "/all"));
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("ipconfig", "/all"));
         assertThat(res, equalTo(0));
         assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
     }
@@ -298,8 +300,8 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = { "onWindows" })
     public void shouldExecuteBatchFileOnWindows() {
-        CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("C:\\overthere\\helloworld.bat"));
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("C:\\overthere\\helloworld.bat"));
         assertThat(res, equalTo(0));
         assertThat(capturingHandler.getOutput(), containsString("Hello World"));
     }
@@ -316,8 +318,8 @@ public abstract class OverthereConnectionItestBase {
             outputStream.close();
         }
 
-        CapturingOverthereProcessOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingHandler(logger), capturingHandler), CmdLine.build("C:\\overthere\\typefile.bat", tempFile.getPath()));
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("C:\\overthere\\typefile.bat", tempFile.getPath()));
         assertThat(res, equalTo(0));
         assertThat(capturingHandler.getOutput(), containsString(content));
     }
@@ -325,7 +327,7 @@ public abstract class OverthereConnectionItestBase {
     @Test
     @Assumption(methods = { "onWindows" })
     public void shouldNotExecuteIncorrectCommandOnWindows() {
-        int res = connection.execute(loggingHandler(logger), CmdLine.build("this-command-does-not-exist"));
+        int res = connection.execute(loggingOutputHandler(logger), loggingErrorHandler(logger), CmdLine.build("this-command-does-not-exist"));
         assertThat(res, not(equalTo(0)));
     }
 
@@ -589,7 +591,7 @@ public abstract class OverthereConnectionItestBase {
         assertThat(fileInHomeDir.exists(), equalTo(true));
 
         // restrict access to file in home dir
-        connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
+        connection.execute(sysoutHandler(), syserrHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
 
         // read file from home dir
         byte[] contentsRead = new byte[SMALL_FILE_SIZE];
@@ -628,7 +630,7 @@ public abstract class OverthereConnectionItestBase {
         assertThat(fileInHomeDir.exists(), equalTo(true));
 
         // restrict access to file in home dir
-        connection.execute(consoleHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
+        connection.execute(sysoutHandler(), syserrHandler(), CmdLine.build("chmod", "0600", fileInHomeDir.getPath()));
 
         // copy file in home dir to local file
         File smallFileReadBack = temp.newFile("small-read-back.dat");

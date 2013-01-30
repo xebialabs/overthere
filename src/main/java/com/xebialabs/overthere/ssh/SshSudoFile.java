@@ -22,23 +22,21 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.ssh.SshSudoConnection.NOSUDO_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
 
 /**
  * A file on a host connected through SSH w/ SUDO.
@@ -63,11 +61,11 @@ class SshSudoFile extends SshScpFile {
     }
 
     @Override
-    protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
+    protected int executeCommand(OverthereExecutionOutputHandler outHandler, OverthereExecutionOutputHandler errHandler, CmdLine commandLine) {
         if (isTempFile) {
             commandLine = SshConnection.prefixWithPseudoCommand(commandLine, NOSUDO_PSEUDO_COMMAND);
         }
-        return super.executeCommand(handler, commandLine);
+        return super.executeCommand(outHandler, errHandler, commandLine);
     }
 
     @Override
@@ -158,10 +156,10 @@ class SshSudoFile extends SshScpFile {
 
             CmdLine chmodCmdLine = CmdLine.build(NOSUDO_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND, "chmod", "-R", "go+rX", remoteFile.getPath());
 
-            CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-            int errno = connection.execute(multiHandler(loggingHandler(logger), capturedOutput), chmodCmdLine);
+            CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
+            int errno = connection.execute(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedOutput), chmodCmdLine);
             if (errno != 0) {
-                throw new RuntimeIOException("Cannot set permissions on file " + this + " to go+rX: " + capturedOutput.getError() + " (errno=" + errno + ")");
+                throw new RuntimeIOException("Cannot set permissions on file " + this + " to go+rX: " + capturedOutput.getOutput() + " (errno=" + errno + ")");
             }
         }
     }
@@ -172,19 +170,19 @@ class SshSudoFile extends SshScpFile {
         boolean sudoPreserveAttributesOnCopyToTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile;
         CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", sudoPreserveAttributesOnCopyToTempFile ? "-pr" : "-r", this.getPath(), tempFile.getPath());
 
-        CapturingOverthereProcessOutputHandler cpCapturedOutput = CapturingOverthereProcessOutputHandler.capturingHandler();
-        int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cpCmdLine);
+        CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
+        int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
         if (cpResult != 0) {
-            String errorMessage = cpCapturedOutput.getAll();
+            String errorMessage = cpCapturedOutput.getOutput();
             throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
         }
 
         CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", "-R", "go+rX", tempFile.getPath());
 
-        CapturingOverthereProcessOutputHandler chmodCapturedOutput = capturingHandler();
-        int chmodResult = getConnection().execute(multiHandler(loggingHandler(logger), chmodCapturedOutput), chmodCmdLine);
+        CapturingOverthereExecutionOutputHandler chmodCapturedOutput = capturingHandler();
+        int chmodResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), chmodCapturedOutput), multiHandler(loggingErrorHandler(logger), chmodCapturedOutput), chmodCmdLine);
         if (chmodResult != 0) {
-            String errorMessage = chmodCapturedOutput.getAll();
+            String errorMessage = chmodCapturedOutput.getOutput();
             throw new RuntimeIOException("Cannot grant group and other read and execute permissions (chmod -R go+rX) to file " + tempFile
                 + " before download: " + errorMessage);
         }
@@ -203,11 +201,11 @@ class SshSudoFile extends SshScpFile {
         cpCmdLine.addArgument(tempFile.getPath());
         cpCmdLine.addArgument(targetPath);
 
-        CapturingOverthereProcessOutputHandler cpCapturedOutput = capturingHandler();
-        int cpResult = getConnection().execute(multiHandler(loggingHandler(logger), cpCapturedOutput), cpCmdLine);
+        CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
+        int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
 
         if (cpResult != 0) {
-            String errorMessage = cpCapturedOutput.getAll();
+            String errorMessage = cpCapturedOutput.getOutput();
             throw new RuntimeIOException("Cannot copy temporary file " + tempFile + " to actual file " + this + " after upload: " + errorMessage);
         }
     }

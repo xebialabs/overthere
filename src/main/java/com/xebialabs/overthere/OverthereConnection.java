@@ -102,8 +102,31 @@ public interface OverthereConnection extends Closeable {
      * @param commandLine
      *            the command line to execute.
      * @return the exit value of the executed command. Usually 0 on successful execution.
+     * @deprecated use {@link #execute(OverthereExecutionOutputHandler, OverthereExecutionOutputHandler, CmdLine)}
      */
     int execute(OverthereProcessOutputHandler handler, CmdLine commandLine);
+
+    /**
+     * Executes a command with its arguments and prints all the output on stdout and stderr to the console.
+     *
+     * @param commandLine
+     *            the command line to execute.
+     * @return the exit value of the executed command. Usually 0 on successful execution.
+     */
+    int execute(CmdLine commandLine);
+
+    /**
+     * Executes a command with its arguments.
+     *
+     * @param stdoutHandler
+     *            the handler that will be invoked when the executed command generated output on stdout.
+     * @param stderrHandler
+     *            the handler that will be invoked when the executed command generated output on stderr.
+     * @param commandLine
+     *            the command line to execute.
+     * @return the exit value of the executed command. Usually 0 on successful execution.
+     */
+    int execute(OverthereExecutionOutputHandler stdoutHandler, OverthereExecutionOutputHandler stderrHandler, CmdLine commandLine);
 
     /**
      * Starts a command with its argument and returns control to the caller.

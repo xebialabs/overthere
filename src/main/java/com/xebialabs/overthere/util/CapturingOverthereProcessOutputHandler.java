@@ -32,7 +32,9 @@ import static java.util.Collections.unmodifiableList;
 
 /**
  * An implementation of the {@link OverthereProcessOutputHandler} that captures the output in variables.
+ * @deprecated See {@link CapturingOverthereExecutionOutputHandler}
  */
+@Deprecated
 public final class CapturingOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
     private final List<String> outputLines = new ArrayList<String>();
@@ -119,7 +121,9 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
      * Creates a {@link CapturingOverthereProcessOutputHandler}.
      * 
      * @return the created {@link CapturingOverthereProcessOutputHandler}.
+     * @deprecated Use {@link com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler#capturingHandler()}
      */
+    @Deprecated
     public static CapturingOverthereProcessOutputHandler capturingHandler() {
         return new CapturingOverthereProcessOutputHandler();
     }

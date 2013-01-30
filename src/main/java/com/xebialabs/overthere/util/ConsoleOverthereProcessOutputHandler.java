@@ -27,7 +27,10 @@ import com.xebialabs.overthere.OverthereProcessOutputHandler;
 /**
  * Implementation of the {@link OverthereProcessOutputHandler} interface that prints the output to the console (
  * {@link System#out} and {@link System#err}).
+ *
+ * @deprecated See {@link ConsoleOverthereExecutionOutputHandler}
  */
+@Deprecated
 public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
     private ConsoleOverthereProcessOutputHandler() {

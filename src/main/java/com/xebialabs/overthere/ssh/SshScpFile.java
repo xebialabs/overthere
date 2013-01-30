@@ -46,15 +46,17 @@ import com.google.common.base.Predicates;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
-import static com.xebialabs.overthere.util.LoggingOverthereProcessOutputHandler.loggingHandler;
-import static com.xebialabs.overthere.util.MultipleOverthereProcessOutputHandler.multiHandler;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
+import static com.xebialabs.overthere.util.NullOverthereExecutionOutputHandler.swallow;
 import static java.lang.String.format;
 
 /**
@@ -132,8 +134,8 @@ class SshScpFile extends SshFile<SshScpConnection> {
         CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "ls", "-ld", getPath());
 
         LsResults results = new LsResults();
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(capturedOutput, lsCmdLine);
+        CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
+        int errno = executeCommand(capturedOutput, swallow(), lsCmdLine);
         if (errno == 0) {
             for (int i = capturedOutput.getOutputLines().size() - 1; i >= 0; i--) {
                 if (parseLsOutputLine(results, capturedOutput.getOutputLines().get(i))) {
@@ -272,14 +274,15 @@ class SshScpFile extends SshFile<SshScpConnection> {
         // pseudo-tty. Long format is NOT what we want here.
         CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND, "ls", "-a1", getPath());
 
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), lsCmdLine);
+        CapturingOverthereExecutionOutputHandler capturedStdout = capturingHandler();
+        CapturingOverthereExecutionOutputHandler capturedStderr = capturingHandler();
+        int errno = executeCommand(multiHandler(loggingOutputHandler(logger), capturedStdout), multiHandler(loggingErrorHandler(logger), capturedStderr), lsCmdLine);
         if (errno != 0) {
-            throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
+            throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedStderr.getOutput() + " (errno=" + errno + ")");
         }
 
         List<OverthereFile> files = newArrayList();
-        for (String lsLine : capturedOutput.getOutputLines()) {
+        for (String lsLine : capturedStdout.getOutputLines()) {
             // Filter out the '.' and '..'
             if (NOT_SELF_OR_PARENT_DIR.apply(lsLine)) {
                 files.add(connection.getFile(this, lsLine));
@@ -310,12 +313,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         }
         mkdirCmdLine.addArgument(getPath());
 
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), mkdirCmdLine);
-        if (errno != 0) {
-            throw new RuntimeIOException(
-                format("Cannot create directory or -ies %s: %s (errno=%d)", this, capturedOutput.getError(), errno));
-        }
+        executeAndThrowOnErrorCode(mkdirCmdLine, "Cannot create directory or -ies " + this);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Created directory " + this + " (with options:" + Joiner.on(' ').join(mkdirOptions));
@@ -330,12 +328,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             SshScpFile sshScpDestFile = (SshScpFile) dest;
             if (sshScpDestFile.getConnection() == getConnection()) {
                 CmdLine mvCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "mv", getPath(), sshScpDestFile.getPath());
-
-                CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-                int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), mvCmdLine);
-                if (errno != 0) {
-                    throw new RuntimeIOException("Cannot rename file/directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-                }
+                executeAndThrowOnErrorCode(mvCmdLine, "Cannot rename file/directory " + this);
             } else {
                 throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
                     + " to file/directory "
@@ -353,12 +346,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         logger.debug("Setting execute permission on {} to {}", this, executable);
 
         CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", executable ? "a+x" : "a-x", getPath());
-
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), chmodCmdLine);
-        if (errno != 0) {
-            throw new RuntimeIOException("Cannot set execute permission on file " + this + " to " + executable + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-        }
+        executeAndThrowOnErrorCode(chmodCmdLine, "Cannot set execute permission on file " + this + " to " + executable);
     }
 
     @Override
@@ -366,12 +354,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         logger.debug("Deleting directory {}", this);
 
         CmdLine rmdirCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rmdir", getPath());
-
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmdirCmdLine);
-        if (errno != 0) {
-            throw new RuntimeIOException("Cannot delete directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-        }
+        executeAndThrowOnErrorCode(rmdirCmdLine, "Cannot delete directory " + this);
     }
 
     @Override
@@ -380,11 +363,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-f", getPath());
 
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmCmdLine);
-        if (errno != 0) {
-            throw new RuntimeIOException("Cannot delete file " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-        }
+        executeAndThrowOnErrorCode(rmCmdLine, "Cannot delete file " + this);
     }
 
     @Override
@@ -393,11 +372,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "rm", "-rf", getPath());
 
-        CapturingOverthereProcessOutputHandler capturedOutput = capturingHandler();
-        int errno = executeCommand(multiHandler(loggingHandler(logger), capturedOutput), rmCmdLine);
-        if (errno != 0) {
-            throw new RuntimeIOException("Cannot recursively delete file or directory " + this + ": " + capturedOutput.getError() + " (errno=" + errno + ")");
-        }
+        executeAndThrowOnErrorCode(rmCmdLine, "Cannot recursively delete file or directory " + this);
     }
 
     @Override
@@ -416,6 +391,14 @@ class SshScpFile extends SshFile<SshScpConnection> {
             }
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot copy " + source + " to " + this + ": " + e.toString(), e);
+        }
+    }
+
+    private void executeAndThrowOnErrorCode(CmdLine mkdirCmdLine, String message) {
+        CapturingOverthereExecutionOutputHandler capturedStderr = capturingHandler();
+        int errno = executeCommand(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedStderr), mkdirCmdLine);
+        if (errno != 0) {
+            throw new RuntimeIOException(format("%s: %s (errno=%d)", message, capturedStderr.getOutput(), errno));
         }
     }
 

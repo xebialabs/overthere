@@ -24,10 +24,7 @@ package com.xebialabs.overthere.ssh;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 /**
@@ -106,8 +103,8 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
     protected abstract void deleteDirectory();
 
-    protected int executeCommand(OverthereProcessOutputHandler handler, CmdLine commandLine) {
-        return connection.execute(handler, commandLine);
+    protected int executeCommand(OverthereExecutionOutputHandler outHandler, OverthereExecutionOutputHandler errHandler, CmdLine commandLine) {
+        return connection.execute(outHandler, errHandler, commandLine);
     }
 
     @Override

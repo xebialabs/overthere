@@ -24,7 +24,9 @@ package com.xebialabs.overthere;
 
 /**
  * Handler that gets sent the output (stdout and stderr) of an {@link OverthereProcess}.
+ * @deprecated Replaced with the {@link OverthereExecutionOutputHandler}
  */
+@Deprecated
 public interface OverthereProcessOutputHandler {
 
     /**

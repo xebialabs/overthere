@@ -28,7 +28,10 @@ import org.slf4j.Logger;
 /**
  * Implementation of the {@link OverthereProcessOutputHandler} interface that sends the output to the specified logger.
  * Regular output will be logged at the INFO level, error output at the ERROR level.
+ *
+ * @deprecated See {@link LoggingOverthereExecutionOutputHandler}
  */
+@Deprecated
 public class LoggingOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
     private final Logger logger;
@@ -58,7 +61,9 @@ public class LoggingOverthereProcessOutputHandler implements OverthereProcessOut
      * @param logger
      *            the logger to send the output to.
      * @return the created {@link LoggingOverthereProcessOutputHandler}.
+     * @deprecated Use {@link LoggingOverthereExecutionOutputHandler#loggingOutputHandler(org.slf4j.Logger)} or {@link LoggingOverthereExecutionOutputHandler#loggingErrorHandler(org.slf4j.Logger)}}.
      */
+    @Deprecated
     public static LoggingOverthereProcessOutputHandler loggingHandler(final Logger logger) {
         return new LoggingOverthereProcessOutputHandler(logger);
     }

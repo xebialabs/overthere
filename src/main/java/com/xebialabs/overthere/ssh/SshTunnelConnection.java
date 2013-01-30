@@ -156,7 +156,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
     }
 
     @Override
-    public int execute(OverthereProcessOutputHandler handler, CmdLine commandLine) {
+    public int execute(final OverthereExecutionOutputHandler stdoutHandler, final OverthereExecutionOutputHandler stderrHandler, final CmdLine commandLine) {
         throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
     }
 

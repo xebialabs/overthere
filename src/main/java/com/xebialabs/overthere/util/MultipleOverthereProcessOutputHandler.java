@@ -27,7 +27,10 @@ import com.xebialabs.overthere.OverthereProcessOutputHandler;
 /**
  * Implementation of the {@link OverthereProcessOutputHandler} interface that sends the output to one or more other
  * {@link OverthereProcessOutputHandler handlers}.
+ *
+ * @deprecated See {@link MultipleOverthereExecutionOutputHandler}
  */
+@Deprecated
 public class MultipleOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
     private final OverthereProcessOutputHandler[] handlers;
@@ -63,7 +66,9 @@ public class MultipleOverthereProcessOutputHandler implements OverthereProcessOu
      * @param handlers
      *            the handlers where the output should be sent to.
      * @return the created {@link MultipleOverthereProcessOutputHandler}.
+     * @deprecated Use {@link MultipleOverthereExecutionOutputHandler#multiHandler(com.xebialabs.overthere.OverthereExecutionOutputHandler...)}
      */
+    @Deprecated
     public static MultipleOverthereProcessOutputHandler multiHandler(final OverthereProcessOutputHandler... handlers) {
         return new MultipleOverthereProcessOutputHandler(handlers);
     }

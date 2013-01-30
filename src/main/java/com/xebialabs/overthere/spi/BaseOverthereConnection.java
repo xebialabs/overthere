@@ -22,36 +22,26 @@
  */
 package com.xebialabs.overthere.spi;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.io.Closeables.closeQuietly;
-import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
-import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_CONNECTION_TIMEOUT_MILLIS;
-import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
-import static com.xebialabs.overthere.ConnectionOptions.DEFAULT_TEMPORARY_FILE_CREATION_RETRIES;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
+import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
+import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStdout;
 import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
 import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
@@ -267,83 +257,22 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.workingDirectory = workingDirectory;
     }
 
-    /**
-     * Executes a command with its arguments.
-     * 
-     * @param handler
-     *            the handler that will be invoked when the executed command generated output.
-     * @param commandLine
-     *            the command line to execute.
-     * @return the exit value of the executed command. Usually 0 on successful execution.
-     */
     @Override
-    public int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
+    public final int execute(final CmdLine commandLine) {
+        return execute(sysoutHandler(), syserrHandler(), commandLine);
+    }
+
+    @Override
+    public int execute(final OverthereExecutionOutputHandler stdoutHandler, final OverthereExecutionOutputHandler stderrHandler, final CmdLine commandLine) {
         final OverthereProcess process = startProcess(commandLine);
         Thread stdoutReaderThread = null;
         Thread stderrReaderThread = null;
         final CountDownLatch latch = new CountDownLatch(2);
         try {
-            stdoutReaderThread = new Thread("Stdout reader thread for command " + commandLine + " on " + this) {
-                @Override
-                public void run() {
-                    StringBuilder lineBuffer = new StringBuilder();
-                    InputStreamReader stdoutReader = new InputStreamReader(process.getStdout());
-                    latch.countDown();
-                    try {
-                        int cInt = stdoutReader.read();
-                        while (cInt > -1) {
-                            char c = (char) cInt;
-                            handler.handleOutput(c);
-                            if (c != '\r' && c != '\n') {
-                                lineBuffer.append(c);
-                            }
-                            if (c == '\n') {
-                                handler.handleOutputLine(lineBuffer.toString());
-                                lineBuffer.setLength(0);
-                            }
-                            cInt = stdoutReader.read();
-                        }
-                    } catch (Exception exc) {
-                        logger.error("An exception occured while reading from stdout", exc);
-                    } finally {
-                        closeQuietly(stdoutReader);
-                        if (lineBuffer.length() > 0) {
-                            handler.handleOutputLine(lineBuffer.toString());
-                        }
-                    }
-                }
-            };
+            stdoutReaderThread = getThread("stdout", commandLine.toString(), stdoutHandler, process.getStdout(), latch);
             stdoutReaderThread.start();
 
-            stderrReaderThread = new Thread("Stderr reader thread for command " + commandLine + " on " + this) {
-                @Override
-                public void run() {
-                    StringBuilder lineBuffer = new StringBuilder();
-                    InputStreamReader stderrReader = new InputStreamReader(process.getStderr());
-                    latch.countDown();
-                    try {
-                        int readInt = stderrReader.read();
-                        while (readInt > -1) {
-                            char c = (char) readInt;
-                            if (c != '\r' && c != '\n') {
-                                lineBuffer.append(c);
-                            }
-                            if (c == '\n') {
-                                handler.handleErrorLine(lineBuffer.toString());
-                                lineBuffer.setLength(0);
-                            }
-                            readInt = stderrReader.read();
-                        }
-                    } catch (Exception exc) {
-                        logger.error("An exception occured while reading from stderr", exc);
-                    } finally {
-                        closeQuietly(stderrReader);
-                        if (lineBuffer.length() > 0) {
-                            handler.handleErrorLine(lineBuffer.toString());
-                        }
-                    }
-                }
-            };
+            stderrReaderThread = getThread("stderr", commandLine.toString(), stderrHandler, process.getStderr(), latch);
             stderrReaderThread.start();
 
             try {
@@ -358,26 +287,69 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 throw new RuntimeIOException("Execution interrupted", exc);
             }
         } finally {
-            if (stdoutReaderThread != null) {
-                try {
-                    // interrupt the stdout reader thread in case it is stuck waiting for output that will never come
-                    stdoutReaderThread.interrupt();
-                    stdoutReaderThread.join();
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            if (stderrReaderThread != null) {
-                try {
-                    // interrupt the stdout reader thread in case it is stuck waiting for output that will never come
-                    stderrReaderThread.interrupt();
-                    stderrReaderThread.join();
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                }
+            quietlyJoinThread(stdoutReaderThread);
+            quietlyJoinThread(stderrReaderThread);
+        }
+    }
+
+    private void quietlyJoinThread(final Thread thread) {
+        if (thread != null) {
+            try {
+                // interrupt the thread in case it is stuck waiting for output that will never come
+                thread.interrupt();
+                thread.join();
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
             }
         }
+    }
 
+    private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch) {
+        return new Thread(streamName + " reader thread for command " + commandLine + " on " + this) {
+            @Override
+            public void run() {
+                StringBuilder lineBuffer = new StringBuilder();
+                InputStreamReader stdoutReader = new InputStreamReader(stream);
+                latch.countDown();
+                try {
+                    int cInt = stdoutReader.read();
+                    while (cInt > -1) {
+                        char c = (char) cInt;
+                        outputHandler.handleChar(c);
+                        if (c != '\r' && c != '\n') {
+                            lineBuffer.append(c);
+                        }
+                        if (c == '\n') {
+                            outputHandler.handleLine(lineBuffer.toString());
+                            lineBuffer.setLength(0);
+                        }
+                        cInt = stdoutReader.read();
+                    }
+                } catch (Exception exc) {
+                    logger.error("An exception occured while reading from " + streamName, exc);
+                } finally {
+                    closeQuietly(stdoutReader);
+                    if (lineBuffer.length() > 0) {
+                        outputHandler.handleLine(lineBuffer.toString());
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Executes a command with its arguments.
+     * 
+     * @param handler
+     *            the handler that will be invoked when the executed command generated output.
+     * @param commandLine
+     *            the command line to execute.
+     * @return the exit value of the executed command. Usually 0 on successful execution.
+     * @deprecated use {@link BaseOverthereConnection#execute(com.xebialabs.overthere.OverthereExecutionOutputHandler, com.xebialabs.overthere.OverthereExecutionOutputHandler, com.xebialabs.overthere.CmdLine)}
+     */
+    @Override
+    public final int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
+        return execute(wrapStdout(handler), wrapStderr(handler), commandLine);
     }
 
     /**

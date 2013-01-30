@@ -3,7 +3,8 @@ package com.xebialabs.overthere.local;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
-import static com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +21,7 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.util.CapturingOverthereProcessOutputHandler;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
 /**
@@ -57,9 +58,9 @@ public class LocalConnectionTest extends OverthereConnectionItestBase {
         OverthereUtils.write("Some text", "UTF-8", tempFile);
         String lsCommand = connection.getHostOperatingSystem() == UNIX ? "ls" : "dir";
         CmdLine commandLine = CmdLine.build(lsCommand, tempFile.getParentFile().getPath());
-        CapturingOverthereProcessOutputHandler handler = capturingHandler();
+        CapturingOverthereExecutionOutputHandler handler = capturingHandler();
 
-        int res = connection.execute(handler, commandLine);
+        int res = connection.execute(handler, syserrHandler(), commandLine);
         assertThat(res, equalTo(0));
         assertThat(handler.getOutputLines().contains(tempFile.getName()), equalTo(true));
     }
