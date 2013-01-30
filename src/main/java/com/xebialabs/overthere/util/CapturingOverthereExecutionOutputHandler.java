@@ -1,11 +1,12 @@
 package com.xebialabs.overthere.util;
 
+import java.util.Collections;
 import java.util.List;
+import com.google.common.collect.Lists;
 
 import com.xebialabs.overthere.OverthereExecutionOutputHandler;
 
 import static com.google.common.base.Joiner.on;
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -13,7 +14,7 @@ import static java.util.Collections.unmodifiableList;
  */
 public class CapturingOverthereExecutionOutputHandler implements OverthereExecutionOutputHandler {
 
-    private List<String> outputLines = newArrayList();
+    private List<String> outputLines = Collections.synchronizedList(Lists.<String>newArrayList());
 
     private CapturingOverthereExecutionOutputHandler() {
     }
