@@ -70,10 +70,7 @@ import static java.lang.String.format;
  *
  * Limitations:
  * <ul>
- * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
- * access is needed.</li>
- * <li>Can only authenticate with basic authentication to WinRM</li>
- * <li>Not tested with domain accounts.</li>
+ *     <li>Cannot start a process yet. Rudimentary support is in, but it is not ready yet.</li>
  * </ul>
  */
 public class CifsWinRmConnection extends CifsConnection {
@@ -89,7 +86,7 @@ public class CifsWinRmConnection extends CifsConnection {
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper, true);
+        super(type, options, mapper, false);
         checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
         checkArgument(!username.contains("\\"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
