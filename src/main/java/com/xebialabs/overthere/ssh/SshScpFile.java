@@ -143,7 +143,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             }
 
             if (!results.exists) {
-                throw new RuntimeIOException("ls -ld " + getPath() + " returned unparseable output: " + capturedOutput.getOutput());
+                throw new RuntimeIOException("ls -ld " + getPath() + " returned " + errno + " but its output is unparseable: " + capturedOutput.getOutput());
             }
         } else {
             results.exists = false;
