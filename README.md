@@ -512,7 +512,7 @@ __N.B.:__ You will only need to configure Kerberos if you are going to use Windo
 
 In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
 
-The simplest configuration is with a single domain/realm, and involves adding the following Java system properties to your commandline: `-Djava.security.krb5.realm=EXAMPLE.COM; -Djava.security.krb5.kdc=KDC.EXAMPLE.COM`. Replace the values with the name of your domain/realm and the hostname of your domain controller.
+The simplest configuration is with a single domain/realm, and involves adding the following Java system properties to your commandline: `-Djava.security.krb5.realm=EXAMPLE.COM -Djava.security.krb5.kdc=KDC.EXAMPLE.COM`. Replace the values with the name of your domain/realm and the hostname of your domain controller.
 
 For a more complex setup, e.g. one involving multiple domains, create a file called `krb5.conf` with at least the following content: 
 
