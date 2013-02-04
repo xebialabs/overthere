@@ -178,8 +178,9 @@ class SshSudoFile extends SshScpFile {
             throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
         }
 
+        // TODO: Do we need to extract this to a separate command, or re-use the SUDO_OVERRIDE_UMASK_COMMAND?
         CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND, SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND_DEFAULT), tempFile.getPath());
+                .addTemplatedFragment(getCommand(SUDO_OVERRIDE_UMASK_COMMAND, SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT), tempFile.getPath());
 
         CapturingOverthereExecutionOutputHandler chmodCapturedOutput = capturingHandler();
         int chmodResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), chmodCapturedOutput), multiHandler(loggingErrorHandler(logger), chmodCapturedOutput), chmodCmdLine);

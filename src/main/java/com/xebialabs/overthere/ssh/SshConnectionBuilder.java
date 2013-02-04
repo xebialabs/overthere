@@ -360,36 +360,57 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_TEMP_MKDIRS_COMMAND_DEFAULT = "mkdir -p -m 1777 {0}";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to copy files from the connection temporary directory
+     * when using an SSH/SUDO connection.
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND = "sudoCopyFromTempFileCommand";
 
+    /**
+     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
+     * from the connection temporary directory while preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}
+     * using an SSH/SUDO connection.
+     */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
+    /**
+     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
+     * from the connection temporary directory while not preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}
+     * using an SSH/SUDO connection.
+     */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to override the umask after copying a file or directory
+     * when using an SSH/SUDO connection.
+     * The placeholder <code>{0}</code> is replaced with the copied file/directory.
      */
     public static final String SUDO_OVERRIDE_UMASK_COMMAND = "sudoOverrideUmaskCommand";
 
+    /**
+     * Default value (<code>chmod -R go+rX {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to override
+     * the umask after copying a file or directory when using an SSH/SUDO connection.
+     */
     public static final String SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT = "chmod -R go+rX {0}";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to copy files to the connection temporary directory when using
+     * an SSH/SUDO connection.
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND = "sudoCopyToTempFileCommand";
 
+    /**
+     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
+     * to the connection temporary directory while preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}
+     * using an SSH/SUDO connection.
+     */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
-    public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
-
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
+     * to the connection temporary directory while not preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}
+     * using an SSH/SUDO connection.
      */
-    public static final String SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND = "sudoCopyToTempFileChmodCommand";
-
-    public static final String SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND_DEFAULT = "chmod -R go+rX {0}";
+    public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
 
     protected SshConnection connection;
 
