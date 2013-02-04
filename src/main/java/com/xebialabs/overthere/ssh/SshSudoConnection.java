@@ -22,29 +22,14 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-
-import java.text.MessageFormat;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.google.common.annotations.VisibleForTesting;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 
 /**
  * A connection to a Unix host using SSH w/ SUDO.
@@ -102,27 +87,21 @@ class SshSudoConnection extends SshScpConnection {
         return super.processCommandLine(cmd);
     }
 
-    /* package-scope for unit test */ CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
+    @VisibleForTesting
+    CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
         CmdLine commandLineWithSudo = new CmdLine();
-        addSudoStatement(commandLineWithSudo);
+        commandLineWithSudo.addTemplatedFragment(sudoCommandPrefix, sudoUsername);
         if (sudoQuoteCommand) {
             commandLineWithSudo.addNested(commandLine);
         } else {
             for (CmdLineArgument a : commandLine.getArguments()) {
                 commandLineWithSudo.add(a);
                 if (a.toString(os, false).equals("|") || a.toString(os, false).equals(";")) {
-                    addSudoStatement(commandLineWithSudo);
+                    commandLineWithSudo.addTemplatedFragment(sudoCommandPrefix, sudoUsername);
                 }
             }
         }
         return commandLineWithSudo;
-    }
-
-    private void addSudoStatement(CmdLine sudoCommandLine) {
-        String prefix = MessageFormat.format(sudoCommandPrefix, sudoUsername);
-        for (String arg : prefix.split("\\s+")) {
-            sudoCommandLine.addArgument(arg);
-        }
     }
 
     @Override

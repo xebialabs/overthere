@@ -132,7 +132,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the
-     * permissions with chmod -R go+rX after uploading a file or directory with scp.
+     * permissions with chmod -R go+rX (Also see: {@link SUDO_OVERRIDE_UMASK_COMMAND}) after uploading a file or directory with scp.
      */
     public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
 
@@ -204,6 +204,192 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * not to open a shell directory before executing a command.
      */
     public static final boolean OPEN_SHELL_BEFORE_EXECUTE_DEFAULT = false;
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to delete a directory when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to delete.
+     */
+    public static final String DELETE_DIRECTORY_COMMAND = "deleteDirectoryCommand";
+
+    /**
+     * Default value (<code>rmdir {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to delete a directory using an SSH/SCP
+     * connection.
+     */
+    public static final String DELETE_DIRECTORY_COMMAND_DEFAULT = "rmdir {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to delete a file when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the file to delete.
+     */
+    public static final String DELETE_FILE_COMMAND = "deleteFileCommand";
+
+    /**
+     * Default value (<code>rm -f {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to delete a file using
+     * an SSH/SCP connection.
+     */
+    public static final String DELETE_FILE_COMMAND_DEFAULT = "rm -f {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to delete recursively when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the directory/file to delete recursively.
+     */
+    public static final String DELETE_RECURSIVELY_COMMAND = "deleteRecursivelyCommand";
+
+    /**
+     * Default value (<code>rm -rf {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to delete recursively using
+     * an SSH/SCP connection.
+     */
+    public static final String DELETE_RECURSIVELY_COMMAND_DEFAULT = "rm -rf {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to get file information when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the file/directory to stat.
+     */
+    public static final String GET_FILE_INFO_COMMAND = "getFileInfoCommand";
+
+    /**
+     * Default value (<code>ls -ld {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to get file information
+     * using an SSH/SCP connection.
+     */
+    public static final String GET_FILE_INFO_COMMAND_DEFAULT = "ls -ld {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to list files in a directory when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to list.
+     */
+    public static final String LIST_FILES_COMMAND = "listFilesCommand";
+
+    /**
+     * Default value (<code>ls -a1 {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to list files in a directory
+     * using an SSH/SCP connection.
+     * <em>NOTE:</em>: this *is* meant to be 'el es minus one'. Each file should go one a separate line, even if we create a pseudo-tty.
+     * Long format is NOT what we want here.
+     */
+    public static final String LIST_FILES_COMMAND_DEFAULT = "ls -a1 {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to create a directory when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to create.
+     */
+    public static final String MKDIR_COMMAND = "mkdirCommand";
+
+    /**
+     * Default value (<code>mkdir {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to create a directory using
+     * an SSH/SCP connection.
+     */
+    public static final String MKDIR_COMMAND_DEFAULT = "mkdir {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to create a directory tree when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to create.
+     */
+    public static final String MKDIRS_COMMAND = "mkdirsCommand";
+
+    /**
+     * Default value (<code>mkdir -p {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to create a directory tree
+     * using an SSH/SCP connection.
+     */
+    public static final String MKDIRS_COMMAND_DEFAULT = "mkdir -p {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to rename a file/directory when using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the file/directory to rename, and the placeholder <code>{1}</code> with the destination name.
+     */
+    public static final String RENAME_TO_COMMAND = "renameToCommand";
+
+    /**
+     * Default value (<code>mv {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to rename a file/directory
+     * using an SSH/SCP connection.
+     */
+    public static final String RENAME_TO_COMMAND_DEFAULT = "mv {0} {1}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to set the executable bit of a file/directory when
+     * using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the file/directory to make executable.
+     */
+    public static final String SET_EXECUTABLE_COMMAND = "setExecutableCommand";
+
+    /**
+     * Default value (<code>chmod a+x {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to make a file/directory
+     * executable using an SSH/SCP connection.
+     */
+    public static final String SET_EXECUTABLE_COMMAND_DEFAULT = "chmod a+x {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to unset the executable bit of a file/directory when
+     * using an SSH/SCP connection.
+     * The placeholder <code>{0}</code> is replaced with the file/directory to make not executable.
+     */
+    public static final String SET_NOT_EXECUTABLE_COMMAND = "setNotExecutableCommand";
+
+    /**
+     * Default value (<code>chmod a-x {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to make a file/directory
+     * not executable using an SSH/SCP connection.
+     */
+    public static final String SET_NOT_EXECUTABLE_COMMAND_DEFAULT = "chmod a-x {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to create a temporary directory when using
+     * an SSH/SUDO connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to create.
+     * <em>Note:</em> For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail.
+     * 1777 is world writable with the sticky bit set.
+     */
+    public static final String SUDO_TEMP_MKDIR_COMMAND = "sudoTempMkdirCommand";
+
+    /**
+     * Default value (<code>mkdir -m 1777 {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to create a temporary
+     * directory using an SSH/SUDO connection.
+     */
+    public static final String SUDO_TEMP_MKDIR_COMMAND_DEFAULT = "mkdir -m 1777 {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to create a temporary directory tree when using
+     * an SSH/SUDO connection.
+     * The placeholder <code>{0}</code> is replaced with the directory to create.
+     * <em>Note:</em> For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail.
+     * 1777 is world writable with the sticky bit set.
+     */
+    public static final String SUDO_TEMP_MKDIRS_COMMAND = "sudoTempMkdirsCommand";
+
+    /**
+     * Default value (<code>mkdir -p -m 1777 {0}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to create a
+     * temporary directory using an SSH/SUDO connection.
+     */
+    public static final String SUDO_TEMP_MKDIRS_COMMAND_DEFAULT = "mkdir -p -m 1777 {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     */
+    public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND = "sudoCopyFromTempFileCommand";
+
+    public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
+
+    public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     */
+    public static final String SUDO_OVERRIDE_UMASK_COMMAND = "sudoOverrideUmaskCommand";
+
+    public static final String SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT = "chmod -R go+rX {0}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     */
+    public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND = "sudoCopyToTempFileCommand";
+
+    public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
+
+    public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
+
+    /**
+     * Name of the {@link ConnectionOptions connection option} used to specify the command used to ... when using an SSH/SCP connection.
+     */
+    public static final String SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND = "sudoCopyToTempFileChmodCommand";
+
+    public static final String SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND_DEFAULT = "chmod -R go+rX {0}";
 
     protected SshConnection connection;
 

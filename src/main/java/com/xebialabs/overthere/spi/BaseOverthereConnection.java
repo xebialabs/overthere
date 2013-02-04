@@ -73,16 +73,19 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
     protected final AddressPortMapper mapper;
 
+    protected final ConnectionOptions options;
+
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
         this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
         this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
         this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
         this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT,
-            DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
+                DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
         this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
         this.canStartProcess = canStartProcess;
         this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null addres-port mapper");
+        this.options = options;
     }
 
     /**
@@ -243,6 +246,14 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     @Override
     public OverthereFile getWorkingDirectory() {
         return workingDirectory;
+    }
+
+    /**
+     * Returns the connection options used to construct this connection.
+     * @return the connection options.
+     */
+    public ConnectionOptions getOptions() {
+        return options;
     }
 
     /**

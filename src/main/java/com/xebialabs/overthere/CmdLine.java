@@ -23,6 +23,7 @@
 package com.xebialabs.overthere;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.List;
 
 import com.google.common.base.Function;
@@ -81,6 +82,21 @@ public class CmdLine implements Serializable {
         arguments.add(raw(arg));
         return this;
     }
+
+    /**
+     * Adds a {@link MessageFormat} compatible templated fragment to the command line as a series of {@link CmdLineArgument#arg(String) regular arguments}.
+     * @param template The {@link MessageFormat} compatible templated fragment.
+     * @param variables The variables that are substituted in the template.
+     * @return this.
+     */
+    public CmdLine addTemplatedFragment(String template, Object... variables) {
+        for (String arg : template.split("\\s+")) {
+            String fragment = MessageFormat.format(arg, variables);
+            addArgument(fragment);
+        }
+        return this;
+    }
+
 
     /**
      * Adds {@link CmdLineArgument#nested(CmdLine) a nested command line} to the command line.

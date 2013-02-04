@@ -32,6 +32,7 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshSudoConnection.NOSUDO_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
@@ -106,12 +107,8 @@ class SshSudoFile extends SshScpFile {
     @Override
     public void mkdir() throws RuntimeIOException {
         if (isTempFile) {
-            /*
-             * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy
-             * will fail. 1777 is world writable with the sticky bit set.
-             */
             logger.debug("Creating world-writable directory, with sticky bit (mode 01777)");
-            mkdir("-m", "1777");
+            mkdir(getCommand(SUDO_TEMP_MKDIR_COMMAND, SUDO_TEMP_MKDIR_COMMAND_DEFAULT));
         } else {
             super.mkdir();
         }
@@ -120,12 +117,8 @@ class SshSudoFile extends SshScpFile {
     @Override
     public void mkdirs() throws RuntimeIOException {
         if (isTempFile) {
-            /*
-             * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy
-             * will fail. 1777 is world writable with the sticky bit set.
-             */
             logger.debug("Creating world-writable directories, with sticky bit (mode 01777)");
-            mkdir("-p", "-m", "1777");
+            mkdir(getCommand(SUDO_TEMP_MKDIRS_COMMAND, SUDO_TEMP_MKDIRS_COMMAND_DEFAULT));
         } else {
             super.mkdirs();
         }
@@ -154,7 +147,8 @@ class SshSudoFile extends SshScpFile {
         if (sudoOverrideUmask) {
             logger.debug("Overriding umask by recursively setting permissions on files and/or directories copied with scp to be readable and executable (if needed) by group and other");
 
-            CmdLine chmodCmdLine = CmdLine.build(NOSUDO_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND, "chmod", "-R", "go+rX", remoteFile.getPath());
+            CmdLine chmodCmdLine = CmdLine.build(NOSUDO_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND)
+                    .addTemplatedFragment(getCommand(SUDO_OVERRIDE_UMASK_COMMAND, SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT), remoteFile.getPath());
 
             CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
             int errno = connection.execute(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedOutput), chmodCmdLine);
@@ -168,7 +162,14 @@ class SshSudoFile extends SshScpFile {
         logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
 
         boolean sudoPreserveAttributesOnCopyToTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile;
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp", sudoPreserveAttributesOnCopyToTempFile ? "-pr" : "-r", this.getPath(), tempFile.getPath());
+
+        String defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+        if (sudoPreserveAttributesOnCopyToTempFile) {
+            defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
+        }
+
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
+                .addTemplatedFragment(getCommand(SUDO_COPY_TO_TEMP_FILE_COMMAND, defaultCommand), this.getPath(), tempFile.getPath());
 
         CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
@@ -177,7 +178,8 @@ class SshSudoFile extends SshScpFile {
             throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
         }
 
-        CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "chmod", "-R", "go+rX", tempFile.getPath());
+        CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
+                .addTemplatedFragment(getCommand(SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND, SUDO_COPY_TO_TEMP_FILE_CHMOD_COMMAND_DEFAULT), tempFile.getPath());
 
         CapturingOverthereExecutionOutputHandler chmodCapturedOutput = capturingHandler();
         int chmodResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), chmodCapturedOutput), multiHandler(loggingErrorHandler(logger), chmodCapturedOutput), chmodCmdLine);
@@ -196,10 +198,13 @@ class SshSudoFile extends SshScpFile {
             targetPath = this.getParentFile().getPath();
         }
 
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND, "cp");
-        cpCmdLine.addArgument(((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile ? "-pr" : "-r");
-        cpCmdLine.addArgument(tempFile.getPath());
-        cpCmdLine.addArgument(targetPath);
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND);
+
+        String defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+        if (((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile) {
+            defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
+        }
+        cpCmdLine.addTemplatedFragment(getCommand(SUDO_COPY_FROM_TEMP_FILE_COMMAND, defaultCommand), tempFile.getPath(), targetPath);
 
         CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
