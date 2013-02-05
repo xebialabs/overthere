@@ -236,7 +236,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<td>If set to <code>true</code>, Overthere will open and close a shell immediately before executing a command on an ssh host. This is useful when the connecting user does not yet have a homedir, but this is created for him on the fly on the host. A setup commonly seen when user management is done through LDAP.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="ssh_deleteDirectoryCommand">deleteDirectoryCommand</a></th>
+	<th align="left" valign="top"><a name="ssh_deleteDirectoryCommand"></a>deleteDirectoryCommand</th>
 	<td>The command to be used when deleting a directory. The string <code>{0}</code> is replaced with the value of the path of the directory to be deleted. The default value is <code>rmdir {0}</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
