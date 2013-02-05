@@ -62,7 +62,7 @@ class SshSudoOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         tempFileOutputStream.close();
-        destFile.copyfromTempFile(tempFile);
+        destFile.copyFromTempFile(tempFile);
     }
 
 }

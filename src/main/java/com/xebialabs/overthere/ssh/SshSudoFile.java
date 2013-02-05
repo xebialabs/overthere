@@ -138,7 +138,7 @@ class SshSudoFile extends SshScpFile {
                 throw new RuntimeIOException("Cannot copy " + source + " to " + this, e);
             }
             overrideUmask(tempFile);
-            copyfromTempFile(tempFile);
+            copyFromTempFile(tempFile);
         }
     }
 
@@ -191,7 +191,7 @@ class SshSudoFile extends SshScpFile {
         }
     }
 
-    void copyfromTempFile(OverthereFile tempFile) {
+    void copyFromTempFile(OverthereFile tempFile) {
         logger.debug("Copying temporary file {} to actual file {} after upload", tempFile, this);
 
         String targetPath = this.getPath();
