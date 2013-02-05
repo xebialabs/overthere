@@ -197,7 +197,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"></a>sudoCommandPrefix</th>
-	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the vaulue of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>.
+	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the value of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
@@ -234,6 +234,96 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 <tr>
 	<th align="left" valign="top"><a name="ssh_openShellBeforeExecute"></a>openShellBeforeExecute</th>
 	<td>If set to <code>true</code>, Overthere will open and close a shell immediately before executing a command on an ssh host. This is useful when the connecting user does not yet have a homedir, but this is created for him on the fly on the host. A setup commonly seen when user management is done through LDAP.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_deleteDirectoryCommand">deleteDirectoryCommand</a></th>
+	<td>The command to be used when deleting a directory. The string <code>{0}</code> is replaced with the value of the path of the directory to be deleted. The default value is <code>rmdir {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_deleteFileCommand">deleteFileCommand</a></th>
+	<td>The command to be used when deleting a file. The string <code>{0}</code> is replaced with the value of the path of the file to be deleted. The default value is <code>rm -f {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_deleteRecursivelyCommand">deleteRecursivelyCommand</a></th>
+	<td>The command to be used when deleting a directory recursively. The string <code>{0}</code> is replaced with the value of the path of the directory to be deleted. The default value is <code>rm -rf {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_getFileInfoCommand">getFileInfoCommand</a></th>
+	<td>The command to be used when getting the metadata of a file/directory. The string <code>{0}</code> is replaced with the value of the path of the file/directory. The default value is <code>ls -ld {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_listFilesCommand">listFilesCommand</a></th>
+	<td>The command to be used when listing the contents of a directory. The string <code>{0}</code> is replaced with the value of the path of the directory to be listed. The default value is <code>ls -a1 {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_mkdirCommand">mkdirCommand</a></th>
+	<td>The command to be used when creating a directory. The string <code>{0}</code> is replaced with the value of the path of the directory to be created. The default value is <code>mkdir {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_mkdirsCommand">mkdirsCommand</a></th>
+	<td>The command to be used when creating a directory tree. The string <code>{0}</code> is replaced with the value of the path of the directory tree to be created. The default value is <code>mkdir -p {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_renameToCommand">renameToCommand</a></th>
+	<td>The command to be used when renaming a file/directory. The string <code>{0}</code> is replaced with the value of the path of the file/directory to be renamed. The string <code>{1}</code> is replaced with the value of the new name. The default value is <code>mv {0} {1}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_setExecutableCommand">setExecutableCommand</a></th>
+	<td>The command to be used when making a file executable. The string <code>{0}</code> is replaced with the value of the path of the file/directory affected. The default value is <code>chmod a+x {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_setNotExecutableCommand">setNotExecutableCommand</a></th>
+	<td>The command to be used when making a file non-executable. The string <code>{0}</code> is replaced with the value of the path of the file/directory affected. The default value is <code>chmod a-x {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SCP</strong>, <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoTempMkdirCommand">sudoTempMkdirCommand</a></th>
+	<td>The command to be used when creating a temporary directory as a sudo user. The directory needs to be read/writeable for both the connecting and the sudo user. The string <code>{0}</code> is replaced with the value of the path of the directory to be created. The default value is <code>mkdir -m 1777 {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoTempMkdirsCommand">sudoTempMkdirsCommand</a></th>
+	<td>The command to be used when creating a temporary directory tree as a sudo user. The directory tree needs to be read/writeable for both the connecting and the sudo user. The string <code>{0}</code> is replaced with the value of the path of the directory to be created. The default value is <code>mkdir -p -m 1777 {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoCopyFromTempFileCommand">sudoCopyFromTempFileCommand</a></th>
+	<td>The command to be used when copying files/directories from the connection temporary directory as the sudo user. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is <code>cp -pr {0} {1}</code> if <a href="#ssh_sudoPreserveAttributesOnCopyFromTempFile">ssh_sudoPreserveAttributesOnCopyFromTempFile</a> is set to true, otherwise the default value is <code>cp -r {0} {1}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoOverrideUmaskCommand">sudoOverrideUmaskCommand</a></th>
+	<td>The command to be used when setting the umask before copying a file/directory from, or after copying it to the connection temporary directory. This command ensures that the sudo user has read (and/or execute) rights for the copied file/directory. The string <code>{0}</code> is replaced with the value of the file/directory being copied. The default value is <code>chmod -R go+rX {0}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_sudoCopyToTempFileCommand">sudoCopyToTempFileCommand</a></th>
+	<td>The command to be used when copying files/directories to the connection temporary directory as the sudo user. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is <code>cp -pr {0} {1}</code> if <a href="#ssh_sudoPreserveAttributesOnCopyToTempFile">ssh_sudoPreserveAttributesOnCopyToTempFile</a> is set to true, otherwise the default value is <code>cp -r {0} {1}</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 </table>
 
