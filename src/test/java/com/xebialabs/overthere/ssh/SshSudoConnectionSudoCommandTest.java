@@ -43,6 +43,7 @@ public class SshSudoConnectionSudoCommandTest {
 
     @Test
     public void shouldUseDefaultSudoCommandPrefixIfNotConfiguredExplicitly() {
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
@@ -57,6 +58,7 @@ public class SshSudoConnectionSudoCommandTest {
     @Test
     public void shouldUseConfiguredSudoCommandPrefix() {
         connectionOptions.set(SUDO_COMMAND_PREFIX, "sx -u {0}");
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
@@ -71,6 +73,7 @@ public class SshSudoConnectionSudoCommandTest {
     @Test
     public void shouldUseConfiguredSudoCommandPrefixWithoutCurlyZero() {
         connectionOptions.set(SUDO_COMMAND_PREFIX, "sx");
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         List<CmdLineArgument> args = connection.processCommandLine(CmdLine.build("ls", "/tmp")).getArguments();
@@ -84,6 +87,7 @@ public class SshSudoConnectionSudoCommandTest {
     public void shouldQuoteOriginalCommand() {
         connectionOptions.set(SUDO_COMMAND_PREFIX, "su -u {0}");
         connectionOptions.set(SUDO_QUOTE_COMMAND, true);
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = connection.processCommandLine(CmdLine.build("ls", "/tmp"));
@@ -98,6 +102,7 @@ public class SshSudoConnectionSudoCommandTest {
 
     @Test
     public void commandWithPipeShouldHaveTwoSudoSectionsIfNotQuotingCommand() {
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
@@ -111,6 +116,7 @@ public class SshSudoConnectionSudoCommandTest {
     public void commandWithPipeShouldNotHaveTwoSudoSectionsIfQuotingCommand() {
         connectionOptions.set(SUDO_COMMAND_PREFIX, "su -u {0}");
         connectionOptions.set(SUDO_QUOTE_COMMAND, true);
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
@@ -124,6 +130,7 @@ public class SshSudoConnectionSudoCommandTest {
 
     @Test
     public void commandWithSemiColonShouldHaveTwoSudoSectionsIfNotQuotingCommand() {
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
@@ -137,6 +144,7 @@ public class SshSudoConnectionSudoCommandTest {
     public void commandWithSemiColonShouldNotHaveTwoSudoSectionsIfQuotingCommand() {
         connectionOptions.set(SUDO_COMMAND_PREFIX, "su -u {0}");
         connectionOptions.set(SUDO_QUOTE_COMMAND, true);
+        @SuppressWarnings("resource")
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");

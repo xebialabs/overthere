@@ -31,6 +31,7 @@ public class SshInteractiveSudoConnectionOptionsTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
+    @SuppressWarnings("resource")
     public void shouldNotAcceptPasswordPromptRegexWithWildcardStar() {
         ConnectionOptions options = new ConnectionOptions(connectionOptions);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, "assword*");
@@ -38,6 +39,7 @@ public class SshInteractiveSudoConnectionOptionsTest {
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
+    @SuppressWarnings("resource")
     public void shouldNotAcceptPasswordPromptRegexWithWildcardQuestion() {
         ConnectionOptions options = new ConnectionOptions(connectionOptions);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, "assword?");
@@ -45,6 +47,7 @@ public class SshInteractiveSudoConnectionOptionsTest {
     }
 
     @Test
+    @SuppressWarnings("resource")
     public void shouldAcceptPasswordPromptRegex() {
         ConnectionOptions options = new ConnectionOptions(connectionOptions);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, "[Pp]assword.*:");

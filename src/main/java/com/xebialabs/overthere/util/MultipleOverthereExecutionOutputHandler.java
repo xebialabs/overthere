@@ -23,7 +23,6 @@
 package com.xebialabs.overthere.util;
 
 import com.xebialabs.overthere.OverthereExecutionOutputHandler;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 /**
  * Implementation of the {@link com.xebialabs.overthere.OverthereExecutionOutputHandler} interface that sends the output to one or more other
