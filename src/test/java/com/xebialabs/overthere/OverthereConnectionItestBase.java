@@ -14,7 +14,6 @@ import java.util.Random;
 import nl.javadude.assumeng.Assumption;
 import nl.javadude.assumeng.AssumptionListener;
 
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -212,9 +211,8 @@ public abstract class OverthereConnectionItestBase {
         }
     }
 
-    @Test
+    @Test(enabled = false, description = "Test fails for WinRM because startProcess does not throw an UnsupportedOperationException even though canStartProcess returns false. Enable test when WinRM streaming is properly implemented.")
     @Assumption(methods = { "notSupportsProcess" })
-    @Ignore("Test fails for WinRM because canStartProcess returns false even though startProcess does not throw an UnsupportedOperationException. Enable test when WinRM streaming is properly implemented.")
     public void shouldStartProcessShouldThrowExceptionWhenNotSupported() {
         try {
             connection.startProcess(CmdLine.build("echo"));
