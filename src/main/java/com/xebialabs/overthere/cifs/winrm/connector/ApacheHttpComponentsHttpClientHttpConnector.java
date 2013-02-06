@@ -89,8 +89,21 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     private boolean kerberosDebug;
 
     public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
-        this.username = username;
-        this.enableKerberos = username.contains("@");
+        int posOfAtSign = username.indexOf('@');
+        if(posOfAtSign >= 0) {
+            String u = username.substring(0, posOfAtSign);
+            String d = username.substring(posOfAtSign + 1);
+            if(d.toUpperCase().equals(d)) {
+                this.username = username;
+            } else {
+                this.username = u + "@" + d.toUpperCase();
+                logger.warn("Fixing username [{}] to have an upper case domain name [{}]", username, this.username);
+            }
+            this.enableKerberos = true;
+        } else {
+            this.username = username;
+            this.enableKerberos = false;
+        }
         this.password = password;
         this.targetURL = targetURL;
     }
