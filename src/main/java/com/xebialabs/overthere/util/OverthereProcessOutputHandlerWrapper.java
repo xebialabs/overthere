@@ -3,6 +3,7 @@ package com.xebialabs.overthere.util;
 import com.xebialabs.overthere.OverthereExecutionOutputHandler;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
+@SuppressWarnings("deprecation")
 public class OverthereProcessOutputHandlerWrapper implements OverthereExecutionOutputHandler {
 
     private OverthereProcessOutputHandler handler;
