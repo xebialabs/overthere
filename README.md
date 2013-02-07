@@ -11,7 +11,7 @@
 	* [Connection options](#common_connection_options)
 	* [Local](#local)
 	* [SSH](#ssh)
-	* [CIFS](#cifs) (includes Telnet and WinRM)
+	* [CIFS, WinRM and Telnet](#cifs)
 	* [Tunnelling](#tunnelling)
 * [Troubleshooting Overthere](#troubleshooting)
 * [Release History](#release_history)
@@ -54,14 +54,14 @@ Binary releases of Overthere are not provided here, but you can download it [str
 <a name="building_overthere"></a>
 ## Building Overthere
 
-1. Install [Gradle 1.0](http://www.gradle.org/).
+1. Install [Gradle 1.0](http://www.gradle.org/) or up.
 1. Clone the Overthere repository.
 1. Run the command `gradle clean build`.
 
 <a name="running_the_examples"></a>
 ## Running the examples
 
-1. Install [Maven 2.2.1 or up](http://maven.apache.org/).
+1. Install [Maven 2.2.1](http://maven.apache.org/) or up.
 1. Clone the Overthere repository.
 1. Go into the `examples` directory and run the command `mvn eclipse:eclipse`.
 1. Import the `examples` project into Eclipse.
@@ -147,8 +147,73 @@ The local protocol implementation uses the local file manipulation and local pro
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
 
-See the [section on the host setup](#ssh_host_setup) for more information on how to setup the remote hosts.
+<a name="ssh_host_setup"></a>
+### Host setup
 
+<a name="ssh_host_setup_ssh"></a>
+#### SSH
+To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms two SSH servers are supported:
+
+* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
+* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
+
+__N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+
+<a name="ssh_host_setup_sftp"></a>
+#### SFTP
+
+To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
+
+<a name="ssh_host_setup_sftp_cygwin"></a>
+#### SFTP_CYGWIN
+
+To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to Cygwin-style paths, e.g. `/cygdrive/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
+
+<a name="ssh_host_setup_sftp_winsshd"></a>
+#### SFTP_WINSSHD
+
+To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
+ 
+<a name="ssh_host_setup_sudo"></a>
+<a name="ssh_host_setup_interactive_sudo"></a>
+#### SUDO and INTERACTIVE_SUDO
+
+To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
+
+* `ls`
+* `cp`
+* `mv`
+* `mkdir`
+* `rmdir`
+* `rm`
+* `chmod`
+* Any other command that you want to execute.
+    
+The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
+
+<a name="troubleshooting_ssh"></a>
+### Troubleshooting SSH connections
+
+This section lists a number of common configuration errors that can occur when using Overthere with SSH. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
+
+#### Cannot start a process on an SSH server because the server disconnects immediately.
+
+If the terminal type requested using the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option is not recognized by the SSH server, the connection will be dropped. Specifically, the `dummy` terminal type configured by [__allocateDefaultPty__] connection option, will cause OpenSSH on AIX and WinSSHD to drop the connection. Try a safe terminal type such as `vt220` instead.
+
+To verify the behaviour of your SSH server with respect to pty allocation, you can manually execute the <code>ssh</code> command with the `-T` (disable pty allocation) or `-t` (force pty allocation) flags.
+
+
+#### Command executed using SUDO or INTERACTIVE_SUDO fails with the message `sudo: sorry, you must have a tty to run sudo`
+
+The `sudo` command requires a tty to run. Set the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option to ask the SSH server allocate a pty.
+
+#### Command executed using SUDO or INTERACTIVE_SUDO appears to hang.
+
+This may be caused by the sudo command waiting for the user to enter his password to confirm his identity. There are two ways to solve this:
+
+1. Use the [`NOPASSWD`](http://www.gratisoft.us/sudo/sudoers.man.html#nopasswd_and_passwd) tag in your `/etc/sudoers` file.
+2. Use the [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo) connection type instead of the [__SUDO__](ssh_host_setup_sudo) connection type.
+3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
 <a name="ssh_connection_options"></a>
 ### Connection options
 
@@ -327,60 +392,14 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 </table>
 
-<a name="ssh_host_setup"></a>
-### Host setup
-
-<a name="ssh_host_setup_ssh"></a>
-#### SSH
-To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms two SSH servers are supported:
-
-* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
-* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
-
-__N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
-
-<a name="ssh_host_setup_sftp"></a>
-#### SFTP
-
-To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
-
-<a name="ssh_host_setup_sftp_cygwin"></a>
-#### SFTP_CYGWIN
-
-To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.no/i2/copssh) on your Windows host. In the COPSSH control panel, add the users as which you want to connect and select _Linux shell and Sftp_ in the _shell_ dropdown box. Check _Password authentication_ and/or _Public key authentication_ depending on the authentication method you want to use.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to Cygwin-style paths, e.g. `/cygdrive/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
-
-<a name="ssh_host_setup_sftp_winsshd"></a>
-#### SFTP_WINSSHD
-
-To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
- 
-<a name="ssh_host_setup_sudo"></a>
-<a name="ssh_host_setup_interactive_sudo"></a>
-#### SUDO and INTERACTIVE_SUDO
-
-To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
-
-* `ls`
-* `cp`
-* `mv`
-* `mkdir`
-* `rmdir`
-* `rm`
-* `chmod`
-* Any other command that you want to execute.
-    
-The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
-
 <a name="cifs"></a>
-## CIFS
+## CIFS, WinRM and Telnet
 
 The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
 
 * The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
 * WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
-
-See the [section on the host setup](#cifs_host_setup) for more information on how to setup the remote hosts.
 
 ### Domain accounts
 Windows domain accounts are supported by the CIFS+WinRM and CIFS+Telnet connection types, but the syntax of the username is different:
@@ -396,7 +415,234 @@ By default Overthere will access the [administrative shares](http://en.wikipedia
 
 __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
 
+<a name="cifs_host_setup"></a>
+### Host setup
 
+<a name="cifs_host_setup_cifs"></a>
+#### CIFS
+To connect to a remote host using the __CIFS__ protocol, ensure the host is reachable on port 445.
+
+If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#cifs_pathShareMappings) connection option is configured accordingly.
+
+<a name="cifs_host_setup_telnet"></a>
+#### TELNET
+
+To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
+
+
+1. (Optional) If the Telnet Server is not already installed on the remote host, add it using the __Add Features Wizard__ in the __Server Manager__ console.
+
+1. (Optional) If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, install the Telnet server according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). 
+
+1. Enable the Telnet Server Service on the remote host according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. 
+
+1. After you have started the Telnet Server, open a command prompt as the __Administrator__ user on the remote host and enter the command `tlntadmn config mode=stream` to enable stream mode.
+
+When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the __Allow logon locally__ privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
+
+<a name="cifs_host_setup_winrm"></a>
+#### WINRM
+
+_For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
+
+To use the __WINRM__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
+
+1. If the remote host is running Windows Server 2003 SP1 or SP2, or Windows XP SP2, install the [WS-Management v.1.1 package](http://support.microsoft.com/default.aspx?scid=kb;EN-US;936059&wa=wsignin1.0).
+
+1. If the remote host is running Windows Server 2003 R2, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRM under the section __Management and Monitoring Tools__. Afterwards install the [WS-Management v.1.1 package](http://support.microsoft.com/default.aspx?scid=kb;EN-US;936059&wa=wsignin1.0) to upgrade the WinRM installation.
+
+1. If the remote host is running Windows Vista or Windows 7, the __Windows Remote Management (WS-Management)__ service is not started by default. Start the service and change its Startup type to __Automatic (Delayed Start)__ before proceeding with the next steps.
+
+1. On the remote host, open a Command Prompt using the __Run as Administrator__ option and execute the following commands:
+
+		winrm quickconfig
+		winrm set winrm/config/service/Auth @{Basic="true"}
+		winrm set winrm/config/service @{AllowUnencrypted="true"}
+		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
+
+	Or keep reading for more detailed instructions. :-)
+
+1. Run the quick config of WinRM to start the Windows Remote Management service, configure an HTTP listener and create exceptions in the Windows Firewall for the Windows Remote Mangement service:
+
+		winrm quickconfig
+
+	__N.B.:__ The Windows Firewall needs to be running to run this command. See [Microsoft Knowledge Base article #2004640](http://support.microsoft.com/kb/2004640).
+
+1. (Optional) By default basic authentication is disabled in WinRM. Enable it if you are going to use local accounts to access the remote host:
+
+		winrm set winrm/config/service/Auth @{Basic="true"}
+
+1. (Optional) By default Kerberos authentication is enabled in WinRM. Disable it if you are __not__ going to use domain accounts to access the remote host:
+
+		winrm set winrm/config/service/Auth @{Kerberos="false"}
+
+	__N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
+	
+1. Configure WinRM to allow unencrypted SOAP messages:
+
+		winrm set winrm/config/service @{AllowUnencrypted="true"}
+
+1. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
+
+		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
+
+	__N.B.:___ This is not supported by WinRM 3.0, included with the Windows Management Framework 3.0. This update [has been temporarily removed from Windows Update](http://blogs.msdn.com/b/powershell/archive/2012/12/20/windows-management-framework-3-0-compatibility-update.aspx) because of numerous incompatiblity issues with other Microsoft product.
+
+1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
+
+	a. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
+
+        	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
+        	Microsoft (R) SelfSSL Version 1.0
+        	Copyright (C) 2003 Microsoft Corporation. All rights reserved.
+
+        	Do you want to replace the SSL settings for site 1 (Y/N)?Y
+        	The self signed certificate was successfully assigned to site 1.
+
+	a. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
+
+			PS C:\Windows\system32> Get-childItem cert:\LocalMachine\Root\ | Select-String -pattern HOSTNAME
+
+			[Subject]
+			  CN=HOSTNAME
+
+			[Issuer]
+			  CN=HOSTNAME
+
+			[Serial Number]
+			  527E7AF9142D96AD49A10469A264E766
+
+			[Not Before]
+			  5/23/2011 10:23:33 AM
+
+			[Not After]
+			  5/20/2021 10:23:33 AM
+
+			[Thumbprint]
+			  5C36B638BC31F505EF7F693D9A60C01551DD486F
+
+	a. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
+
+			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
+
+
+For more information on WinRM, please refer to <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">the online documentation at Microsoft's DevCenter</a>. As a quick reference, have a look at the list of useful commands below:
+
+* Do a quickconfig for WinRM with HTTPS: `winrm quickconfig -transport:https`
+* View the complete WinRM configuration: `winrm get winrm/config`
+* View the listeners that have been configured: `winrm enumerate winrm/config/listener`
+* Create an HTTP listener: `winrm create winrm/config/listener?Address=*+Transport=HTTP` (also done by `winrm quickconfig`)
+* Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
+* Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
+
+<a name="cifs_host_setup_krb5"></a>
+#### Kerberos - source host
+
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
+
+In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
+
+Create a file called `krb5.conf` (Unix) or `krb5.ini` (Windows) with at least the following content: 
+
+<pre>
+[realms]
+EXAMPLE.COM = {
+    kdc = KDC.EXAMPLE.COM
+}
+</pre>
+
+Replace the values with the name of your domain/realm and the hostname of your domain controller (multiple entries can be added to allow the Overthere source host to connect to multiple domains) and place the file in the default location for your operating system:
+
+* Linux: `/etc/krb5.conf`
+* Solaris: `/etc/krb5/krb5.conf`
+* Windows: `C:\Windows\krb5.ini`
+
+Alternatively, place the file somewhere else and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the file you just created. 
+
+<a name="cifs_host_setup_spn"></a>
+#### Kerberos - remote host
+
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
+
+By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#cifs_host_setup_winrm).
+
+If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
+
+This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any host in the domain, as follows:
+<pre>
+setspn -A <em>PROTOCOL</em>/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
+</pre>
+where:
+
+* `PROTOCOL` is either `WSMAN` (default) or `HTTP` (if [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) has been set to `true`).
+* `ADDRESS` is the [__address__](#address) used to connect to the remote host,
+* `PORT` (optional) is the [__port__](#port) used to connect to the remote host (usually 5985 or 5986, only necessary if [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) has been set to `true`), and
+* `WINDOWS-HOST` is the short Windows hostname of the remote host.
+
+Some other useful commands:
+
+* List all service principal names configured for the domain: `setspn -Q */*` 
+* List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
+ 
+<a name="troubleshooting_cifs"></a>
+<a name="troubleshooting_telnet"></a>
+<a name="troubleshooting_krb"></a>
+### Troubleshooting CIFS, WinrRM and Telnet
+
+This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
+
+For more troubleshooting tips for Kerberos, please refer to the [Kerberos troubleshooting guide in the Java SE documentation](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html).
+
+#### CIFS connections are very slow to set up.
+
+The [JCIFS library](http://jcifs.samba.org), which Overthere uses to connect to CIFS shares, will try and query the Windows domain controller to resolve the hostname in SMB URLs. JCIFS will send packets over port 139 (one of the [NetBIOS over TCP/IP] ports) to query the <a href="http://en.wikipedia.org/wiki/Distributed_File_System_(Microsoft)">DFS</a>. If that port is blocked by a firewall, JCIFS will only fall back to using regular hostname resolution after a timeout has occurred.
+
+Set the following Java system property to prevent JCIFS from sending DFS query packets:
+`-Djcifs.smb.client.dfs.disabled=true`.
+
+See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
+
+#### Kerberos authentication fails with the message `Cannot get kdc for realm …`
+
+The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) is case sensitive and must be entered in upper case in the `krb5.conf` file.
+
+#### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
+
+The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
+
+#### Kerberos authentication fails with the message `Message stream modified (41)`
+
+The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. The realm name is case sensitive and must be entered in upper case in the `krb5.conf` file.
+
+#### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
+
+The username or the password supplied was invalid. Did you supply the correct credentials?
+
+#### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
+
+The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
+
+#### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
+
+The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
+
+#### Telnet connection fails with the message `VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).`
+
+The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
+
+#### WinRM command fails with the message `java.net.ConnectException: Connection refused`
+
+The Windows Remote Management service is not running or is not running on the port that has been configured. Start the service or configure Overthere to use <a href="#port">a different port number</a>.
+
+#### WinRM command fails with a 401 response code.
+
+Multiple causes can lead to this error messge:
+
+1. The Kerberos ticket is not accepted by the remote hosts. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
+
+1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the <a href="#cifs_host_setup_winrm">host setup for WinRM</a>?
+
+1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
 <a name="cifs_connection_options"></a>
 ### Connection options
@@ -488,157 +734,6 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 </table>
 
-<a name="cifs_host_setup"></a>
-### Host setup
-
-<a name="cifs_host_setup_cifs"></a>
-#### CIFS
-To connect to a remote host using the __CIFS__ protocol, ensure the host is reachable on port 445.
-
-If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#cifs_pathShareMappings) connection option is configured accordingly.
-
-<a name="cifs_host_setup_telnet"></a>
-#### TELNET
-
-To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
-
-
-1. (Optional) If the Telnet Server is not already installed on the remote host, add it using the __Add Features Wizard__ in the __Server Manager__ console.
-
-1. (Optional) If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, install the Telnet server according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). 
-
-1. Enable the Telnet Server Service on the remote host according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. 
-
-2. After you have started the Telnet Server, open a command prompt as the __Administrator__ user on the remote host and enter the command `tlntadmn config mode=stream` to enable stream mode.
-
-When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the __Allow logon locally__ privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
-
-<a name="cifs_host_setup_winrm"></a>
-#### WINRM
-
-_For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
-
-To use the __WINRM__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
-
-1. If the remote host is running Windows Server 2003 R2, you will need to enable WinRM. As the Administrator user, go to the __Add/Remove System Components__ feature in the __Control Panel__ and add WinRM under the section __Management and Monitoring Tools__.
-
-1. If the remote host is running Windows Vista or Windows 7, the __Windows Remote Management (WS-Management)__ service is not started by default. Start the service and change its Startup type to __Automatic (Delayed Start)__ before proceeding with the next steps.
-
-1. On the remote host, as the Administrator user, open a Command Prompt and follow the steps below.
-
-1. (Optional) By default basic authentication is disabled in WinRM. Enable it if you are going to use local accounts to access the remote host:
-
-		winrm set winrm/config/service/Auth @{Basic="true"}
-
-1. (Optional) By default Kerberos authentication is enabled in WinRM. Disable it if you are __not__ going to use domain accounts to access the remote host:
-
-		winrm set winrm/config/service/Auth @{Kerberos="false"}
-
-	__N.B.__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
-	
-1. Configure WinRM to allow unencrypted SOAP messages:
-
-		winrm set winrm/config/service @{AllowUnencrypted="true"}
-
-1. Configure WinRM to provide enough memory to the commands that you are going to run, e.g. 1024 MB:
-
-		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
-
-1. To use the __WINRM__ connection type with HTTP, i.e. with [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `false`, create an HTTP WinRM listener:
-
-		winrm create winrm/config/listener?Address=*+Transport=HTTP
-
-1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
-
-	a. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
-
-        	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
-        	Microsoft (R) SelfSSL Version 1.0
-        	Copyright (C) 2003 Microsoft Corporation. All rights reserved.
-
-        	Do you want to replace the SSL settings for site 1 (Y/N)?Y
-        	The self signed certificate was successfully assigned to site 1.
-
-	a. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
-
-			PS C:\Windows\system32> Get-childItem cert:\LocalMachine\Root\ | Select-String -pattern HOSTNAME
-
-			[Subject]
-			  CN=HOSTNAME
-
-			[Issuer]
-			  CN=HOSTNAME
-
-			[Serial Number]
-			  527E7AF9142D96AD49A10469A264E766
-
-			[Not Before]
-			  5/23/2011 10:23:33 AM
-
-			[Not After]
-			  5/20/2021 10:23:33 AM
-
-			[Thumbprint]
-			  5C36B638BC31F505EF7F693D9A60C01551DD486F
-
-	a. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
-
-			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
-
-
-For more information on WinRM, please refer to <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa384426(v=vs.85).aspx">the online documentation at Microsoft's DevCenter</a>. As a quick reference, have a look at the list of useful commands below:
-
-* Do a quickconfig for WinRM: `winrm qc`
-* Do a quickconfig for WinRM with HTTPS: `winrm qc -transport:https`
-* View the complete WinRM configuration: `winrm get winrm/config`
-* View the listeners that have been configured: `winrm enumerate winrm/config/listener`
-* Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
-* Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
-
-<a name="cifs_host_setup_krb5"></a>
-#### Kerberos - source host
-
-__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
-
-In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
-
-The simplest configuration is with a single domain/realm, and involves adding the following Java system properties to your commandline: `-Djava.security.krb5.realm=EXAMPLE.COM -Djava.security.krb5.kdc=KDC.EXAMPLE.COM`. Replace the values with the name of your domain/realm and the hostname of your domain controller.
-
-For a more complex setup, e.g. one involving multiple domains, create a file called `krb5.conf` with at least the following content: 
-
-<pre>
-[realms]
-EXAMPLE.COM = {
-    kdc = KDC.EXAMPLE.COM
-}
-</pre>
-and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the `krb5.conf` file you just created. Multiple entries can be added to allow the Overthere source host to connect to multiple domains.
-
-<a name="cifs_host_setup_spn"></a>
-#### Kerberos - remote host
-
-__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
-
-By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#cifs_host_setup_winrm).
-
-If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
-
-This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any host in the domain, as follows:
-<pre>
-setspn -A <em>PROTOCOL</em>/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
-</pre>
-where:
-
-* `PROTOCOL` is either `WSMAN` (default) or `HTTP` (if [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) has been set to `true`).
-* `ADDRESS` is the [__address__](#address) used to connect to the remote host,
-* `PORT` (optional) is the [__port__](#port) used to connect to the remote host (usually 5985 or 5986, only necessary if [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) has been set to `true`), and
-* `WINDOWS-HOST` is the short Windows hostname of the remote host.
-
-Some other useful commands:
-
-* List all service principal names configured for the domain: `setspn -Q */*` 
-* List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
- 
 <a name="tunnelling"></a>
 ## Tunnelling
 
@@ -652,84 +747,6 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is <code>1025</code>.</td>
 </tr>
 </table>
-
-<a name="troubleshooting"></a>
-# Troubleshooting Overthere
-
-This section lists a number of common configuration errors that can occur when using Overthere. Please let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls) if you have run into other connectivity issues when using Overthere.
-
-<a name="troubleshooting_ssh"></a>
-## SSH
-
-#### Cannot start a process on an SSH server because the server disconnects immediately.
-
-If the terminal type requested using the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option is not recognized by the SSH server, the connection will be dropped. Specifically, the `dummy` terminal type configured by [__allocateDefaultPty__] connection option, will cause OpenSSH on AIX and WinSSHD to drop the connection. Try a safe terminal type such as `vt220` instead.
-
-To verify the behaviour of your SSH server with respect to pty allocation, you can manually execute the <code>ssh</code> command with the `-T` (disable pty allocation) or `-t` (force pty allocation) flags.
-
-
-#### Command executed using SUDO or INTERACTIVE_SUDO fails with the message `sudo: sorry, you must have a tty to run sudo`
-
-The `sudo` command requires a tty to run. Set the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option to ask the SSH server allocate a pty.
-
-#### Command executed using SUDO or INTERACTIVE_SUDO appears to hang.
-
-This may be caused by the sudo command waiting for the user to enter his password to confirm his identity. There are two ways to solve this:
-
-1. Use the [`NOPASSWD`](http://www.gratisoft.us/sudo/sudoers.man.html#nopasswd_and_passwd) tag in your `/etc/sudoers` file.
-2. Use the [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo) connection type instead of the [__SUDO__](ssh_host_setup_sudo) connection type.
-3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
-
-
-<a name="troubleshooting_cifs"></a>
-## CIFS
-
-#### CIFS connections are very slow to set up.
-
-The [JCIFS library](http://jcifs.samba.org), which Overthere uses to connect to CIFS shares, will try and query the Windows domain controller to resolve the hostname in SMB URLs. JCIFS will send packets over port 139 (one of the [NetBIOS over TCP/IP] ports) to query the <a href="http://en.wikipedia.org/wiki/Distributed_File_System_(Microsoft)">DFS</a>. If that port is blocked by a firewall, JCIFS will only fall back to using regular hostname resolution after a timeout has occurred.
-
-Set the following Java system property to prevent JCIFS from sending DFS query packets:
-`-Djcifs.smb.client.dfs.disabled=true`.
-
-See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
-
-<a name="troubleshooting_telnet"></a>
-## Telnet
-
-#### Telnet connection fails with the message `VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).`
-
-The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
-
-<a name="troubleshooting_krb"></a>
-## Kerberos
-
-#### Kerberos authentication fails with the message `Cannot get kdc for realm …`
-
-The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name is case sensitive. Does the case match the case in the `krb5.conf` file?
-
-#### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
-
-The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
-
-#### Kerberos authentication fails with the message `Message stream modified (41)`
-
-The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. In most cases this can be fixed by specifying the realm name in all caps.
-
-#### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
-
-The username or the password supplied was invalid. Did you supply the correct credentials?
-
-#### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
-
-The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
-
-#### Kerberos authentication fails with a 401 response code
-
-The Kerberos ticket is not accepted by the remote hosts. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
-
-#### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
-
-The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
 
 <a name="release_history"></a>
 # Release History
