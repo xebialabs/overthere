@@ -293,11 +293,8 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
      */
     protected String handleResponse(final HttpResponse response, final HttpContext context) throws IOException {
         final HttpEntity entity = response.getEntity();
-        if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith(
-            "application/soap+xml")) {
-            throw new WinRMRuntimeIOException(
-                "Error when sending request to " + getTargetURL() + "; Unexpected content-type: " + entity
-                    .getContentType());
+        if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith("application/soap+xml")) {
+            throw new WinRMRuntimeIOException("Error when sending request to " + getTargetURL() + "; Unexpected content-type: " + entity.getContentType());
         }
 
         final InputStream is = entity.getContent();

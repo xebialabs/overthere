@@ -107,10 +107,8 @@ public class CifsWinRmConnection extends CifsConnection {
 
     private ApacheHttpComponentsHttpClientHttpConnector createHttpConnector(URL targetURL, ConnectionOptions options) {
         final ApacheHttpComponentsHttpClientHttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(username, password, targetURL);
-        httpConnector.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class,
-            DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
-        httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class,
-            DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
+        httpConnector.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
+        httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
         httpConnector.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
         httpConnector.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
         httpConnector.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
