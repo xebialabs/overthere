@@ -36,7 +36,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.1.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.2.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -46,7 +46,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.1.1</version>
+			<version>2.2.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -734,6 +734,13 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.2.0 (07-Feb-2013)
+    * Introduced `OverthereExecutionOutputHandler` interface to allow `stderr` to also be captured character by character, fixes issue [#67](https://github.com/xebialabs/overthere/issues/67).
+    * Made the commands used for SSH/SCP, SSH/SUDO and SSH/INTERACTIVE_SUDO connections configurable, fixes issue [#52](https://github.com/xebialabs/overthere/issues/52).
+    * Made `canStartProcess()` return `false` for CIFS/Telnet connections because its `startProcess` implementation does not correctly handle `stdin`, disables fix for issue [#54](https://github.com/xebialabs/overthere/issues/54).
+    * Fixed issues [#65](https://github.com/xebialabs/overthere/issues/65), [#68](https://github.com/xebialabs/overthere/issues/68) and [#70](https://github.com/xebialabs/overthere/issues/70).
+    * Some minor code fixes.
+    * Some not-so-minor documentation improvements: more setup and troubleshooting info for WinRM and Kerberos.
 * Overthere 2.1.1 (17-Dec-2012)
     * Fixed issues [#61](https://github.com/xebialabs/overthere/issues/61) and [#62](https://github.com/xebialabs/overthere/issues/62).
     * Added connection option [__openShellBeforeExecute__](#ssh_openShellBeforeExecute), fixes [#63](https://github.com/xebialabs/overthere/issues/63).
@@ -755,8 +762,8 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
     * Changed default value of [__sudoOverrideUmask__](#ssh_sudoOverrideUmask) to `true`.
     * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
     * Upgraded to SSH/J 0.8.1.
-	* Added description of WinRM options and how to set up Kerberos authentication to the documentation.
-	* Added troubleshooting section to the documentation.
+    * Added description of WinRM options and how to set up Kerberos authentication to the documentation.
+    * Added troubleshooting section to the documentation.
 * Overthere 2.0.0-beta-7 (02-Aug-2012)
     * Fixed bug in WinRM implementation: It was not sending individual stdout chars to `OverthereProcessOutputHandler.handleOutput()`.
 * Overthere 2.0.0-beta-6 (02-Aug-2012)
