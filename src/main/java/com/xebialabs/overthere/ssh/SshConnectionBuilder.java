@@ -132,7 +132,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     /**
      * Name of the {@link ConnectionOptions connection option} used to specify whether or not to explicitly change the
-     * permissions with chmod -R go+rX (Also see: {@link SUDO_OVERRIDE_UMASK_COMMAND}) after uploading a file or directory with scp.
+     * permissions with chmod -R go+rX after uploading a file or directory with scp. Also see {@link #SUDO_OVERRIDE_UMASK_COMMAND}.
      */
     public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
 
@@ -366,16 +366,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND = "sudoCopyFromTempFileCommand";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
-     * from the connection temporary directory while preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}
-     * using an SSH/SUDO connection.
+     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify
+     * the command used to copy files from the connection temporary directory while preserving the file attributes using
+     * an SSH/SUDO connection. See also {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}.
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
     /**
-     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
-     * from the connection temporary directory while not preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}
-     * using an SSH/SUDO connection.
+     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * command used to copy files from the connection temporary directory while not preserving the file attributes using
+     * an SSH/SUDO connection. See also {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}.
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
 
@@ -399,16 +399,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND = "sudoCopyToTempFileCommand";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
-     * to the connection temporary directory while preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}
-     * using an SSH/SUDO connection.
+     * Default value (<code>cp -pr {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify
+     * the command used to copy files to the connection temporary directory while preserving the file attributes using
+     * an SSH/SUDO connection. See {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}.
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
     /**
-     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the command used to copy files
-     * to the connection temporary directory while not preserving the file attributes (See: {@link SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}
-     * using an SSH/SUDO connection.
+     * Default value (<code>cp -r {0} {1}</code>) of the {@link ConnectionOptions connection option} used to specify the
+     * command used to copy files to the connection temporary directory while not preserving the file attributes using
+     * an SSH/SUDO connection. See {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}.
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
 

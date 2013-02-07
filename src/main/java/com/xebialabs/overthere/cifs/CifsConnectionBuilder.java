@@ -61,14 +61,12 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final int DEFAULT_TELNET_PORT = 23;
 
     /**
-     * Default port (<code>5985</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
-     * {@link CifsConnectionType#WINRM_HTTP WINRM_HTTP}.
+     * Default port (<code>5985</code>) used when the {@link #WINRM_ENABLE_HTTPS} is set to <tt>false</tt>.
      */
     public static final int DEFAULT_WINRM_HTTP_PORT = 5985;
 
     /**
-     * Default port (<code>5986</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
-     * {@link CifsConnectionType#WINRM_HTTPS WINRM_HTTPS}.
+     * Default port (<code>5985</code>) used when the {@link #WINRM_ENABLE_HTTPS} is set to <tt>true</tt>.
      */
     public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
 
