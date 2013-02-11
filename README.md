@@ -1,3 +1,4 @@
+<a name="toc"></a>
 # Table of Contents
 
 * [Introduction](#introduction)
@@ -8,12 +9,17 @@
 * [Programming Overthere](#programming_overthere) 
 * [Configuring Overthere](#configuring_overthere)
 	* [Protocols](#protocols)
-	* [Connection options](#common_connection_options)
+	* [Common connection options](#common_connection_options)
 	* [Local](#local)
 	* [SSH](#ssh)
+	    * [Host setup](#ssh_host_setup)
+	    * [Troubleshooting](#ssh_troubleshooting)
+	    * [Connection options](#ssh_connection_options)
 	* [CIFS, WinRM and Telnet](#cifs)
+	    * [Host setup](#cifs_host_setup)
+	    * [Troubleshooting](#cifs_troubleshooting)
+	    * [Connection options](#cifs_connection_options)
 	* [Tunnelling](#tunnelling)
-* [Troubleshooting Overthere](#troubleshooting)
 * [Release History](#release_history)
 
 
@@ -89,7 +95,7 @@ Overthere supports a number of protocols to connect to remote hosts:
 * [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
 
 <a name="common_connection_options"></a>
-## Connection options
+## Common connection options
 
 Apart from selecting a protocol to use, you will also need to supply a number of connection options when creating a connection. Common connection options are:
 
@@ -148,7 +154,7 @@ The local protocol implementation uses the local file manipulation and local pro
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
 
 <a name="ssh_host_setup"></a>
-### Host setup
+### SSH host setup
 
 <a name="ssh_host_setup_ssh"></a>
 #### SSH
@@ -191,7 +197,7 @@ To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have 
     
 The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
 
-<a name="troubleshooting_ssh"></a>
+<a name="ssh_troubleshooting"></a>
 ### Troubleshooting SSH connections
 
 This section lists a number of common configuration errors that can occur when using Overthere with SSH. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
@@ -201,7 +207,6 @@ This section lists a number of common configuration errors that can occur when u
 If the terminal type requested using the [__allocatePty__](#ssh_allocatePty) connection option or the [__allocateDefaultPty__](#ssh_allocateDefaultPty) connection option is not recognized by the SSH server, the connection will be dropped. Specifically, the `dummy` terminal type configured by [__allocateDefaultPty__] connection option, will cause OpenSSH on AIX and WinSSHD to drop the connection. Try a safe terminal type such as `vt220` instead.
 
 To verify the behaviour of your SSH server with respect to pty allocation, you can manually execute the <code>ssh</code> command with the `-T` (disable pty allocation) or `-t` (force pty allocation) flags.
-
 
 #### Command executed using SUDO or INTERACTIVE_SUDO fails with the message `sudo: sorry, you must have a tty to run sudo`
 
@@ -214,8 +219,9 @@ This may be caused by the sudo command waiting for the user to enter his passwor
 1. Use the [`NOPASSWD`](http://www.gratisoft.us/sudo/sudoers.man.html#nopasswd_and_passwd) tag in your `/etc/sudoers` file.
 2. Use the [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo) connection type instead of the [__SUDO__](ssh_host_setup_sudo) connection type.
 3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
+
 <a name="ssh_connection_options"></a>
-### Connection options
+### SSH connection options
 
 The SSH protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
 
@@ -584,9 +590,7 @@ Some other useful commands:
 * List all service principal names configured for the domain: `setspn -Q */*` 
 * List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
  
-<a name="troubleshooting_cifs"></a>
-<a name="troubleshooting_telnet"></a>
-<a name="troubleshooting_krb"></a>
+<a name="cifs_troubleshooting"></a>
 ### Troubleshooting CIFS, WinrRM and Telnet
 
 This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
@@ -645,7 +649,7 @@ Multiple causes can lead to this error messge:
 1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
 <a name="cifs_connection_options"></a>
-### Connection options
+### CIFS connection options
 
 The CIFS protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
 
