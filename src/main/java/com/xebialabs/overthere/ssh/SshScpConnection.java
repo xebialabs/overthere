@@ -42,7 +42,7 @@ class SshScpConnection extends SshConnection {
     }
 
     @Override
-    protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
+    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
         return new SshScpFile(this, hostPath);
     }
 

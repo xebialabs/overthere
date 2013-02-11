@@ -216,6 +216,10 @@ class SshSudoFile extends SshScpFile {
         }
     }
 
+    boolean isTempFile() {
+        return isTempFile;
+    }
+
     private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
 }

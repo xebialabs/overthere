@@ -40,7 +40,7 @@ public class PresetClientSshConnection extends SshConnection {
     }
 
     @Override
-    protected OverthereFile getFile(String hostPath, boolean isTempFile)
+    public OverthereFile getFile(String hostPath)
         throws RuntimeIOException {
         throw new UnsupportedOperationException("TODO Auto-generated method stub");
     }

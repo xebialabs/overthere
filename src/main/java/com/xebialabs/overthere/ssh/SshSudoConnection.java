@@ -30,6 +30,7 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 
 /**
  * A connection to a Unix host using SSH w/ SUDO.
@@ -105,8 +106,20 @@ class SshSudoConnection extends SshScpConnection {
     }
 
     @Override
-    protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-        return new SshSudoFile(this, hostPath, isTempFile);
+    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
+        return new SshSudoFile(this, hostPath, false);
+    }
+
+    @Override
+    public OverthereFile getFile(final OverthereFile parent, final String child) throws RuntimeIOException {
+        checkParentFile(parent);
+        return new SshSudoFile(this, constructPath(parent, child), ((SshSudoFile) parent).isTempFile());
+    }
+
+    @Override
+    protected OverthereFile getFileForTempFile(final OverthereFile parent, final String name) {
+        checkParentFile(parent);
+        return new SshSudoFile(this, constructPath(parent, name), true);
     }
 
     @Override

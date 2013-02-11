@@ -64,6 +64,7 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 import static java.net.InetSocketAddress.createUnresolved;
 
 /**
@@ -201,30 +202,24 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     @Override
-    public final OverthereFile getFile(String hostPath) throws RuntimeIOException {
-        return getFile(hostPath, false);
+    public OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
+        checkParentFile(parent);
+        return getFile(constructPath(parent, child));
     }
 
     @Override
-    public final OverthereFile getFile(OverthereFile parent, String child) throws RuntimeIOException {
-        return getFile(parent, child, false);
+    protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
+        checkParentFile(parent);
+        return getFile(parent, name);
     }
 
-    @Override
-    protected final OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-        return getFile(parent, name, true);
-    }
-
-    protected abstract OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException;
-
-    protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+    protected void checkParentFile(final OverthereFile parent) {
         if (!(parent instanceof SshFile)) {
             throw new IllegalStateException("parent is not a file on an SSH host");
         }
         if (parent.getConnection() != this) {
             throw new IllegalStateException("parent is not a file in this connection");
         }
-        return getFile(parent.getPath() + getHostOperatingSystem().getFileSeparator() + child, isTempFile);
     }
 
     @Override

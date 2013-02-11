@@ -114,4 +114,14 @@ public class OverthereUtils {
         return "";
     }
 
+    /**
+     * Construct a new (host) path from a parent directory, and a child.
+     * @param parent The parent directory
+     * @param child The path that should be appended to the parent.
+     * @return A newly constructed path.
+     */
+    public static String constructPath(final OverthereFile parent, final String child) {
+        return parent.getPath() + parent.getConnection().getHostOperatingSystem().getFileSeparator() + child;
+    }
+
 }

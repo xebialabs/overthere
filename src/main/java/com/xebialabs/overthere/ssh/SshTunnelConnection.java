@@ -121,12 +121,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
     }
 
     @Override
-    protected OverthereFile getFile(String hostPath, boolean isTempFile) throws RuntimeIOException {
-        throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
-    }
-
-    @Override
-    protected OverthereFile getFile(OverthereFile parent, String child, boolean isTempFile) throws RuntimeIOException {
+    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
         throw new UnsupportedOperationException("Cannot get a file from the tunnel.");
     }
 
