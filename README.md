@@ -587,6 +587,7 @@ Some other useful commands:
 <a name="troubleshooting_cifs"></a>
 <a name="troubleshooting_telnet"></a>
 <a name="troubleshooting_krb"></a>
+<a name="troubleshooting"></a>
 ### Troubleshooting CIFS, WinrRM and Telnet
 
 This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
