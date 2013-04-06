@@ -85,7 +85,6 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
         } else {
             return connection.getFile(path.substring(0, lastFileSepPos));
         }
-
     }
 
     @Override

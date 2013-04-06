@@ -22,13 +22,16 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 
+import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
+import static org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+
 public enum WinrmHttpsHostnameVerificationStrategy {
-    STRICT(SSLSocketFactory.STRICT_HOSTNAME_VERIFIER),
-    BROWSER_COMPATIBLE(SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER),
-    ALLOW_ALL(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    STRICT(STRICT_HOSTNAME_VERIFIER),
+    BROWSER_COMPATIBLE(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER),
+    ALLOW_ALL(ALLOW_ALL_HOSTNAME_VERIFIER);
 
     private X509HostnameVerifier verifier;
 
