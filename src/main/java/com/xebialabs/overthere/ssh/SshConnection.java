@@ -112,7 +112,9 @@ abstract class SshConnection extends BaseOverthereConnection {
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
         this.sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
-        InetSocketAddress addressPort = mapper.map(createUnresolved(options.<String> get(ADDRESS), options.getInteger(PORT, SSH_PORT_DEFAULT)));
+        String unmappedAddress = options.get(ADDRESS);
+        int unmappedPort = options.getInteger(PORT, SSH_PORT_DEFAULT);
+        InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
         this.host = addressPort.getHostName();
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);

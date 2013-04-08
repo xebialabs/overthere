@@ -22,9 +22,21 @@
  */
 package com.xebialabs.overthere.cifs.winrm.connector;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URL;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.security.UnrecoverableKeyException;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -45,8 +57,6 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.KerberosSchemeFactory;
-import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -82,13 +92,15 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
     private final boolean enableKerberos;
     private final String password;
     private final URL targetURL;
+    private final String unmappedAddress;
+    private final int unmappedPort;
     private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
     private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
     private boolean kerberosUseHttpSpn;
     private boolean kerberosAddPortToSpn;
     private boolean kerberosDebug;
 
-    public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL) {
+    public ApacheHttpComponentsHttpClientHttpConnector(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort) {
         int posOfAtSign = username.indexOf('@');
         if(posOfAtSign >= 0) {
             String u = username.substring(0, posOfAtSign);
@@ -106,6 +118,8 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         }
         this.password = password;
         this.targetURL = targetURL;
+        this.unmappedAddress = unmappedAddress;
+        this.unmappedPort = unmappedPort;
     }
 
     /**
@@ -259,13 +273,9 @@ public class ApacheHttpComponentsHttpClientHttpConnector implements HttpConnecto
         configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
 
         if (enableKerberos) {
-            if (kerberosUseHttpSpn) {
-                httpclient.getAuthSchemes().register(KERBEROS, new KerberosSchemeFactory(!kerberosAddPortToSpn));
-                httpclient.getAuthSchemes().register(SPNEGO, new SPNegoSchemeFactory(!kerberosAddPortToSpn));
-            } else {
-                httpclient.getAuthSchemes().register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn));
-                httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn));
-            }
+            String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN"; 
+            httpclient.getAuthSchemes().register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
             configureAuthentication(httpclient, KERBEROS, new KerberosPrincipal(username));
             configureAuthentication(httpclient, SPNEGO, new KerberosPrincipal(username));
         }

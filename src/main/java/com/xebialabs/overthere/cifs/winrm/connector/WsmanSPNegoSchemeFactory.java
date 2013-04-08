@@ -6,12 +6,21 @@ import org.apache.http.params.HttpParams;
 
 class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
 
-    public WsmanSPNegoSchemeFactory(boolean stripPort) {
+    private final String spnServiceClass;
+
+    private final String spnHost;
+
+    private final int spnPort;
+
+    public WsmanSPNegoSchemeFactory(boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
         super(stripPort);
+        this.spnServiceClass = spnServiceClass;
+        this.spnHost = spnHost;
+        this.spnPort = spnPort;
     }
     
     public AuthScheme newInstance(final HttpParams params) {
-        return new WsmanSPNegoScheme(isStripPort());
+        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
 
 }

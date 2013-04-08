@@ -106,7 +106,7 @@ public class CifsWinRmConnection extends CifsConnection {
     }
 
     private ApacheHttpComponentsHttpClientHttpConnector createHttpConnector(URL targetURL, ConnectionOptions options) {
-        final ApacheHttpComponentsHttpClientHttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(username, password, targetURL);
+        final ApacheHttpComponentsHttpClientHttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(username, password, targetURL, unmappedAddress, unmappedPort);
         httpConnector.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
         httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
         httpConnector.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
