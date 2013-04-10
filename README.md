@@ -648,6 +648,8 @@ Multiple causes can lead to this error messge:
 
 1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
+1. The user is not allowed to perform a WinRM command. Did you grant the user (local) administrative privileges?
+
 <a name="cifs_connection_options"></a>
 ### CIFS connection options
 
