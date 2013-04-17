@@ -16,10 +16,7 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
@@ -27,10 +24,14 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 
 import com.xebialabs.overcast.CloudHost;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.local.LocalFile;
+import com.xebialabs.overthere.ssh.SshConnectionTest;
+import com.xebialabs.overthere.ssh.SshConnectionType;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
@@ -92,6 +93,11 @@ public abstract class OverthereConnectionItestBase {
         temp.create();
         setTypeAndOptions();
         connection = Overthere.getConnection(protocol, options);
+    }
+
+    @BeforeMethod
+    public void isConnected() {
+        assertThat("We're not connected!", connection != null);
     }
 
     @AfterClass
@@ -730,31 +736,31 @@ public abstract class OverthereConnectionItestBase {
     }
 
     public boolean onUnix() {
-        return connection.getHostOperatingSystem().equals(UNIX);
+        return options.get(OPERATING_SYSTEM).equals(UNIX);
     }
 
     public boolean onWindows() {
-        return connection.getHostOperatingSystem().equals(WINDOWS);
+        return options.get(OPERATING_SYSTEM).equals(WINDOWS);
     }
 
     public boolean onlyCifs() {
-        return protocol == CIFS_PROTOCOL;
+        return protocol.equals(CIFS_PROTOCOL);
     }
 
     public boolean onlyCifsWinrm() {
-        return protocol == CIFS_PROTOCOL && options.get(CONNECTION_TYPE).equals(WINRM);
+        return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(WINRM);
     }
 
     public boolean onlyCifsTelnet() {
-        return protocol == CIFS_PROTOCOL && options.get(CONNECTION_TYPE).equals(TELNET);
+        return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(TELNET);
     }
 
     public boolean notSftpCygwin() {
-        return !connection.getClass().getName().equals("com.xebialabs.overthere.ssh.SshSftpCygwinConnection");
+        return !onlySftpCygwin();
     }
 
     public boolean onlySftpCygwin() {
-        return connection.getClass().getName().equals("com.xebialabs.overthere.ssh.SshSftpCygwinConnection");
+        return SshConnectionType.SFTP_CYGWIN.equals(options.get(CONNECTION_TYPE, null));
     }
 
     public boolean supportsProcess() {

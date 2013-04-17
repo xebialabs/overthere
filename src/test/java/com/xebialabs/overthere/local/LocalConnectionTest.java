@@ -1,7 +1,9 @@
 package com.xebialabs.overthere.local;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
@@ -21,6 +23,7 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
@@ -42,6 +45,7 @@ public class LocalConnectionTest extends OverthereConnectionItestBase {
         protocol = LOCAL_PROTOCOL;
         options = new ConnectionOptions();
         options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
+        options.set(OPERATING_SYSTEM, getLocalHostOperatingSystemFamily());
         expectedConnectionClassName = LocalConnection.class.getName();
     }
 
