@@ -160,7 +160,7 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
      * Creates a connection to the local host.
      */
     public static OverthereConnection getLocalConnection() {
-        return Overthere.getConnection("local", new ConnectionOptions());
+        return Overthere.getConnection(LOCAL_PROTOCOL, new ConnectionOptions());
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
