@@ -6,6 +6,8 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class WsmanKerberosScheme extends KerberosScheme {
 
@@ -37,12 +39,20 @@ class WsmanKerberosScheme extends KerberosScheme {
             }
         }
 
+        String spn = spnServiceClass + "@" + authServer;
+
+        logger.debug("Requesting Kerberos ticket for SPN [{}]", spn);
         GSSManager manager = getManager();
-        GSSName serverName = manager.createName(spnServiceClass + "@" + authServer, GSSName.NT_HOSTBASED_SERVICE);
-        GSSContext gssContext = manager.createContext(serverName.canonicalize(oid), oid, null, GSSContext.DEFAULT_LIFETIME);
+        GSSName serverName = manager.createName(spn, GSSName.NT_HOSTBASED_SERVICE);
+        GSSName canonicalizedName = serverName.canonicalize(oid);
+
+        logger.debug("Creating Kerberos GSS context for canonicalized SPN [{}]", canonicalizedName);
+        GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, GSSContext.DEFAULT_LIFETIME);
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
         return gssContext.initSecContext(token, 0, token.length);
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(WsmanKerberosScheme.class);
 
 }
