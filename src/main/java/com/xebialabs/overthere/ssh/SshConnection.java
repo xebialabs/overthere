@@ -29,6 +29,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.io.Closeables;
+
+import net.schmizz.sshj.Config;
+import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
@@ -102,10 +105,13 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
+    private static final Config config = new DefaultConfig();
+
+
     @VisibleForTesting protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
         public SSHClient create() {
-            return new SSHClient();
+            return new SSHClient(config);
         }
     };
 
