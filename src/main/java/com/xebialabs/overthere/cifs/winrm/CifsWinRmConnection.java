@@ -26,6 +26,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
@@ -138,10 +141,12 @@ public class CifsWinRmConnection extends CifsConnection {
             final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
             final PipedInputStream callersStderr = new PipedInputStream();
             final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
+            final PipedOutputStream callersStdin = new PipedOutputStream();
+            final PipedInputStream toCallersStdin = new PipedInputStream(callersStdin);
 
             winRmClient.startCmd(cmd);
 
-            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine,
+            final Thread processOutputReaderThread = new Thread(format("Output reader of [%s] on [%s]", obfuscatedCommandLine,
                 CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
@@ -160,12 +165,33 @@ public class CifsWinRmConnection extends CifsConnection {
             };
             processOutputReaderThread.start();
 
+            final Thread processInputSenderThread = new Thread(format("Input sender to [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+                @Override
+                public void run() {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(toCallersStdin));
+                    String line = null;
+                    try {
+                        // FIXME Check if this Thread ends correctly, or keeps hanging on an open stream when the step ends
+                        // This would provoke a serious resource and thread leak!
+                        while ((line = in.readLine()) != null) {
+                            logger.debug("WinRM sending to stdin: [{}]", line);
+                            winRmClient.sendInput(line);
+                        }
+                    } catch (IOException e) {
+                        logger.info("Done reading stdin!", e);
+                    } finally {
+                        Closeables.closeQuietly(toCallersStdin);
+                    }
+                }
+            };
+            processInputSenderThread.start();
+
             return new OverthereProcess() {
                 boolean processTerminated = false;
 
                 @Override
                 public synchronized OutputStream getStdin() {
-                    return new ByteArrayOutputStream();
+                    return callersStdin;
                 }
 
                 @Override
@@ -224,5 +250,7 @@ public class CifsWinRmConnection extends CifsConnection {
         }
 
     }
+
+    private static Logger logger = LoggerFactory.getLogger(CifsWinRmConnection.class);
 
 }

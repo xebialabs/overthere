@@ -30,7 +30,8 @@ public enum Action {
     WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
     WS_RECEIVE("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive"),
     WS_SIGNAL("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal"),
-    WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
+    WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete"),
+    WS_SEND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send");
 
     private String uri;
 
@@ -40,5 +41,10 @@ public enum Action {
 
     public URI getUri() {
         return Soapy.getUri(uri);
+    }
+
+    @Override
+    public String toString() {
+        return uri;
     }
 }
