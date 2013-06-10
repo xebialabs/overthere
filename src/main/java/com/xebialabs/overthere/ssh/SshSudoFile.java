@@ -48,7 +48,7 @@ class SshSudoFile extends SshScpFile {
 
     /**
      * Constructs a SshSudoHostFile
-     * 
+     *
      * @param connection
      *            the connection connected to the host
      * @param remotePath
@@ -187,7 +187,7 @@ class SshSudoFile extends SshScpFile {
         if (chmodResult != 0) {
             String errorMessage = chmodCapturedOutput.getOutput();
             throw new RuntimeIOException("Cannot grant group and other read and execute permissions (chmod -R go+rX) to file " + tempFile
-                + " before download: " + errorMessage);
+                    + " before download: " + errorMessage);
         }
     }
 
@@ -218,6 +218,19 @@ class SshSudoFile extends SshScpFile {
 
     boolean isTempFile() {
         return isTempFile;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SshSudoFile)) {
+            return false;
+        }
+        return  super.equals(obj) && isTempFile == ((SshSudoFile)obj).isTempFile;
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode() + Boolean.valueOf(isTempFile).hashCode();
     }
 
     private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
