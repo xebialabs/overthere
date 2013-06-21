@@ -102,8 +102,6 @@ public class WinRmClient {
 
         String encoded = "\"" + command + "\"";
 
-        logger.info("Encoded command is {}", encoded);
-
         bodyContent.addElement(QName.get("Command", NS_WIN_SHELL)).addText(encoded);
 
         final Document requestDocument = getRequestDocument(Action.WS_COMMAND, ResourceURI.RESOURCE_URI_CMD, OptionSet.RUN_COMMAND, shellId, bodyContent);
