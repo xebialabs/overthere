@@ -97,7 +97,7 @@ public class WinRmClient {
     }
 
     private String executeCommand(String command) {
-        logger.debug("runCommand shellId {} command {}", shellId, command);
+        logger.debug("runCommand shellId {}", shellId);
         final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", NS_WIN_SHELL));
 
         String encoded = "\"" + command + "\"";
