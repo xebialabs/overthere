@@ -22,12 +22,14 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
 
@@ -144,6 +146,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
             winRmClient.startCmd(cmd);
 
+            final Exception processOutputReaderThreadException[] = new Exception[1];
             final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
@@ -153,7 +156,7 @@ public class CifsWinRmConnection extends CifsConnection {
                                 break;
                         }
                     } catch (Exception exc) {
-                        logger.error(format("Error executing command [%s]", obfuscatedCommandLine), exc);
+                        processOutputReaderThreadException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                         Closeables.closeQuietly(toCallersStderr);
@@ -193,6 +196,13 @@ public class CifsWinRmConnection extends CifsConnection {
                             winRmClient.deleteShell();
                             processTerminated = true;
                         }
+                        if(processOutputReaderThreadException[0] != null) {
+                            if(processOutputReaderThreadException[0] instanceof RuntimeException) {
+                                throw (RuntimeException) processOutputReaderThreadException[0];
+                            } else {
+                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), processOutputReaderThreadException[0]);
+                            }
+                        }
                         return exitValue();
                     } catch (InterruptedException exc) {
                         throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), exc);
@@ -226,7 +236,5 @@ public class CifsWinRmConnection extends CifsConnection {
         }
 
     }
-
-    private static Logger logger = LoggerFactory.getLogger(CifsWinRmConnection.class);
 
 }
