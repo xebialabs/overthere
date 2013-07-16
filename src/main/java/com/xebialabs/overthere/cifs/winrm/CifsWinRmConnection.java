@@ -26,6 +26,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
@@ -141,8 +144,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
             winRmClient.startCmd(cmd);
 
-            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine,
-                CifsWinRmConnection.this)) {
+            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
                     try {
@@ -150,8 +152,8 @@ public class CifsWinRmConnection extends CifsConnection {
                             if (!winRmClient.receiveOutput(toCallersStdout, toCallersStderr))
                                 break;
                         }
-                    } catch (IOException exc) {
-                        throw new RuntimeIOException("Cannot start process " + commandLine, exc);
+                    } catch (Exception exc) {
+                        logger.error(format("Error executing command [%s]", obfuscatedCommandLine), exc);
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                         Closeables.closeQuietly(toCallersStderr);
@@ -224,5 +226,7 @@ public class CifsWinRmConnection extends CifsConnection {
         }
 
     }
+
+    private static Logger logger = LoggerFactory.getLogger(CifsWinRmConnection.class);
 
 }
