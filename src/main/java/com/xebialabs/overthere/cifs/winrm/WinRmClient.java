@@ -68,7 +68,7 @@ public class WinRmClient {
 
     private String shellId;
     private String commandId;
-    private int exitValue;
+    private int exitValue = -1;
 
     private int chunk = 0;
 
