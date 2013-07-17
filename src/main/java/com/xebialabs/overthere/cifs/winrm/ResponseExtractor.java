@@ -30,7 +30,7 @@ import org.jaxen.SimpleNamespaceContext;
 public enum ResponseExtractor {
 
     COMMAND_ID("CommandId"),
-    EXIT_CODE("ExitCode"),
+    EXIT_CODE("CommandState[@State='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done']/rsp:ExitCode", Namespaces.NS_WIN_SHELL),
     SHELL_ID("Selector[@Name='ShellId']", Namespaces.NS_WSMAN_DMTF),
     STDOUT("Stream[@Name='stdout']"),
     STDERR("Stream[@Name='stderr']"),

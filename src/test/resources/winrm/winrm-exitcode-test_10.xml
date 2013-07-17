@@ -1,0 +1,57 @@
+<s:Envelope xml:lang="en-US" xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:w="http://schemas.dmtf.org/wbem/wsman/1/wsman.xsd"><s:Header><a:Action  >http://schemas.microsoft.com/wbem/wsman/1/windows/shell/ReceiveResponse</a:Action><a:MessageID  >uuid:8CB35363-8B76-4B7D-A3B7-44BD33798181</a:MessageID><a:To>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:To><a:RelatesTo  >uuid:796FAB7C-166C-4936-A126-4185697AA457</a:RelatesTo></s:Header><s:Body><rsp:ReceiveResponse xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell"><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stdout" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488">DQo=
+</rsp:Stream><rsp:CommandState xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Running" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488"><rsp:ExitCode>0</rsp:ExitCode></rsp:CommandState><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stderr" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488">RmlsZSBub3QgZm91bmQgLSAqLioNCg==
+</rsp:Stream><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stdout" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488">QzpcV0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1w
+XGdlbmVyaWNfcGx1Z2luLnRtcD5zZXQgVkVSU0lPTj1DTi02LjIuOS4wMjIgDQo=
+</rsp:Stream><rsp:CommandState xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Pending" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488"><rsp:ExitCode>12</rsp:ExitCode></rsp:CommandState><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stderr" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488" End="true"></rsp:Stream><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stdout" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488">DQpDOlxXSU5ET1dTXFRlbXBcb3ZlcnRoZXJlLTIwMTMwNzE3VDE1NDkyNTQ0Ni50
+bXBcZ2VuZXJpY19wbHVnaW4udG1wPnNldCBDT05GSUdVUkU9dHJ1ZSANCg0KQzpc
+V0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdl
+bmVyaWNfcGx1Z2luLnRtcD5zZXQgREVQTE9ZX05JTD1mYWxzZSANCg0KQzpcV0lO
+RE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdlbmVy
+aWNfcGx1Z2luLnRtcD5zZXQgREVQTE9ZX0lOVF9TRVJWRVI9ZmFsc2UgDQoNCkM6
+XFdJTkRPV1NcVGVtcFxvdmVydGhlcmUtMjAxMzA3MTdUMTU0OTI1NDQ2LnRtcFxn
+ZW5lcmljX3BsdWdpbi50bXA+c2V0IERFUExPWV9FWFRfU0VSVkVSPWZhbHNlIA0K
+DQpDOlxXSU5ET1dTXFRlbXBcb3ZlcnRoZXJlLTIwMTMwNzE3VDE1NDkyNTQ0Ni50
+bXBcZ2VuZXJpY19wbHVnaW4udG1wPnNldCBERVBMT1lfV1NHVz1mYWxzZSANCg0K
+QzpcV0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1w
+XGdlbmVyaWNfcGx1Z2luLnRtcD5zZXQgTElTVEFQUFM9ZmFsc2UgDQoNCkM6XFdJ
+TkRPV1NcVGVtcFxvdmVydGhlcmUtMjAxMzA3MTdUMTU0OTI1NDQ2LnRtcFxnZW5l
+cmljX3BsdWdpbi50bXA+c2V0IEFETUlOPWNjLWktZDE2MC1jMDAtYTAxLmNyLnJv
+b3Q0Lm5ldCANCg0KQzpcV0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1Qx
+NTQ5MjU0NDYudG1wXGdlbmVyaWNfcGx1Z2luLnRtcD5zZXQgRU5WPVNJVEUyIA0K
+DQpDOlxXSU5ET1dTXFRlbXBcb3ZlcnRoZXJlLTIwMTMwNzE3VDE1NDkyNTQ0Ni50
+bXBcZ2VuZXJpY19wbHVnaW4udG1wPnNldCBKQVZBX0hPTUU9ZDpcamF2YVxqcm9j
+a2l0LWpkazEuNi4wXzI5LVIyOC4yLjItNC4xLjAtMzJiaXQgDQoNCkM6XFdJTkRP
+V1NcVGVtcFxvdmVydGhlcmUtMjAxMzA3MTdUMTU0OTI1NDQ2LnRtcFxnZW5lcmlj
+X3BsdWdpbi50bXA+c2V0IE1BVkVOX0hPTUU9RDpcbWF2ZW5cYXBhY2hlLW1hdmVu
+LTIuMi4xXGJpbiANCg0KQzpcV0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcx
+N1QxNTQ5MjU0NDYudG1wXGdlbmVyaWNfcGx1Z2luLnRtcD5zZXQgREVMSVZFUllI
+T01FPWQ6XGRlbGl2ZXJpZXNcdXBsb2FkXENvcnBvcmF0ZU5ldGJhbmsgDQoNCkM6
+XFdJTkRPV1NcVGVtcFxvdmVydGhlcmUtMjAxMzA3MTdUMTU0OTI1NDQ2LnRtcFxn
+ZW5lcmljX3BsdWdpbi50bXA+c2V0IElNUE9SVEhPTUU9ZDpcZGVsaXZlcmllc1xp
+bXBvcnRcQ29ycG9yYXRlTmV0YmFua1wgDQoNCkM6XFdJTkRPV1NcVGVtcFxvdmVy
+dGhlcmUtMjAxMzA3MTdUMTU0OTI1NDQ2LnRtcFxnZW5lcmljX3BsdWdpbi50bXA+
+c2V0IERJU1RSSUJVVElPTkhPTUU9ZDpcZGVsaXZlcmllc1xpbXBvcnRcQ29ycG9y
+YXRlTmV0YmFua1xDTi02LjIuOS4wMjJcZGlzdHJpYnV0aW9uIA0KDQpDOlxXSU5E
+T1dTXFRlbXBcb3ZlcnRoZXJlLTIwMTMwNzE3VDE1NDkyNTQ0Ni50bXBcZ2VuZXJp
+Y19wbHVnaW4udG1wPnNldCBDTl9ESVNUUklCVVRJT05fUEFUSD1kOi9kZWxpdmVy
+aWVzL2ltcG9ydC9Db3Jwb3JhdGVOZXRiYW5rL0NOLTYuMi45LjAyMi9kaXN0cmli
+dXRpb24gDQoNCkM6XFdJTkRPV1NcVGVtcFxvdmVydGhlcmUtMjAxMzA3MTdUMTU0
+OTI1NDQ2LnRtcFxnZW5lcmljX3BsdWdpbi50bXA+c2V0IEFQUENPTkZJRz1EOlxz
+bmFwc2hvdHNcTWlkYXNJbmZyYXN0cnVjdHVyZS0zXE1pZGFzSW5mcmFzdHJ1Y3R1
+cmVcQXBwQ29uZmlnXENvcnBvcmF0ZW5ldGJhbmtfMDFcY2MtaSANCg0KQzpcV0lO
+RE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdlbmVy
+aWNfcGx1Z2luLnRtcD5zZXQgU1VTRVI9Ym9vdCANCg0KQzpcV0lORE9XU1xUZW1w
+XG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdlbmVyaWNfcGx1Z2lu
+LnRtcD5zZXQgU1BBU1NXT1JEPXFhenhzdzIxIA0KDQpDOlxXSU5ET1dTXFRlbXBc
+b3ZlcnRoZXJlLTIwMTMwNzE3VDE1NDkyNTQ0Ni50bXBcZ2VuZXJpY19wbHVnaW4u
+dG1wPnNldCBOSUxTRVJWRVI9TklMX1NFUlZFUiANCg0KQzpcV0lORE9XU1xUZW1w
+XG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdlbmVyaWNfcGx1Z2lu
+LnRtcD5zZXQgSU5UU0VSVkVSPUlOVEVSTkFMX1NFUlZFUiANCg0KQzpcV0lORE9X
+U1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdlbmVyaWNf
+cGx1Z2luLnRtcD5zZXQgRVhUU0VSVkVSPUVYVEVSTkFMX1NFUlZFUiANCg0KQzpc
+V0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1wXGdl
+bmVyaWNfcGx1Z2luLnRtcD5zZXQgV1NHV1NFUlZFUj1XU0dXX1NFUlZFUiANCg0K
+QzpcV0lORE9XU1xUZW1wXG92ZXJ0aGVyZS0yMDEzMDcxN1QxNTQ5MjU0NDYudG1w
+XGdlbmVyaWNfcGx1Z2luLnRtcD5lY2hvIG9mZiANCjAgRmlsZShzKSBjb3BpZWQN
+Cg==
+</rsp:Stream><rsp:Stream xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" Name="stdout" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488" End="true"></rsp:Stream><rsp:CommandState xmlns:rsp="http://schemas.microsoft.com/wbem/wsman/1/windows/shell" State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done" CommandId="bc7e8420-01eb-48f4-b06e-51478b956488"><rsp:ExitCode>12</rsp:ExitCode></rsp:CommandState></rsp:ReceiveResponse></s:Body></s:Envelope>
