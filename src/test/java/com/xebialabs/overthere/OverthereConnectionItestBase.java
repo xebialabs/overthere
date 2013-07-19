@@ -24,9 +24,7 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
 
 import com.xebialabs.overcast.CloudHost;
-import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.local.LocalFile;
-import com.xebialabs.overthere.ssh.SshConnectionTest;
 import com.xebialabs.overthere.ssh.SshConnectionType;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
