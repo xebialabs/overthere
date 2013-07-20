@@ -22,7 +22,6 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -86,12 +85,14 @@ public class CifsWinRmConnection extends CifsConnection {
 
     private ApacheHttpComponentsHttpClientHttpConnector httpConnector;
 
+    public static final int STDIN_BUF_SIZE = 4096;
+
     /**
      * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper, false);
+        super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
         checkArgument(!username.contains("\\"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
@@ -139,13 +140,43 @@ public class CifsWinRmConnection extends CifsConnection {
 
         final WinRmClient winRmClient = createWinrmClient(targetURL, httpConnector, options);
         try {
+            final PipedInputStream toCallersStdin = new PipedInputStream();
+            final PipedOutputStream callersStdin = new PipedOutputStream(toCallersStdin);
             final PipedInputStream callersStdout = new PipedInputStream();
             final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
             final PipedInputStream callersStderr = new PipedInputStream();
             final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
 
-            winRmClient.startCmd(cmd);
+            winRmClient.createShell();
+            winRmClient.executeCommand(cmd);
 
+            final Exception processInputReaderTheaException[] = new Exception[1];
+            final Thread processInputReaderThead = new Thread(format("Process input reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+                @Override
+                public void run() {
+                    try {
+                        byte[] buf = new byte[STDIN_BUF_SIZE];
+                        for(;;) {
+                            int n = toCallersStdin.read(buf);
+                            if (n == -1)
+                                break;
+                            if (n == 0)
+                                continue;
+
+                            byte[] bufToSend = new byte[n];
+                            System.arraycopy(buf, 0, bufToSend, 0, n);
+                            winRmClient.sendInput(bufToSend);
+                        }
+                    } catch(Exception exc) {
+                        processInputReaderTheaException[0] = exc;
+                    } finally {
+                        Closeables.closeQuietly(callersStdin);
+                    }
+                }
+            };
+            processInputReaderThead.setDaemon(true);
+            processInputReaderThead.start();
+            
             final Exception processOutputReaderThreadException[] = new Exception[1];
             final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
@@ -170,7 +201,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
                 @Override
                 public synchronized OutputStream getStdin() {
-                    return new ByteArrayOutputStream();
+                    return callersStdin;
                 }
 
                 @Override

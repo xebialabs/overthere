@@ -52,8 +52,6 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
 import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
 
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WIN_SHELL;
-
 /**
  * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
  */
@@ -77,47 +75,47 @@ public class WinRmClient {
         this.targetURL = targetURL;
     }
 
-    public void startCmd(String command) {
-        shellId = createShell();
-        commandId = executeCommand(command);
-    }
-    
-    private String createShell() {
-        logger.debug("createShell");
+    public void createShell() {
+        logger.debug("Sending WinRM Create Shell request");
 
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Shell", NS_WIN_SHELL));
-        bodyContent.addElement(QName.get("InputStreams", NS_WIN_SHELL)).addText("stdin");
-        bodyContent.addElement(QName.get("OutputStreams", NS_WIN_SHELL)).addText("stdout stderr");
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Shell", Namespaces.NS_WIN_SHELL));
+        bodyContent.addElement(QName.get("InputStreams", Namespaces.NS_WIN_SHELL)).addText("stdin");
+        bodyContent.addElement(QName.get("OutputStreams", Namespaces.NS_WIN_SHELL)).addText("stdout stderr");
+        final Document requestDocument = getRequestDocument(Action.WS_ACTION, ResourceURI.RESOURCE_URI_CMD, OptionSet.OPEN_SHELL, bodyContent);
 
-        final Document requestDocument = getRequestDocument(Action.WS_ACTION, ResourceURI.RESOURCE_URI_CMD, OptionSet.OPEN_SHELL, null, bodyContent);
         Document responseDocument = sendMessage(requestDocument, SoapAction.SHELL);
 
-        return getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
+        shellId = getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
 
+        logger.debug("Received WinRM Create Shell response: shell with ID [{}] start created", shellId);
     }
 
-    private String executeCommand(String command) {
-        logger.debug("runCommand shellId {}", shellId);
-        final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", NS_WIN_SHELL));
+    public void executeCommand(String command) {
+        logger.debug("Sending WinRM Execute Command request to shell [{}]", shellId);
 
+        final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", Namespaces.NS_WIN_SHELL));
         String encoded = "\"" + command + "\"";
+        bodyContent.addElement(QName.get("Command", Namespaces.NS_WIN_SHELL)).addText(encoded);
+        final Document requestDocument = getRequestDocument(Action.WS_COMMAND, ResourceURI.RESOURCE_URI_CMD, OptionSet.RUN_COMMAND, bodyContent);
 
-        bodyContent.addElement(QName.get("Command", NS_WIN_SHELL)).addText(encoded);
-
-        final Document requestDocument = getRequestDocument(Action.WS_COMMAND, ResourceURI.RESOURCE_URI_CMD, OptionSet.RUN_COMMAND, shellId, bodyContent);
         Document responseDocument = sendMessage(requestDocument, SoapAction.COMMAND_LINE);
+        
+        commandId = getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
 
-        return getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
+        logger.debug("Received WinRM Execute Command response to shell [{}]: command with ID [{}] was started", shellId, commandId);
     }
-
 
     public boolean receiveOutput(OutputStream stdout, OutputStream stderr) throws IOException {
-        logger.debug("receiveOutput shellId {} commandId {} ", shellId, commandId);
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", NS_WIN_SHELL));
-        bodyContent.addElement(QName.get("DesiredStream", NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
-        final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
+        logger.debug("Sending WinRM Receive Output request for command [{}] in shell [{}]", commandId, shellId);
+
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", Namespaces.NS_WIN_SHELL));
+        bodyContent.addElement(QName.get("DesiredStream", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
+        final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
 
         Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
+
+        logger.debug("Received WinRM Receive Output response for command [{}] in shell [{}]", commandId, shellId);
+        
         handleStream(responseDocument, ResponseExtractor.STDOUT, stdout);
         handleStream(responseDocument, ResponseExtractor.STDERR, stderr);
 
@@ -140,35 +138,62 @@ public class WinRmClient {
          */
         final List<?> list = ResponseExtractor.STREAM_DONE.getXPath().selectNodes(responseDocument);
         if (!list.isEmpty()) {
+            logger.trace("Found CommandState element with State=Done, parsing exit code and returning false.");
             parseExitCode(responseDocument);
             return false;
+        } else {
+            logger.trace("Did not find CommandState element with State=Done, returning true.");
+            return true;
         }
+    }
 
-        return true;
+    public void sendInput(byte[] buf) throws IOException {
+        logger.debug("Sending WinRM Send Input request for command [{}} in shell [{}]", commandId, shellId);
+
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Send", Namespaces.NS_WIN_SHELL));
+        final Base64 base64 = new Base64();
+        bodyContent.addElement(QName.get("Stream", Namespaces.NS_WIN_SHELL)).addAttribute("Name", "stdin").addAttribute("CommandId", commandId).addText(base64.encodeAsString(buf));
+        final Document requestDocument = getRequestDocument(Action.WS_SEND, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
+        sendMessage(requestDocument, SoapAction.SEND);
+
+        logger.debug("Sent WinRM Send Input request for command [{}} in shell [{}]", commandId, shellId);
     }
 
     public void signal() {
-        if (commandId == null)
+        if (commandId == null) {
+            logger.warn("Not sending WinRM Signal request in shell [{}] because there is no running command", shellId);
             return;
-        logger.debug("Signal shellId {} commandId {} ", shellId, commandId);
-        final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", NS_WIN_SHELL)).addAttribute("CommandId", commandId);
-        bodyContent.addElement(QName.get("Code", NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
-        final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, shellId, bodyContent);
+        }
+
+        logger.debug("Sending WinRM Signal request for command [{}} in shell [{}]", commandId, shellId);
+
+        final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId);
+        bodyContent.addElement(QName.get("Code", Namespaces.NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
+        final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
         sendMessage(requestDocument, SoapAction.SIGNAL);
+
+        logger.debug("Sent WinRM Signal request for command [{}} in shell [{}]", commandId, shellId);
     }
 
     public void deleteShell() {
-        if (shellId == null)
+        if (shellId == null) {
+            logger.warn("Not sending WinRM Delete Shell request because there is no shell");
             return;
-        logger.debug("DeleteShell shellId {}", shellId);
-        final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, shellId, null);
+        }
+
+        logger.debug("Sending WinRM Delete Shell request for shell [{}]", shellId);
+
+        final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, null);
         sendMessage(requestDocument, null);
+
+        logger.debug("Sent WinRM Delete Shell request for shell [{}]", shellId);
     }
 
     private void parseExitCode(Document responseDocument) {
         try {
+            logger.trace("Parsing exit code");
             String exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
-            logger.debug("exit code {}", exitCode);
+            logger.trace("Found exit code [{}]", exitCode);
             try {
                 exitValue = Integer.parseInt(exitCode);
             } catch(NumberFormatException exc) {
@@ -176,7 +201,7 @@ public class WinRmClient {
                 exitValue = -1;
             }
         } catch (Exception exc) {
-            logger.debug("Exit code not found, not processing it");
+            logger.trace("Exit code not found,");
         }
     }
 
@@ -208,11 +233,11 @@ public class WinRmClient {
         return connector.sendMessage(requestDocument, soapAction);
     }
 
-    private Document getRequestDocument(Action action, ResourceURI resourceURI, OptionSet optionSet, String shelId, Element bodyContent) {
+    private Document getRequestDocument(Action action, ResourceURI resourceURI, OptionSet optionSet, Element bodyContent) {
         SoapMessageBuilder message = Soapy.newMessage();
         SoapMessageBuilder.EnvelopeBuilder envelope = message.envelope();
         try {
-            addHeaders(envelope, action, resourceURI, optionSet, shelId);
+            addHeaders(envelope, action, resourceURI, optionSet);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -224,7 +249,7 @@ public class WinRmClient {
         return message.getDocument();
     }
 
-    private void addHeaders(SoapMessageBuilder.EnvelopeBuilder envelope, Action action, ResourceURI resourceURI, OptionSet optionSet, String shelId)
+    private void addHeaders(SoapMessageBuilder.EnvelopeBuilder envelope, Action action, ResourceURI resourceURI, OptionSet optionSet)
         throws URISyntaxException {
         HeaderBuilder header = envelope.header();
         header.to(targetURL.toURI()).replyTo(new URI("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
@@ -233,7 +258,7 @@ public class WinRmClient {
         header.withLocale(locale);
         header.withTimeout(timeout);
         header.withAction(action.getUri());
-        if (shelId != null) {
+        if (shellId != null) {
             header.withShellId(shellId);
         }
         header.withResourceURI(resourceURI.getUri());
