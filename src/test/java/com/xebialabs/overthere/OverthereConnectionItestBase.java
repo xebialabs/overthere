@@ -1,5 +1,6 @@
 package com.xebialabs.overthere;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -28,6 +29,8 @@ import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.ssh.SshConnectionType;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
+
+import static org.hamcrest.CoreMatchers.nullValue;
 
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -290,6 +293,36 @@ public abstract class OverthereConnectionItestBase {
         } finally {
             p.destroy();
         }
+    }   
+
+    @Test
+    @Assumption(methods = { "onWindows", "supportsProcess", "notSftpWinsshd" })
+    public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
+        OverthereProcess process = connection.startProcess(CmdLine.build("powershell.exe", "-ExecutionPolicy", "Unrestricted", "-File", "C:\\overthere\\echoname.ps1"));
+        OutputStream stdin = process.getStdin();
+        BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getStdout()));
+
+        waitForPrompt(stdout, "name");
+
+        String reply = "iiPoWeR";
+        enterPrompt(stdin, reply);
+
+        String hi = waitForPrompt(stdout, "Hi");
+        assertThat(hi, containsString("iiPoWeR"));
+    }
+
+    private String waitForPrompt(BufferedReader stdout, String prompt) throws IOException {
+        for (;;) {
+            String line = stdout.readLine();
+            assertThat(line, not(nullValue()));
+            if (line.contains(prompt))
+                return line;
+        }
+    }
+
+    private void enterPrompt(OutputStream stdin, String reply) throws IOException {
+        stdin.write((reply + "\r\n").getBytes());
+        stdin.flush();
     }
 
     @Test
@@ -759,6 +792,14 @@ public abstract class OverthereConnectionItestBase {
 
     public boolean onlySftpCygwin() {
         return SshConnectionType.SFTP_CYGWIN.equals(options.get(CONNECTION_TYPE, null));
+    }
+
+    public boolean notSftpWinsshd() {
+        return !onlySftpWinsshd();
+    }
+
+    public boolean onlySftpWinsshd() {
+        return SshConnectionType.SFTP_WINSSHD.equals(options.get(CONNECTION_TYPE, null));
     }
 
     public boolean supportsProcess() {
