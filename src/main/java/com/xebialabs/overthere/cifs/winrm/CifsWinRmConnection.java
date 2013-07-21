@@ -151,7 +151,7 @@ public class CifsWinRmConnection extends CifsConnection {
             winRmClient.executeCommand(cmd);
 
             final Exception processInputReaderTheaException[] = new Exception[1];
-            final Thread processInputReaderThead = new Thread(format("Process input reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+            final Thread processInputReaderThead = new Thread(format("Input reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
                     try {
@@ -178,7 +178,7 @@ public class CifsWinRmConnection extends CifsConnection {
             processInputReaderThead.start();
             
             final Exception processOutputReaderThreadException[] = new Exception[1];
-            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+            final Thread processOutputReaderThread = new Thread(format("Output reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
                     try {
