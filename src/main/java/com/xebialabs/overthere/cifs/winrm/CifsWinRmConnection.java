@@ -40,8 +40,6 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.cifs.winrm.connector.ApacheHttpComponentsHttpClientHttpConnector;
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -81,10 +79,6 @@ public class CifsWinRmConnection extends CifsConnection {
 
     private ConnectionOptions options;
 
-    private URL targetURL;
-
-    private ApacheHttpComponentsHttpClientHttpConnector httpConnector;
-
     public static final int STDIN_BUF_SIZE = 4096;
 
     /**
@@ -97,36 +91,6 @@ public class CifsWinRmConnection extends CifsConnection {
         checkArgument(!username.contains("\\"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
         this.options = options;
-        targetURL = getTargetURL(options);
-        httpConnector = createHttpConnector(targetURL, options);
-    }
-
-    private URL getTargetURL(ConnectionOptions options) {
-        final String scheme = options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS) ? "https" : "http";
-        final String context = options.get(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
-        try {
-            return new URL(scheme, address, port, context);
-        } catch (MalformedURLException e) {
-            throw new WinRMRuntimeIOException("Cannot build a new URL for " + this, e);
-        }
-    }
-
-    private ApacheHttpComponentsHttpClientHttpConnector createHttpConnector(URL targetURL, ConnectionOptions options) {
-        final ApacheHttpComponentsHttpClientHttpConnector httpConnector = new ApacheHttpComponentsHttpClientHttpConnector(username, password, targetURL, unmappedAddress, unmappedPort);
-        httpConnector.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
-        httpConnector.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
-        httpConnector.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
-        httpConnector.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
-        httpConnector.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
-        return httpConnector;
-    }
-
-    private WinRmClient createWinrmClient(URL targetURL, ApacheHttpComponentsHttpClientHttpConnector httpConnector, ConnectionOptions options) {
-        final WinRmClient client = new WinRmClient(httpConnector, targetURL);
-        client.setTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
-        client.setEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
-        client.setLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
-        return client;
     }
 
     @Override
@@ -138,7 +102,7 @@ public class CifsWinRmConnection extends CifsConnection {
             cmd = "CD /D " + workingDirectory.getPath() + " & " + cmd;
         }
 
-        final WinRmClient winRmClient = createWinrmClient(targetURL, httpConnector, options);
+        final WinRmClient winRmClient = createWinrmClient();
         try {
             final PipedInputStream toCallersStdin = new PipedInputStream();
             final PipedOutputStream callersStdin = new PipedOutputStream(toCallersStdin);
@@ -265,7 +229,29 @@ public class CifsWinRmConnection extends CifsConnection {
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + this, exc);
         }
+    }
 
+    private WinRmClient createWinrmClient() {
+        final WinRmClient client = new WinRmClient(username, password, createTargetURL(options), unmappedAddress, unmappedPort);
+        client.setWinRmTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
+        client.setWinRmEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
+        client.setWinRmLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
+        client.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
+        client.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
+        client.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
+        client.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
+        client.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
+        return client;
+    }
+
+    private URL createTargetURL(ConnectionOptions options) {
+        final String scheme = options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS) ? "https" : "http";
+        final String context = options.get(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
+        try {
+            return new URL(scheme, address, port, context);
+        } catch (MalformedURLException e) {
+            throw new WinRmRuntimeIOException("Cannot build a new URL for " + this, e);
+        }
     }
 
 }

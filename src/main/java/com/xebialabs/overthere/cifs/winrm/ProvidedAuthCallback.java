@@ -1,4 +1,4 @@
-package com.xebialabs.overthere.cifs.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm;
 
 import java.io.IOException;
 

@@ -22,7 +22,8 @@
  */
 package com.xebialabs.overthere.cifs.winrm.soap;
 
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.WinRmRuntimeIOException;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -56,7 +57,7 @@ public class Soapy {
             xmlWriter.write(doc);
             xmlWriter.close();
         } catch (IOException e) {
-            throw new WinRMRuntimeIOException("Cannnot convert XML to String ", e);
+            throw new WinRmRuntimeIOException("Cannnot convert XML to String ", e);
         }
         return stringWriter.toString();
     }

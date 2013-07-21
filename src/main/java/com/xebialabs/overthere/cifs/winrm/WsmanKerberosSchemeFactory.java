@@ -1,10 +1,10 @@
-package com.xebialabs.overthere.cifs.winrm.connector;
+package com.xebialabs.overthere.cifs.winrm;
 
 import org.apache.http.auth.AuthScheme;
-import org.apache.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.http.impl.auth.KerberosSchemeFactory;
 import org.apache.http.params.HttpParams;
 
-class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
+class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
 
     private final String spnServiceClass;
 
@@ -12,7 +12,7 @@ class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
 
     private final int spnPort;
 
-    public WsmanSPNegoSchemeFactory(boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
+    public WsmanKerberosSchemeFactory(final boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
         super(stripPort);
         this.spnServiceClass = spnServiceClass;
         this.spnHost = spnHost;
@@ -20,7 +20,7 @@ class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
     }
     
     public AuthScheme newInstance(final HttpParams params) {
-        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
+        return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
 
 }

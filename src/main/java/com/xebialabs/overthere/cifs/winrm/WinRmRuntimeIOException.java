@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.exception;
+package com.xebialabs.overthere.cifs.winrm;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -32,23 +32,23 @@ import org.dom4j.io.XMLWriter;
 import com.xebialabs.overthere.RuntimeIOException;
 
 @SuppressWarnings("serial")
-public class WinRMRuntimeIOException extends RuntimeIOException {
+public class WinRmRuntimeIOException extends RuntimeIOException {
 
     final Document in;
     final Document out;
 
-    public WinRMRuntimeIOException(String message, Document in, Document out, Throwable cause) {
+    public WinRmRuntimeIOException(String message, Document in, Document out, Throwable cause) {
         super(message, cause);
         this.in = in;
         this.out = out;
     }
 
-    public WinRMRuntimeIOException(String message) {
+    public WinRmRuntimeIOException(String message) {
         this(message, null, null, null);
 
     }
 
-    public WinRMRuntimeIOException(String message, Throwable throwable) {
+    public WinRmRuntimeIOException(String message, Throwable throwable) {
         this(message, null, null, throwable);
     }
 

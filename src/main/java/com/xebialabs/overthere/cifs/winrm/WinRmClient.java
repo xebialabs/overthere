@@ -22,17 +22,53 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.security.UnrecoverableKeyException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.BasicUserPrincipal;
+import org.apache.http.auth.Credentials;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -42,7 +78,10 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.cifs.winrm.exception.WinRMRuntimeIOException;
+import com.google.common.io.Closeables;
+
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.cifs.winrm.soap.Action;
 import com.xebialabs.overthere.cifs.winrm.soap.BodyBuilder;
 import com.xebialabs.overthere.cifs.winrm.soap.HeaderBuilder;
@@ -52,27 +91,60 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
 import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
 
+import static org.apache.http.auth.AuthScope.ANY_HOST;
+import static org.apache.http.auth.AuthScope.ANY_PORT;
+import static org.apache.http.auth.AuthScope.ANY_REALM;
+import static org.apache.http.client.params.AuthPolicy.BASIC;
+import static org.apache.http.client.params.AuthPolicy.KERBEROS;
+import static org.apache.http.client.params.AuthPolicy.SPNEGO;
+import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
+
 /**
  * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
  */
 public class WinRmClient {
 
+    private final String username;
+    private final boolean enableKerberos;
+    private final String password;
     private final URL targetURL;
-    private final HttpConnector connector;
+    private final String unmappedAddress;
+    private final int unmappedPort;
 
-    private String timeout;
-    private int envelopSize;
-    private String locale;
+    private String winRmTimeout;
+    private int winRmEnvelopSize;
+    private String winRmLocale;
+    private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
+    private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
+    private boolean kerberosUseHttpSpn;
+    private boolean kerberosAddPortToSpn;
+    private boolean kerberosDebug;    
 
     private String shellId;
     private String commandId;
     private int exitValue = -1;
-
     private int chunk = 0;
 
-    public WinRmClient(HttpConnector connector, URL targetURL) {
-        this.connector = connector;
+    public WinRmClient(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort) {
+        int posOfAtSign = username.indexOf('@');
+        if(posOfAtSign >= 0) {
+            String u = username.substring(0, posOfAtSign);
+            String d = username.substring(posOfAtSign + 1);
+            if(d.toUpperCase().equals(d)) {
+                this.username = username;
+            } else {
+                this.username = u + "@" + d.toUpperCase();
+                logger.warn("Fixing username [{}] to have an upper case domain name [{}]", username, this.username);
+            }
+            this.enableKerberos = true;
+        } else {
+            this.username = username;
+            this.enableKerberos = false;
+        }
+        this.password = password;
         this.targetURL = targetURL;
+        this.unmappedAddress = unmappedAddress;
+        this.unmappedPort = unmappedPort;
     }
 
     public void createShell() {
@@ -83,7 +155,7 @@ public class WinRmClient {
         bodyContent.addElement(QName.get("OutputStreams", Namespaces.NS_WIN_SHELL)).addText("stdout stderr");
         final Document requestDocument = getRequestDocument(Action.WS_ACTION, ResourceURI.RESOURCE_URI_CMD, OptionSet.OPEN_SHELL, bodyContent);
 
-        Document responseDocument = sendMessage(requestDocument, SoapAction.SHELL);
+        Document responseDocument = sendRequest(requestDocument, SoapAction.SHELL);
 
         shellId = getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
 
@@ -98,7 +170,7 @@ public class WinRmClient {
         bodyContent.addElement(QName.get("Command", Namespaces.NS_WIN_SHELL)).addText(encoded);
         final Document requestDocument = getRequestDocument(Action.WS_COMMAND, ResourceURI.RESOURCE_URI_CMD, OptionSet.RUN_COMMAND, bodyContent);
 
-        Document responseDocument = sendMessage(requestDocument, SoapAction.COMMAND_LINE);
+        Document responseDocument = sendRequest(requestDocument, SoapAction.COMMAND_LINE);
         
         commandId = getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
 
@@ -112,7 +184,7 @@ public class WinRmClient {
         bodyContent.addElement(QName.get("DesiredStream", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
         final Document requestDocument = getRequestDocument(Action.WS_RECEIVE, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
 
-        Document responseDocument = sendMessage(requestDocument, SoapAction.RECEIVE);
+        Document responseDocument = sendRequest(requestDocument, SoapAction.RECEIVE);
 
         logger.debug("Received WinRM Receive Output response for command [{}] in shell [{}]", commandId, shellId);
         
@@ -154,7 +226,7 @@ public class WinRmClient {
         final Base64 base64 = new Base64();
         bodyContent.addElement(QName.get("Stream", Namespaces.NS_WIN_SHELL)).addAttribute("Name", "stdin").addAttribute("CommandId", commandId).addText(base64.encodeAsString(buf));
         final Document requestDocument = getRequestDocument(Action.WS_SEND, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
-        sendMessage(requestDocument, SoapAction.SEND);
+        sendRequest(requestDocument, SoapAction.SEND);
 
         logger.debug("Sent WinRM Send Input request for command [{}} in shell [{}]", commandId, shellId);
     }
@@ -170,7 +242,7 @@ public class WinRmClient {
         final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId);
         bodyContent.addElement(QName.get("Code", Namespaces.NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
         final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
-        sendMessage(requestDocument, SoapAction.SIGNAL);
+        sendRequest(requestDocument, SoapAction.SIGNAL);
 
         logger.debug("Sent WinRM Signal request for command [{}} in shell [{}]", commandId, shellId);
     }
@@ -184,9 +256,13 @@ public class WinRmClient {
         logger.debug("Sending WinRM Delete Shell request for shell [{}]", shellId);
 
         final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, null);
-        sendMessage(requestDocument, null);
+        sendRequest(requestDocument, null);
 
         logger.debug("Sent WinRM Delete Shell request for shell [{}]", shellId);
+    }
+
+    public int exitValue() {
+        return exitValue;
     }
 
     private void parseExitCode(Document responseDocument) {
@@ -229,10 +305,6 @@ public class WinRmClient {
         return next.getText();
     }
 
-    private Document sendMessage(Document requestDocument, SoapAction soapAction) {
-        return connector.sendMessage(requestDocument, soapAction);
-    }
-
     private Document getRequestDocument(Action action, ResourceURI resourceURI, OptionSet optionSet, Element bodyContent) {
         SoapMessageBuilder message = Soapy.newMessage();
         SoapMessageBuilder.EnvelopeBuilder envelope = message.envelope();
@@ -253,10 +325,10 @@ public class WinRmClient {
         throws URISyntaxException {
         HeaderBuilder header = envelope.header();
         header.to(targetURL.toURI()).replyTo(new URI("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
-        header.maxEnvelopeSize(envelopSize);
+        header.maxEnvelopeSize(winRmEnvelopSize);
         header.withId(getUUID());
-        header.withLocale(locale);
-        header.withTimeout(timeout);
+        header.withLocale(winRmLocale);
+        header.withTimeout(winRmTimeout);
         header.withAction(action.getUri());
         if (shellId != null) {
             header.withShellId(shellId);
@@ -267,52 +339,255 @@ public class WinRmClient {
         }
     }
 
+    private static String getUUID() {
+        return "uuid:" + UUID.randomUUID().toString().toUpperCase();
+    }
+
+    private Document sendRequest(final Document requestDocument, final SoapAction soapAction) {
+        if (enableKerberos) {
+            return runPrivileged(new PrivilegedSendMessage(requestDocument, soapAction));
+        } else {
+            return doSendRequest(requestDocument, soapAction);
+        }
+    }
+
+    /**
+     * Performs the JAAS login and run the sendRequest method within a privileged scope.
+     */
+    private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
+        final CallbackHandler handler = new ProvidedAuthCallback(username, password);
+        Document result;
+        try {
+            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(kerberosDebug));
+            lc.login();
+
+            result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
+        } catch (LoginException e) {
+            throw new WinRmRuntimeIOException("Login failure sending message on " + targetURL + " error: " + e.getMessage(),
+                privilegedSendMessage.getRequestDocument(), null, e);
+        } catch (PrivilegedActionException e) {
+            throw new WinRmRuntimeIOException("Failure sending message on " + targetURL + " error: " + e.getMessage(),
+                privilegedSendMessage.getRequestDocument(), null, e.getException());
+        }
+        return result;
+    }
+
+    /**
+     * PrivilegedExceptionAction that wraps the internal sendRequest
+     */
+    private class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
+        private Document requestDocument;
+        private SoapAction soapAction;
+
+        private PrivilegedSendMessage(final Document requestDocument, final SoapAction soapAction) {
+            this.requestDocument = requestDocument;
+            this.soapAction = soapAction;
+        }
+
+        @Override
+        public Document run() throws Exception {
+            return WinRmClient.this.doSendRequest(requestDocument, soapAction);
+        }
+
+        public Document getRequestDocument() {
+            return requestDocument;
+        }
+    }
+
+    /**
+     * Internal sendRequest, performs the HTTP request and returns the result document.
+     */
+    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) {
+        final DefaultHttpClient client = new DefaultHttpClient();
+        try {
+            configureHttpClient(client);
+            final HttpContext context = new BasicHttpContext();
+            final HttpPost request = new HttpPost(targetURL.toURI());
+
+            if (soapAction != null) {
+                request.setHeader("SOAPAction", soapAction.getValue());
+            }
+
+            final String requestBody = toString(requestDocument);
+            logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
+
+            final HttpEntity entity = createEntity(requestBody);
+            request.setEntity(entity);
+
+            final HttpResponse response = client.execute(request, context);
+
+            logResponseHeaders(response);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new WinRmRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
+                    targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
+            }
+
+            final String responseBody = handleResponse(response, context);
+            Document responseDocument = DocumentHelper.parseText(responseBody);
+
+            logDocument("Response body:", responseDocument);
+
+            return responseDocument;
+        } catch (WinRmRuntimeIOException exc) {
+            throw exc;
+        } catch (Exception exc) {
+            throw new WinRmRuntimeIOException("Error when sending request to " + targetURL, requestDocument, null, exc);
+        } finally {
+            client.getConnectionManager().shutdown();
+        }
+    }
+
+    private void configureHttpClient(final DefaultHttpClient httpclient) throws GeneralSecurityException {
+        configureTrust(httpclient);
+
+        configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
+
+        if (enableKerberos) {
+            String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
+            httpclient.getAuthSchemes().register(KERBEROS,
+                new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            configureAuthentication(httpclient, KERBEROS, new KerberosPrincipal(username));
+            configureAuthentication(httpclient, SPNEGO, new KerberosPrincipal(username));
+        }
+
+        httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
+    }
+
+    private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
+        KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+
+        if (!"https".equalsIgnoreCase(targetURL.getProtocol())) {
+            return;
+        }
+
+        final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
+        final X509HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
+        final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
+        final Scheme sch = new Scheme("https", 443, socketFactory);
+        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+    }
+
+    private void configureAuthentication(final DefaultHttpClient httpclient, final String scheme, final Principal principal) {
+        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, scheme), new Credentials() {
+            public Principal getUserPrincipal() {
+                return principal;
+            }
+
+            public String getPassword() {
+                return password;
+            }
+        });
+    }
+
+    private static void logResponseHeaders(final HttpResponse response) {
+        if (!logger.isTraceEnabled()) {
+            return;
+        }
+
+        StringBuilder headers = new StringBuilder();
+        for (final Header header : response.getAllHeaders()) {
+            headers.append(header.getName()).append(": ").append(header.getValue()).append("\n");
+        }
+
+        logger.trace("Response headers:\n{}", headers);
+    }
+
+    private static void logDocument(String caption, final Document document) {
+        if (!logger.isTraceEnabled()) {
+            return;
+        }
+
+        StringWriter text = new StringWriter();
+        try {
+            XMLWriter writer = new XMLWriter(text, OutputFormat.createPrettyPrint());
+            writer.write(document);
+            writer.close();
+        } catch (IOException e) {
+            logger.trace("{}\n{}", caption, e);
+        }
+
+        logger.trace("{}\n{}", caption, text);
+    }
+
+
+    /**
+     * Handle the httpResponse and return the SOAP XML String.
+     */
+    protected String handleResponse(final HttpResponse response, final HttpContext context) throws IOException {
+        final HttpEntity entity = response.getEntity();
+        if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith("application/soap+xml")) {
+            throw new WinRmRuntimeIOException("Error when sending request to " + targetURL + "; Unexpected content-type: " + entity.getContentType());
+        }
+
+        final InputStream is = entity.getContent();
+        final Writer writer = new StringWriter();
+        final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        try {
+            int n;
+            final char[] buffer = new char[1024];
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } finally {
+            Closeables.closeQuietly(reader);
+            Closeables.closeQuietly(is);
+            EntityUtils.consume(response.getEntity());
+        }
+
+        return writer.toString();
+    }
+
     private static String toString(Document doc) {
         StringWriter stringWriter = new StringWriter();
         XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
         try {
             xmlWriter.write(doc);
             xmlWriter.close();
-        } catch (IOException e) {
-            throw new WinRMRuntimeIOException("error ", e);
+        } catch (IOException exc) {
+            throw new WinRmRuntimeIOException("Cannnot convert XML to String ", exc);
         }
         return stringWriter.toString();
     }
 
-    private static String getUUID() {
-        return "uuid:" + UUID.randomUUID().toString().toUpperCase();
+    /**
+     * Create the HttpEntity to send in the request.
+     */
+    protected HttpEntity createEntity(final String requestDocAsString) {
+        return new StringEntity(requestDocAsString, ContentType.create("application/soap+xml", "UTF-8"));
     }
 
-    public int exitValue() {
-        return exitValue;
+    public void setWinRmTimeout(String timeout) {
+        this.winRmTimeout = timeout;
     }
 
-    public String getTimeout() {
-        return timeout;
+    public void setWinRmEnvelopSize(int envelopSize) {
+        this.winRmEnvelopSize = envelopSize;
     }
 
-    public void setTimeout(String timeout) {
-        this.timeout = timeout;
+    public void setWinRmLocale(String locale) {
+        this.winRmLocale = locale;
     }
 
-    public int getEnvelopSize() {
-        return envelopSize;
+    public void setHttpsCertTrustStrategy(WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy) {
+        this.httpsCertTrustStrategy = httpsCertTrustStrategy;
     }
 
-    public void setEnvelopSize(int envelopSize) {
-        this.envelopSize = envelopSize;
+    public void setHttpsHostnameVerifyStrategy(WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy) {
+        this.httpsHostnameVerifyStrategy = httpsHostnameVerifyStrategy;
     }
 
-    public String getLocale() {
-        return locale;
+    public void setKerberosUseHttpSpn(boolean kerberosUseHttpSpn) {
+        this.kerberosUseHttpSpn = kerberosUseHttpSpn;
     }
 
-    public void setLocale(String locale) {
-        this.locale = locale;
+    public void setKerberosAddPortToSpn(boolean kerberosAddPortToSpn) {
+        this.kerberosAddPortToSpn = kerberosAddPortToSpn;
     }
 
-    public URL getTargetURL() {
-        return targetURL;
+    public void setKerberosDebug(boolean kerberosDebug) {
+        this.kerberosDebug = kerberosDebug;
     }
 
     private static Logger logger = LoggerFactory.getLogger(WinRmClient.class);
