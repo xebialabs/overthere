@@ -296,7 +296,7 @@ public abstract class OverthereConnectionItestBase {
     }   
 
     @Test
-    @Assumption(methods = { "onWindows", "supportsProcess", "notSftpWinsshd" })
+    @Assumption(methods = { "onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd" })
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
         OverthereProcess process = connection.startProcess(CmdLine.build("powershell.exe", "-ExecutionPolicy", "Unrestricted", "-File", "C:\\overthere\\echoname.ps1"));
         OutputStream stdin = process.getStdin();
