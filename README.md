@@ -141,6 +141,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
 </tr>
 </table>
+
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
 
 <a name="local"></a>
@@ -152,6 +153,17 @@ The local protocol implementation uses the local file manipulation and local pro
 ## SSH
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
+
+### Compatibility
+
+Overthere uses the [sshj](https://github.com/shikhar/sshj) library for SSH and supports all algorithms and formats supported by that library:
+
+* Ciphers: ``aes{128,192,256}-{cbc,ctr}``, ``blowfish-cbc``, ``3des-cbc``
+* Key Exchange methods: ``diffie-hellman-group1-sha1``, ``diffie-hellman-group14-sha1``
+* Signature formats: ``ssh-rsa``, ``ssh-dss``
+* MAC algorithms: ``hmac-md5``, ``hmac-md5-96``, ``hmac-sha1``, ``hmac-sha1-96``
+* Compression algorithms: ``zlib`` and ``zlib@openssh.com`` (delayed zlib)
+* Private Key file formats: ``pkcs8`` encoded (the format used by [OpenSSH](http://www.openssh.com/))
 
 <a name="ssh_host_setup"></a>
 ### SSH host setup
@@ -459,9 +471,10 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 1. If the remote host is running Windows Vista or Windows 7, the __Windows Remote Management (WS-Management)__ service is not started by default. Start the service and change its Startup type to __Automatic (Delayed Start)__ before proceeding with the next steps.
 
-1. On the remote host, open a Command Prompt using the __Run as Administrator__ option and execute the following commands:
+1. On the remote host, open a Command Prompt (not a PowerShell prompt!) using the __Run as Administrator__ option and paste in the following lines:
 
 		winrm quickconfig
+		y
 		winrm set winrm/config/service/Auth @{Basic="true"}
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
@@ -550,12 +563,10 @@ In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm
 
 Create a file called `krb5.conf` (Unix) or `krb5.ini` (Windows) with at least the following content: 
 
-<pre>
-[realms]
-EXAMPLE.COM = {
-    kdc = KDC.EXAMPLE.COM
-}
-</pre>
+    [realms]
+    EXAMPLE.COM = {
+        kdc = KDC.EXAMPLE.COM
+    }
 
 Replace the values with the name of your domain/realm and the hostname of your domain controller (multiple entries can be added to allow the Overthere source host to connect to multiple domains) and place the file in the default location for your operating system:
 
@@ -564,6 +575,8 @@ Replace the values with the name of your domain/realm and the hostname of your d
 * Windows: `C:\Windows\krb5.ini`
 
 Alternatively, place the file somewhere else and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the file you just created. 
+
+See [the Kerberos V5 System Administrator's Guide at MIT](http://web.mit.edu/kerberos/krb5-1.10/krb5-1.10.6/doc/krb5-admin.html#krb5_002econf) for more information on the `krb5.conf` format.
 
 <a name="cifs_host_setup_spn"></a>
 #### Kerberos - remote host
@@ -606,25 +619,45 @@ Set the following Java system property to prevent JCIFS from sending DFS query p
 
 See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
 
+#### CIFS connections time out
+
+If the problem cannot be solved by changing the network topology, try increasing the JCIFS timeout values documented in the [JCIFS documentation](http://jcifs.samba.org/src/docs/api/overview-summary.html#scp). Another system property not mentioned there but only on the [JCIFS homepage](http://jcifs.samba.org/) is `jcifs.smb.client.connTimeout`.
+
+To get more debug information from JCIFS, set the system property `jcifs.util.loglevel` to 3.
+
+#### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
+
+The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
+
 #### Kerberos authentication fails with the message `Cannot get kdc for realm …`
 
 The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) is case sensitive and must be entered in upper case in the `krb5.conf` file.
+
+Alternatively, you can use the `dns_lookup_kdc` and `dns_lookup_realm` options in the `libdefaults` section to automatically find the right realm and KDC from the DNS server if it has been configured to include the necessary `SRV` and `TXT` records:
+
+    [libdefaults]
+        dns_lookup_kdc = true
+        dns_lookup_realm = true
 
 #### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
 
 The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
 
-#### Kerberos authentication fails with the message `Message stream modified (41)`
-
-The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. The realm name is case sensitive and must be entered in upper case in the `krb5.conf` file.
-
 #### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
 
 The username or the password supplied was invalid. Did you supply the correct credentials?
 
-#### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
+#### Kerberos authentication fails with the message `Integrity check on decrypted field failed (31)`
 
-The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
+Is the target machine part of a Windows 2000 domain? In that case, you'll have to add `rc4-hmac` to the supported encryption types:
+
+    [libdefaults]
+        default_tgs_enctypes = aes256-cts-hmac-sha1-96 des3-cbc-sha1 arcfour-hmac-md5 des-cbc-crc des-cbc-md5 des-cbc-md4 rc4-hmac
+        default_tkt_enctypes = aes256-cts-hmac-sha1-96 des3-cbc-sha1 arcfour-hmac-md5 des-cbc-crc des-cbc-md5 des-cbc-md4 rc4-hmac
+
+#### Kerberos authentication fails with the message `Message stream modified (41)`
+
+The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. The realm name is case sensitive and must be entered in upper case in the `krb5.conf` file.
 
 #### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
 
@@ -634,21 +667,58 @@ The Kerberos subsystem of Java cannot start up and the remote WinRM server is se
 
 The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
 
+#### The `winrm` configuration command fails with the message `There are no more endpoints available from the endpoint mapper`
+
+The Windows Firewall has not been started. See [Microsoft Knowledge Base article #2004640](http://support.microsoft.com/kb/2004640) for more information.
+
+#### The `winrm` configuration command fails with the message `The WinRM client cannot process the request`
+
+This can occur if you have disabled the `Negotiate` authentication method in the WinRM configuration. To fix this situation, edit the configuration in the Windows registry under the key `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WSMAN\` and restart the Windows Remote Management service.
+
+_Courtesy of [this blog by Chris Knight](http://blog.chrisara.com.au/2012/06/recovering-from-winrm-authentication.html)_
+
 #### WinRM command fails with the message `java.net.ConnectException: Connection refused`
 
 The Windows Remote Management service is not running or is not running on the port that has been configured. Start the service or configure Overthere to use <a href="#port">a different port number</a>.
 
-#### WinRM command fails with a 401 response code.
+#### WinRM command fails with a 401 response code
 
-Multiple causes can lead to this error messge:
+Multiple causes can lead to this error message:
 
-1. The Kerberos ticket is not accepted by the remote hosts. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name.
+1. The Kerberos ticket is not accepted by the remote host:
+
+1.1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
+
+1.1. Has the reverse DNS of the remote host been set up correctly? See [Principal names and DNS](http://web.mit.edu/Kerberos/krb5-devel/doc/admin/princ_dns.html) for more information. Please note that the `rdns` option is not available in Java's Kerberos implementation.
 
 1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the <a href="#cifs_host_setup_winrm">host setup for WinRM</a>?
 
 1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
 1. The user is not allowed to perform a WinRM command. Did you grant the user (local) administrative privileges?
+
+#### WinRM command fails with a 500 response code
+
+Multiple causes can lead to this error message:
+
+1. If the command was executing for a long time, this might have been caused by a timeout. You can increase the [WinRM timeout](#cifs_winrmTimeout) connection option to increase the request timeout. Don't forget to increase the `MaxTimeoutms` setting on the remote host as well. For example, to set the maximum timeout on the server to five minutes, enter the following command:
+
+    winrm set winrm/config @{MaxTimeoutms="300000"}
+
+1. If a lot of commands are being executed concurrently, increase the `MaxConcurrentOperationsPerUser` setting on the server. For example, to set the maximum number of concurrent operations per user to 100, enter the following command:
+
+    winrm set winrm/config/service @{MaxConcurrentOperationsPerUser="100"}
+
+Other configuration options that may be of use are `Service/MaxConcurrentOperations` and `MaxProviderRequests` (WinRM 1.0 only).
+
+#### WinRM command fails with an unknown error code
+
+If you see an unknown WinRM error code in the logging, you can use the `winrm helpmsg` command to get more information, e.g.
+
+    winrm helpmsg 0x80338104
+    The WS-Management service cannot process the request. The WMI service returned an 'access denied' error.
+
+_Courtesy of [this PowerShell Magazine blog by Shay Levy](http://www.powershellmagazine.com/2013/03/06/pstip-decoding-winrm-error-messages/)_
 
 <a name="cifs_connection_options"></a>
 ### CIFS connection options
