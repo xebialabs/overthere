@@ -101,7 +101,7 @@ public abstract class OverthereConnectionItestBase {
         assertThat("We're not connected!", connection != null);
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void disconnect() {
         if (connection != null) {
             try {
@@ -293,7 +293,7 @@ public abstract class OverthereConnectionItestBase {
         } finally {
             p.destroy();
         }
-    }   
+    }
 
     @Test
     @Assumption(methods = { "onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd" })
