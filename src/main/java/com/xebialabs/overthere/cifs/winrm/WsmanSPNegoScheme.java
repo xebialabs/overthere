@@ -12,18 +12,18 @@ import org.slf4j.LoggerFactory;
 class WsmanSPNegoScheme extends SPNegoScheme {
 
     private final String spnServiceClass;
-
     private final String spnAddress;
-
     private final int spnPort;
+    private final WinRmHttpClient whClient;
 
-    public WsmanSPNegoScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort) {
+    public WsmanSPNegoScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort, final WinRmHttpClient whClient) {
         super(stripPort);
         this.spnServiceClass = spnServiceClass;
         this.spnAddress = spnAddress;
         this.spnPort = spnPort;
+        this.whClient = whClient;
     }
-    
+
     @Override
     protected byte[] generateGSSToken(final byte[] input, final Oid oid, String authServer) throws GSSException {
         byte[] token = input;
@@ -31,8 +31,8 @@ class WsmanSPNegoScheme extends SPNegoScheme {
             token = new byte[0];
         }
 
-        if(authServer.equals("localhost")) {
-            if(authServer.indexOf(':') > 0) {
+        if (authServer.equals("localhost")) {
+            if (authServer.indexOf(':') > 0) {
                 authServer = spnAddress + ":" + spnPort;
             } else {
                 authServer = spnAddress;
@@ -40,7 +40,7 @@ class WsmanSPNegoScheme extends SPNegoScheme {
         }
 
         String spn = spnServiceClass + "@" + authServer;
-        
+
         logger.debug("Requesting SPNego ticket for SPN [{}]", spn);
         GSSManager manager = getManager();
         GSSName serverName = manager.createName(spn, GSSName.NT_HOSTBASED_SERVICE);
@@ -48,6 +48,7 @@ class WsmanSPNegoScheme extends SPNegoScheme {
 
         logger.debug("Creating SPNego GSS context for canonicalized SPN [{}]", canonicalizedName);
         GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, GSSContext.DEFAULT_LIFETIME);
+        whClient.setGSSContext(gssContext);
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
         return gssContext.initSecContext(token, 0, token.length);

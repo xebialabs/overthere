@@ -12,18 +12,18 @@ import org.slf4j.LoggerFactory;
 class WsmanKerberosScheme extends KerberosScheme {
 
     private final String spnServiceClass;
-
     private final String spnAddress;
-
     private final int spnPort;
+    private final WinRmHttpClient whClient;
 
-    public WsmanKerberosScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort) {
+    public WsmanKerberosScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort, final WinRmHttpClient whClient) {
         super(stripPort);
         this.spnServiceClass = spnServiceClass;
         this.spnAddress = spnAddress;
         this.spnPort = spnPort;
+        this.whClient = whClient;
     }
-    
+
     @Override
     protected byte[] generateGSSToken(final byte[] input, final Oid oid, String authServer) throws GSSException {
         byte[] token = input;
@@ -31,8 +31,8 @@ class WsmanKerberosScheme extends KerberosScheme {
             token = new byte[0];
         }
 
-        if(authServer.equals("localhost")) {
-            if(authServer.indexOf(':') > 0) {
+        if (authServer.equals("localhost")) {
+            if (authServer.indexOf(':') > 0) {
                 authServer = spnAddress + ":" + spnPort;
             } else {
                 authServer = spnAddress;
@@ -48,6 +48,7 @@ class WsmanKerberosScheme extends KerberosScheme {
 
         logger.debug("Creating Kerberos GSS context for canonicalized SPN [{}]", canonicalizedName);
         GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, GSSContext.DEFAULT_LIFETIME);
+        whClient.setGSSContext(gssContext);
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
         return gssContext.initSecContext(token, 0, token.length);
