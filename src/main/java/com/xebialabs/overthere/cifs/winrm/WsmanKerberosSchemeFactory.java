@@ -7,20 +7,20 @@ import org.apache.http.params.HttpParams;
 class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
 
     private final String spnServiceClass;
-    private final String spnHost;
-    private final int spnPort;
-    private final WinRmHttpClient whClient;
 
-    public WsmanKerberosSchemeFactory(final boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort, WinRmHttpClient whClient) {
+    private final String spnHost;
+
+    private final int spnPort;
+
+    public WsmanKerberosSchemeFactory(final boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
         super(stripPort);
         this.spnServiceClass = spnServiceClass;
         this.spnHost = spnHost;
         this.spnPort = spnPort;
-        this.whClient = whClient;
     }
     
     public AuthScheme newInstance(final HttpParams params) {
-        return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort, whClient);
+        return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
 
 }

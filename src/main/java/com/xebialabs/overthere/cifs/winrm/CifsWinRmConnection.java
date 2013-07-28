@@ -30,9 +30,6 @@ import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
@@ -105,10 +102,8 @@ public class CifsWinRmConnection extends CifsConnection {
             cmd = "CD /D " + workingDirectory.getPath() + " & " + cmd;
         }
 
-        final URL targetURL = createTargetURL(options);
-        final WinRmClient winRmClient = createWinrmClient(targetURL);
+        final WinRmClient winRmClient = createWinrmClient();
         try {
-            winRmClient.connect();
             final PipedInputStream toCallersStdin = new PipedInputStream();
             final PipedOutputStream callersStdin = new PipedOutputStream(toCallersStdin);
             final PipedInputStream callersStdout = new PipedInputStream();
@@ -116,39 +111,28 @@ public class CifsWinRmConnection extends CifsConnection {
             final PipedInputStream callersStderr = new PipedInputStream();
             final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
 
-            final String shellId = winRmClient.createShell();
-            final String commandId = winRmClient.executeCommand(cmd);
+            winRmClient.createShell();
+            winRmClient.executeCommand(cmd);
 
-            final Exception processInputReaderThreadException[] = new Exception[1];
-            final Thread processInputReaderThead = new Thread(format("Input reader for command [%s]", commandId)) {
+            final Exception processInputReaderTheaException[] = new Exception[1];
+            final Thread processInputReaderThead = new Thread(format("Input reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
                     try {
-                        final WinRmClient stdinClient = createWinrmClient(targetURL);
-                        stdinClient.shellId = shellId;
-                        stdinClient.commandId = commandId;
-                        stdinClient.connect();
-                        try {
-                            byte[] buf = new byte[STDIN_BUF_SIZE];
-                            for (;;) {
-                                int n = toCallersStdin.read(buf);
-                                if (n == -1)
-                                    break;
-                                if (n == 0)
-                                    continue;
+                        byte[] buf = new byte[STDIN_BUF_SIZE];
+                        for(;;) {
+                            int n = toCallersStdin.read(buf);
+                            if (n == -1)
+                                break;
+                            if (n == 0)
+                                continue;
 
-                                byte[] bufToSend = new byte[n];
-                                System.arraycopy(buf, 0, bufToSend, 0, n);
-                                stdinClient.sendInput(bufToSend);
-                            }
-                        } finally {
-                            stdinClient.disconnect();
+                            byte[] bufToSend = new byte[n];
+                            System.arraycopy(buf, 0, bufToSend, 0, n);
+                            winRmClient.sendInput(bufToSend);
                         }
-                    } catch (Exception exc) {
-                        logger.trace(format("Input reader for command [%s] has terminated abnormally", commandId), exc);
-                        synchronized (processInputReaderThreadException) {
-                            processInputReaderThreadException[0] = exc;
-                        }
+                    } catch(Exception exc) {
+                        processInputReaderTheaException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(callersStdin);
                     }
@@ -156,30 +140,18 @@ public class CifsWinRmConnection extends CifsConnection {
             };
             processInputReaderThead.setDaemon(true);
             processInputReaderThead.start();
-
+            
             final Exception processOutputReaderThreadException[] = new Exception[1];
-            final Thread processOutputReaderThread = new Thread(format("Output reader for command [%s]", commandId)) {
+            final Thread processOutputReaderThread = new Thread(format("Output reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
                 @Override
                 public void run() {
                     try {
-                        final WinRmClient stdoutClient = createWinrmClient(targetURL);
-                        stdoutClient.shellId = shellId;
-                        stdoutClient.commandId = commandId;
-                        stdoutClient.connect();
-                        try {
-                            for (;;) {
-                                System.err.println("Command ID: " + commandId);
-                                if (!stdoutClient.receiveOutput(toCallersStdout, toCallersStderr))
-                                    break;
-                            }
-                        } finally {
-                            stdoutClient.disconnect();
+                        for (;;) {
+                            if (!winRmClient.receiveOutput(toCallersStdout, toCallersStderr))
+                                break;
                         }
                     } catch (Exception exc) {
-                        logger.trace(format("Output reader for command [%s] has terminated abnormally", commandId), exc);
-                        synchronized (processOutputReaderThreadException) {
-                            processOutputReaderThreadException[0] = exc;
-                        }
+                        processOutputReaderThreadException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                         Closeables.closeQuietly(toCallersStderr);
@@ -189,7 +161,7 @@ public class CifsWinRmConnection extends CifsConnection {
             processOutputReaderThread.start();
 
             return new OverthereProcess() {
-                Boolean processTerminated = false;
+                boolean processTerminated = false;
 
                 @Override
                 public synchronized OutputStream getStdin() {
@@ -208,39 +180,24 @@ public class CifsWinRmConnection extends CifsConnection {
 
                 @Override
                 public synchronized int waitFor() {
-                    synchronized (processTerminated) {
-                        if (processTerminated) {
-                            return exitValue();
-                        }
+                    if (processTerminated) {
+                        return exitValue();
                     }
 
                     try {
                         try {
                             processOutputReaderThread.join();
                         } finally {
-                            destroyQuietly(false);
+                            winRmClient.deleteShell();
+                            processTerminated = true;
                         }
-
-                        synchronized (processInputReaderThreadException) {
-                            if (processInputReaderThreadException[0] != null) {
-                                if (processInputReaderThreadException[0] instanceof RuntimeException) {
-                                    throw (RuntimeException) processInputReaderThreadException[0];
-                                } else {
-                                    throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), processInputReaderThreadException[0]);
-                                }
+                        if(processOutputReaderThreadException[0] != null) {
+                            if(processOutputReaderThreadException[0] instanceof RuntimeException) {
+                                throw (RuntimeException) processOutputReaderThreadException[0];
+                            } else {
+                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), processOutputReaderThreadException[0]);
                             }
                         }
-
-                        synchronized (processOutputReaderThreadException) {
-                            if (processOutputReaderThreadException[0] != null) {
-                                if (processOutputReaderThreadException[0] instanceof RuntimeException) {
-                                    throw (RuntimeException) processOutputReaderThreadException[0];
-                                } else {
-                                    throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), processOutputReaderThreadException[0]);
-                                }
-                            }
-                        }
-
                         return exitValue();
                     } catch (InterruptedException exc) {
                         throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), exc);
@@ -249,38 +206,13 @@ public class CifsWinRmConnection extends CifsConnection {
 
                 @Override
                 public synchronized void destroy() {
-                    destroyQuietly(true);
-                }
-
-                void destroyQuietly(boolean signal) {
-                    synchronized (processTerminated) {
-                        if (processTerminated) {
-                            return;
-                        }
-
-                        if (signal) {
-                            try {
-                                winRmClient.signal();
-                            } catch (RuntimeException exc) {
-                                logger.warn(String.format("Could not to signal command [%s]", commandId), exc);
-                            }
-                        }
-
-                        try {
-                            winRmClient.deleteShell();
-                        } catch (RuntimeException exc) {
-                            logger.warn(String.format("Could not to delete shell [%s]", shellId), exc);
-                        }
-
-                        try {
-                            winRmClient.disconnect();
-                        } catch (RuntimeException exc) {
-                            logger.warn(String.format("Could not to disconnect from [%s]", targetURL), exc);
-                        }
-
-                        processTerminated = true;
+                    if (processTerminated) {
+                        return;
                     }
 
+                    winRmClient.signal();
+                    winRmClient.deleteShell();
+                    processTerminated = true;
                 }
 
                 @Override
@@ -293,9 +225,23 @@ public class CifsWinRmConnection extends CifsConnection {
                     return winRmClient.exitValue();
                 }
             };
+
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + this, exc);
         }
+    }
+
+    private WinRmClient createWinrmClient() {
+        final WinRmClient client = new WinRmClient(username, password, createTargetURL(options), unmappedAddress, unmappedPort);
+        client.setWinRmTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
+        client.setWinRmEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
+        client.setWinRmLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
+        client.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
+        client.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
+        client.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
+        client.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
+        client.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
+        return client;
     }
 
     private URL createTargetURL(ConnectionOptions options) {
@@ -307,22 +253,5 @@ public class CifsWinRmConnection extends CifsConnection {
             throw new WinRmRuntimeIOException("Cannot build a new URL for " + this, e);
         }
     }
-
-    private WinRmClient createWinrmClient(URL targetURL) {
-        final WinRmHttpClient httpClient = new WinRmHttpClient(username, password, targetURL, unmappedAddress, unmappedPort);
-        httpClient.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY));
-        httpClient.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY));
-        httpClient.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN));
-        httpClient.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN));
-        httpClient.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, DEFAULT_WINRM_KERBEROS_DEBUG));
-
-        final WinRmClient client = new WinRmClient(httpClient);
-        client.setWinRmTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
-        client.setWinRmEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
-        client.setWinRmLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
-        return client;
-    }
-
-    private static Logger logger = LoggerFactory.getLogger(CifsWinRmConnection.class);
 
 }
