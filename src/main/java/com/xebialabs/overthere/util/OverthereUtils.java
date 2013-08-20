@@ -22,10 +22,18 @@
  */
 package com.xebialabs.overthere.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.InputSupplier;
+
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * Contains a number of static helper methods.
@@ -33,12 +41,56 @@ import java.io.UnsupportedEncodingException;
 public class OverthereUtils {
 
     /**
+     * Reads the contents of an {@link OverthereFile} into a byte array.
+     *
+     * @param from
+     *            the file to read from.
+     * @returns
+     *            the byte array.
+     */
+    public static byte[] read(final OverthereFile from) {
+        try {
+            return ByteStreams.toByteArray(new InputSupplier<InputStream>() {
+                @Override
+                public InputStream getInput() throws IOException {
+                    return from.getInputStream();
+                }
+            });
+        } catch (IOException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    /**
+     * Reads the contents of an {@link OverthereFile} into a string.
+     *
+     * @param from
+     *            the file to read from.
+     * @param charsetName
+     *            the {@link java.nio.charset.Charset charset} to use.
+     * @returns
+     *            the string.
+     */
+    public static String read(final OverthereFile from, final String charsetName) {
+        try {
+            return CharStreams.toString(new InputSupplier<Reader>() {
+                @Override
+                public Reader getInput() throws IOException {
+                    return new InputStreamReader(from.getInputStream(), charsetName);
+                }
+            });
+        } catch (IOException exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+    /**
      * Writes the contents of a byte array to an {@link OverthereFile}.
      *
      * @param from
      *            the byte array to copy from.
      * @param to
-     *            the file to copy to.
+     *            the file to write to.
      */
     public static void write(final byte[] from, final OverthereFile to) {
         new ByteArrayFile(to.getPath(), from).copyTo(to);
@@ -49,14 +101,14 @@ public class OverthereUtils {
      *
      * @param from
      *            the string to copy from.
-     * @param encoding
-     *            the {@link String#getBytes(String) encoding} to use.
+     * @param charsetName
+     *            the {@link java.nio.charset.Charset charset} to use.
      * @param to
-     *            the file to copy to.
+     *            the file to write to.
      */
-    public static void write(final String from, final String encoding, final OverthereFile to) {
+    public static void write(final String from, final String charsetName, final OverthereFile to) {
         try {
-            write(from.getBytes(encoding), to);
+            write(from.getBytes(charsetName), to);
         } catch (UnsupportedEncodingException exc) {
             throw new RuntimeIOException("Cannot write string to " + to, exc);
         }
