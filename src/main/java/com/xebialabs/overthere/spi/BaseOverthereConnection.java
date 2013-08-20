@@ -42,8 +42,6 @@ import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandle
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStdout;
-import static com.xebialabs.overthere.util.OverthereUtils.getBaseName;
-import static com.xebialabs.overthere.util.OverthereUtils.getExtension;
 
 /**
  * A connection on a host (local or remote) on which to manipulate files and execute commands.
@@ -74,6 +72,8 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected OverthereFile connectionTemporaryDirectory;
 
     protected OverthereFile workingDirectory;
+
+    protected Random random = new Random();
 
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
         this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
@@ -125,34 +125,28 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is
      * invoked.
      * 
-     * @param nameTemplate
-     *            the template on which to base the name of the temporary file. May be <code>null</code>.
+     * @param name
+     *            the name of the temporary file. May be <code>null</code>.
      * @return a reference to the temporary file on the host
      */
     @Override
-    public final OverthereFile getTempFile(String nameTemplate) {
-        String prefix, suffix;
-
-        if (nameTemplate != null) {
-            int pos = nameTemplate.lastIndexOf('/');
-            if (pos != -1) {
-                nameTemplate = nameTemplate.substring(pos + 1);
-            }
-            pos = nameTemplate.lastIndexOf('\\');
-            if (pos != -1) {
-                nameTemplate = nameTemplate.substring(pos + 1);
-            }
+    public final OverthereFile getTempFile(String name) {
+        if (isNullOrEmpty(name)) {
+            name = "tmp";
         }
 
-        if (isNullOrEmpty(nameTemplate)) {
-            prefix = "hostsession";
-            suffix = ".tmp";
-        } else {
-            prefix = getBaseName(nameTemplate);
-            suffix = getExtension(nameTemplate);
+        for (int i = 0; i <= temporaryFileCreationRetries; i++) {
+            String infix = Long.toString(Math.abs(random.nextLong()));
+            OverthereFile f = getFileForTempFile(getConnectionTemporaryDirectory(), infix);
+            if (!f.exists()) {
+                logger.trace("Creating holder directory [{}] for temporary file with name [{}]", f, name);
+                f.mkdir();
+                OverthereFile t = f.getFile(name);
+                logger.debug("Created temporary file [{}]", t);
+                return t;
+            }
         }
-
-        return getTempFile(prefix, suffix);
+        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
     }
 
     /**
@@ -176,17 +170,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
             suffix = ".tmp";
         }
 
-        Random r = new Random();
-        String infix = "";
-        for (int i = 0; i < temporaryFileCreationRetries; i++) {
-            OverthereFile f = getFileForTempFile(getConnectionTemporaryDirectory(), prefix + infix + suffix);
-            if (!f.exists()) {
-                logger.debug("Created temporary file {}", f);
-                return f;
-            }
-            infix = "-" + Long.toString(Math.abs(r.nextLong()));
-        }
-        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
+        return getTempFile(prefix + suffix);
     }
 
     private OverthereFile getConnectionTemporaryDirectory() throws RuntimeIOException {
@@ -198,7 +182,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
     private OverthereFile createConnectionTemporaryDirectory() {
         OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
-        Random r = new Random();
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
         String prefix = "overthere-" + dateFormat.format(new Date());
         String infix = "";
@@ -210,7 +193,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 logger.info("Created connection temporary directory {}", tempDir);
                 return tempDir;
             }
-            infix = "-" + Long.toString(Math.abs(r.nextLong()));
+            infix = "-" + Long.toString(Math.abs(random.nextLong()));
         }
         throw new RuntimeIOException("Cannot create connection temporary directory on " + this);
     }

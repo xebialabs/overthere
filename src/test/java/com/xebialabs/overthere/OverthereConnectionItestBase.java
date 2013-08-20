@@ -17,7 +17,11 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
@@ -586,21 +590,25 @@ public abstract class OverthereConnectionItestBase {
         tempDir.mkdir();
 
         // Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
-        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
-        target.mkdir();
-
-        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
-        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
-        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
-
-        sourceFolder.copyTo(target);
-
+        OverthereFile targetFolder = connection.getFile(tempDir.getPath() + "/targetFolder");
+        targetFolder.mkdir();
         try {
-            assertThat(target.getFile("sourceFile").exists(), is(true));
+            OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
+            OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
+            OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+
+            sourceFolder.copyTo(targetFolder);
+
+            OverthereFile targetFile = targetFolder.getFile("sourceFile");
+            assertThat(targetFile.exists(), is(true));
+            assertThat(OverthereUtils.read(targetFile, "UTF-8"), equalTo("Some test data"));
+
+            OverthereUtils.write("Some new test data", "UTF-8", sourceFile);
+            sourceFolder.copyTo(targetFolder);
+            assertThat("Expected new file data to be written to the correct location", OverthereUtils.read(targetFile, "UTF-8"), equalTo("Some new test data"));
         } finally {
-            // When using a sudo connection, the target folder has different rights to the temp folder it was created
-            // in.
-            target.deleteRecursively();
+            // When using a sudo connection, the target folder has different rights to the temp folder it was created in.
+            targetFolder.deleteRecursively();
         }
     }
 
