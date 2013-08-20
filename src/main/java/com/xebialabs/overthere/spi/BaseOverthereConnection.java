@@ -94,7 +94,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      * @return the OS family
      */
     @Override
-    public final OperatingSystemFamily getHostOperatingSystem() {
+    public OperatingSystemFamily getHostOperatingSystem() {
         return os;
     }
 

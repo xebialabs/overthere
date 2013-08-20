@@ -3,10 +3,12 @@ package com.xebialabs.overthere.ssh;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SshSudoFileTest {
 
@@ -16,6 +18,7 @@ public class SshSudoFileTest {
     @BeforeClass
     public void setup() {
         connection = mock(SshSudoConnection.class);
+        when(connection.getHostOperatingSystem()).thenReturn(UNIX);
     }
 
     @Test
