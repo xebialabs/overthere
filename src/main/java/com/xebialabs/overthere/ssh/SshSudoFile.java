@@ -225,7 +225,7 @@ class SshSudoFile extends SshScpFile {
         if (!(obj instanceof SshSudoFile)) {
             return false;
         }
-        return  super.equals(obj) && isTempFile == ((SshSudoFile)obj).isTempFile;
+        return super.equals(obj) && isTempFile == ((SshSudoFile)obj).isTempFile;
     }
 
     @Override
