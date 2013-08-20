@@ -197,7 +197,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             } else {
                 permissionsMask &= ~0111;
             }
-            connection.getSharedSftpClient().chmod(path, permissionsMask);
+            connection.getSharedSftpClient().chmod(getPath(), permissionsMask);
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot delete file " + this, e);
         }

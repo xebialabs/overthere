@@ -230,7 +230,7 @@ class SshSudoFile extends SshScpFile {
 
     @Override
     public int hashCode() {
-        return path.hashCode() + Boolean.valueOf(isTempFile).hashCode();
+        return super.hashCode() + Boolean.valueOf(isTempFile).hashCode();
     }
 
     private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
