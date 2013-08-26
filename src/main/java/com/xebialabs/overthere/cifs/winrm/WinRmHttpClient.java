@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -34,21 +35,26 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.MessageProp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
+import com.google.common.primitives.Bytes;
 
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
@@ -66,8 +72,8 @@ import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
 
 class WinRmHttpClient {
     // Configuration options set in constructor
-    private final String username;
     private final boolean enableKerberos;
+    private final String username;
     private final String password;
     private final URL targetURL;
     private final String unmappedAddress;
@@ -125,14 +131,19 @@ class WinRmHttpClient {
 
                 String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
                 httpClient.getAuthSchemes().register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort, this));
-                httpClient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort, this));
+//                httpClient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort, this));
                 configureAuthentication(KERBEROS, new KerberosPrincipal(username));
-                configureAuthentication(SPNEGO, new KerberosPrincipal(username));
+//                configureAuthentication(SPNEGO, new KerberosPrincipal(username));
             }
 
             httpClient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
 
             httpContext = new BasicHttpContext();
+
+            if(enableKerberos) {
+                // start encryption
+                sendRequest("", null);
+            }
         } catch (Exception exc) {
             throw new WinRmRuntimeIOException("Error connecting to " + targetURL, exc);
         }
@@ -189,7 +200,24 @@ class WinRmHttpClient {
         logger.trace("Disconnected from [{}]", targetURL);
     }
 
-    synchronized Document sendRequest(final Document requestDocument, final SoapAction soapAction) {
+    Document sendRequest(final Document requestDocument, final SoapAction soapAction) {
+        final String requestBody = WinRmClient.toString(requestDocument);
+        final String responseBody = sendRequest(requestBody, soapAction);
+        
+        Document responseDocument;
+        try {
+            responseDocument = DocumentHelper.parseText(responseBody);
+        } catch (DocumentException exc) {
+            throw new WinRmRuntimeIOException("Cannot parse", requestDocument, null, exc);
+        }
+
+        logDocument("Response body:", responseDocument);
+
+        return responseDocument;
+    }
+    
+
+    synchronized String sendRequest(final String requestDocument, final SoapAction soapAction) {
         if (enableKerberos) {
             return runPrivileged(new PrivilegedSendMessage(requestDocument, soapAction));
         } else {
@@ -200,54 +228,84 @@ class WinRmHttpClient {
     /**
      * Performs the JAAS login and run the sendRequest method within a privileged scope.
      */
-    private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
+    private String runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
         try {
             checkNotNull(kerberosLoginContext, "kerberosLoginContext == null: Invoke connect() before using the WinRMClient");
 
             return Subject.doAs(kerberosLoginContext.getSubject(), privilegedSendMessage);
         } catch (PrivilegedActionException exc) {
             throw new WinRmRuntimeIOException("Failure sending message on " + targetURL + " error: " + exc.getMessage(),
-                privilegedSendMessage.getRequestDocument(), null, exc.getException());
+                null, null, exc.getException());
+//            throw new WinRmRuntimeIOException("Failure sending message on " + targetURL + " error: " + exc.getMessage(),
+//                privilegedSendMessage.getRequestBody(), null, exc.getException());
         }
     }
 
     /**
      * PrivilegedExceptionAction that wraps the internal sendRequest
      */
-    private class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
-        private Document requestDocument;
+    private class PrivilegedSendMessage implements PrivilegedExceptionAction<String> {
+        private String requestBody;
         private SoapAction soapAction;
 
-        private PrivilegedSendMessage(final Document requestDocument, final SoapAction soapAction) {
-            this.requestDocument = requestDocument;
+        private PrivilegedSendMessage(final String requestDocument, final SoapAction soapAction) {
+            this.requestBody = requestDocument;
             this.soapAction = soapAction;
         }
 
         @Override
-        public Document run() throws Exception {
-            return WinRmHttpClient.this.doSendRequest(requestDocument, soapAction);
+        public String run() throws Exception {
+            return WinRmHttpClient.this.doSendRequest(requestBody, soapAction);
         }
 
-        public Document getRequestDocument() {
-            return requestDocument;
+        public String getRequestBody() {
+            return requestBody;
         }
     }
 
     /**
      * Internal sendRequest, performs the HTTP request and returns the result document.
      */
-    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) {
+    private String doSendRequest(final String requestBody, final SoapAction soapAction) {
         try {
             final HttpPost request = new HttpPost(targetURL.toURI());
 try {
-            if (soapAction != null) {
-                request.setHeader("SOAPAction", soapAction.getValue());
+//            if (soapAction != null) {
+//                request.setHeader("SOAPAction", soapAction.getValue());
+//            }
+
+            
+            final HttpEntity entity;
+
+            if(!enableKerberos || kerberosGSSContext == null) {
+                entity = createEntity(requestBody);
+                logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
+            } else {
+                byte[] requestBytes = requestBody.getBytes("UTF-8");
+                MessageProp mp = new MessageProp(false);
+                byte[] wrapped = kerberosGSSContext.wrap(requestBytes, 0, requestBytes.length, mp);
+                // int padlength = 8 - (requestBytes.length % 8);
+                int padlength = 0;
+                System.out.println("orig.length=" + requestBytes.length + ", wrapped.length=" + wrapped.length + ", padlength=" + padlength);
+                byte[] beforeBytes = ("--Encrypted Boundary\r" + 
+"Content-Type: application/HTTP-Kerberos-session-encrypted\r" +
+"OriginalContent: type=application/soap+xml;charset=UTF-8;Length=" + (requestBytes.length + padlength) + "\r" +
+"--Encrypted Boundary\r" +
+"Content-Type: application/octet-stream\r").getBytes(Charset.forName("UTF-8"));
+                byte[] headerBytes = new byte [4];
+                headerBytes[3] = 0;
+                headerBytes[1] = 0;
+                headerBytes[2] = 0;
+                headerBytes[0] = (byte) (wrapped.length - requestBytes.length - padlength);
+                byte[] afterBytes = ("--Encrypted Boundary\r").getBytes(Charset.forName("UTF-8"));
+                byte[] completeBytes = Bytes.concat(beforeBytes, headerBytes, wrapped, afterBytes);
+                entity = new ByteArrayEntity(completeBytes, null);
+                String header = "multipart/encrypted;protocol=\"application/HTTP-Kerberos-session-encrypted\";boundary=\"Encrypted Boundary\"";
+                ((ByteArrayEntity) entity).setContentType(header);
+                logger.trace("Request is encrypted");
+                logger.trace("Request:\nPOST {}\n{}", targetURL, new String(completeBytes, "UTF-8"));
             }
 
-            final String requestBody = WinRmClient.toString(requestDocument);
-            logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
-
-            final HttpEntity entity = createEntity(requestBody);
             request.setEntity(entity);
 
             final HttpResponse response = httpClient.execute(request, httpContext);
@@ -261,9 +319,13 @@ try {
 
             Header[] authenticateHeaders = response.getHeaders("WWW-Authenticate");
             for (Header ah : authenticateHeaders) {
-                if (ah.getValue().startsWith("Negotiate ")) {
+                if (ah.getValue().startsWith("Negotiate ") || ah.getValue().startsWith("Kerberos ")) {
                     Base64 base64codec = new Base64();
-                    String tokenStr = ah.getValue().substring("Negotiate ".length());
+                    int len = "Kerberos ".length();
+                    if(ah.getValue().startsWith("Negotiate ")) {
+                        len = "Negotiate ".length();
+                    }
+                    String tokenStr = ah.getValue().substring(len);
                     byte[] token = base64codec.decode(tokenStr);
                     System.err.println("established (3a): " + kerberosGSSContext.isEstablished());
                     System.err.println("protReady (3a): " + kerberosGSSContext.isProtReady());
@@ -274,24 +336,26 @@ try {
             }
 
             final String responseBody = handleResponse(response, httpContext);
-            Document responseDocument = DocumentHelper.parseText(responseBody);
-
-            logDocument("Response body:", responseDocument);
-
-            return responseDocument;
+            return responseBody;
 } finally {
     request.releaseConnection();
 }
         } catch (WinRmRuntimeIOException exc) {
             throw exc;
         } catch (Exception exc) {
-            throw new WinRmRuntimeIOException("Error when sending request to " + targetURL, requestDocument, null, exc);
+            throw new WinRmRuntimeIOException("Error when sending request to " + targetURL, null, null, exc);
+//            throw new WinRmRuntimeIOException("Error when sending request to " + targetURL, requestBody, null, exc);
         }
     }
 
     protected String handleResponse(final HttpResponse response, final HttpContext context) throws IOException {
         final HttpEntity entity = response.getEntity();
-        if (null == entity.getContentType() || !entity.getContentType().getValue().startsWith("application/soap+xml")) {
+        if (null == entity.getContentType()) {
+            EntityUtils.consume(response.getEntity());
+            return "";
+        }
+
+        if(!entity.getContentType().getValue().startsWith("application/soap+xml")) {
             throw new WinRmRuntimeIOException("Error when sending request to " + targetURL + "; Unexpected content-type: " + entity.getContentType());
         }
 

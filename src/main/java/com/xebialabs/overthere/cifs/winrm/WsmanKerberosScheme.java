@@ -1,6 +1,6 @@
 package com.xebialabs.overthere.cifs.winrm;
 
-import org.apache.http.impl.auth.KerberosScheme;
+import org.apache.http.impl.auth.MyGGSSchemeBase;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
@@ -9,12 +9,14 @@ import org.ietf.jgss.Oid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class WsmanKerberosScheme extends KerberosScheme {
+class WsmanKerberosScheme extends MyGGSSchemeBase {
 
     private final String spnServiceClass;
     private final String spnAddress;
     private final int spnPort;
     private final WinRmHttpClient whClient;
+
+    private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
 
     public WsmanKerberosScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort, final WinRmHttpClient whClient) {
         super(stripPort);
@@ -25,6 +27,10 @@ class WsmanKerberosScheme extends KerberosScheme {
     }
 
     @Override
+    protected byte[] generateToken(final byte[] input, final String authServer) throws GSSException {
+        return generateGSSToken(input, new Oid(KERBEROS_OID), authServer);
+    }
+
     protected byte[] generateGSSToken(final byte[] input, final Oid oid, String authServer) throws GSSException {
         byte[] token = input;
         if (token == null) {
@@ -51,7 +57,27 @@ class WsmanKerberosScheme extends KerberosScheme {
         whClient.setGSSContext(gssContext);
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
+        gssContext.requestConf(true);
         return gssContext.initSecContext(token, 0, token.length);
+    }
+
+    public String getSchemeName() {
+        return "Kerberos";
+    }
+
+    @Override
+    public String getParameter(String name) {
+        return null;
+    }
+
+    @Override
+    public String getRealm() {
+        return null;
+    }
+
+    @Override
+    public boolean isConnectionBased() {
+        return true;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(WsmanKerberosScheme.class);
