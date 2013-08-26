@@ -612,10 +612,6 @@ public abstract class OverthereConnectionItestBase {
         }
     }
 
-    /**
-     * Tests whether getOutputStream and getInputStream have the right permission behaviour (specifically for SSH/SUDO
-     * connections).
-     */
     @Test
     @Assumption(methods = { "onUnix", "notLocal" })
     public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectoryOnUnix() throws IOException {
@@ -653,9 +649,6 @@ public abstract class OverthereConnectionItestBase {
         assertThat(fileInHomeDir.exists(), equalTo(false));
     }
 
-    /**
-     * Tests whether copyTo has the right permission behaviour (specifically for SSH/SUDO connections).
-     */
     @Test
     @Assumption(methods = { "onUnix", "notLocal" })
     public void shouldCopyFileToAndFromSudoUserHomeDirectoryOnUnix() throws IOException {
