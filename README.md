@@ -509,7 +509,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
-	a. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
+	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
         	C:\Program Files\IIS Resources\SelfSSL>selfssl.exe /T /N:cn=HOSTNAME /V:3650
         	Microsoft (R) SelfSSL Version 1.0
@@ -518,7 +518,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
         	Do you want to replace the SSL settings for site 1 (Y/N)?Y
         	The self signed certificate was successfully assigned to site 1.
 
-	a. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
+	1. Open a PowerShell window and enter the command below to find the thumbprint for the certificate for the remote host:
 
 			PS C:\Windows\system32> Get-childItem cert:\LocalMachine\Root\ | Select-String -pattern HOSTNAME
 
@@ -540,7 +540,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 			[Thumbprint]
 			  5C36B638BC31F505EF7F693D9A60C01551DD486F
 
-	a. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
+	1. Create an HTTPS WinRM listener for the remote host with the thumbprint you've just found:
 
 			winrm create winrm/config/Listener?Address=*+Transport=HTTPS @{Hostname="HOSTNAME"; CertificateThumbprint="THUMBPRINT"}
 
@@ -687,9 +687,9 @@ Multiple causes can lead to this error message:
 
 1. The Kerberos ticket is not accepted by the remote host:
 
-1.1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
+    1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
 
-1.1. Has the reverse DNS of the remote host been set up correctly? See [Principal names and DNS](http://web.mit.edu/Kerberos/krb5-devel/doc/admin/princ_dns.html) for more information. Please note that the `rdns` option is not available in Java's Kerberos implementation.
+    1. Has the reverse DNS of the remote host been set up correctly? See [Principal names and DNS](http://web.mit.edu/Kerberos/krb5-devel/doc/admin/princ_dns.html) for more information. Please note that the `rdns` option is not available in Java's Kerberos implementation.
 
 1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the <a href="#cifs_host_setup_winrm">host setup for WinRM</a>?
 
