@@ -295,7 +295,7 @@ public abstract class OverthereConnectionItestBase {
             assertThat(commandOutput, not(containsString("ipconfig")));
             assertThat(commandOutput, containsString("Windows IP Configuration"));
         } finally {
-            p.destroy();
+            p.waitFor();
         }
     }
 
@@ -303,16 +303,20 @@ public abstract class OverthereConnectionItestBase {
     @Assumption(methods = { "onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd" })
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
         OverthereProcess process = connection.startProcess(CmdLine.build("powershell.exe", "-ExecutionPolicy", "Unrestricted", "-File", "C:\\overthere\\echoname.ps1"));
-        OutputStream stdin = process.getStdin();
-        BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getStdout()));
+        try {
+            OutputStream stdin = process.getStdin();
+            BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getStdout()));
 
-        waitForPrompt(stdout, "name");
+            waitForPrompt(stdout, "name");
 
-        String reply = "iiPoWeR";
-        enterPrompt(stdin, reply);
+            String reply = "iiPoWeR";
+            enterPrompt(stdin, reply);
 
-        String hi = waitForPrompt(stdout, "Hi");
-        assertThat(hi, containsString("iiPoWeR"));
+            String hi = waitForPrompt(stdout, "Hi");
+            assertThat(hi, containsString("iiPoWeR"));
+       } finally {
+            process.waitFor();
+        }
     }
 
     private String waitForPrompt(BufferedReader stdout, String prompt) throws IOException {
