@@ -231,7 +231,8 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
         try {
             final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.READ));
-            final RemoteFile.RemoteFileInputStream stream = remoteFile.getInputStream();
+            final InputStream wrapped = remoteFile.new RemoteFileInputStream();
+            
             return new InputStream() {
 
                 @Override
@@ -294,7 +295,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
         try {
             final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
-            final OutputStream wrapped = remoteFile.getOutputStream();
+            final OutputStream wrapped = remoteFile.new RemoteFileOutputStream();
 
             return new OutputStream() {
 
