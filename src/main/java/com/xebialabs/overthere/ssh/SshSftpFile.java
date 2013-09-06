@@ -37,12 +37,12 @@ import net.schmizz.sshj.xfer.FilePermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.io.Closeables;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.io.Closeables.closeQuietly;
 
 /**
  * A file on a host connected through SSH that is accessed using SFTP.
@@ -237,51 +237,51 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
                 @Override
                 public int read() throws IOException {
-                    return stream.read();
+                    return wrapped.read();
                 }
 
                 @Override
                 public int read(byte[] b) throws IOException {
-                    return stream.read(b);
+                    return wrapped.read(b);
                 }
 
                 @Override
                 public int read(byte[] b, int off, int len) throws IOException {
-                    return stream.read(b, off, len);
+                    return wrapped.read(b, off, len);
                 }
 
                 @Override
                 public long skip(long n) throws IOException {
-                    return stream.skip(n);
+                    return wrapped.skip(n);
                 }
 
                 @Override
                 public int available() throws IOException {
-                    return stream.available();
+                    return wrapped.available();
+                }
+
+                @Override
+                public boolean markSupported() {
+                    return wrapped.markSupported();
+                }
+
+                @Override
+                public void mark(int readlimit) {
+                    wrapped.mark(readlimit);
+                }
+
+                @Override
+                public void reset() throws IOException {
+                    wrapped.reset();
                 }
 
                 @Override
                 public void close() throws IOException {
                     try {
-                        super.close();
+                        wrapped.close();
                     } finally {
-                        Closeables.closeQuietly(remoteFile);
+                        closeQuietly(remoteFile);
                     }
-                }
-
-                @Override
-                public void mark(int readlimit) {
-                    stream.mark(readlimit);
-                }
-
-                @Override
-                public void reset() throws IOException {
-                    stream.reset();
-                }
-
-                @Override
-                public boolean markSupported() {
-                    return stream.markSupported();
                 }
             };
         } catch (IOException e) {
@@ -324,7 +324,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                     try {
                         wrapped.close();
                     } finally {
-                        Closeables.closeQuietly(remoteFile);
+                        closeQuietly(remoteFile);
                     }
                 }
             };
