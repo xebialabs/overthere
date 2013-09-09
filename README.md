@@ -505,7 +505,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
 
-	__N.B.:__ This is not supported by WinRM 3.0, included with the Windows Management Framework 3.0. This update [has been temporarily removed from Windows Update](http://blogs.msdn.com/b/powershell/archive/2012/12/20/windows-management-framework-3-0-compatibility-update.aspx) because of numerous incompatiblity issues with other Microsoft product.
+	__N.B.:__ This is not supported by WinRM 3.0, included with the Windows Management Framework 3.0. This update [has been temporarily removed from Windows Update](http://blogs.msdn.com/b/powershell/archive/2012/12/20/windows-management-framework-3-0-compatibility-update.aspx) because of numerous incompatiblity issues with other Microsoft products. However, if you have already installed WMF 3.0 and cannot downgrade, [Microsoft Knowledge Base article #2842230](http://support.microsoft.com/kb/2842230) describes a hotfix that can be installed to re-enable the `MaxMemoryPerShellMB` setting.
 
 1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
