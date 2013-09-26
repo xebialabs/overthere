@@ -20,6 +20,7 @@ class KerberosJaasConfiguration extends Configuration {
         options.put("useTicketCache", "false");
         options.put("useKeyTab", "false");
         options.put("doNotPrompt", "false");
+        options.put("refreshKrb5Config", "true");
         if (debug) {
             options.put("debug", "true");
         }
