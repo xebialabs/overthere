@@ -73,7 +73,7 @@ public abstract class OverthereConnectionItestBase {
 
     private static final int NR_OF_SMALL_FILES = 100;
     public static final int SMALL_FILE_SIZE = 10 * 1024;
-    public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
+    public static final int LARGE_FILE_SIZE = 100 * 1024 * 1024;
 
     protected String protocol;
     protected ConnectionOptions options;
