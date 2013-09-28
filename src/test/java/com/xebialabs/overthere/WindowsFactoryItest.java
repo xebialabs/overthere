@@ -148,7 +148,6 @@ public class WindowsFactoryItest {
         options.set(PORT, 2222);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
-        options.set(JUMPSTATION, createPartialTunnelOptions());
         return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpWinSshdWithAdministrativeUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
     }
@@ -161,7 +160,6 @@ public class WindowsFactoryItest {
         options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
         options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
         options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
-        options.set(JUMPSTATION, createPartialTunnelOptions());
         return new OverthereConnectionItest(this.getClass().getSimpleName() + "_sshSftpWinSshdWithRegularUser", SSH_PROTOCOL, options,
             "com.xebialabs.overthere.ssh.SshSftpWinSshdConnection", "overthere-windows");
     }
