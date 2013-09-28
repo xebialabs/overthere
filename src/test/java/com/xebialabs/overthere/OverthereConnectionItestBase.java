@@ -101,7 +101,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @BeforeMethod
-    public void isConnected() {
+    public void assertConnection() {
         assertThat("We're not connected!", connection != null);
     }
 
