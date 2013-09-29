@@ -28,13 +28,19 @@ package com.xebialabs.overthere.cifs;
 public enum CifsConnectionType {
 
     /**
-     * A CIFS connection that uses Telnet to execute commands, to a Windows host.
+     * A CIFS connection to a Windows host that uses Telnet to execute commands.
      */
     TELNET,
 
     /**
-     * A CIFS connection that uses WinRM to execute commands, to a Windows host.
+     * A CIFS connection to a Windows host that uses a Java implementation WinRM to execute commands.
      */
-    WINRM,
+    WINRM_INTERNAL,
+    
+    /**
+     * A CIFS connection  to a Windows host that uses the <code>winrs</code> command native to Windows to execute commands.
+     * <em>N.B.:</em> This implementation only works when Overthere runs on Windows.
+     */
+    WINRM_NATIVE
 
 }

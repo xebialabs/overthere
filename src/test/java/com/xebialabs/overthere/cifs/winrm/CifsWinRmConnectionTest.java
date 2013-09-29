@@ -7,7 +7,7 @@ import org.testng.annotations.Test;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 
 public class CifsWinRmConnectionTest {
@@ -18,7 +18,7 @@ public class CifsWinRmConnectionTest {
     public void setupOptions() {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(PASSWORD, "foobar");
         options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
         options.set(CIFS_PORT, DEFAULT_CIFS_PORT);

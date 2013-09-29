@@ -22,7 +22,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HT
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
@@ -91,7 +91,7 @@ public class WindowsFactoryItest {
     private OverthereConnectionItest cifsWinRmHttpWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
@@ -105,7 +105,7 @@ public class WindowsFactoryItest {
     private OverthereConnectionItest cifsWinRmHttpsWithAdministrativeUser() throws Exception {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);

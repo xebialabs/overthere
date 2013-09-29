@@ -44,7 +44,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
@@ -151,7 +151,7 @@ public abstract class OverthereConnectionItestBase {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with an old-style Windows domain account");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + WINRM.toString().toLowerCase() + " connection with an old-style Windows domain account"));
+            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account"));
         }
     }
 
@@ -798,7 +798,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     public boolean onlyCifsWinrm() {
-        return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(WINRM);
+        return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(WINRM_INTERNAL);
     }
 
     public boolean onlyCifsTelnet() {

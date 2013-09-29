@@ -22,20 +22,23 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
-import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
-
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
+import com.xebialabs.overthere.cifs.winrs.CifsWinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
+import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 /**
  * Builds CIFS connections.
@@ -211,6 +214,79 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
+    /**
+     * Connection option (Boolean) that specifies whether to allow the user's credentials to be passed to the remote
+     * host. Corresponds to the <code>winrs</code> command option <code>-noprofile</code>.
+     */
+    public static final String WINRS_ALLOW_DELEGATE = "winrsAllowDelegate";
+
+    /**
+     * Default value (<code>false</code>) for the connection option used to specify whether to allow the user's
+     * credentials to be passed to the remote machine
+     */
+    public static final boolean DEFAULT_WINRS_ALLOW_DELEGATE = false;
+
+    /**
+     * Connection option (Boolean) that specifies whether to enable compression. Corresponds to the <code>winrs</code>
+     * command option <code>-compression</code>.
+     */
+    public static final String WINRS_COMPRESSION = "winrsCompression";
+
+    /**
+     * Default value (<code>false</code>) for the connection option used to specify whether to enable compression.
+     */
+    public static final boolean DEFAULT_WINRS_COMPRESSION = false;
+
+    /**
+     * Connection option (Boolean) that specifies whether to disable echo. Corresponds to the <code>winrs</code> command
+     * option <code>-noecho</code>.
+     */
+    public static final String WINRS_NOECHO = "winrsNoecho";
+
+    /**
+     * Default value (<code>false</code>) for the connection option used to specify whether to disable echo.
+     */
+    public static final boolean DEFAULT_WINRS_NOECHO = false;
+
+    /**
+     * Connection option (Boolean) that specifies whether to disable loading the user profile before executing the
+     * command. Corresponds to the <code>winrs</code> command option <code>-noprofile</code>.
+     */
+    public static final String WINRS_NOPROFILE = "winrsNoprofile";
+
+    /**
+     * Default value (<code>false</code>) for the connection option used to specify whether to disable loading the user
+     * profile before executing the command.
+     */
+    public static final boolean DEFAULT_WINRS_NOPROFILE = false;
+
+    /**
+     * Connection option (Boolean) that specifies whether to disable encryption. Corresponds to the <code>winrs</code>
+     * command option <code>-unencrypted</code>.
+     */
+    public static final String WINRS_UNENCRYPTED = "winrsUnencrypted";
+
+    /**
+     * Default value (<code>false</code>) for the connection option used to specify whether to disable encryption.
+     */
+    public static final boolean DEFAULT_WINRS_UNENCRYPTED = false;
+
+    /**
+     * Connection option (String) that specifies the protocol for the "winrs proxy".
+     */
+    public static final String WINRS_PROXY_PROTOCOL = "winrsProxyProtocol";
+
+    /**
+     * Default value (<code>local</code>) for the connection option that specifies the protocol for the "winrs proxy".
+     */
+    public static final String DEFAULT_WINRS_PROXY_PROTOCOL = LOCAL_PROTOCOL;
+
+    /**
+     * Connection option (<code>ConnectionOptions</code>) that specifies the {@link ConnectionOptions connection
+     * options} to be used for the "winrs proxy".
+     */
+    public static final String WINRS_PROXY_CONNECTION_OPTIONS = "winrsProxyConnectionOptions";
+
     private OverthereConnection connection;
 
     public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
@@ -220,9 +296,12 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
         case TELNET:
             connection = new CifsTelnetConnection(type, options, mapper);
             break;
-        case WINRM:
+        case WINRM_INTERNAL:
             connection = new CifsWinRmConnection(type, options, mapper);
             break;
+        case WINRM_NATIVE:
+        	connection = new CifsWinrsConnection(type, options, mapper);
+        	break;
         default:
             throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
         }

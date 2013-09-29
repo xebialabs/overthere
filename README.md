@@ -416,17 +416,17 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
 
 * The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
-* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts.
+* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [connectionType](#cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [connectionType](#cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
 ### Domain accounts
-Windows domain accounts are supported by the CIFS+WinRM and CIFS+Telnet connection types, but the syntax of the username is different:
+Windows domain accounts are supported by the __WINRM_INTERNAL__, __WINRM_NATIVE__ and __TELNET__ connection types, but the syntax of the username is different:
 
-* For the __WINRM__ connection type, domain accounts must be specified using the new-style domain syntax, e.g. `USER@FULL.DOMAIN`.
+* For the __WINRM_INTERNAL__ and __WINRM_NATIVE__ connection types, domain accounts must be specified using the new-style domain syntax, e.g. `USER@FULL.DOMAIN`.
 * For the __TELNET__ connection type, domain accounts must be specified using the old-style domain synyax, e.g `DOMAIN\USER`.
 * For both connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
-__N.B.:__ When using WinRM, Kerberos authentication is used for domain accounts. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
+__N.B.:__ When using domain accounts with the __WINRM_INTERNAL__ connection type, the Kerberos subsystem of the Java Virtual Machine must be configured correctly. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
 
 ### Administrative shares
 By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
@@ -459,11 +459,13 @@ To use the __TELNET__ connection type, you'll need to enable and configure the T
 When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the __Allow logon locally__ privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
 <a name="cifs_host_setup_winrm"></a>
-#### WINRM
+<a name="cifs_host_setup_winrm_internal"></a>
+<a name="cifs_host_setup_winrm_native"></a>
+#### WINRM (WINRM_INTERNAL and WINRM_NATIVE)
 
 _For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
 
-To use the __WINRM__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
+To use the __WINRM_INTERNAL__ or the __WINRM_NATIVE__ connection type, you'll need to setup WinRM on the remote host by following these instructions:
 
 1. If the remote host is running Windows Server 2003 SP1 or SP2, or Windows XP SP2, install the [WS-Management v.1.1 package](http://support.microsoft.com/default.aspx?scid=kb;EN-US;936059&wa=wsignin1.0).
 
@@ -471,12 +473,19 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 1. If the remote host is running Windows Vista or Windows 7, the __Windows Remote Management (WS-Management)__ service is not started by default. Start the service and change its Startup type to __Automatic (Delayed Start)__ before proceeding with the next steps.
 
-1. On the remote host, open a Command Prompt (not a PowerShell prompt!) using the __Run as Administrator__ option and paste in the following lines:
+1. On the remote host, open a Command Prompt (not a PowerShell prompt!) using the __Run as Administrator__ option and paste in the following lines when using the __WINRM_INTERNAL__ connection type:
 
 		winrm quickconfig
 		y
 		winrm set winrm/config/service/Auth @{Basic="true"}
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
+		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
+
+	Or the following lines when using the __WINRM_NATIVE__ connection type:
+
+		winrm quickconfig
+		y
+		winrm set winrm/config/service/Auth @{Basic="true"}
 		winrm set winrm/config/winrs @{MaxMemoryPerShellMB="1024"}
 
 	Or keep reading for more detailed instructions. :-)
@@ -497,7 +506,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 	__N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
 	
-1. Configure WinRM to allow unencrypted SOAP messages:
+1. (Only required for __WINRM_INTERNAL__ or when the connection option [winrsUnencrypted](#cifs_winrsUnencrypted) is set to <code>true</code>) Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 
@@ -507,7 +516,7 @@ To use the __WINRM__ connection type, you'll need to setup WinRM on the remote h
 
 	__N.B.:__ This is not supported by WinRM 3.0, included with the Windows Management Framework 3.0. This update [has been temporarily removed from Windows Update](http://blogs.msdn.com/b/powershell/archive/2012/12/20/windows-management-framework-3-0-compatibility-update.aspx) because of numerous incompatiblity issues with other Microsoft products. However, if you have already installed WMF 3.0 and cannot downgrade, [Microsoft Knowledge Base article #2842230](http://support.microsoft.com/kb/2842230) describes a hotfix that can be installed to re-enable the `MaxMemoryPerShellMB` setting.
 
-1. To use the __WINRM__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
+1. To use the __WINRM_INTERNAL__ or __WINRM_NATIVE__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
 	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
@@ -557,7 +566,7 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 <a name="cifs_host_setup_krb5"></a>
 #### Kerberos - source host
 
-__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host with the __WINRM_INTERNAL__ connection type.
 
 In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
 
@@ -581,7 +590,7 @@ See [the Kerberos V5 System Administrator's Guide at MIT](http://web.mit.edu/ker
 <a name="cifs_host_setup_spn"></a>
 #### Kerberos - remote host
 
-__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host.
+__N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host with the __WINRM_INTERNAL__ connection type.
 
 By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#cifs_host_setup_winrm).
 
@@ -729,7 +738,8 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <tr>
 	<th align="left" valign="top"><a name="cifs_connectionType"></a>connectionType</th>
 	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:<ul>
-		<li><strong><a href="#cifs_host_setup_winrm">WINRM</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS.</li>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM_INTERNAL</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS. A Java implementation of WinRM used.</li>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM_NATIVE</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS. The native Windows implementation of WinRM is used, i.e. the <code>winrs</code> command.</li>
 		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
 	</ul></td>
 </tr>
@@ -745,18 +755,18 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<th align="left" valign="top"><a name="cifs_winrmEnableHttps"></a>winrmEnableHttps</th>
 	<td>If set to <code>true</code>, HTTPS is used to connect to the WinRM server. Otherwise HTTP is used. The default value is <code>false</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> and <strong>WINRM_NATIVE</strong> connection types.</td>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmContext"></a>winrmContext</th>
 	<td>The context used by the WinRM server. The default value is <code>/wsman</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
 	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmHttpsCertificateTrustStrategy"></a>winrmHttpsCertificateTrustStrategy</th>
@@ -765,7 +775,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 		<li><strong>SELF_SIGNED</strong> - self-signed certificates are allowed (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/TrustSelfSignedStrategy.html">TrustSelfSignedStrategy</a>)</li>
 		<li><strong>ALLOW_ALL</strong> - trust all certificates.</li>
 	</ul>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerificationStrategy"></a>winrmHttpsHostnameVerificationStrategy</th>
@@ -776,38 +786,81 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	</ul>
 	See the <a href="http://hc.apache.org/httpcomponents-client-ga/tutorial/html/connmgmt.html#d5e535">Apache HttpComponent HttpClient documentation</a> for more information about the hostname verifications strategies.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmKerberosAddPortToSpn"></a>winrmKerberosAddPortToSpn</th>
 	<td>If set to <code>true</code>, the port number (e.g. 5985) will be added to the service principal name (SPN) for which a Kerberos ticket is requested. The default value is <code>false</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td></td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmKerberosDebug"></a>winrmKerberosDebug</th>
 	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmKerberosUseHttpSpn"></a>winrmKerberosUseHttpSpn</th>
 	<td>If set to <code>true</code>, the protocol <code>HTTP</code> will be used in the service principal name (SPN) for which a Kerberos ticket is requested. Otherwise the protocol <code>WSMAN</code> is used. The default value is <code>false</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type, when a Windows domain acount is used.</td></td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td></td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
 	<td>The WinRM locale to use. The default value is <code>en-US</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmTimeout"></a>winrmTimeout</th>
 	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>.
 	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM</strong> connection type.</td>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate">winrsAllowDelegate</a></th>
+	<td>If set to <code>false</code>, the user's credentials may be passed to the remote host. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsCompression">winrsCompression</a></th>
+	<td>If set to <code>true</code>, compression is enabled. This option corresponds to the <code>winrs</code> command option <code>-compression</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsNoecho">winrsNoecho</a></th>
+	<td>If set to <code>true</code>, echo is disabled. This option corresponds to the <code>winrs</code> command option <code>-noecho</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsNoprofile">winrsNoprofile</a></th>
+	<td>If set to <code>true</code>, loading the user profile before executing the command is disabled. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsUnencrypted">winrsUnencrypted</a></th>
+	<td>If set to <code>true</code>, encryption is disabled. This option corresponds to the <code>winrs</code> command option <code>-unencrypted</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsProxyProtocol">winrsProxyProtocol</a></th>
+	<td>The protocol to use when connecting to the "winrs proxy host", i.e. the host that is used to run the <code>winrs</code> command. The "winrs proxy host" must run Windows. The default value is <code>local</code>, which means the commands will be executed on the local host, which means the local host must run Windows.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="cifs_winrsProxyConnectionOptions">winrsProxyConnectionOptions</a></th>
+	<td>The connection options to use when connecting to the "winrs proxy host".
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
+</tr>
+
 </table>
 
 <a name="tunnelling"></a>

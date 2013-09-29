@@ -31,7 +31,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.google.common.io.Closeables;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -233,7 +232,7 @@ public class CifsWinRmConnection extends CifsConnection {
     }
 
     private WinRmClient createWinrmClient() {
-        final WinRmClient client = new WinRmClient(username, password, createTargetURL(options), unmappedAddress, unmappedPort);
+        final WinRmClient client = new WinRmClient(username, password, createWinrmURL(), unmappedAddress, unmappedPort);
         client.setWinRmTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
         client.setWinRmEnvelopSize(options.get(WINRM_ENVELOP_SIZE, DEFAULT_WINRM_ENVELOP_SIZE));
         client.setWinRmLocale(options.get(WINRM_LOCALE, DEFAULT_WINRM_LOCALE));
@@ -245,7 +244,7 @@ public class CifsWinRmConnection extends CifsConnection {
         return client;
     }
 
-    private URL createTargetURL(ConnectionOptions options) {
+    private URL createWinrmURL() {
         final String scheme = options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS) ? "https" : "http";
         final String context = options.get(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
         try {
