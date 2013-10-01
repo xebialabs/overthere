@@ -72,7 +72,7 @@ dependencies {
     exclude group: 'commons-logging', module: 'commons-logging'
   }
   compile 'org.apache.httpcomponents:httpcore:4.2.1'
-  compile 'commons-codec:commons-codec:1.5'
+  compile 'commons-codec:commons-codec:1.6'
 
   // Test dependencies
   testCompile 'com.xebialabs.cloud:overcast:1.1.2'
