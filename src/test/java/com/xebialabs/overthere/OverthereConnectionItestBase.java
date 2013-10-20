@@ -73,7 +73,7 @@ import static org.testng.Assert.fail;
 @Listeners(AssumptionListener.class)
 public abstract class OverthereConnectionItestBase {
 
-    private static final int NR_OF_SMALL_FILES = 100;
+    private static final int NR_OF_SMALL_FILES = 256;
     public static final int SMALL_FILE_SIZE = 10 * 1024;
     public static final int LARGE_FILE_SIZE = 100 * 1024 * 1024;
 
@@ -559,13 +559,19 @@ public abstract class OverthereConnectionItestBase {
 
     @Test
     public void shouldCopyDirectoryWithManyFiles() throws IOException {
-        File largeFolder = temp.newFolder("large.folder");
+        File largeFolder = temp.newFolder("small.folder");
         for (int i = 0; i < NR_OF_SMALL_FILES; i++) {
-            writeRandomBytes(new File(largeFolder, "large" + i + ".dat"), SMALL_FILE_SIZE);
+            writeRandomBytes(new File(largeFolder, "small" + i + ".dat"), SMALL_FILE_SIZE);
         }
 
-        OverthereFile remoteLargeFolder = connection.getTempFile("large.folder");
+        OverthereFile remoteLargeFolder = connection.getTempFile("small.folder");
         LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);
+        
+        for(int i = 0; i < NR_OF_SMALL_FILES; i++) {
+            OverthereFile remoteFile = remoteLargeFolder.getFile("small" + i + ".dat");
+            byte[] remoteBytes = OverthereUtils.read(remoteFile);
+            assertThat(remoteBytes.length, equalTo(SMALL_FILE_SIZE));
+        }
     }
 
     @Test

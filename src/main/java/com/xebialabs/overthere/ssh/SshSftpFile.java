@@ -32,6 +32,7 @@ import net.schmizz.sshj.sftp.FileMode;
 import net.schmizz.sshj.sftp.OpenMode;
 import net.schmizz.sshj.sftp.RemoteFile;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
+import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.xfer.FilePermission;
 
 import org.slf4j.Logger;
@@ -230,7 +231,8 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
         logger.debug("Opening SFTP input stream to read from file {}", this);
 
         try {
-            final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.READ));
+            final SFTPClient sftp = connection.connectSftp();
+            final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.READ));
             final InputStream wrapped = remoteFile.new RemoteFileInputStream();
             
             return new InputStream() {
@@ -281,6 +283,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                         wrapped.close();
                     } finally {
                         closeQuietly(remoteFile);
+                        connection.disconnectSftp(sftp);
                     }
                 }
             };
@@ -294,7 +297,8 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
         logger.debug("Opening SFTP ouput stream to write to file {}", this);
 
         try {
-            final RemoteFile remoteFile = connection.getSharedSftpClient().open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
+            final SFTPClient sftp = connection.connectSftp();
+            final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
             final OutputStream wrapped = remoteFile.new RemoteFileOutputStream();
 
             return new OutputStream() {
@@ -325,6 +329,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                         wrapped.close();
                     } finally {
                         closeQuietly(remoteFile);
+                        connection.disconnectSftp(sftp);
                     }
                 }
             };

@@ -22,17 +22,21 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.io.IOException;
+
+import net.schmizz.sshj.sftp.SFTPClient;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
-import net.schmizz.sshj.sftp.SFTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.io.Closeables.closeQuietly;
+import static java.lang.String.format;
 
 /**
  * Base class for connections to a remote host using SSH w/ SFTP.
@@ -48,37 +52,41 @@ abstract class SshSftpConnection extends SshConnection {
     @Override
     protected void connect() {
         super.connect();
-
-        logger.debug("Opening SFTP client to {}", this);
-        try {
-            sharedSftpClient = getSshClient().newSFTPClient();
-        } catch (IOException e) {
-            throw new RuntimeIOException("Cannot make SFTP connection to " + this, e);
-        }
+        
+        sharedSftpClient = connectSftp();
     }
 
     @Override
     public void doClose() {
         checkState(sharedSftpClient != null, "Not connected to SFTP");
 
-        logger.debug("Closing SFTP client to {}", this);
-        try {
-            sharedSftpClient.close();
-        } catch (IOException e) {
-            logger.error("Couldn't close the SFTP client", e);
-        }
-
+        disconnectSftp(sharedSftpClient);
         sharedSftpClient = null;
-        super.doClose();
-    }
 
-    protected SFTPClient getSharedSftpClient() {
-        return sharedSftpClient;
+        super.doClose();
     }
 
     @Override
     public OverthereFile getFile(String hostPath) throws RuntimeIOException {
         return new SshSftpFile(this, hostPath);
+    }
+
+    SFTPClient getSharedSftpClient() {
+        return sharedSftpClient;
+    }
+
+    SFTPClient connectSftp() {
+        logger.debug("Opening SFTP client to [{}]", this);
+        try {
+           return getSshClient().newSFTPClient();
+        } catch (IOException e) {
+            throw new RuntimeIOException(format("Cannot make SFTP connection to [%s]", this), e);
+        }
+    }
+
+    void disconnectSftp(SFTPClient sftp) {
+        logger.debug("Closing SFTP client to [{}]", this);
+        closeQuietly(sftp);
     }
 
     protected abstract String pathToSftpPath(String path);
