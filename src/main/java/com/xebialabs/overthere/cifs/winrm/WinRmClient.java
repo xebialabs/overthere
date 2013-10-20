@@ -159,13 +159,13 @@ public class WinRmClient {
 
         shellId = getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
 
-        logger.debug("Received WinRM Create Shell response: shell with ID [{}] start created", shellId);
+        logger.debug("Received WinRM Create Shell response: shell with ID {} start created", shellId);
 
         return shellId;
     }
 
     public String executeCommand(String command) {
-        logger.debug("Sending WinRM Execute Command request to shell [{}]", shellId);
+        logger.debug("Sending WinRM Execute Command request to shell {}", shellId);
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", Namespaces.NS_WIN_SHELL));
         String encoded = "\"" + command + "\"";
@@ -176,13 +176,13 @@ public class WinRmClient {
         
         commandId = getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
 
-        logger.debug("Received WinRM Execute Command response to shell [{}]: command with ID [{}] was started", shellId, commandId);
+        logger.debug("Received WinRM Execute Command response to shell {}: command with ID {} was started", shellId, commandId);
         
         return commandId;
     }
 
     public boolean receiveOutput(OutputStream stdout, OutputStream stderr) throws IOException {
-        logger.debug("Sending WinRM Receive Output request for command [{}] in shell [{}]", commandId, shellId);
+        logger.debug("Sending WinRM Receive Output request for command {} in shell {}", commandId, shellId);
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("Receive", Namespaces.NS_WIN_SHELL));
         bodyContent.addElement(QName.get("DesiredStream", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId).addText("stdout stderr");
@@ -190,7 +190,7 @@ public class WinRmClient {
 
         Document responseDocument = sendRequest(requestDocument, SoapAction.RECEIVE);
 
-        logger.debug("Received WinRM Receive Output response for command [{}] in shell [{}]", commandId, shellId);
+        logger.debug("Received WinRM Receive Output response for command {} in shell {}", commandId, shellId);
         
         handleStream(responseDocument, ResponseExtractor.STDOUT, stdout);
         handleStream(responseDocument, ResponseExtractor.STDERR, stderr);
@@ -224,7 +224,7 @@ public class WinRmClient {
     }
 
     public void sendInput(byte[] buf) throws IOException {
-        logger.debug("Sending WinRM Send Input request for command [{}} in shell [{}]", commandId, shellId);
+        logger.debug("Sending WinRM Send Input request for command {} in shell {}", commandId, shellId);
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("Send", Namespaces.NS_WIN_SHELL));
         final Base64 base64 = new Base64();
@@ -232,23 +232,23 @@ public class WinRmClient {
         final Document requestDocument = getRequestDocument(Action.WS_SEND, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
         sendRequest(requestDocument, SoapAction.SEND);
 
-        logger.debug("Sent WinRM Send Input request for command [{}} in shell [{}]", commandId, shellId);
+        logger.debug("Sent WinRM Send Input request for command {} in shell {}", commandId, shellId);
     }
 
     public void signal() {
         if (commandId == null) {
-            logger.warn("Not sending WinRM Signal request in shell [{}] because there is no running command", shellId);
+            logger.warn("Not sending WinRM Signal request in shell {} because there is no running command", shellId);
             return;
         }
 
-        logger.debug("Sending WinRM Signal request for command [{}} in shell [{}]", commandId, shellId);
+        logger.debug("Sending WinRM Signal request for command {} in shell {}", commandId, shellId);
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("Signal", Namespaces.NS_WIN_SHELL)).addAttribute("CommandId", commandId);
         bodyContent.addElement(QName.get("Code", Namespaces.NS_WIN_SHELL)).addText("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/signal/terminate");
         final Document requestDocument = getRequestDocument(Action.WS_SIGNAL, ResourceURI.RESOURCE_URI_CMD, null, bodyContent);
         sendRequest(requestDocument, SoapAction.SIGNAL);
 
-        logger.debug("Sent WinRM Signal request for command [{}} in shell [{}]", commandId, shellId);
+        logger.debug("Sent WinRM Signal request for command {} in shell {}", commandId, shellId);
     }
 
     public void deleteShell() {
@@ -257,12 +257,12 @@ public class WinRmClient {
             return;
         }
 
-        logger.debug("Sending WinRM Delete Shell request for shell [{}]", shellId);
+        logger.debug("Sending WinRM Delete Shell request for shell {}", shellId);
 
         final Document requestDocument = getRequestDocument(Action.WS_DELETE, ResourceURI.RESOURCE_URI_CMD, null, null);
         sendRequest(requestDocument, null);
 
-        logger.debug("Sent WinRM Delete Shell request for shell [{}]", shellId);
+        logger.debug("Sent WinRM Delete Shell request for shell {}", shellId);
     }
 
     public int exitValue() {
@@ -273,11 +273,11 @@ public class WinRmClient {
         try {
             logger.trace("Parsing exit code");
             String exitCode = getFirstElement(responseDocument, ResponseExtractor.EXIT_CODE);
-            logger.trace("Found exit code [{}]", exitCode);
+            logger.trace("Found exit code {}", exitCode);
             try {
                 exitValue = Integer.parseInt(exitCode);
             } catch(NumberFormatException exc) {
-                logger.error("Cannot parse exit code [{}], setting it to -1", exc);
+                logger.error("Cannot parse exit code {}, setting it to -1", exc);
                 exitValue = -1;
             }
         } catch (Exception exc) {

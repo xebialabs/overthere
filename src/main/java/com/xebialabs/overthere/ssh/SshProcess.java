@@ -89,10 +89,10 @@ class SshProcess implements OverthereProcess {
         try {
             command.join();
             Integer exitStatus = command.getExitStatus();
-            logger.info("Command [{}] on [{}] returned exit code [{}]", new Object[] { obfuscatedCommandLine, connection, exitStatus });
+            logger.info("Command [{}] on {} returned exit code {}", new Object[] { obfuscatedCommandLine, connection, exitStatus });
             closeSession();
             if (exitStatus == null) {
-                logger.warn("Command [{}] on [{}] could not be started. Returning exit code -1", obfuscatedCommandLine, connection);
+                logger.warn("Command [{}] on {} could not be started. Returning exit code -1", obfuscatedCommandLine, connection);
                 exitValue = -1;
             } else {
                 exitValue = exitStatus;

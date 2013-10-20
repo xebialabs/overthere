@@ -142,10 +142,10 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
             String infix = Long.toString(Math.abs(random.nextLong()));
             OverthereFile f = getFileForTempFile(getConnectionTemporaryDirectory(), infix);
             if (!f.exists()) {
-                logger.trace("Creating holder directory [{}] for temporary file with name [{}]", f, name);
+                logger.trace("Creating holder directory {} for temporary file with name {}", f, name);
                 f.mkdir();
                 OverthereFile t = f.getFile(name);
-                logger.debug("Created temporary file [{}]", t);
+                logger.debug("Created temporary file {}", t);
                 return t;
             }
         }
@@ -323,7 +323,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                         cInt = stdoutReader.read();
                     }
                 } catch (Exception exc) {
-                    logger.error(format("An exception occured reading %s while executing [%s] on [%s]", streamName, commandLine, this), exc);
+                    logger.error(format("An exception occured reading %s while executing [%s] on %s", streamName, commandLine, this), exc);
                 } finally {
                     closeQuietly(stdoutReader);
                     if (lineBuffer.length() > 0) {

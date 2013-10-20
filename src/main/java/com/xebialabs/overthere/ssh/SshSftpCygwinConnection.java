@@ -29,6 +29,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static java.lang.Character.toLowerCase;
 
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
 import java.util.List;
 
 import net.schmizz.sshj.connection.ConnectionException;
@@ -43,6 +44,8 @@ import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.RuntimeIOException;
 
+import static java.lang.String.format;
+
 /**
  * A connection to a Windows host running OpenSSH on Cygwin using SSH w/ SFTP.
  */
@@ -50,15 +53,14 @@ class SshSftpCygwinConnection extends SshSftpConnection {
 
     public SshSftpCygwinConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a non-Windows operating system", sshConnectionType.toString()
-            .toLowerCase());
+        checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a non-Windows operating system", sshConnectionType.toString().toLowerCase());
     }
 
     @Override
     protected String pathToSftpPath(String path) {
         String translatedPath = toCygwinPath(path);
         if (translatedPath == null) {
-            throw new RuntimeIOException("Cannot translate path " + path + " to SFTP path because it is not a Windows path or a Cygwin path");
+            throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a Cygdrive path because it is not a Windows path or a Cygwin path", path));
         }
         return translatedPath;
     }
@@ -90,7 +92,7 @@ class SshSftpCygwinConnection extends SshSftpConnection {
             for (int i = 1; i < args.size(); i++) {
                 modifiedCommandLine.add(args.get(i));
             }
-            logger.debug("Translated first element (command) of command line from Windows path [{}] to Cygwin path [{}]", arg0, arg0CygwinPath);
+            logger.trace("Translated first element (command) of command line from Windows path [{}] to Cygwin path [{}]", arg0, arg0CygwinPath);
             return super.processCommandLine(modifiedCommandLine);
         } else {
             return super.processCommandLine(commandLine);

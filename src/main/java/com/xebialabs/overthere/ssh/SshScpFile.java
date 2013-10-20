@@ -131,8 +131,9 @@ class SshScpFile extends SshFile<SshScpConnection> {
      *             if an I/O exception occurs
      */
     public LsResults getFileInfo() throws RuntimeIOException {
-        CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(GET_FILE_INFO_COMMAND, GET_FILE_INFO_COMMAND_DEFAULT), getPath());
+        logger.debug("Retrieving file info of {}", this);
+
+        CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(getCommand(GET_FILE_INFO_COMMAND, GET_FILE_INFO_COMMAND_DEFAULT), getPath());
         LsResults results = new LsResults();
         CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
         int errno = executeCommand(capturedOutput, swallow(), lsCmdLine);
@@ -151,7 +152,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             results.exists = false;
         }
 
-        logger.debug("Listed file [{}]: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[] { this, results.exists,
+        logger.debug("Listed file {}: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[] { this, results.exists,
             results.isDirectory, results.length
             , results.canRead, results.canWrite, results.canExecute });
 
@@ -214,23 +215,22 @@ class SshScpFile extends SshFile<SshScpConnection> {
             logger.debug("Downloading contents of {} to temporary file {}", this, tempFile);
             connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
 
-            logger.debug(
-                "Opening input stream to temporary file {} to retrieve contents download from {}. Temporary file will be deleted when the stream is closed",
-                tempFile, this);
+            logger.debug("Opening input stream to temporary file {} to retrieve contents downloaded from {}. Temporary file will be deleted when the stream is closed", tempFile, this);
             return new FileInputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
+                    logger.debug("Closing input stream to temporary file {}", tempFile);
                     try {
                         super.close();
                     } finally {
-                        logger.debug("Removing temporary file {}", tempFile);
+                        logger.debug("Deleting temporary file {}", tempFile);
                         tempFile.delete();
                     }
 
                 }
             };
         } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot open " + this + " for reading: " + exc.toString(), exc);
+            throw new RuntimeIOException(format("Cannot open %s for reading: %s", this, exc.toString()), exc);
         }
     }
 
@@ -244,6 +244,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             return new FileOutputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
+                    logger.debug("Closing output stream to temporary file {}", tempFile);
                     try {
                         super.close();
                     } finally {
@@ -256,13 +257,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
                     try {
                         connection.getSshClient().newSCPFileTransfer().upload(tempFile.getPath(), getPath());
                     } finally {
-                        logger.debug("Removing temporary file {}", tempFile);
+                        logger.debug("Deleting temporary file {}", tempFile);
                         tempFile.delete();
                     }
                 }
             };
         } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot open " + this + " for reading: " + exc.toString(), exc);
+            throw new RuntimeIOException(format("Cannot open %s for writing: %s", this, exc.toString()), exc);
         }
     }
 

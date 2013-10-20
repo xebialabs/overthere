@@ -76,16 +76,16 @@ abstract class SshSftpConnection extends SshConnection {
     }
 
     SFTPClient connectSftp() {
-        logger.debug("Opening SFTP client to [{}]", this);
+        logger.debug("Opening SFTP client to {}", this);
         try {
            return getSshClient().newSFTPClient();
         } catch (IOException e) {
-            throw new RuntimeIOException(format("Cannot make SFTP connection to [%s]", this), e);
+            throw new RuntimeIOException(format("Cannot start SFTP session for %s", this), e);
         }
     }
 
     void disconnectSftp(SFTPClient sftp) {
-        logger.debug("Closing SFTP client to [{}]", this);
+        logger.debug("Closing SFTP client to {}", this);
         closeQuietly(sftp);
     }
 

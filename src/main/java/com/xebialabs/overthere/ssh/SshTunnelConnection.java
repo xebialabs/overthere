@@ -155,8 +155,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         throw new UnsupportedOperationException("Cannot execute a command on the tunnel.");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(SshTunnelConnection.class);
-
     private static class PortForwarder extends Thread implements Closeable {
         private final SSHClient sshClient;
         private final InetSocketAddress remoteAddress;
@@ -171,7 +169,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         }
 
         private static String buildName(InetSocketAddress remoteAddress, Integer localPort) {
-            return format("SSH local port forward thread [%d:%s]", localPort, remoteAddress.toString());
+            return format("SSH local port forward thread %d:%s", localPort, remoteAddress.toString());
         }
 
         @Override
@@ -247,4 +245,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
             }
         }
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(SshTunnelConnection.class);
+
 }

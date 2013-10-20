@@ -28,11 +28,14 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static java.lang.Character.toUpperCase;
 
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.RuntimeIOException;
+
+import static java.lang.String.format;
 
 /**
  * A connection to a Windows host running WinSSHD.
@@ -53,9 +56,9 @@ class SshSftpWinSshdConnection extends SshSftpConnection {
             String pathInDrive = path.substring(2).replace('\\', '/');
             translatedPath = "/" + driveLetter + pathInDrive;
         } else {
-            throw new RuntimeIOException("Cannot translate path " + path + " because it is not a Windows path");
+            throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a WinSSHD path because it is not a Windows path", path));
         }
-        logger.trace("Translated path {} to sftp path {}", path, translatedPath);
+        logger.trace("Translated Windows path [{}] to WinSSHD path [{}]", path, translatedPath);
         return translatedPath;
     }
 

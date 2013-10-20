@@ -201,18 +201,18 @@ public class CifsTelnetConnection extends CifsConnection {
                 private synchronized void disconnect() {
                     try {
                         tc.disconnect();
-                        logger.info("Disconnected from [{}]", CifsTelnetConnection.this);
+                        logger.info("Disconnected from {}", CifsTelnetConnection.this);
 
                         Closeables.closeQuietly(toCallersStdout);
                     } catch (IOException exc) {
-                        throw new RuntimeIOException(format("Cannot disconnect from [%s]", CifsTelnetConnection.this), exc);
+                        throw new RuntimeIOException(format("Cannot disconnect from %s", CifsTelnetConnection.this), exc);
                     }
                 }
                 
                 @Override
                 public synchronized int exitValue() {
                     if(tc.isConnected()) {
-                        throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine, CifsTelnetConnection.this));
+                        throw new IllegalThreadStateException(format("Process for command [%s] on %s is still running", obfuscatedCommandLine, CifsTelnetConnection.this));
                     }
 
                     synchronized(exitValue) {

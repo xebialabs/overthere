@@ -41,12 +41,12 @@ class WsmanKerberosScheme extends KerberosScheme {
 
         String spn = spnServiceClass + "@" + authServer;
 
-        logger.debug("Requesting Kerberos ticket for SPN [{}]", spn);
+        logger.debug("Requesting Kerberos ticket for SPN {}", spn);
         GSSManager manager = getManager();
         GSSName serverName = manager.createName(spn, GSSName.NT_HOSTBASED_SERVICE);
         GSSName canonicalizedName = serverName.canonicalize(oid);
 
-        logger.debug("Creating Kerberos GSS context for canonicalized SPN [{}]", canonicalizedName);
+        logger.debug("Creating Kerberos GSS context for canonicalized SPN {}", canonicalizedName);
         GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, GSSContext.DEFAULT_LIFETIME);
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
