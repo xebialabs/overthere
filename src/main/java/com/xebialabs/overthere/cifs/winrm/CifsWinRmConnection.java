@@ -158,6 +158,7 @@ public class CifsWinRmConnection extends CifsConnection {
                     }
                 }
             };
+            processOutputReaderThread.setDaemon(true);
             processOutputReaderThread.start();
 
             return new OverthereProcess() {

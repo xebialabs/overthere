@@ -302,7 +302,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     }
 
     private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch) {
-        return new Thread(format("%s reader", streamName)) {
+        Thread t = new Thread(format("%s reader", streamName)) {
             @Override
             public void run() {
                 StringBuilder lineBuffer = new StringBuilder();
@@ -332,6 +332,8 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 }
             }
         };
+        t.setDaemon(true);
+        return t;
     }
 
     /**

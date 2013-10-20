@@ -152,6 +152,7 @@ public class CifsTelnetConnection extends CifsConnection {
                     }
                 }
             };
+            processOutputReaderThread.setDaemon(true);
             processOutputReaderThread.start();
 
             return new OverthereProcess() {
