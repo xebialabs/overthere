@@ -99,7 +99,7 @@ public class CifsTelnetConnection extends CifsConnection {
             final int[] exitValue = new int[1];
             exitValue[0] = -1;
 
-            final Thread processOutputReaderThread = new Thread("Telnet output reader") {
+            final Thread outputReaderThread = new Thread("Telnet output reader") {
                 @Override
                 public void run() {
                     try {
@@ -152,8 +152,8 @@ public class CifsTelnetConnection extends CifsConnection {
                     }
                 }
             };
-            processOutputReaderThread.setDaemon(true);
-            processOutputReaderThread.start();
+            outputReaderThread.setDaemon(true);
+            outputReaderThread.start();
 
             return new OverthereProcess() {
                 @Override
@@ -179,7 +179,7 @@ public class CifsTelnetConnection extends CifsConnection {
 
                     try {
                         try {
-                            processOutputReaderThread.join();
+                            outputReaderThread.join();
                         } finally {
                             disconnect();
                         }

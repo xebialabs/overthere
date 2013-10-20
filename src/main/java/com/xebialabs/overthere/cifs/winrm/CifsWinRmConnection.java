@@ -114,8 +114,8 @@ public class CifsWinRmConnection extends CifsConnection {
             winRmClient.createShell();
             final String commandId = winRmClient.executeCommand(cmd);
 
-            final Exception processInputReaderTheaException[] = new Exception[1];
-            final Thread processInputReaderThead = new Thread(format("WinRM input reader for command [%s]", commandId)) {
+            final Exception inputReaderTheaException[] = new Exception[1];
+            final Thread inputReaderThead = new Thread(format("WinRM input reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
                     try {
@@ -132,17 +132,17 @@ public class CifsWinRmConnection extends CifsConnection {
                             winRmClient.sendInput(bufToSend);
                         }
                     } catch(Exception exc) {
-                        processInputReaderTheaException[0] = exc;
+                        inputReaderTheaException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(callersStdin);
                     }
                 }
             };
-            processInputReaderThead.setDaemon(true);
-            processInputReaderThead.start();
+            inputReaderThead.setDaemon(true);
+            inputReaderThead.start();
             
-            final Exception processOutputReaderThreadException[] = new Exception[1];
-            final Thread processOutputReaderThread = new Thread(format("WinRM output reader for command [%s]", commandId)) {
+            final Exception outputReaderThreadException[] = new Exception[1];
+            final Thread outputReaderThread = new Thread(format("WinRM output reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
                     try {
@@ -151,15 +151,15 @@ public class CifsWinRmConnection extends CifsConnection {
                                 break;
                         }
                     } catch (Exception exc) {
-                        processOutputReaderThreadException[0] = exc;
+                        outputReaderThreadException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                         Closeables.closeQuietly(toCallersStderr);
                     }
                 }
             };
-            processOutputReaderThread.setDaemon(true);
-            processOutputReaderThread.start();
+            outputReaderThread.setDaemon(true);
+            outputReaderThread.start();
 
             return new OverthereProcess() {
                 boolean processTerminated = false;
@@ -187,16 +187,16 @@ public class CifsWinRmConnection extends CifsConnection {
 
                     try {
                         try {
-                            processOutputReaderThread.join();
+                            outputReaderThread.join();
                         } finally {
                             winRmClient.deleteShell();
                             processTerminated = true;
                         }
-                        if(processOutputReaderThreadException[0] != null) {
-                            if(processOutputReaderThreadException[0] instanceof RuntimeException) {
-                                throw (RuntimeException) processOutputReaderThreadException[0];
+                        if(outputReaderThreadException[0] != null) {
+                            if(outputReaderThreadException[0] instanceof RuntimeException) {
+                                throw (RuntimeException) outputReaderThreadException[0];
                             } else {
-                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), processOutputReaderThreadException[0]);
+                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), outputReaderThreadException[0]);
                             }
                         }
                         return exitValue();
