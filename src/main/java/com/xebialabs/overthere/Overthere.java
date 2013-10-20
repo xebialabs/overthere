@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Closeables;
+
+import com.xebialabs.overthere.local.LocalConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
@@ -106,11 +108,17 @@ public class Overthere {
     private static OverthereConnection buildConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
         final Class<? extends OverthereConnectionBuilder> connectionBuilderClass = protocols.get().get(protocol);
         try {
-            final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class,
-                AddressPortMapper.class);
+            final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortMapper.class);
             OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
-            logger.info("Connecting to {}", connectionBuilder);
+
+            if(!(connectionBuilder instanceof LocalConnection)) {
+                logger.info("Connecting to {}", connectionBuilder);
+            } else {
+                logger.debug("Connecting to {}", connectionBuilder);
+            }
+
             OverthereConnection connection = connectionBuilder.connect();
+
             logger.trace("Connected to {}", connection);
             return connection;
         } catch (NoSuchMethodException exc) {
