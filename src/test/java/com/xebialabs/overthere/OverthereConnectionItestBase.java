@@ -23,7 +23,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
@@ -34,8 +33,10 @@ import com.xebialabs.overthere.ssh.SshConnectionType;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-import static org.hamcrest.CoreMatchers.nullValue;
-
+import static com.google.common.io.ByteStreams.copy;
+import static com.google.common.io.ByteStreams.readFully;
+import static com.google.common.io.ByteStreams.write;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
@@ -58,6 +59,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
@@ -356,11 +358,11 @@ public abstract class OverthereConnectionItestBase {
     public void shouldExecuteBatchFileWithArgumentsOnWindows() throws IOException {
         String content = "Hello from the file just uploaded";
         OverthereFile tempFile = connection.getTempFile("hello world", ".txt");
-        OutputStream outputStream = tempFile.getOutputStream();
+        OutputStream out = tempFile.getOutputStream();
         try {
-            outputStream.write(content.getBytes());
+            out.write(content.getBytes());
         } finally {
-            outputStream.close();
+            closeQuietly(out);
         }
 
         CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
@@ -395,11 +397,11 @@ public abstract class OverthereConnectionItestBase {
         assertThat("Expected name of temporary file to end with the suffix", tempFile.getName(), endsWith(suffix));
         assertThat("Expected temporary file to not exist yet", tempFile.exists(), equalTo(false));
 
-        OutputStream outputStream = tempFile.getOutputStream();
+        OutputStream out = tempFile.getOutputStream();
         try {
-            outputStream.write(contents);
+            out.write(contents);
         } finally {
-            outputStream.close();
+            closeQuietly(out);
         }
 
         assertThat("Expected temporary file to exist after writing to it", tempFile.exists(), equalTo(true));
@@ -413,14 +415,14 @@ public abstract class OverthereConnectionItestBase {
             assertFalse("Expected temporary file to not be executable", tempFile.canExecute());
         }
 
-        DataInputStream inputStream = new DataInputStream(tempFile.getInputStream());
+        DataInputStream in = new DataInputStream(tempFile.getInputStream());
         try {
             final byte[] contentsRead = new byte[contents.length];
-            inputStream.readFully(contentsRead);
-            assertThat("Expected input stream to be exhausted after reading the full contents", inputStream.available(), equalTo(0));
+            in.readFully(contentsRead);
+            assertThat("Expected input stream to be exhausted after reading the full contents", in.available(), equalTo(0));
             assertThat("Expected contents in temporary file to be identical to data written into it", contentsRead, equalTo(contents));
         } finally {
-            inputStream.close();
+            closeQuietly(in);
         }
 
         tempFile.delete();
@@ -507,9 +509,9 @@ public abstract class OverthereConnectionItestBase {
         byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
         InputStream largeIn = remoteLargeFile.getInputStream();
         try {
-            ByteStreams.readFully(largeIn, largeFileContentsRead);
+            readFully(largeIn, largeFileContentsRead);
         } finally {
-            largeIn.close();
+            closeQuietly(largeIn);
         }
 
         assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
@@ -526,9 +528,9 @@ public abstract class OverthereConnectionItestBase {
         byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
         InputStream largeIn = remoteLargeFile.getInputStream();
         try {
-            ByteStreams.readFully(largeIn, largeFileContentsRead);
+            readFully(largeIn, largeFileContentsRead);
         } finally {
-            largeIn.close();
+            closeQuietly(largeIn);
         }
 
         assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
@@ -626,7 +628,7 @@ public abstract class OverthereConnectionItestBase {
 
         // write data to file in home dir
         final byte[] contentsWritten = generateRandomBytes(SMALL_FILE_SIZE);
-        ByteStreams.write(contentsWritten, new OutputSupplier<OutputStream>() {
+        write(contentsWritten, new OutputSupplier<OutputStream>() {
             @Override
             public OutputStream getOutput() throws IOException {
                 return fileInHomeDir.getOutputStream();
@@ -642,9 +644,9 @@ public abstract class OverthereConnectionItestBase {
         byte[] contentsRead = new byte[SMALL_FILE_SIZE];
         InputStream in = fileInHomeDir.getInputStream();
         try {
-            ByteStreams.readFully(in, contentsRead);
+            readFully(in, contentsRead);
         } finally {
-            in.close();
+            closeQuietly(in);
         }
         assertThat(contentsRead, equalTo(contentsWritten));
 
@@ -682,8 +684,11 @@ public abstract class OverthereConnectionItestBase {
         // read new local file
         byte[] contentsRead = new byte[SMALL_FILE_SIZE];
         InputStream in = smallLocalFileReadBack.getInputStream();
-        ByteStreams.readFully(in, contentsRead);
-
+        try {
+            readFully(in, contentsRead);
+        } finally {
+            closeQuietly(in);
+        }
         assertThat(contentsRead, equalTo(contentsWritten));
 
         // remove file from home dir
@@ -722,7 +727,7 @@ public abstract class OverthereConnectionItestBase {
         newSource.copyTo(existingDestination);
 
         ByteArrayOutputStream to = new ByteArrayOutputStream();
-        ByteStreams.copy(new InputSupplier<InputStream>() {
+        copy(new InputSupplier<InputStream>() {
             @Override
             public InputStream getInput() throws IOException {
                 return existingDestination.getInputStream();
@@ -734,7 +739,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     private static void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
-        ByteStreams.write(data, new OutputSupplier<OutputStream>() {
+        write(data, new OutputSupplier<OutputStream>() {
             @Override
             public OutputStream getOutput() throws IOException {
                 return tempFile.getOutputStream();
@@ -744,7 +749,7 @@ public abstract class OverthereConnectionItestBase {
 
     protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
         byte[] randomBytes = generateRandomBytes(size);
-        ByteStreams.write(randomBytes, new OutputSupplier<OutputStream>() {
+        write(randomBytes, new OutputSupplier<OutputStream>() {
             @Override
             public OutputStream getOutput() throws IOException {
                 return new FileOutputStream(f);
@@ -764,6 +769,7 @@ public abstract class OverthereConnectionItestBase {
     }
 
     public boolean notCifs() {
+        
         return !protocol.equals(CIFS_PROTOCOL);
     }
 
