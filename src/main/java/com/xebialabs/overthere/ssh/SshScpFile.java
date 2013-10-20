@@ -472,6 +472,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
     }
 
-    private Logger logger = LoggerFactory.getLogger(SshScpFile.class);
+    private static Logger logger = LoggerFactory.getLogger(SshScpFile.class);
 
 }

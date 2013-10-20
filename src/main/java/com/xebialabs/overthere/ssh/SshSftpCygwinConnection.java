@@ -102,6 +102,6 @@ class SshSftpCygwinConnection extends SshSftpConnection {
         return new SshProcess(this, UNIX, session, commandLine);
     }
 
-    private Logger logger = LoggerFactory.getLogger(SshSftpCygwinConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpCygwinConnection.class);
 
 }

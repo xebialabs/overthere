@@ -233,6 +233,6 @@ class SshSudoFile extends SshScpFile {
         return super.hashCode() + Boolean.valueOf(isTempFile).hashCode();
     }
 
-    private Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
 }

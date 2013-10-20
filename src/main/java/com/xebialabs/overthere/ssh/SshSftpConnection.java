@@ -91,6 +91,6 @@ abstract class SshSftpConnection extends SshConnection {
 
     protected abstract String pathToSftpPath(String path);
 
-    private Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpConnection.class);
 
 }

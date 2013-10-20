@@ -59,6 +59,6 @@ class SshSftpWinSshdConnection extends SshSftpConnection {
         return translatedPath;
     }
 
-    private Logger logger = LoggerFactory.getLogger(SshSftpWinSshdConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpWinSshdConnection.class);
 
 }
