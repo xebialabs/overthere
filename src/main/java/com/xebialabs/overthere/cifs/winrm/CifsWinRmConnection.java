@@ -112,10 +112,10 @@ public class CifsWinRmConnection extends CifsConnection {
             final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
 
             winRmClient.createShell();
-            winRmClient.executeCommand(cmd);
+            final String commandId = winRmClient.executeCommand(cmd);
 
             final Exception processInputReaderTheaException[] = new Exception[1];
-            final Thread processInputReaderThead = new Thread(format("Input reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+            final Thread processInputReaderThead = new Thread(format("WinRM input reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
                     try {
@@ -142,7 +142,7 @@ public class CifsWinRmConnection extends CifsConnection {
             processInputReaderThead.start();
             
             final Exception processOutputReaderThreadException[] = new Exception[1];
-            final Thread processOutputReaderThread = new Thread(format("Output reader for [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this)) {
+            final Thread processOutputReaderThread = new Thread(format("WinRM output reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
                     try {

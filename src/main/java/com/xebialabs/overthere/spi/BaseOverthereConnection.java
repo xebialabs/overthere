@@ -29,10 +29,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.*;
+
+import static java.lang.String.format;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -299,7 +302,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     }
 
     private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch) {
-        return new Thread(streamName + " reader thread for command " + commandLine + " on " + this) {
+        return new Thread(format("%s reader", streamName)) {
             @Override
             public void run() {
                 StringBuilder lineBuffer = new StringBuilder();
@@ -320,7 +323,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                         cInt = stdoutReader.read();
                     }
                 } catch (Exception exc) {
-                    logger.error("An exception occured while reading from " + streamName, exc);
+                    logger.error(format("An exception occured reading %s while executing [%s] on [%s]", streamName, commandLine, this), exc);
                 } finally {
                     closeQuietly(stdoutReader);
                     if (lineBuffer.length() > 0) {

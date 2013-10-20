@@ -147,7 +147,7 @@ public class WinRmClient {
         this.unmappedPort = unmappedPort;
     }
 
-    public void createShell() {
+    public String createShell() {
         logger.debug("Sending WinRM Create Shell request");
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("Shell", Namespaces.NS_WIN_SHELL));
@@ -160,9 +160,11 @@ public class WinRmClient {
         shellId = getFirstElement(responseDocument, ResponseExtractor.SHELL_ID);
 
         logger.debug("Received WinRM Create Shell response: shell with ID [{}] start created", shellId);
+
+        return shellId;
     }
 
-    public void executeCommand(String command) {
+    public String executeCommand(String command) {
         logger.debug("Sending WinRM Execute Command request to shell [{}]", shellId);
 
         final Element bodyContent = DocumentHelper.createElement(QName.get("CommandLine", Namespaces.NS_WIN_SHELL));
@@ -175,6 +177,8 @@ public class WinRmClient {
         commandId = getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
 
         logger.debug("Received WinRM Execute Command response to shell [{}]: command with ID [{}] was started", shellId, commandId);
+        
+        return commandId;
     }
 
     public boolean receiveOutput(OutputStream stdout, OutputStream stderr) throws IOException {

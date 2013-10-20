@@ -99,7 +99,7 @@ public class CifsTelnetConnection extends CifsConnection {
             final int[] exitValue = new int[1];
             exitValue[0] = -1;
 
-            final Thread processOutputReaderThread = new Thread(format("Process output reader for command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this)) {
+            final Thread processOutputReaderThread = new Thread("Telnet output reader") {
                 @Override
                 public void run() {
                     try {
