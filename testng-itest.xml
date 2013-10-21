@@ -1,0 +1,14 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="All itests" verbose="1" parallel="false" >
+	<test name="Unix itests">
+		<classes>
+			<class name="com.xebialabs.overthere.UnixFactoryItest" />
+		</classes>
+	</test>
+	<test name="Windows itests">
+		<classes>
+			<class name="com.xebialabs.overthere.WindowsFactoryItest" />
+		</classes>
+	</test>
+</suite>
