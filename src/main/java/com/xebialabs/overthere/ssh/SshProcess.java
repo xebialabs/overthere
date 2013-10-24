@@ -55,7 +55,6 @@ class SshProcess implements OverthereProcess {
         this.connection = connection;
         this.session = session;
         this.obfuscatedCommandLine = commandLine.toCommandLine(os, true);
-        logger.debug("Executing command {} on {}", obfuscatedCommandLine, connection);
         this.command = session.exec(commandLine.toCommandLine(os, false));
     }
 
