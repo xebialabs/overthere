@@ -39,7 +39,12 @@ public enum OperatingSystemFamily {
     /**
      * An operating system from the Unix family: Linux, AIX, MacOS, etc.
      */
-    UNIX('/', ':', "\n", ";", ".sh", "/tmp");
+    UNIX('/', ':', "\n", ";", ".sh", "/tmp"),
+
+    /**
+     * The Z/OS operating system.
+     */
+    ZOS('/', ':', "\n", ";", ".sh", "/tmp");
 
     private final String fileSeparator;
 

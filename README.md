@@ -91,7 +91,7 @@ The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS,
 Overthere supports a number of protocols to connect to remote hosts:
 
 * [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
-* [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
+* [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
 * [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
 
 <a name="common_connection_options"></a>
@@ -102,7 +102,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <table>
 <tr>
 	<th align="left" valign="top"><a name="os"></a>os</th>
-	<td>The operating system of the remote host, either <code>UNIX</code> or <code>WINDOWS</code>. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
+	<td>The operating system of the remote host. Can be <code>UNIX</code>, <code>WINDOWS</code> or <code>ZOS</code>. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="address"></a>address</th>
@@ -122,7 +122,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmp"></a>tmp</th>
-	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory, e.g. <code>/tmp/overthere-20111128T132600-7234435.tmp</code>, to store temporary files for the duration of the connection.<br/>The default value is <code>tmp</code> for UNIX hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol where the default is the value of the <code>java.io.tmpdir</code> system property.</td>
+	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory, e.g. <code>/tmp/overthere-20111128T132600-7234435.tmp</code>, to store temporary files for the duration of the connection.<br/>The default value is <code>tmp</code> for UNIX and z/OS hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol where the default is the value of the <code>java.io.tmpdir</code> system property.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmpFileCreationRetries"></a>tmpFileCreationRetries</th>
@@ -175,7 +175,7 @@ To connect to a remote host using the SSH protocol, you will need to install an 
 * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
 * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
 
-__N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+__N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
 
 <a name="ssh_host_setup_sftp"></a>
 #### SFTP
@@ -241,7 +241,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 <tr>
 	<th align="left" valign="top"><a name="ssh_connectionType"></a>connectionType</th>
 	<td>Specifies how the SSH protocol is used. One of the following values must be set:<ul>
-		<li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix hosts.</li>
+		<li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host or a z/OS host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix and z/OS hosts.</li>
 		<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
 		<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
 		<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>

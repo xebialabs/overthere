@@ -32,6 +32,8 @@ import java.util.List;
 
 import org.testng.annotations.Test;
 
+import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
+
 public class CmdLineTest {
 
     private String command = "C:\\Program Files\\WebSphere\\bin\\wsadmin.bat";
@@ -92,6 +94,21 @@ public class CmdLineTest {
     public void shouldEncodeCorrectlyForUnix() {
         CmdLine commandLine = CmdLine.build(command, regularArgument, emptyArgument, argumentWithSpaces, argumentWithSpecialChars);
         String actualEncodedCommandLine = commandLine.toCommandLine(UNIX, false);
+
+        String encodedCommand = command.replace("\\", "\\\\").replace(" ", "\\ ");
+        String encodedEmptyArgument = "\"\"";
+        String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
+        String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}\\*\\?andthatwasem";
+        String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
+        String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
+
+        assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
+    }
+
+    @Test
+    public void shouldEncodeCorrectlyForZos() {
+        CmdLine commandLine = CmdLine.build(command, regularArgument, emptyArgument, argumentWithSpaces, argumentWithSpecialChars);
+        String actualEncodedCommandLine = commandLine.toCommandLine(ZOS, false);
 
         String encodedCommand = command.replace("\\", "\\\\").replace(" ", "\\ ");
         String encodedEmptyArgument = "\"\"";

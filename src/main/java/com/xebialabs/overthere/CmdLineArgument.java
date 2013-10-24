@@ -127,18 +127,19 @@ public abstract class CmdLineArgument implements Serializable {
         }
 
         switch (os) {
-        case UNIX:
-            if (!containsAny(str, SPECIAL_CHARS_UNIX)) {
-                builder.append(str);
-            } else {
-                encodeArgumentWithSpecialCharactersForUnix(str, builder);
-            }
-            break;
         case WINDOWS:
             if (!containsAny(str, SPECIAL_CHARS_WINDOWS)) {
                 builder.append(str);
             } else {
                 encodeArgumentWithSpecialCharactersForWindows(str, builder);
+            }
+            break;
+        case UNIX:
+        case ZOS:
+            if (!containsAny(str, SPECIAL_CHARS_UNIX)) {
+                builder.append(str);
+            } else {
+                encodeArgumentWithSpecialCharactersForUnix(str, builder);
             }
             break;
         default:
