@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2008, 2012, XebiaLabs B.V., All rights reserved.
+/*
+ * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
