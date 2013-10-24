@@ -52,8 +52,8 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String CIFS_PROTOCOL = "cifs";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the {@link CifsConnectionType CIFS
-     * connection type} to use.
+     * Connection option (<code>CifsConnectionType</code>) that specifies the {@link CifsConnectionType CIFS connection
+     * type} to use.
      */
     public static final String CONNECTION_TYPE = "connectionType";
 
@@ -74,7 +74,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the CIFS port to connect to.
+     * Connection option (Integer) that specifies the CIFS port to connect to.
      */
     public static final String CIFS_PORT = "cifsPort";
 
@@ -85,7 +85,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final int DEFAULT_CIFS_PORT = 445;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the path to share mappings to use for
+     * Connection option (<code>Map&lt;String, String&gt;</code>) that specifies the path to share mappings to use for
      * CIFS, specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not
      * explicitly mapped to a share the administrative share will be used..
      */
@@ -98,40 +98,38 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether to use HTTPS for WinRM.
+     * Connection option (Boolean) that specifies whether to use HTTPS for WinRM.
      */
     public static final String WINRM_ENABLE_HTTPS = "winrmEnableHttps";
 
     /**
-     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
-     * use HTTPS for WinRM.
+     * Default value (<code>false</code>) for the connection option used to specify whether to use HTTPS for WinRM.
      */
     public static final boolean DEFAULT_WINRM_ENABLE_HTTPS = false;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the context (URI) used by WinRM.
+     * Connection option (String) that specifies the context (URI) used by WinRM.
      */
     public static final String WINRM_CONTEXT = "winrmContext";
 
     /**
-     * Default value (<code>/wsman</code>) of the {@link ConnectionOptions connection option} used to specify the
-     * context (URI) used by WinRM.
+     * Default value (<code>/wsman</code>) for the connection option used to specify the context (URI) used by WinRM.
      */
     public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM envelop size in bytes to use.
+     * Connection option (Integer) that specifies the WinRM envelop size in bytes to use.
      */
     public static final String WINRM_ENVELOP_SIZE = "winrmEnvelopSize";
 
     /**
-     * Default value (<code>153600</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
-     * envelop size in bytes to use.
+     * Default value (<code>153600</code>) for the connection option used to specify the WinRM envelop size in bytes to
+     * use.
      */
     public static final int DEFAULT_WINRM_ENVELOP_SIZE = 153600;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the
+     * Connection option (<code>WinrmHttpsCertificateTrustStrategy</code>) that specifies the
      * {@link WinrmHttpsCertificateTrustStrategy} for WinRM HTTPS connections.
      */
     public static final String WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = "winrmHttpsCertificateTrustStrategy";
@@ -143,7 +141,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final WinrmHttpsCertificateTrustStrategy DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = STRICT;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the
+     * Connection option (<code>WinrmHttpsHostnameVerificationStrategy</code>) that specifies the
      * {@link WinrmHttpsHostnameVerificationStrategy} for WinRM HTTPS connections.
      */
     public static final String WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = "winrmHttpsHostnameVerificationStrategy";
@@ -156,61 +154,57 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final WinrmHttpsHostnameVerificationStrategy DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = BROWSER_COMPATIBLE;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether to enable debug output for
-     * Kerberos authentication.
+     * Connection option (Boolean) that specifies whether to enable debug output for Kerberos authentication.
      */
     public static final String WINRM_KERBEROS_DEBUG = "winrmKerberosDebug";
 
     /**
-     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
-     * enable debug output for Kerberos authentication.
+     * Default value (<code>false</code>) for the connection option used to specify whether to enable debug output for
+     * Kerberos authentication.
      */
     public static final boolean DEFAULT_WINRM_KERBEROS_DEBUG = false;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether to use the <code>HTTP</code>
-     * protocol in the SPN for Kerberos authentication.
+     * Connection option (Boolean) that specifies whether to use the <code>HTTP</code> protocol in the SPN for Kerberos
+     * authentication.
      */
     public static final String WINRM_KERBEROS_USE_HTTP_SPN = "winrmKerberosUseHttpSpn";
 
     /**
-     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
-     * use the <code>HTTP</code> protocol in the SPN for Kerberos authentication.
+     * Default value (<code>false</code>) for the connection option used to specify whether to use the <code>HTTP</code>
+     * protocol in the SPN for Kerberos authentication.
      */
     public static final boolean DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN = false;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify whether to add the port to the SPN for
-     * Kerberos authentication.
+     * Connection option (Boolean) that specifies whether to add the port to the SPN for Kerberos authentication.
      */
     public static final String WINRM_KERBEROS_ADD_PORT_TO_SPN = "winrmKerberosAddPortToSpn";
-    
+
     /**
-     * Default value (<code>false</code>) of the {@link ConnectionOptions connection option} used to specify whether to
-     * add the port to the SPN for Kerberos authentication.
+     * Default value (<code>false</code>) for the connection option used to specify whether to add the port to the SPN
+     * for Kerberos authentication.
      */
     public static final boolean DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN = false;
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM locale to use.
+     * Connection option (String) that specifies the WinRM locale to use.
      */
     public static final String WINRM_LOCALE = "winrmLocale";
 
     /**
-     * Default value (<code>en-US</code>) of the {@link ConnectionOptions connection option} used to specify the WinRM
-     * locale to use.
+     * Default value (<code>en-US</code>) for the connection option used to specify the WinRM locale to use.
      */
     public static final String DEFAULT_WINRM_LOCALE = "en-US";
 
     /**
-     * Name of the {@link ConnectionOptions connection option} used to specify the WinRM timeout in <a
+     * Connection option (String) that specifies the WinRM timeout in <a
      * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
      */
     public static final String WINRM_TIMEMOUT = "winrmTimeout";
 
     /**
-     * Default value (<code>PT60.000S</code>) of the {@link ConnectionOptions connection option} used to specify the
-     * WinRM timeout.
+     * Default value (<code>PT60.000S</code>) for the connection option used to specify the WinRM timeout.
      */
     public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 

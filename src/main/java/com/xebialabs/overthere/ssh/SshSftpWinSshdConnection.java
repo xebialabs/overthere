@@ -44,7 +44,7 @@ class SshSftpWinSshdConnection extends SshSftpConnection {
 
     public SshSftpWinSshdConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a non-Windows operating system", sshConnectionType.toString()
+        checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a host that is not running Windows", sshConnectionType.toString()
             .toLowerCase());
     }
 

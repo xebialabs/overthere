@@ -46,6 +46,8 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
@@ -77,13 +79,17 @@ public class CifsTelnetConnection extends CifsConnection {
      */
     public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
+        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
         checkArgument(!username.contains("@"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with a new-style Windows domain account [%s], use DOMAIN\\USER instead.", cifsConnectionType.toString().toLowerCase(), username);
     }
 
     @Override
-    public OverthereProcess startProcess(final CmdLine commandLine) {
-        final String obfuscatedCommandLine = commandLine.toCommandLine(getHostOperatingSystem(), true);
+    public OverthereProcess startProcess(final CmdLine cmd) {
+        checkNotNull(cmd, "Cannot execute null command line");
+        checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
+
+        final String obfuscatedCmd = cmd.toCommandLine(os, true);
+        logger.info("Starting command [{}] on [{}]", obfuscatedCmd, this);
 
         try {
             final TelnetClient tc = new TelnetClient();
@@ -121,7 +127,7 @@ public class CifsTelnetConnection extends CifsConnection {
                             receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
                         }
 
-                        send(stdin, commandLine.toCommandLine(getHostOperatingSystem(), false));
+                        send(stdin, cmd.toCommandLine(getHostOperatingSystem(), false));
 
                         receive(stdout, outputBuf, toCallersStdout, DETECTABLE_WINDOWS_PROMPT);
 
@@ -146,7 +152,7 @@ public class CifsTelnetConnection extends CifsConnection {
                             logger.error("Cannot find errorlevel in Windows output: " + outputBuf);
                         }
                     } catch (IOException exc) {
-                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this), exc);
+                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, CifsTelnetConnection.this), exc);
                     } finally {
                         Closeables.closeQuietly(toCallersStdout);
                     }
@@ -185,7 +191,7 @@ public class CifsTelnetConnection extends CifsConnection {
                         }
                         return exitValue[0];
                     } catch (InterruptedException exc) {
-                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCommandLine, CifsTelnetConnection.this), exc);
+                        throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, CifsTelnetConnection.this), exc);
                     }
                 }
 
@@ -212,7 +218,7 @@ public class CifsTelnetConnection extends CifsConnection {
                 @Override
                 public synchronized int exitValue() {
                     if(tc.isConnected()) {
-                        throw new IllegalThreadStateException(format("Process for command [%s] on %s is still running", obfuscatedCommandLine, CifsTelnetConnection.this));
+                        throw new IllegalThreadStateException(format("Process for command [%s] on %s is still running", obfuscatedCmd, CifsTelnetConnection.this));
                     }
 
                     synchronized(exitValue) {
@@ -221,9 +227,9 @@ public class CifsTelnetConnection extends CifsConnection {
                 }
             };
         } catch (InvalidTelnetOptionException exc) {
-            throw new RuntimeIOException("Cannot execute command " + commandLine + " at telnet://" + username + "@" + address, exc);
+            throw new RuntimeIOException("Cannot execute command " + cmd + " at telnet://" + username + "@" + address, exc);
         } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot execute command " + commandLine + " at telnet://" + username + "@" + address, exc);
+            throw new RuntimeIOException("Cannot execute command " + cmd + " at telnet://" + username + "@" + address, exc);
         }
     }
 

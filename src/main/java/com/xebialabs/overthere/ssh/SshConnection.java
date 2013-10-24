@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -58,6 +59,8 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
+
+import static java.lang.String.format;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -231,11 +234,15 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     @Override
-    public OverthereProcess startProcess(final CmdLine commandLine) {
-        checkNotNull(commandLine, "Cannot execute null command line");
-        checkArgument(commandLine.getArguments().size() > 0, "Cannot execute empty command line");
+    public OverthereProcess startProcess(final CmdLine origCmd) {
+        checkNotNull(origCmd, "Cannot execute null command line");
+        checkArgument(origCmd.getArguments().size() > 0, "Cannot execute empty command line");
 
-        CmdLine cmd = processCommandLine(commandLine);
+        final CmdLine cmd = processCommandLine(origCmd);
+
+        final String obfuscatedCmd = origCmd.toCommandLine(os, true);
+        logger.info("Starting command [{}] on [{}]", obfuscatedCmd, this);
+
         try {
             if (openShellBeforeExecute) {
                 Session session = null;
@@ -272,7 +279,7 @@ abstract class SshConnection extends BaseOverthereConnection {
             }
             return createProcess(session, cmd);
         } catch (SSHException e) {
-            throw new RuntimeIOException("Cannot execute remote command \"" + cmd.toCommandLine(getHostOperatingSystem(), true) + "\" on " + this, e);
+            throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, this), e);
         }
 
     }

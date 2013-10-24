@@ -85,8 +85,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
         this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, DEFAULT_CONNECTION_TIMEOUT_MILLIS);
         this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
-        this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT,
-                DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
+        this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT);
         this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, DEFAULT_TEMPORARY_FILE_CREATION_RETRIES);
         this.canStartProcess = canStartProcess;
     }

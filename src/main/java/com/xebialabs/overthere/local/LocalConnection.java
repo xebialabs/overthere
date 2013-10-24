@@ -23,6 +23,7 @@
 package com.xebialabs.overthere.local;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,10 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import static java.lang.String.format;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
@@ -110,13 +115,34 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     }
 
     @Override
-    public OverthereProcess startProcess(CmdLine commandLine) {
-        logger.info("Executing command [{}] on [{}]", commandLine, this);
+    public OverthereProcess startProcess(CmdLine cmd) {
+        checkNotNull(cmd, "Cannot execute null command line");
+        checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
+
+        final String obfuscatedCmd = cmd.toCommandLine(os, true);
+        logger.info("Starting command [{}] on [{}]", obfuscatedCmd, this);
+
         File wd = null;
         if (workingDirectory != null) {
             wd = ((LocalFile) workingDirectory).getFile();
         }
-        return LocalProcess.fromCommandLine(commandLine, wd, os);
+
+        try {
+            logger.debug("Creating " + os + " process with command line [{}]", obfuscatedCmd);
+            final ProcessBuilder pb = new ProcessBuilder(cmd.toCommandArray(os, false));
+            if(wd != null) {
+                logger.debug("Setting working directory to [{}]", wd);
+                pb.directory(wd);
+            } else {
+                logger.debug("Not setting working directory");
+            }
+
+            logger.debug("Starting process");
+            final Process p = pb.start();
+            return new LocalProcess(p);
+        } catch (IOException exc) {
+            throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, this), exc);
+        }
     }
 
     @Override

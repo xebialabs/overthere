@@ -30,7 +30,11 @@ import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.io.Closeables;
+
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -40,6 +44,8 @@ import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -86,19 +92,23 @@ public class CifsWinRmConnection extends CifsConnection {
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a non-Windows operating system", cifsConnectionType.toString().toLowerCase());
+        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
         checkArgument(!username.contains("\\"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
         this.options = options;
     }
 
     @Override
-    public OverthereProcess startProcess(final CmdLine commandLine) {
-        final String obfuscatedCommandLine = commandLine.toCommandLine(getHostOperatingSystem(), true);
+    public OverthereProcess startProcess(final CmdLine cmd) {
+        checkNotNull(cmd, "Cannot execute null command line");
+        checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
 
-        String cmd = commandLine.toCommandLine(getHostOperatingSystem(), false);
+        final String obfuscatedCmd = cmd.toCommandLine(os, true);
+        logger.info("Starting command [{}] on [{}]", obfuscatedCmd, this);
+
+        String cmdString = cmd.toCommandLine(os, false);
         if (workingDirectory != null) {
-            cmd = "CD /D " + workingDirectory.getPath() + " & " + cmd;
+            cmdString = "CD /D " + workingDirectory.getPath() + " & " + cmdString;
         }
 
         final WinRmClient winRmClient = createWinrmClient();
@@ -111,7 +121,7 @@ public class CifsWinRmConnection extends CifsConnection {
             final PipedOutputStream toCallersStderr = new PipedOutputStream(callersStderr);
 
             winRmClient.createShell();
-            final String commandId = winRmClient.executeCommand(cmd);
+            final String commandId = winRmClient.executeCommand(cmdString);
 
             final Exception inputReaderTheaException[] = new Exception[1];
             final Thread inputReaderThead = new Thread(format("WinRM input reader for command [%s]", commandId)) {
@@ -195,12 +205,12 @@ public class CifsWinRmConnection extends CifsConnection {
                             if(outputReaderThreadException[0] instanceof RuntimeException) {
                                 throw (RuntimeException) outputReaderThreadException[0];
                             } else {
-                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), outputReaderThreadException[0]);
+                                throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCmd, CifsWinRmConnection.this), outputReaderThreadException[0]);
                             }
                         }
                         return exitValue();
                     } catch (InterruptedException exc) {
-                        throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCommandLine, CifsWinRmConnection.this), exc);
+                        throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCmd, CifsWinRmConnection.this), exc);
                     }
                 }
 
@@ -218,7 +228,7 @@ public class CifsWinRmConnection extends CifsConnection {
                 @Override
                 public synchronized int exitValue() {
                     if (!processTerminated) {
-                        throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine,
+                        throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCmd,
                             CifsWinRmConnection.this));
                     }
 
@@ -227,7 +237,7 @@ public class CifsWinRmConnection extends CifsConnection {
             };
 
         } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot execute command " + commandLine + " on " + this, exc);
+            throw new RuntimeIOException("Cannot execute command " + cmd + " on " + this, exc);
         }
     }
 
@@ -253,5 +263,7 @@ public class CifsWinRmConnection extends CifsConnection {
             throw new WinRmRuntimeIOException("Cannot build a new URL for " + this, e);
         }
     }
+
+    private static Logger logger = LoggerFactory.getLogger(CifsWinRmConnection.class);
 
 }

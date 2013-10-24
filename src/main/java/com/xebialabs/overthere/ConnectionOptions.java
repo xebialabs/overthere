@@ -67,8 +67,8 @@ public class ConnectionOptions {
     public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmpFileCreationRetries";
 
     /**
-     * Defalut value (<code>100</code>) for connection option that specifies how many times to retry creating a unique
-     * temporary file name before giving up.
+     * Default value (<code>100</code>) for the connection option that specifies how many times to retry creating a
+     * unique temporary file name before giving up.
      */
     public static final int DEFAULT_TEMPORARY_FILE_CREATION_RETRIES = 100;
 
@@ -104,7 +104,8 @@ public class ConnectionOptions {
     public static final String PASSWORD = "password";
 
     /**
-     * Common connection option that specifies the connection options used to create a tunnel.
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the {@link ConnectionOptions connection
+     * options} to be used to create a tunnel.
      */
     public static final String JUMPSTATION = "jumpstation";
 
