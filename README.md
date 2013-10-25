@@ -819,43 +819,43 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate">winrsAllowDelegate</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate"></a>winrsAllowDelegate</th>
 	<td>If set to <code>false</code>, the user's credentials may be passed to the remote host. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsCompression">winrsCompression</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsCompression"></a>winrsCompression</th>
 	<td>If set to <code>true</code>, compression is enabled. This option corresponds to the <code>winrs</code> command option <code>-compression</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsNoecho">winrsNoecho</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsNoecho"></a>winrsNoecho</th>
 	<td>If set to <code>true</code>, echo is disabled. This option corresponds to the <code>winrs</code> command option <code>-noecho</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsNoprofile">winrsNoprofile</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsNoprofile"></a>winrsNoprofile</th>
 	<td>If set to <code>true</code>, loading the user profile before executing the command is disabled. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsUnencrypted">winrsUnencrypted</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsUnencrypted"></a>winrsUnencrypted</th>
 	<td>If set to <code>true</code>, encryption is disabled. This option corresponds to the <code>winrs</code> command option <code>-unencrypted</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsProxyProtocol">winrsProxyProtocol</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsProxyProtocol"></a>winrsProxyProtocol</th>
 	<td>The protocol to use when connecting to the "winrs proxy host", i.e. the host that is used to run the <code>winrs</code> command. The "winrs proxy host" must run Windows. The default value is <code>local</code>, which means the commands will be executed on the local host, which means the local host must run Windows.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsProxyConnectionOptions">winrsProxyConnectionOptions</a></th>
+	<th align="left" valign="top"><a name="cifs_winrsProxyConnectionOptions"></a>winrsProxyConnectionOptions</th>
 	<td>The connection options to use when connecting to the "winrs proxy host".
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
