@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.2.2%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.3.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.2.2</version>
+			<version>2.3.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -880,6 +880,11 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.3.0 (25-Oct-2013)
+    * Implemented support for `winrs`, the native WinRM implementation available on Windows hosts, fixes issue [#12|https://github.com/xebialabs/overthere/issues/12]. *N.B.:* To distinguish this connection type from the existing Java one, the connection type `WINRM` has been replaced by `WINRM_INTERNAL` (the Java implementation) and `WINRM_NATIVE` (the Windows implementation).
+    * Added `refreshKrb5Config=true` option to the Kerberos JAAS configuration to make sure the configuration is re-read for every request.
+    * Upgraded the SSH/J 0.9.0.
+    * Fixed bug that occurred when reading or writing many files over a single SFTP connection to a WinSSHD server.
 * Overthere 2.2.2 (28-Aug-2013)
     * Fixed [#81](https://github.com/xebialabs/overthere/issues/81).
 * Overthere 2.2.1 (24-Jul-2013)
