@@ -245,7 +245,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 		<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
 		<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
 		<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
-		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection option is required and specifies that user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
+		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection option is required and specifies the user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
 	<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <strong>SUDO</strong> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
 	</ul></td>
 </tr>
@@ -416,7 +416,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
 
 * The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
-* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [connectionType](#cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [connectionType](#cifs_connectionType) connection option to __WINRM_NATIVE__.
+* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
 ### Domain accounts
@@ -429,7 +429,7 @@ Windows domain accounts are supported by the __WINRM_INTERNAL__, __WINRM_NATIVE_
 __N.B.:__ When using domain accounts with the __WINRM_INTERNAL__ connection type, the Kerberos subsystem of the Java Virtual Machine must be configured correctly. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
 
 ### Administrative shares
-By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection options should have access to those shares and the underlying directories and files.
+By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection option should have access to those shares and the underlying directories and files.
 
 __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
 
@@ -506,7 +506,7 @@ To use the __WINRM_INTERNAL__ or the __WINRM_NATIVE__ connection type, you'll ne
 
 	__N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
 	
-1. (Only required for __WINRM_INTERNAL__ or when the connection option [winrsUnencrypted](#cifs_winrsUnencrypted) is set to <code>true</code>) Configure WinRM to allow unencrypted SOAP messages:
+1. (Only required for __WINRM_INTERNAL__ or when the connection option [**winrsUnencrypted**](#cifs_winrsUnencrypted) is set to `true`) Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 
@@ -696,11 +696,11 @@ Multiple causes can lead to this error message:
 
 1. The Kerberos ticket is not accepted by the remote host:
 
-    1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used as the `address` in the connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
+    1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used in the **address** connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
 
     1. Has the reverse DNS of the remote host been set up correctly? See [Principal names and DNS](http://web.mit.edu/Kerberos/krb5-devel/doc/admin/princ_dns.html) for more information. Please note that the `rdns` option is not available in Java's Kerberos implementation.
 
-1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the <a href="#cifs_host_setup_winrm">host setup for WinRM</a>?
+1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the [host setup for WinRM](#cifs_host_setup_winrm)?
 
 1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
@@ -710,7 +710,7 @@ Multiple causes can lead to this error message:
 
 Multiple causes can lead to this error message:
 
-1. If the command was executing for a long time, this might have been caused by a timeout. You can increase the [WinRM timeout](#cifs_winrmTimeout) connection option to increase the request timeout. Don't forget to increase the `MaxTimeoutms` setting on the remote host as well. For example, to set the maximum timeout on the server to five minutes, enter the following command:
+1. If the command was executing for a long time, this might have been caused by a timeout. You can increase the WinRM timeout specified by the [**winrmTimeout**](#cifs_winrmTimeout) connection option to increase the request timeout. Don't forget to increase the `MaxTimeoutms` setting on the remote host as well. For example, to set the maximum timeout on the server to five minutes, enter the following command:
 
     winrm set winrm/config @{MaxTimeoutms="300000"}
 
