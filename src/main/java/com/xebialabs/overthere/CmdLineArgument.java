@@ -76,7 +76,7 @@ public abstract class CmdLineArgument implements Serializable {
      * Creates a raw argument. When encoded for execution or for logging, a raw argument is left as-is.
      */
     public static CmdLineArgument raw(String arg) {
-        checkNotNull(arg, "Cannot create a null password argument");
+        checkNotNull(arg, "Cannot create a null raw argument");
         return new Raw(arg);
     }
 
