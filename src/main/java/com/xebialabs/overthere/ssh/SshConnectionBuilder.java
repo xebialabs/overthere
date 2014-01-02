@@ -126,6 +126,12 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SUDO_USERNAME = "sudoUsername";
 
     /**
+     * Connection option (String) that specifies an alternate password to use for the password prompt for
+     * {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH connections. When empty, the default password used for making the connection is used.
+     */
+    public static final String SUDO_INTERACTIVE_PASSWORD = "sudoInteractivePassword";
+
+    /**
      * Connection option (Boolean) that specifies whether or not to explicitly change the permissions with chmod -R
      * go+rX after uploading a file or directory with scp. Also see {@link #SUDO_OVERRIDE_UMASK_COMMAND}.
      */

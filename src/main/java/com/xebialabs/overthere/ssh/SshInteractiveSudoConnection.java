@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_INTERACTIVE_PASSWORD;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
 
@@ -44,14 +45,17 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
 
     private String passwordPromptRegex;
 
+    private String sudoInteractivePassword;
+
     private static final String OVERRIDE_ALLOCATE_PTY = "vt220:80:24:0:0";
 
     public SshInteractiveSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
+        this.sudoInteractivePassword = options.get(SUDO_INTERACTIVE_PASSWORD, password);
+        this.passwordPromptRegex = options.get(SUDO_PASSWORD_PROMPT_REGEX, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
         checkArgument(!passwordPromptRegex.endsWith("*"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
         checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
-        checkArgument(password != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
+        checkArgument(sudoInteractivePassword != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
         if (!allocateDefaultPty && allocatePty == null) {
             logger.warn("An ssh:{}: connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY +"].", sshConnectionType.toString().toLowerCase());
             allocatePty = OVERRIDE_ALLOCATE_PTY;
@@ -63,7 +67,7 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
         return new SshProcess(this, os, session, commandLine) {
             @Override
             public InputStream getStdout() {
-                return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), password, passwordPromptRegex);
+                return new SshInteractiveSudoPasswordHandlingStream(super.getStdout(), getStdin(), sudoInteractivePassword, passwordPromptRegex);
             }
         };
     }

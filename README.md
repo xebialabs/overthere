@@ -256,6 +256,12 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="ssh_sudoInteractivePassword"></a>sudoInteractivePassword</th>
+	<td>Specifies the password to use for keyboard-interactive password prompts resulting from executing commands having a <a href="#ssh_sudoCommandPrefix"><strong>sudoCommandPrefix</strong></a> that require a different password to that used to establish the connection. Example <code>su - privilegeduser -c 'start server1'</code>.  When empty, the default password used for making the connection is used.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="ssh_privateKeyFile"></a>privateKeyFile</th>
 	<td>The RSA private key file to use when connecting to the remote host. When this connection option is specified, the <strong>password</strong> connection option is ignored.</td>
 </tr>
@@ -280,7 +286,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"></a>sudoCommandPrefix</th>
-	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the value of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>.
+	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the value of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. 
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
@@ -310,7 +316,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoQuoteCommand"></a>sudoQuoteCommand</th>
-	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser 'start server1'</code>. The default value is <code>false</code>.
+	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser -c 'start server1'</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
