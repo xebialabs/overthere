@@ -191,9 +191,13 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         for (int i = 0; i < temporaryFileCreationRetries; i++) {
             OverthereFile tempDir = getFileForTempFile(temporaryDirectory, prefix + infix + suffix);
             if (!tempDir.exists()) {
-                tempDir.mkdir();
-                logger.info("Created connection temporary directory {}", tempDir);
-                return tempDir;
+                try {
+                    tempDir.mkdir();
+                    logger.info("Created connection temporary directory {}", tempDir);
+                    return tempDir;
+                } catch(RuntimeException exc) {
+                    logger.debug(format("Failed to create temporary directory %s", tempDir), exc);
+                }
             }
             infix = "-" + Long.toString(Math.abs(random.nextLong()));
         }
