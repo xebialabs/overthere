@@ -886,6 +886,9 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.3.1 (16-Jan-2014)
+    * Fixed [#89](https://github.com/xebialabs/overthere/issues/89)
+    * Fixed race condition in creation of local temporary directories.
 * Overthere 2.3.0 (25-Oct-2013)
     * Implemented support for `winrs`, the native WinRM implementation available on Windows hosts, fixes issue [#12|https://github.com/xebialabs/overthere/issues/12]. *N.B.:* To distinguish this connection type from the existing Java one, the connection type `WINRM` has been replaced by `WINRM_INTERNAL` (the Java implementation) and `WINRM_NATIVE` (the Windows implementation).
     * Added `refreshKrb5Config=true` option to the Kerberos JAAS configuration to make sure the configuration is re-read for every request.
