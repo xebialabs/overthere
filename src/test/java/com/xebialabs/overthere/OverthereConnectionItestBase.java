@@ -523,21 +523,125 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
+    public void shouldCopyRemoteFileToRemoteLocationOnSameConnection() throws IOException {
+        File smallFile = temp.newFile("small.dat");
+        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
+        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
+
+        OverthereFile remoteSmallCopy = connection.getTempFile("copy-of-small.dat");
+        remoteSmallFile.copyTo(remoteSmallCopy);
+
+        assertThat(remoteSmallCopy.exists(), equalTo(true));
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToRemoteLocationOnSameConnection() throws IOException {
+        File directory = temp.newFolder("folder");
+        File smallFile = new File(directory, "small.dat");
+        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteDir = connection.getTempFile("remote-dir");
+        LocalFile.valueOf(directory).copyTo(remoteDir);
+
+        assertThat(remoteDir.exists(), equalTo(true));
+        assertThat(remoteDir.getFile("small.dat").exists(), equalTo(true));
+
+        OverthereFile remoteCopy = connection.getTempFile("remote-dir-copy");
+        remoteDir.copyTo(remoteCopy);
+
+        assertThat(remoteCopy.exists(), equalTo(true));
+        assertThat(remoteCopy.getFile("small.dat").exists(), equalTo(true));
+    }
+
+    @Test
+    public void shouldCopyRemoteFileOverRemoteExistingFileOnSameConnection() throws IOException {
+        File smallFile = temp.newFile("small.dat");
+        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
+        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
+
+        OverthereFile remoteSmallCopy = connection.getTempFile("copy-of-small.dat");
+        writeData(remoteSmallCopy, "I exist".getBytes());
+        remoteSmallFile.copyTo(remoteSmallCopy);
+
+        assertThat(readBytes(remoteSmallCopy, SMALL_FILE_SIZE), equalTo(bytes));
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryOverRemoteExistingDirectoryOnSameConnection() throws IOException {
+        File directory = temp.newFolder("folder");
+        File smallFile = new File(directory, "small.dat");
+        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteDir = connection.getTempFile("remote-dir");
+        LocalFile.valueOf(directory).copyTo(remoteDir);
+
+        OverthereFile remoteCopy = connection.getTempFile("remote-dir-copy");
+        remoteCopy.mkdir();
+        OverthereFile remoteSmallCopy = remoteCopy.getFile("small.dat");
+        writeData(remoteSmallCopy, "I exist".getBytes());
+
+        // Check that we haven't copied into, but over.
+        assertThat(remoteCopy.getFile("remote-dir").exists(), equalTo(false));
+
+        remoteDir.copyTo(remoteCopy);
+        assertThat(readBytes(remoteSmallCopy, SMALL_FILE_SIZE), equalTo(bytes));
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldNotCopyRemoteFileIntoRemoteExistingDirectoryOnSameConnection() throws IOException {
+        File smallFile = temp.newFile("small.dat");
+        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
+        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
+
+        OverthereFile dir = connection.getTempFile("dir");
+        dir.mkdir();
+        remoteSmallFile.copyTo(dir);
+        fail("Should not succeed copying file to directory in local mode");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldNotCopyRemoteDirectoryOntoExistingFileOnSameConnection() throws IOException {
+        File directory = temp.newFolder("folder");
+        File smallFile = new File(directory, "small.dat");
+        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
+
+        OverthereFile remoteDir = connection.getTempFile("remote-dir");
+        LocalFile.valueOf(directory).copyTo(remoteDir);
+
+        OverthereFile tempFile = connection.getTempFile("file.dat");
+        writeData(tempFile, "Hello!".getBytes());
+
+        remoteDir.copyTo(tempFile);
+        fail("Should not succeed copying directory to file in local mode");
+    }
+
+    @Test
     public void shouldWriteLargeFile() throws IOException {
         byte[] largeFileContentsWritten = generateRandomBytes(LARGE_FILE_SIZE);
 
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
         OverthereUtils.write(largeFileContentsWritten, remoteLargeFile);
 
-        byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
+        byte[] largeFileContentsRead = readBytes(remoteLargeFile, LARGE_FILE_SIZE);
+
+        assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+    }
+
+    private byte[] readBytes(OverthereFile remoteLargeFile, int size) throws IOException {
+        byte[] largeFileContentsRead = new byte[size];
         InputStream largeIn = remoteLargeFile.getInputStream();
         try {
             readFully(largeIn, largeFileContentsRead);
         } finally {
             closeQuietly(largeIn);
         }
-
-        assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+        return largeFileContentsRead;
     }
 
     @Test
@@ -548,15 +652,7 @@ public abstract class OverthereConnectionItestBase {
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
         LocalFile.valueOf(largeFile).copyTo(remoteLargeFile);
 
-        byte[] largeFileContentsRead = new byte[LARGE_FILE_SIZE];
-        InputStream largeIn = remoteLargeFile.getInputStream();
-        try {
-            readFully(largeIn, largeFileContentsRead);
-        } finally {
-            closeQuietly(largeIn);
-        }
-
-        assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
+        assertThat(readBytes(remoteLargeFile, LARGE_FILE_SIZE), equalTo(largeFileContentsWritten));
     }
 
     @Test
@@ -590,12 +686,11 @@ public abstract class OverthereConnectionItestBase {
         OverthereFile remoteLargeFolder = connection.getTempFile("small.folder");
         LocalFile.valueOf(largeFolder).copyTo(remoteLargeFolder);
         
-        /* FIXME: Uncomment this code when running the itest on a local KVM host.
         for(int i = 0; i < NR_OF_SMALL_FILES; i++) {
             OverthereFile remoteFile = remoteLargeFolder.getFile("small" + i + ".dat");
             byte[] remoteBytes = OverthereUtils.read(remoteFile);
             assertThat(remoteBytes.length, equalTo(SMALL_FILE_SIZE));
-        }*/
+        }
     }
 
     @Test

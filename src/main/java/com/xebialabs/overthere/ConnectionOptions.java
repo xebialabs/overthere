@@ -109,6 +109,29 @@ public class ConnectionOptions {
      */
     public static final String JUMPSTATION = "jumpstation";
 
+    /**
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command to execute when doing a local copy on the remote host.
+     */
+    public static final String LOCAL_COPY_COMMAND = "localCopyCommand";
+
+    /**
+     * Default value (<code>cp -pr {0} {1}</code>) for the common connection option that specifies the command to execute on a UNIX host
+     * when doing a local copy.
+     */
+    public static final String LOCAL_COPY_COMMAND_UNIX_DEFAULT_VALUE = "cp -pRf {0} {1}";
+
+    /**
+     * Default value (<code>cp -pr {0} {1}</code>) for the common connection option that specifies the command to execute on a Z/OS host
+     * when doing a local copy.
+     */
+    public static final String LOCAL_COPY_COMMAND_ZOS_DEFAULT_VALUE = "cp -pRf {0} {1}";
+
+    /**
+     * Default value (<code>copy {0} {1}</code>) for the common connection option that specifies the command to execute on a Windows host
+     * when doing a local copy.
+     */
+    public static final String LOCAL_COPY_COMMAND_WINDOWS_DEFAULT_VALUE = "xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H";
+
     private final Map<String, Object> options;
 
     private static final ImmutableSet<String> filteredKeys = ImmutableSet.of(PASSWORD, PASSPHRASE);

@@ -22,8 +22,10 @@
  */
 package com.xebialabs.overthere.spi;
 
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.util.OverthereFileCopier;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -69,7 +71,11 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
     public final void copyTo(final OverthereFile dest) {
         checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
 
-        ((BaseOverthereFile<?>) dest).copyFrom(this);
+        if (getConnection().equals(dest.getConnection())) {
+            ((BaseOverthereFile<?>) dest).localCopyFrom(this);
+        } else {
+            ((BaseOverthereFile<?>) dest).copyFrom(this);
+        }
     }
 
     protected void copyFrom(OverthereFile source) {
@@ -77,9 +83,44 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
     }
 
     /**
+     * Copies this file or directory (recursively) to a (new) destination in the same connection.
+     * @param source The source file or directory
+     */
+    protected void localCopyFrom(OverthereFile source) {
+        checkArgument(!exists() || (source.isDirectory() == isDirectory()), "Cannot local copy files into directories or vice-versa for [source %s %s to destination %s %s]", typeOf(source), source.getPath(), typeOf(this), getPath());
+        OperatingSystemFamily hostOperatingSystem = source.getConnection().getHostOperatingSystem();
+        CmdLine cmdLine = new CmdLine();
+        String defaultValue = null;
+        switch (hostOperatingSystem) {
+            case WINDOWS:
+                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_WINDOWS_DEFAULT_VALUE;
+                break;
+            case UNIX:
+                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_UNIX_DEFAULT_VALUE;
+                break;
+            case ZOS:
+                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_ZOS_DEFAULT_VALUE;
+                break;
+        }
+
+        String commandTemplate = getConnection().getOptions().get(ConnectionOptions.LOCAL_COPY_COMMAND, defaultValue);
+        cmdLine.addTemplatedFragment(commandTemplate, source.getPath(), getPath());
+
+        logger.debug("Going to execute command [{}] on [{}]", cmdLine, source.getConnection());
+        source.getConnection().execute(cmdLine);
+    }
+
+    private String typeOf(OverthereFile overthereFile) {
+        return overthereFile.isDirectory() ? "directory" : "file";
+    }
+
+
+    /**
      * Subclasses MUST implement toString properly.
      */
     @Override
     public abstract String toString();
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseOverthereFile.class);
 
 }
