@@ -134,6 +134,7 @@ artifacts {
 
 license {
   header project.file('HEADER')
+  ignoreFailures true
 }
 
 signing {
