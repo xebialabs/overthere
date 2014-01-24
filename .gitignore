@@ -1,4 +1,5 @@
 build/
+classes/
 target/
 out/
 bin/
