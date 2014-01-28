@@ -385,4 +385,20 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
     private static Logger logger = LoggerFactory.getLogger(BaseOverthereConnection.class);
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final BaseOverthereConnection that = (BaseOverthereConnection) o;
+
+        return options.equals(that.options) && protocol.equals(that.protocol);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = protocol.hashCode();
+        result = 31 * result + options.hashCode();
+        return result;
+    }
 }
