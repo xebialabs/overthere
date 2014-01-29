@@ -29,6 +29,8 @@ import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITest;
 
 /**
@@ -53,7 +55,8 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase imple
         if (!timesHostNeeded.containsKey(host)) {
             timesHostNeeded.put(host, new AtomicInteger(0));
         }
-        timesHostNeeded.get(host).incrementAndGet();
+        int i = timesHostNeeded.get(host).incrementAndGet();
+        logger.info("Host [{}] is now needed [{}] times", host, i);
     }
 
     @Override
@@ -68,7 +71,10 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase imple
 
     @Override
     protected void doTeardownHost() {
-        if (timesHostNeeded.get(hostname).decrementAndGet() == 0) {
+        int i = timesHostNeeded.get(hostname).decrementAndGet();
+        logger.info("Tearing down host [{}], now needed [{}] times", hostname, i);
+        if (i == 0) {
+            logger.info("Cleaning up host [{}]", hostname);
             CloudHostHolder.teardownHost(hostname);
         }
     }
@@ -83,5 +89,7 @@ public class OverthereConnectionItest extends OverthereConnectionItestBase imple
             tunnelOptions.set(ADDRESS, host.getHostName());
         }
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(OverthereConnectionItest.class);
 
 }

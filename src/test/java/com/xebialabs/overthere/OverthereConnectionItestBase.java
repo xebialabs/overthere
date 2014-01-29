@@ -132,19 +132,22 @@ public abstract class OverthereConnectionItestBase {
 
     @AfterClass(alwaysRun = true)
     public void disconnect() {
-        if (connection != null) {
-            try {
-                connection.close();
-                connection = null;
-            } catch (Exception exc) {
-                System.out.println("Exception while disconnecting at end of test case:");
-                exc.printStackTrace(System.out);
-            } catch (AssertionError e) {
-                System.out.println("Ignoring " + e);
+        try {
+            if (connection != null) {
+                try {
+                    connection.close();
+                    connection = null;
+                } catch (Exception exc) {
+                    System.out.println("Exception while disconnecting at end of test case:");
+                    exc.printStackTrace(System.out);
+                } catch (AssertionError e) {
+                    System.out.println("Ignoring " + e);
+                }
             }
+            temp.delete();
+        } finally {
+            doTeardownHost();
         }
-        temp.delete();
-        doTeardownHost();
     }
 
     @Test
