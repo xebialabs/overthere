@@ -548,7 +548,7 @@ public abstract class OverthereConnectionItestBase {
         assertThat(remoteDir.exists(), equalTo(true));
         assertThat(remoteDir.getFile("small.dat").exists(), equalTo(true));
 
-        OverthereFile remoteCopy = connection.getTempFile("remote-dir-copy");
+        OverthereFile remoteCopy = connection.getTempFile("remote-dir");
         remoteDir.copyTo(remoteCopy);
 
         assertThat(remoteCopy.exists(), equalTo(true));
@@ -579,15 +579,16 @@ public abstract class OverthereConnectionItestBase {
         OverthereFile remoteDir = connection.getTempFile("remote-dir");
         LocalFile.valueOf(directory).copyTo(remoteDir);
 
-        OverthereFile remoteCopy = connection.getTempFile("remote-dir-copy");
+        OverthereFile remoteCopy = connection.getTempFile("remote-dir");
         remoteCopy.mkdir();
         OverthereFile remoteSmallCopy = remoteCopy.getFile("small.dat");
         writeData(remoteSmallCopy, "I exist".getBytes());
 
-        // Check that we haven't copied into, but over.
-        assertThat(remoteCopy.getFile("remote-dir").exists(), equalTo(false));
-
         remoteDir.copyTo(remoteCopy);
+
+        // Check that we haven't copied into, but over.
+        assertThat("Should not have copied into the existing remote directory, but over it", !remoteCopy.getFile("remote-dir").exists());
+
         assertThat(readBytes(remoteSmallCopy, SMALL_FILE_SIZE), equalTo(bytes));
     }
 

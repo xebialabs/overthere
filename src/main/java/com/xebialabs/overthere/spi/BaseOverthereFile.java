@@ -87,7 +87,12 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
      * @param source The source file or directory
      */
     protected void localCopyFrom(OverthereFile source) {
-        checkArgument(!exists() || (source.isDirectory() == isDirectory()), "Cannot local copy files into directories or vice-versa for [source %s %s to destination %s %s]", typeOf(source), source.getPath(), typeOf(this), getPath());
+        OverthereFile dest = this;
+        if (isDirectory() && source.isDirectory() && getName().equals(source.getName())) {
+            dest = getParentFile();
+        }
+
+        checkArgument(!exists() || (source.isDirectory() == dest.isDirectory()), "Cannot local copy files into directories or vice-versa for [source %s %s to destination %s %s]", typeOf(source), source.getPath(), typeOf(this), getPath());
         OperatingSystemFamily hostOperatingSystem = source.getConnection().getHostOperatingSystem();
         CmdLine cmdLine = new CmdLine();
         String defaultValue = null;
@@ -104,7 +109,7 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         }
 
         String commandTemplate = getConnection().getOptions().get(ConnectionOptions.LOCAL_COPY_COMMAND, defaultValue);
-        cmdLine.addTemplatedFragment(commandTemplate, source.getPath(), getPath());
+        cmdLine.addTemplatedFragment(commandTemplate, source.getPath(), dest.getPath());
 
         logger.debug("Going to execute command [{}] on [{}]", cmdLine, source.getConnection());
         source.getConnection().execute(cmdLine);
