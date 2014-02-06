@@ -144,9 +144,9 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	<th align="left" valign="top"><a name="localCopyCommand"></a>localCopyCommand</th>
 	<td>The command used when copying files for which both source and destination are on the same remote machine. Instead of streaming the files over the local host, the file is copied locally to the remote host. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is:
 		<ul>
-			<li><em>UNIX:</em> cp -pRF {0} {1}</li>
-			<li><em>Z/OS:</em> cp -pRF {0} {1}</li>
-			<li><em>WINDOWS:</em> xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H</li>
+			<li><strong>UNIX:</strong> <code>cp -pRF {0} {1}</code></li>
+			<li><strong>Z/OS:</strong> <code>cp -pRF {0} {1}</code></li>
+			<li><strong>WINDOWS:</strong> <code>xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H</code></li>
 		</ul>
 	</td>
 </tr>
