@@ -150,14 +150,6 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 		</ul>
 	</td>
 </tr>
-<tr>
-	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
-	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
-	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
-</tr>
 </table>
 
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
