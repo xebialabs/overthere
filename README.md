@@ -140,6 +140,24 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
 	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="localCopyCommand"></a>localCopyCommand</th>
+	<td>The command used when copying files for which both source and destination are on the same remote machine. Instead of streaming the files over the local host, the file is copied locally to the remote host. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is:
+		<ul>
+			<li><em>UNIX:</em> cp -pRF {0} {1}</li>
+			<li><em>Z/OS:</em> cp -pRF {0} {1}</li>
+			<li><em>WINDOWS:</em> xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H</li>
+		</ul>
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
+	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
+	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
+</tr>
 </table>
 
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
