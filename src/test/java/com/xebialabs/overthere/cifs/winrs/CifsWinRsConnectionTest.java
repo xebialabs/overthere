@@ -57,10 +57,10 @@ public class CifsWinRsConnectionTest {
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     @Assumption(methods = "onWindows")
     @SuppressWarnings("resource")
-    public void shouldNotSupportOldStyleDomainAccount() {
+    public void shouldSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
     }

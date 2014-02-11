@@ -438,9 +438,10 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 ### Domain accounts
 Windows domain accounts are supported by the __WINRM_INTERNAL__, __WINRM_NATIVE__ and __TELNET__ connection types, but the syntax of the username is different:
 
-* For the __WINRM_INTERNAL__ and __WINRM_NATIVE__ connection types, domain accounts must be specified using the new-style domain syntax, e.g. `USER@FULL.DOMAIN`.
-* For the __TELNET__ connection type, domain accounts must be specified using the old-style domain synyax, e.g `DOMAIN\USER`.
-* For both connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
+* For the __WINRM_INTERNAL__ connection type, domain accounts must be specified using the new-style domain syntax, e.g. `USER@FULL.DOMAIN`.
+* For the __TELNET__ connection type, domain accounts must be specified using the old-style domain syntax, e.g `DOMAIN\USER`.
+* For the __WINRM_NATIVE__ connection type, domain accounts may be specified using either the new-style (`USER@FULL.DOMAIN`) or old-style (`DOMAIN\USER`) domain syntax.
+* For all three connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
 __N.B.:__ When using domain accounts with the __WINRM_INTERNAL__ connection type, the Kerberos subsystem of the Java Virtual Machine must be configured correctly. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
 
