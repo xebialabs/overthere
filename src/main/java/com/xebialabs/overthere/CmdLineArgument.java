@@ -35,12 +35,12 @@ public abstract class CmdLineArgument implements Serializable {
     /**
      * String containing special characters that require quoting or escaping on Unix.
      */
-    private static final String SPECIAL_CHARS_UNIX = " '\"\\;&|()${}*?";
+    public static final String SPECIAL_CHARS_UNIX = " '\"\\;&|()${}*?!<>";
 
     /**
      * String containing special characters that require quoting or escaping on Windows.
      */
-    private static final String SPECIAL_CHARS_WINDOWS = " '\";&|()${}*?";
+    public static final String SPECIAL_CHARS_WINDOWS = " '\";&|()${}*?";
 
     /**
      * String used to encode an empty argument as a string.

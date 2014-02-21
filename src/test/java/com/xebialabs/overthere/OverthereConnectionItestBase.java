@@ -59,6 +59,7 @@ import static com.google.common.io.ByteStreams.copy;
 import static com.google.common.io.ByteStreams.readFully;
 import static com.google.common.io.ByteStreams.write;
 import static com.google.common.io.Closeables.closeQuietly;
+import static com.xebialabs.overthere.CmdLineArgument.SPECIAL_CHARS_UNIX;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
@@ -218,6 +219,22 @@ public abstract class OverthereConnectionItestBase {
         } else {
             assertThat(captured.getOutputLines().size(), equalTo(1));
             assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
+        }
+    }
+
+    @Test
+    @Assumption(methods = "onUnix")
+    public void shouldExecuteCommandWithSpecialCharactersOnUnix() {
+        CapturingOverthereExecutionOutputHandler captured = capturingHandler();
+        int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(), CmdLine.build("echo", SPECIAL_CHARS_UNIX));
+        assertThat(res, equalTo(0));
+        if (captured.getOutputLines().size() == 2) {
+            // When using ssh_interactive_sudo, the first line may contain a password prompt.
+            assertThat(captured.getOutputLines().get(0), containsString("assword"));
+            assertThat(captured.getOutputLines().get(1), containsString(SPECIAL_CHARS_UNIX));
+        } else {
+            assertThat(captured.getOutputLines().size(), equalTo(1));
+            assertThat(captured.getOutput(), containsString(SPECIAL_CHARS_UNIX));
         }
     }
 
