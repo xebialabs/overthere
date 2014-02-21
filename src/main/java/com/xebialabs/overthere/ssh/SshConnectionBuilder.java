@@ -106,7 +106,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * Default value (<code>1025</code>) for the connection option that specifies from what port onwards to locate an
      * empty port for a local port forward in an {@link SshTunnelConnection tunnel}
      */
-    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1025;
+    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1024;
 
     /**
      * Connection option (String) that specifies the sudo command to prefix. The placeholder {0} is replaced with the
