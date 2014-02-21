@@ -54,20 +54,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class LocalConnectionTest extends OverthereConnectionItestBase {
 
     @Override
-    protected void doInitHost() {
+    protected String getProtocol() {
+        return LOCAL_PROTOCOL;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    protected void doTeardownHost() {
-    }
-
-    @Override
-    protected void setTypeAndOptions() {
-        protocol = LOCAL_PROTOCOL;
-        options = new ConnectionOptions();
+    protected ConnectionOptions getOptions() {
+        ConnectionOptions options = new ConnectionOptions();
         options.set(TEMPORARY_DIRECTORY_PATH, temp.getRoot().getPath());
-        options.set(OPERATING_SYSTEM, getLocalHostOperatingSystemFamily());
-        expectedConnectionClassName = LocalConnection.class.getName();
+        return options;
+    }
+
+    @Override
+    protected String getExpectedConnectionClassName() {
+        return LocalConnection.class.getName();
     }
 
     @Test

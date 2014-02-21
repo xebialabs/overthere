@@ -100,9 +100,7 @@ test {
 }
 
 task itest(type: Test) {
-  useTestNG {
-    suites "testng-itest.xml"
-  }
+  useTestNG()
   options {
     listeners << 'org.uncommons.reportng.JUnitXMLReporter'
   }

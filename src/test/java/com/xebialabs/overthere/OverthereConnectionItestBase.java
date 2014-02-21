@@ -96,59 +96,51 @@ import static org.testng.Assert.fail;
 @Listeners(AssumptionListener.class)
 public abstract class OverthereConnectionItestBase {
 
-    private static final int NR_OF_SMALL_FILES = 256;
+    public static final int NR_OF_SMALL_FILES = 256;
     public static final int SMALL_FILE_SIZE = 10 * 1024;
     public static final int LARGE_FILE_SIZE = 1 * 1024 * 1024;
     /* FIXME: Set LARGE_FILE_SIZE back to 100MB when running the itest on a local KVM host. */
 
+    protected TemporaryFolder temp = new TemporaryFolder();
     protected String protocol;
     protected ConnectionOptions options;
     protected String expectedConnectionClassName;
     protected OverthereConnection connection;
 
-    public TemporaryFolder temp = new TemporaryFolder();
-
-    protected CloudHost host;
-    protected String hostname;
-
-    protected abstract void doInitHost();
-
-    protected abstract void doTeardownHost();
-
-    protected abstract void setTypeAndOptions() throws Exception;
+    protected abstract String getProtocol();
+    protected abstract ConnectionOptions getOptions();
+    protected abstract String getExpectedConnectionClassName();
 
     @BeforeClass
     public void setupHost() throws Exception {
-        doInitHost();
-        host = CloudHostHolder.getHost(hostname);
         temp.create();
-        setTypeAndOptions();
+
+        protocol = getProtocol();
+        options = getOptions();
+        expectedConnectionClassName = getExpectedConnectionClassName();
+
         connection = Overthere.getConnection(protocol, options);
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void disconnect() {
+        if (connection != null) {
+            try {
+                connection.close();
+                connection = null;
+            } catch (Exception exc) {
+                System.out.println("Exception while disconnecting at end of test case:");
+                exc.printStackTrace(System.out);
+            } catch (AssertionError e) {
+                System.out.println("Ignoring " + e);
+            }
+        }
+        temp.delete();
     }
 
     @BeforeMethod
     public void assertConnection() {
         assertThat("We're not connected!", connection != null);
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void disconnect() {
-        try {
-            if (connection != null) {
-                try {
-                    connection.close();
-                    connection = null;
-                } catch (Exception exc) {
-                    System.out.println("Exception while disconnecting at end of test case:");
-                    exc.printStackTrace(System.out);
-                } catch (AssertionError e) {
-                    System.out.println("Ignoring " + e);
-                }
-            }
-            temp.delete();
-        } finally {
-            doTeardownHost();
-        }
     }
 
     @Test
@@ -924,11 +916,11 @@ public abstract class OverthereConnectionItestBase {
     }
 
     public boolean onUnix() {
-        return options.get(OPERATING_SYSTEM).equals(UNIX);
+        return connection.getHostOperatingSystem().equals(UNIX);
     }
 
     public boolean onWindows() {
-        return options.get(OPERATING_SYSTEM).equals(WINDOWS);
+        return connection.getHostOperatingSystem().equals(WINDOWS);
     }
 
     public boolean onlyCifs() {
