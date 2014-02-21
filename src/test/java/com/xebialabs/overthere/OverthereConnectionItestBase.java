@@ -204,14 +204,7 @@ public abstract class OverthereConnectionItestBase {
         CapturingOverthereExecutionOutputHandler captured = capturingHandler();
         int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(), CmdLine.build("ls", "-ld", "/tmp/."));
         assertThat(res, equalTo(0));
-        if (captured.getOutputLines().size() == 2) {
-            // When using ssh_interactive_sudo, the first line may contain a password prompt.
-            assertThat(captured.getOutputLines().get(0), containsString("assword"));
-            assertThat(captured.getOutputLines().get(1), containsString("drwxrwxrwt"));
-        } else {
-            assertThat(captured.getOutputLines().size(), equalTo(1));
-            assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
-        }
+        assertThat(captured.getOutput(), containsString("drwxrwxrwt"));
     }
 
     @Test
@@ -220,13 +213,8 @@ public abstract class OverthereConnectionItestBase {
         CapturingOverthereExecutionOutputHandler captured = capturingHandler();
         int res = connection.execute(multiHandler(sysoutHandler(), captured), syserrHandler(), CmdLine.build("echo", SPECIAL_CHARS_UNIX));
         assertThat(res, equalTo(0));
-        if (captured.getOutputLines().size() == 2) {
-            // When using ssh_interactive_sudo, the first line may contain a password prompt.
-            assertThat(captured.getOutputLines().get(0), containsString("assword"));
-            assertThat(captured.getOutputLines().get(1), containsString(SPECIAL_CHARS_UNIX));
-        } else {
-            assertThat(captured.getOutputLines().size(), equalTo(1));
-            assertThat(captured.getOutput(), containsString(SPECIAL_CHARS_UNIX));
+        for (int i = 0; i < SPECIAL_CHARS_UNIX.length(); i++) {
+            assertThat(captured.getOutput().indexOf(SPECIAL_CHARS_UNIX.charAt(i)) >= 0, is(true));
         }
     }
 
