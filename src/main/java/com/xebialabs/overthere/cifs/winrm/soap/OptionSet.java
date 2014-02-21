@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,9 +22,8 @@
  */
 package com.xebialabs.overthere.cifs.winrm.soap;
 
-import com.google.common.collect.Lists;
-
 import java.util.List;
+import com.google.common.collect.Lists;
 
 /**
  */

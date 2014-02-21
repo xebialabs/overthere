@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,16 +22,24 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+import java.lang.reflect.Field;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Field;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

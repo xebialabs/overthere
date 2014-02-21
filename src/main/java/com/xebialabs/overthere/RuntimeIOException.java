@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -37,9 +37,8 @@ public class RuntimeIOException extends RuntimeException {
 
     /**
      * Constructs an <code>RuntimeIOException</code> with the specified detail message.
-     * 
-     * @param message
-     *            the detail message.
+     *
+     * @param message the detail message.
      */
     public RuntimeIOException(String message) {
         super(message);
@@ -48,9 +47,8 @@ public class RuntimeIOException extends RuntimeException {
     /**
      * Constructs an <code>RuntimeIOException</code> with specified cause and a detail message of (cause==null ? null :
      * cause.toString()) (which typically contains the class and detail message of cause).
-     * 
-     * @param cause
-     *            the root cause
+     *
+     * @param cause the root cause
      */
     public RuntimeIOException(Throwable cause) {
         super(cause);
@@ -58,11 +56,9 @@ public class RuntimeIOException extends RuntimeException {
 
     /**
      * Constructs an <code>RuntimeIOException</code> with the specified detail message and cause.
-     * 
-     * @param message
-     *            the detail message.
-     * @param cause
-     *            the root cause
+     *
+     * @param message the detail message.
+     * @param cause   the root cause
      */
     public RuntimeIOException(String message, Throwable cause) {
         super(message, cause);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,14 +22,13 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Detects password prompts in the output stream and sends the password in response.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,15 +22,15 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.common.Factory;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.common.Factory;
+
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 public class PresetClientSshConnection extends SshConnection {
 
@@ -46,7 +46,7 @@ public class PresetClientSshConnection extends SshConnection {
 
     @Override
     public OverthereFile getFile(String hostPath)
-        throws RuntimeIOException {
+            throws RuntimeIOException {
         throw new UnsupportedOperationException("TODO Auto-generated method stub");
     }
 

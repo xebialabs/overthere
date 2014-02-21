@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -27,8 +27,19 @@ import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Closeables;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 import net.schmizz.sshj.Config;
 import net.schmizz.sshj.DefaultConfig;
@@ -46,22 +57,6 @@ import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.annotations.VisibleForTesting;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
-
-import static java.lang.String.format;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -69,8 +64,19 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
+import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
 /**
@@ -111,7 +117,8 @@ abstract class SshConnection extends BaseOverthereConnection {
     private static final Config config = new DefaultConfig();
 
 
-    @VisibleForTesting protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
+    @VisibleForTesting
+    protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
         public SSHClient create() {
             return new SSHClient(config);
@@ -154,8 +161,8 @@ abstract class SshConnection extends BaseOverthereConnection {
             if (privateKeyFile != null) {
                 if (password != null) {
                     logger.warn("The " + PRIVATE_KEY_FILE + " and " + PASSWORD + " connection options have both been set for the connection {}. Ignoring "
-                        + PASSWORD
-                        + " and using " + PRIVATE_KEY_FILE + ".", this);
+                            + PASSWORD
+                            + " and using " + PRIVATE_KEY_FILE + ".", this);
                 }
                 KeyProvider keys;
                 try {
@@ -171,7 +178,7 @@ abstract class SshConnection extends BaseOverthereConnection {
             } else if (password != null) {
                 PasswordFinder passwordFinder = getPasswordFinder();
                 client.auth(username, new AuthPassword(passwordFinder),
-                    new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
+                        new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
             }
             sshClient = client;
         } catch (SSHException e) {
@@ -260,8 +267,8 @@ abstract class SshConnection extends BaseOverthereConnection {
             if (allocatePty != null && !allocatePty.isEmpty()) {
                 if (allocateDefaultPty) {
                     logger.warn("The " + ALLOCATE_PTY + " and " + ALLOCATE_DEFAULT_PTY
-                        + " connection options have both been set for the connection {}. Ignoring "
-                        + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
+                            + " connection options have both been set for the connection {}. Ignoring "
+                            + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
                 }
                 Matcher matcher = ptyPattern.matcher(allocatePty);
                 checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
@@ -271,8 +278,8 @@ abstract class SshConnection extends BaseOverthereConnection {
                 int rows = Integer.valueOf(matcher.group(3));
                 int width = Integer.valueOf(matcher.group(4));
                 int height = Integer.valueOf(matcher.group(5));
-                logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[] { term, cols, rows, width, height });
-                session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer> emptyMap());
+                logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[]{term, cols, rows, width, height});
+                session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer>emptyMap());
             } else if (allocateDefaultPty) {
                 logger.debug("Allocating default PTY");
                 session.allocateDefaultPTY();
@@ -287,7 +294,7 @@ abstract class SshConnection extends BaseOverthereConnection {
     protected CmdLine processCommandLine(final CmdLine commandLine) {
         if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
             logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND
-                + " pseudo command was present, but the pseudo command will be stripped");
+                    + " pseudo command was present, but the pseudo command will be stripped");
             logger.trace("Replacing: {}", commandLine);
             CmdLine cmd = stripPrefixedPseudoCommand(commandLine);
             logger.trace("With     : {}", cmd);

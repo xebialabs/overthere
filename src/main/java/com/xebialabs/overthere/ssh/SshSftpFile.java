@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -26,6 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 
 import net.schmizz.sshj.sftp.FileAttributes;
 import net.schmizz.sshj.sftp.FileMode;
@@ -34,12 +39,6 @@ import net.schmizz.sshj.sftp.RemoteFile;
 import net.schmizz.sshj.sftp.RemoteResourceInfo;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.xfer.FilePermission;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -178,12 +177,12 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                 }
             } else {
                 throw new RuntimeIOException(format(
-                    "Cannot move/rename ssh:%s: file/directory %s to file/directory %s because it is in a different connection",
-                    connection.sshConnectionType.toString().toLowerCase(), this, dest));
+                        "Cannot move/rename ssh:%s: file/directory %s to file/directory %s because it is in a different connection",
+                        connection.sshConnectionType.toString().toLowerCase(), this, dest));
             }
         } else {
             throw new RuntimeIOException(format("Cannot move/rename ssh:%s: file/directory %s  to non-ssh:%s: file/directory %s",
-                connection.sshConnectionType.toString().toLowerCase(), this, connection.sshConnectionType.toString().toLowerCase(), dest));
+                    connection.sshConnectionType.toString().toLowerCase(), this, connection.sshConnectionType.toString().toLowerCase(), dest));
         }
     }
 
@@ -234,7 +233,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             final SFTPClient sftp = connection.connectSftp();
             final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.READ));
             final InputStream wrapped = remoteFile.new RemoteFileInputStream();
-            
+
             return new InputStream() {
 
                 @Override

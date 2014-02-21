@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -53,8 +53,7 @@ public class MultipleOverthereExecutionOutputHandler implements OverthereExecuti
     /**
      * Creates a {@link com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler}.
      *
-     * @param handlers
-     *            the handlers where the output should be sent to.
+     * @param handlers the handlers where the output should be sent to.
      * @return the created {@link com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler}.
      */
     public static MultipleOverthereExecutionOutputHandler multiHandler(final OverthereExecutionOutputHandler... handlers) {

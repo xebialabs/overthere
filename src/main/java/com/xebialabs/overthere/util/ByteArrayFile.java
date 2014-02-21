@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,15 +22,15 @@
  */
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.spi.BaseOverthereFile;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;

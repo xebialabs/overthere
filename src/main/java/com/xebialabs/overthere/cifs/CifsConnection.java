@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -24,10 +24,6 @@ package com.xebialabs.overthere.cifs;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-
-import jcifs.smb.NtlmPasswordAuthentication;
-import jcifs.smb.SmbFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +33,9 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
+
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbFile;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -56,7 +55,7 @@ import static java.net.InetSocketAddress.createUnresolved;
 
 /**
  * Base class for connections to a Windows host using CIFS.
- * 
+ * <p/>
  * Limitations:
  * <ul>
  * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
@@ -109,17 +108,17 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 
     private int getDefaultPort(ConnectionOptions options) {
         switch (cifsConnectionType) {
-        case TELNET:
-            return DEFAULT_TELNET_PORT;
-        case WINRM_INTERNAL:
-        case WINRM_NATIVE:
-            if (!options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS)) {
-                return DEFAULT_WINRM_HTTP_PORT;
-            } else {
-                return DEFAULT_WINRM_HTTPS_PORT;
-            }
-        default:
-            throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
+            case TELNET:
+                return DEFAULT_TELNET_PORT;
+            case WINRM_INTERNAL:
+            case WINRM_NATIVE:
+                if (!options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS)) {
+                    return DEFAULT_WINRM_HTTP_PORT;
+                } else {
+                    return DEFAULT_WINRM_HTTPS_PORT;
+                }
+            default:
+                throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
         }
     }
 

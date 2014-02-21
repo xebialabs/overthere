@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -23,9 +23,6 @@
 package com.xebialabs.overthere.ssh;
 
 import java.io.IOException;
-
-import net.schmizz.sshj.sftp.SFTPClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +30,8 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import net.schmizz.sshj.sftp.SFTPClient;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.io.Closeables.closeQuietly;
@@ -52,7 +51,7 @@ abstract class SshSftpConnection extends SshConnection {
     @Override
     protected void connect() {
         super.connect();
-        
+
         sharedSftpClient = connectSftp();
     }
 
@@ -78,7 +77,7 @@ abstract class SshSftpConnection extends SshConnection {
     SFTPClient connectSftp() {
         logger.debug("Opening SFTP client to {}", this);
         try {
-           return getSshClient().newSFTPClient();
+            return getSshClient().newSFTPClient();
         } catch (IOException e) {
             throw new RuntimeIOException(format("Cannot start SFTP session for %s", this), e);
         }

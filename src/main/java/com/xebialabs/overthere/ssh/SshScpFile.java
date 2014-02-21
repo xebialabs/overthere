@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -31,14 +31,8 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-
-import net.schmizz.sshj.xfer.LocalFileFilter;
-import net.schmizz.sshj.xfer.LocalSourceFile;
-import net.schmizz.sshj.xfer.scp.SCPUploadClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
@@ -47,11 +41,34 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
+import net.schmizz.sshj.xfer.LocalFileFilter;
+import net.schmizz.sshj.xfer.LocalSourceFile;
+import net.schmizz.sshj.xfer.scp.SCPUploadClient;
+
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
@@ -73,10 +90,8 @@ class SshScpFile extends SshFile<SshScpConnection> {
     /**
      * Constructs an SshScpOverthereFile
      *
-     * @param connection
-     *            the connection to the host
-     * @param remotePath
-     *            the path of the file on the host
+     * @param connection the connection to the host
+     * @param remotePath the path of the file on the host
      */
     public SshScpFile(SshScpConnection connection, String remotePath) {
         super(connection, remotePath);
@@ -127,8 +142,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
      * Gets information about the file by executing "ls -ld" on it.
      *
      * @return the information about the file, never <code>null</code>.
-     * @throws RuntimeIOException
-     *             if an I/O exception occurs
+     * @throws RuntimeIOException if an I/O exception occurs
      */
     public LsResults getFileInfo() throws RuntimeIOException {
         logger.debug("Retrieving file info of {}", this);
@@ -152,9 +166,9 @@ class SshScpFile extends SshFile<SshScpConnection> {
             results.exists = false;
         }
 
-        logger.debug("Listed file {}: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[] { this, results.exists,
-            results.isDirectory, results.length
-            , results.canRead, results.canWrite, results.canExecute });
+        logger.debug("Listed file {}: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[]{this, results.exists,
+                results.isDirectory, results.length
+                , results.canRead, results.canWrite, results.canExecute});
 
         return results;
     }
@@ -169,7 +183,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         String permissions = outputTokens.nextToken();
         if (!permissionsTokenPattern.matcher(permissions).matches()) {
             logger.debug("Not parsing ls output line [{}] because it the first token does not match the pattern for permissions [" + PERMISSIONS_TOKEN_PATTERN
-                + "]", outputLine);
+                    + "]", outputLine);
             return false;
         }
 
@@ -327,13 +341,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 executeAndThrowOnErrorCode(mvCmdLine, "Cannot rename file/directory " + this);
             } else {
                 throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
-                    + " to file/directory "
-                    + dest + " because it is in a different connection");
+                        + " to file/directory "
+                        + dest + " because it is in a different connection");
             }
         } else {
             throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
-                + " to non-:ssh:"
-                + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + dest);
+                    + " to non-:ssh:"
+                    + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + dest);
         }
     }
 

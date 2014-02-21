@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,10 +22,9 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.net.ServerSocket;
 import org.hamcrest.Matchers;
 import org.testng.annotations.Test;
-
-import java.net.ServerSocket;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

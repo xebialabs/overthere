@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -47,7 +47,7 @@ public abstract class CloudHostListener implements ISuiteListener {
         logger.debug("Setting up cloud host {}", cloudHostLabel);
         CloudHost host = CloudHostFactory.getCloudHost(cloudHostLabel);
         host.setup();
-        if(!hostHolder.compareAndSet(null, host)) {
+        if (!hostHolder.compareAndSet(null, host)) {
             throw new IllegalStateException(format("Cannot initialize host [%s] twice", cloudHostLabel));
         }
     }

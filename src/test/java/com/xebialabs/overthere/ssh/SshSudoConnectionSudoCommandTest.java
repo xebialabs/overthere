@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,6 +22,15 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.util.List;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -35,16 +44,6 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.List;
-
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 public class SshSudoConnectionSudoCommandTest {
 

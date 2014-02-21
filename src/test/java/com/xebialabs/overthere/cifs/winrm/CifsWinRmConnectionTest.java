@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,13 +22,22 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import com.xebialabs.overthere.ConnectionOptions;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import com.xebialabs.overthere.ConnectionOptions;
+
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,6 +22,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.io.IOException;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+
+import net.schmizz.sshj.MockitoFriendlySSHClient;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import net.schmizz.sshj.userauth.method.AuthMethod;
+
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
@@ -42,29 +58,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-
-import net.schmizz.sshj.MockitoFriendlySSHClient;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-import net.schmizz.sshj.userauth.method.AuthMethod;
-
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 /**
  * Unit tests for {@link SshConnection}
  */
 public class SshConnectionTest {
 
-    @Mock MockitoFriendlySSHClient client;
+    @Mock
+    MockitoFriendlySSHClient client;
 
     private ConnectionOptions connectionOptions;
 
@@ -92,7 +92,7 @@ public class SshConnectionTest {
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
         newConnectionWithClient(client).connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider> anyVararg());
+        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
     }
 
     @Test
@@ -102,7 +102,7 @@ public class SshConnectionTest {
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
         newConnectionWithClient(client).connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider> anyVararg());
+        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
         verify(client, never()).authPassword(anyString(), anyString());
     }
 

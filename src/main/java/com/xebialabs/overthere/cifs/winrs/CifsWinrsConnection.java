@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -34,8 +34,6 @@ import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
-import static java.lang.String.format;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.io.Closeables.closeQuietly;
@@ -56,6 +54,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOPROFILE
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_CONNECTION_OPTIONS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPTED;
+import static java.lang.String.format;
 
 public class CifsWinrsConnection extends CifsConnection {
 
@@ -72,8 +71,8 @@ public class CifsWinrsConnection extends CifsConnection {
         this.options = options;
 
         connectToWinrsProxy(options);
-        
-        if(winrsProxyConnection.getHostOperatingSystem() != WINDOWS) {
+
+        if (winrsProxyConnection.getHostOperatingSystem() != WINDOWS) {
             disconnectFromWinrsProxy();
             throw new IllegalArgumentException(format("Cannot create a " + CIFS_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }

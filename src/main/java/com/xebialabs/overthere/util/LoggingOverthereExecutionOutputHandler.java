@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -29,7 +29,6 @@ import com.xebialabs.overthere.OverthereExecutionOutputHandler;
 /**
  * Implementation of the {@link com.xebialabs.overthere.OverthereExecutionOutputHandler} interface that sends the output to the specified logger.
  * Regular output will be logged at the INFO level, error output at the ERROR level.
- *
  */
 public class LoggingOverthereExecutionOutputHandler implements OverthereExecutionOutputHandler {
 
@@ -73,8 +72,7 @@ public class LoggingOverthereExecutionOutputHandler implements OverthereExecutio
     /**
      * Creates a {@link LoggingOverthereExecutionOutputHandler} that logs on INFO level.
      *
-     * @param logger
-     *            the logger to send the output to.
+     * @param logger the logger to send the output to.
      * @return the created {@link LoggingOverthereExecutionOutputHandler}.
      */
     public static LoggingOverthereExecutionOutputHandler loggingOutputHandler(Logger logger) {
@@ -84,8 +82,7 @@ public class LoggingOverthereExecutionOutputHandler implements OverthereExecutio
     /**
      * Creates a {@link LoggingOverthereExecutionOutputHandler} that logs on ERROR level.
      *
-     * @param logger
-     *            the logger to send the output to.
+     * @param logger the logger to send the output to.
      * @return the created {@link LoggingOverthereExecutionOutputHandler}.
      */
     public static LoggingOverthereExecutionOutputHandler loggingErrorHandler(Logger logger) {

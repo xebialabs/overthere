@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -33,9 +33,8 @@ public class OverthereProcessOutputHandlerWrapper implements OverthereExecutionO
     private boolean stdout;
 
     /**
-     *
      * @param handler The handler to wrap.
-     * @param stdout Whether the wrapper is created for stdout (true), or stderr (false).
+     * @param stdout  Whether the wrapper is created for stdout (true), or stderr (false).
      */
     public OverthereProcessOutputHandlerWrapper(final OverthereProcessOutputHandler handler, boolean stdout) {
         this.handler = handler;

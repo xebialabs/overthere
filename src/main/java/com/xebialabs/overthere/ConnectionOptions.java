@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,13 +22,12 @@
  */
 package com.xebialabs.overthere;
 
-import static com.google.common.collect.Maps.newHashMap;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-
 import java.util.Map;
 import java.util.Set;
-
 import com.google.common.collect.ImmutableSet;
+
+import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
@@ -152,11 +151,9 @@ public class ConnectionOptions {
 
     /**
      * Sets a connection option.
-     * 
-     * @param key
-     *            the key of the connection option.
-     * @param value
-     *            the value of the connection option.
+     *
+     * @param key   the key of the connection option.
+     * @param value the value of the connection option.
      */
     public void set(String key, Object value) {
         options.put(key, value);
@@ -164,14 +161,11 @@ public class ConnectionOptions {
 
     /**
      * Retrieves the value of a required connection option.
-     * 
-     * @param <T>
-     *            the type of the connection option.
-     * @param key
-     *            the key of the connection option.
+     *
+     * @param <T> the type of the connection option.
+     * @param key the key of the connection option.
      * @return the value of the connection option.
-     * @throws IllegalArgumentException
-     *             if no value was supplied for the connection option
+     * @throws IllegalArgumentException if no value was supplied for the connection option
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String key) throws IllegalArgumentException {
@@ -184,11 +178,9 @@ public class ConnectionOptions {
 
     /**
      * Retrieves the value of an optional connection option.
-     * 
-     * @param <T>
-     *            the type of the connection option.
-     * @param key
-     *            the key of the connection option.
+     *
+     * @param <T> the type of the connection option.
+     * @param key the key of the connection option.
      * @return the value of the connection option or <code>null</code> if that option was not specified.
      */
     @SuppressWarnings("unchecked")
@@ -198,13 +190,10 @@ public class ConnectionOptions {
 
     /**
      * Retrieves the value of a connection option or a default value if that option has not been set.
-     * 
-     * @param <T>
-     *            the type of the connection option.
-     * @param key
-     *            the key of the connection option.
-     * @param defaultValue
-     *            the default value to use of the connection options has not been set.
+     *
+     * @param <T>          the type of the connection option.
+     * @param key          the key of the connection option.
+     * @param defaultValue the default value to use of the connection options has not been set.
      * @return the value of the connection option or the default value if that option was not specified.
      */
     @SuppressWarnings("unchecked")
@@ -279,7 +268,7 @@ public class ConnectionOptions {
             return Enum.valueOf(enumClazz, (String) o);
         } else {
             throw new IllegalArgumentException("Value specified for required connection option " + key + " is neither an " + enumClazz.getName()
-                + " nor a String");
+                    + " nor a String");
         }
     }
 
@@ -294,15 +283,14 @@ public class ConnectionOptions {
             return Enum.valueOf(enumClazz, (String) o);
         } else {
             throw new IllegalArgumentException("Value specified for connection option " + key + " is neither an instanceof of " + enumClazz.getName()
-                + " nor a String");
+                    + " nor a String");
         }
     }
 
     /**
      * Returns whether a connection option is set.
-     * 
-     * @param key
-     *            the key of the connection option.
+     *
+     * @param key the key of the connection option.
      * @return true iff the connection option is set, false otherwise.
      */
     public boolean containsKey(String key) {
@@ -311,7 +299,7 @@ public class ConnectionOptions {
 
     /**
      * Returns the keys of all connection options set.
-     * 
+     *
      * @return a {@link Set} containing the keys.
      */
     public Set<String> keys() {

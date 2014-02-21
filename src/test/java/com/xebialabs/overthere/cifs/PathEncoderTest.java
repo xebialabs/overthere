@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,12 +22,12 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import org.testng.annotations.Test;
+import com.google.common.collect.ImmutableMap;
+
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
-import com.google.common.collect.ImmutableMap;
-import org.testng.annotations.Test;
 
 /**
  * Unit tests for the {@link PathEncoder}
@@ -37,65 +37,65 @@ public class PathEncoderTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void requiresUniquePathMappings() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of("c", "share", "d", "share"));
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of("c", "share", "d", "share"));
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void hostPathOfLessThanTwoCharsFails() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void requiresColonAsSecondChar() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c!");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void charAfterColonMustBeSlash() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         encoder.toSmbUrl("c:c");
     }
 
     @Test
     public void replacesFirstSlashInUsername() {
-        encoder = new PathEncoder("domain\\user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("domain\\user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://domain%3Buser:pass@windows-box/c$/Temp"));
     }
 
     @Test
     public void urlEncodesUsername() {
-        encoder = new PathEncoder("us;er", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("us;er", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://us%3Ber:pass@windows-box/c$/Temp"));
     }
 
     @Test
     public void urlEncodesPassword() {
-        encoder = new PathEncoder("user", "pa;ss", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pa;ss", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://user:pa%3Bss@windows-box/c$/Temp"));
     }
 
     @Test
     public void urlEncodesAddress() {
-        encoder = new PathEncoder("user", "pass", "windows;box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows;box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://user:pass@windows%3Bbox/c$/Temp"));
     }
 
     @Test
     public void ignoresDefaultCifsPort() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://user:pass@windows-box/c$/Temp"));
     }
 
     @Test
     public void addsNonDefaultCifsPortToUrl() {
-        encoder = new PathEncoder("user", "pass", "windows-box", 0, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", 0, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp"), is("smb://user:pass@windows-box:0/c$/Temp"));
     }
@@ -109,21 +109,21 @@ public class PathEncoderTest {
 
     @Test
     public void fallsBackToAdminShare() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Windows"), is("smb://user:pass@windows-box/c$/Windows"));
     }
 
     @Test
     public void supportsPathlessLocalPath() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:"), is("smb://user:pass@windows-box/c$"));
     }
 
     @Test
     public void usesForwardSlashAsFileSeparator() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         // %3B = ;
         assertThat(encoder.toSmbUrl("c:\\Temp\\file.txt"), is("smb://user:pass@windows-box/c$/Temp/file.txt"));
     }
@@ -132,25 +132,25 @@ public class PathEncoderTest {
     public void usesPathMappingToConvertUncPath() {
         encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.of("c:\\Windows", "windows-share"));
         assertThat(encoder.fromUncPath("\\\\windows-box\\windows-share\\Temp\\file.txt"),
-            is("c:\\Windows\\Temp\\file.txt"));
+                is("c:\\Windows\\Temp\\file.txt"));
     }
 
     @Test
     public void understandsAdminSharesWhenConvertingUncPath() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         assertThat(encoder.fromUncPath("\\\\windows-box\\c$\\Temp\\file.txt"),
-            is("c:\\Temp\\file.txt"));
+                is("c:\\Temp\\file.txt"));
     }
 
     @Test
     public void supportsShareAndSeparatorUncPath() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         assertThat(encoder.fromUncPath("\\\\windows-box\\c$\\"), is("c:\\"));
     }
 
     @Test
     public void supportsPathlessUncPath() {
-        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String> of());
+        encoder = new PathEncoder("user", "pass", "windows-box", DEFAULT_CIFS_PORT, ImmutableMap.<String, String>of());
         assertThat(encoder.fromUncPath("\\\\windows-box\\c$"), is("c:"));
     }
 }

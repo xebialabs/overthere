@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
@@ -43,10 +42,8 @@ public class OverthereUtils {
     /**
      * Reads the contents of an {@link OverthereFile} into a byte array.
      *
-     * @param from
-     *            the file to read from.
-     * @returns
-     *            the byte array.
+     * @param from the file to read from.
+     * @returns the byte array.
      */
     public static byte[] read(final OverthereFile from) {
         try {
@@ -64,12 +61,9 @@ public class OverthereUtils {
     /**
      * Reads the contents of an {@link OverthereFile} into a string.
      *
-     * @param from
-     *            the file to read from.
-     * @param charsetName
-     *            the {@link java.nio.charset.Charset charset} to use.
-     * @returns
-     *            the string.
+     * @param from        the file to read from.
+     * @param charsetName the {@link java.nio.charset.Charset charset} to use.
+     * @returns the string.
      */
     public static String read(final OverthereFile from, final String charsetName) {
         try {
@@ -87,10 +81,8 @@ public class OverthereUtils {
     /**
      * Writes the contents of a byte array to an {@link OverthereFile}.
      *
-     * @param from
-     *            the byte array to copy from.
-     * @param to
-     *            the file to write to.
+     * @param from the byte array to copy from.
+     * @param to   the file to write to.
      */
     public static void write(final byte[] from, final OverthereFile to) {
         new ByteArrayFile(to.getPath(), from).copyTo(to);
@@ -99,12 +91,9 @@ public class OverthereUtils {
     /**
      * Writes the contents of a {@link String} to an {@link OverthereFile}.
      *
-     * @param from
-     *            the string to copy from.
-     * @param charsetName
-     *            the {@link java.nio.charset.Charset charset} to use.
-     * @param to
-     *            the file to write to.
+     * @param from        the string to copy from.
+     * @param charsetName the {@link java.nio.charset.Charset charset} to use.
+     * @param to          the file to write to.
      */
     public static void write(final String from, final String charsetName, final OverthereFile to) {
         try {
@@ -117,8 +106,7 @@ public class OverthereUtils {
     /**
      * Returns the name component of a path. The name component is the part after the last slash or backslash.
      *
-     * @param path
-     *            the path
+     * @param path the path
      * @return the name component.
      */
     public static String getName(String path) {
@@ -138,8 +126,7 @@ public class OverthereUtils {
     /**
      * Returns the base name of a name (not a path). The base name is the part before the last dot.
      *
-     * @param name
-     *            the name
+     * @param name the name
      * @return the base name.
      */
     public static String getBaseName(String name) {
@@ -154,8 +141,7 @@ public class OverthereUtils {
      * Returns the extension of a name (not a path). The extension is the part from the last dot in a name onwards.
      * If there is no dot character in the name, this will return an empty string.
      *
-     * @param name
-     *            the name
+     * @param name the name
      * @return the extension.
      */
     public static String getExtension(String name) {
@@ -168,8 +154,9 @@ public class OverthereUtils {
 
     /**
      * Construct a new (host) path from a parent directory, and a child.
+     *
      * @param parent The parent directory
-     * @param child The path that should be appended to the parent.
+     * @param child  The path that should be appended to the parent.
      * @return A newly constructed path.
      */
     public static String constructPath(final OverthereFile parent, final String child) {

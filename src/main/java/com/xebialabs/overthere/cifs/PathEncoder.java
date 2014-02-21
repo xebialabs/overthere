@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,10 +22,6 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static java.lang.String.format;
-import static java.util.regex.Pattern.quote;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -33,6 +29,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.xebialabs.overthere.RuntimeIOException;
+
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import static java.lang.String.format;
+import static java.util.regex.Pattern.quote;
 
 /**
  * Conversions to/from UNC, SMB and Windows file paths
@@ -99,8 +99,7 @@ class PathEncoder {
     }
 
     /**
-     * @param uncPath
-     *            the UNC path to convert to a Windows file path
+     * @param uncPath the UNC path to convert to a Windows file path
      * @return the Windows file path representing the UNC path
      */
     final String fromUncPath(String uncPath) {

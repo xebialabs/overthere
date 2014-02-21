@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -28,11 +28,25 @@ import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereExecutionOutputHandler;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshSudoConnection.NOSUDO_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
@@ -49,12 +63,9 @@ class SshSudoFile extends SshScpFile {
     /**
      * Constructs a SshSudoHostFile
      *
-     * @param connection
-     *            the connection connected to the host
-     * @param remotePath
-     *            the path of the file on the host
-     * @param isTempFile
-     *            is <code>true</code> if this is a temporary file; <code>false</code> otherwise
+     * @param connection the connection connected to the host
+     * @param remotePath the path of the file on the host
+     * @param isTempFile is <code>true</code> if this is a temporary file; <code>false</code> otherwise
      */
     public SshSudoFile(SshSudoConnection connection, String remotePath, boolean isTempFile) {
         super(connection, remotePath);
@@ -225,7 +236,7 @@ class SshSudoFile extends SshScpFile {
         if (!(obj instanceof SshSudoFile)) {
             return false;
         }
-        return super.equals(obj) && isTempFile == ((SshSudoFile)obj).isTempFile;
+        return super.equals(obj) && isTempFile == ((SshSudoFile) obj).isTempFile;
     }
 
     @Override

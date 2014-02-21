@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -24,7 +24,6 @@ package com.xebialabs.overthere.local;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +42,11 @@ import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import static java.lang.String.format;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
+import static java.lang.String.format;
 
 /**
  * A connection to the local host.
@@ -130,7 +128,7 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         try {
             logger.debug("Creating " + os + " process with command line [{}]", obfuscatedCmd);
             final ProcessBuilder pb = new ProcessBuilder(cmd.toCommandArray(os, false));
-            if(wd != null) {
+            if (wd != null) {
                 logger.debug("Setting working directory to [{}]", wd);
                 pb.directory(wd);
             } else {

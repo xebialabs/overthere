@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -23,7 +23,6 @@
 package com.xebialabs.overthere.cifs.winrm;
 
 import java.util.HashMap;
-
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
@@ -46,8 +45,8 @@ class KerberosJaasConfiguration extends Configuration {
         if (debug) {
             options.put("debug", "true");
         }
-        return new AppConfigurationEntry[] { new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
-            AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options) };
+        return new AppConfigurationEntry[]{new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
+                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
     }
 
 }

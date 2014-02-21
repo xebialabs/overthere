@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -23,7 +23,6 @@
 package com.xebialabs.overthere.cifs;
 
 import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
 
 import com.xebialabs.overthere.ConnectionOptions;
@@ -287,17 +286,17 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
         CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
 
         switch (cifsConnectionType) {
-        case TELNET:
-            connection = new CifsTelnetConnection(type, options, mapper);
-            break;
-        case WINRM_INTERNAL:
-            connection = new CifsWinRmConnection(type, options, mapper);
-            break;
-        case WINRM_NATIVE:
-        	connection = new CifsWinrsConnection(type, options, mapper);
-        	break;
-        default:
-            throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
+            case TELNET:
+                connection = new CifsTelnetConnection(type, options, mapper);
+                break;
+            case WINRM_INTERNAL:
+                connection = new CifsWinRmConnection(type, options, mapper);
+                break;
+            case WINRM_NATIVE:
+                connection = new CifsWinrsConnection(type, options, mapper);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
         }
     }
 

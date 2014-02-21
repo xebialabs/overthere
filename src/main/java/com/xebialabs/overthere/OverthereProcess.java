@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -32,32 +32,30 @@ public interface OverthereProcess {
 
     /**
      * Returns an output stream that is connected to the standard input stream (stdin) of the process.
-     * 
+     *
      * @return the input stream
      */
     OutputStream getStdin();
 
     /**
      * Returns an input stream that is connected to the standard output stream (stdout) of the process.
-     * 
+     *
      * @return the output stream
      */
     InputStream getStdout();
 
     /**
      * Returns an input stream that is connected to the standard error stream (stderr) of the process.
-     * 
+     *
      * @return the output stream
      */
     InputStream getStderr();
 
     /**
      * Waits for the command to complete its execution. Returns immediately if the process has already terminated.
-     * 
+     *
      * @return the exit value of the process
-     * 
-     * @throws InterruptedException
-     *             if this method was interrupted
+     * @throws InterruptedException if this method was interrupted
      */
     int waitFor() throws InterruptedException;
 
@@ -70,7 +68,6 @@ public interface OverthereProcess {
      * Returns the exit value for the process.
      *
      * @return the exit value of the process
-     * 
      * @throws IllegalThreadStateException if the process has not yet terminated.
      */
     int exitValue() throws IllegalThreadStateException;

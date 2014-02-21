@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -27,7 +27,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.CmdLine;
@@ -37,10 +36,8 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;
 
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;

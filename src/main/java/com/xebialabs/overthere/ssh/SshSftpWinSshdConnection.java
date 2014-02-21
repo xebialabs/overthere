@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,19 +22,17 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static java.lang.Character.toUpperCase;
-
-import com.xebialabs.overthere.spi.AddressPortMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static java.lang.Character.toUpperCase;
 import static java.lang.String.format;
 
 /**
@@ -45,7 +43,7 @@ class SshSftpWinSshdConnection extends SshSftpConnection {
     public SshSftpWinSshdConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
         checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a host that is not running Windows", sshConnectionType.toString()
-            .toLowerCase());
+                .toLowerCase());
     }
 
     @Override

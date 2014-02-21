@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -45,7 +45,7 @@ class WsmanKerberosScheme extends KerberosScheme {
         this.spnAddress = spnAddress;
         this.spnPort = spnPort;
     }
-    
+
     @Override
     protected byte[] generateGSSToken(final byte[] input, final Oid oid, String authServer) throws GSSException {
         byte[] token = input;
@@ -53,8 +53,8 @@ class WsmanKerberosScheme extends KerberosScheme {
             token = new byte[0];
         }
 
-        if(authServer.equals("localhost")) {
-            if(authServer.indexOf(':') > 0) {
+        if (authServer.equals("localhost")) {
+            if (authServer.indexOf(':') > 0) {
                 authServer = spnAddress + ":" + spnPort;
             } else {
                 authServer = spnAddress;

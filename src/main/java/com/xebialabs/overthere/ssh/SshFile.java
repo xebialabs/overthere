@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,16 +22,20 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-
+import java.util.List;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.xebialabs.overthere.*;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereExecutionOutputHandler;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-import java.util.List;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 
 /**
  * A file on a host connected through SSH.
@@ -42,11 +46,9 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
     /**
      * Constructs an SshOverthereFile
-     * 
-     * @param connection
-     *            the connection to the host
-     * @param path
-     *            the path of the file on the host
+     *
+     * @param connection the connection to the host
+     * @param path       the path of the file on the host
      */
     SshFile(C connection, String path) {
         this(connection, splitPath(path, connection.getHostOperatingSystem()));
@@ -70,7 +72,7 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
     @Override
     public String getName() {
-        if(pathComponents.isEmpty()) {
+        if (pathComponents.isEmpty()) {
             return connection.getHostOperatingSystem().getFileSeparator();
         } else {
             return pathComponents.get(pathComponents.size() - 1);
@@ -79,12 +81,12 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
     @Override
     public OverthereFile getParentFile() {
-        if(pathComponents.isEmpty()) {
+        if (pathComponents.isEmpty()) {
             // The root path is its own parent.
             return this;
         }
 
-        if(connection.getHostOperatingSystem() == WINDOWS && pathComponents.size() == 1) {
+        if (connection.getHostOperatingSystem() == WINDOWS && pathComponents.size() == 1) {
             // On Windows, the drive path is its own parent
             return this;
         }
@@ -143,13 +145,13 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
     static String joinPath(List<String> pathComponents, OperatingSystemFamily os) {
         String fileSep = os.getFileSeparator();
 
-        if(pathComponents.isEmpty()) {
+        if (pathComponents.isEmpty()) {
             return fileSep;
         }
 
-        if(os == WINDOWS) {
+        if (os == WINDOWS) {
             String path = Joiner.on(fileSep).join(pathComponents);
-            if(pathComponents.size() == 1) {
+            if (pathComponents.size() == 1) {
                 path += fileSep;
             }
             return path;
@@ -159,7 +161,7 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
     }
 
     static void checkWindowsPath(List<String> pathComponents, OperatingSystemFamily os) {
-        if(os == WINDOWS && pathComponents.isEmpty()) {
+        if (os == WINDOWS && pathComponents.isEmpty()) {
             throw new IllegalArgumentException("Empty path is not allowed on Windows");
         }
     }

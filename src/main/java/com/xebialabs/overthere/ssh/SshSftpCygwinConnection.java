@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,20 +22,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static java.lang.Character.toLowerCase;
-
-import com.xebialabs.overthere.spi.AddressPortMapper;
-
 import java.util.List;
-
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +30,17 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static java.lang.Character.toLowerCase;
 import static java.lang.String.format;
 
 /**

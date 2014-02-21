@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,10 +22,10 @@
  */
 package com.xebialabs.overthere.spi;
 
-import com.xebialabs.overthere.ConnectionOptions;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import com.xebialabs.overthere.ConnectionOptions;
 
 /**
  * Annotation used to specify that a class is an Overthere protocol. It will be registered on startup of the application

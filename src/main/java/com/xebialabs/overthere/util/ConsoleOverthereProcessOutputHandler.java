@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -53,7 +53,7 @@ public class ConsoleOverthereProcessOutputHandler implements OverthereProcessOut
 
     /**
      * Creates a {@link ConsoleOverthereProcessOutputHandler}.
-     * 
+     *
      * @return the created {@link ConsoleOverthereProcessOutputHandler}.
      */
     public static ConsoleOverthereProcessOutputHandler consoleHandler() {

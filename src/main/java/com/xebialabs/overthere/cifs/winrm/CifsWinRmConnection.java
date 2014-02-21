@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -29,10 +29,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
@@ -45,9 +43,8 @@ import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
@@ -74,10 +71,10 @@ import static java.lang.String.format;
 
 /**
  * A connection to a Windows host using CIFS and WinRM.
- *
+ * <p/>
  * Limitations:
  * <ul>
- *     <li>Cannot start a process yet. Rudimentary support is in, but it is not ready yet.</li>
+ * <li>Cannot start a process yet. Rudimentary support is in, but it is not ready yet.</li>
  * </ul>
  */
 public class CifsWinRmConnection extends CifsConnection {
@@ -129,7 +126,7 @@ public class CifsWinRmConnection extends CifsConnection {
                 public void run() {
                     try {
                         byte[] buf = new byte[STDIN_BUF_SIZE];
-                        for(;;) {
+                        for (; ; ) {
                             int n = toCallersStdin.read(buf);
                             if (n == -1)
                                 break;
@@ -140,7 +137,7 @@ public class CifsWinRmConnection extends CifsConnection {
                             System.arraycopy(buf, 0, bufToSend, 0, n);
                             winRmClient.sendInput(bufToSend);
                         }
-                    } catch(Exception exc) {
+                    } catch (Exception exc) {
                         inputReaderTheaException[0] = exc;
                     } finally {
                         Closeables.closeQuietly(callersStdin);
@@ -149,13 +146,13 @@ public class CifsWinRmConnection extends CifsConnection {
             };
             inputReaderThead.setDaemon(true);
             inputReaderThead.start();
-            
+
             final Exception outputReaderThreadException[] = new Exception[1];
             final Thread outputReaderThread = new Thread(format("WinRM output reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
                     try {
-                        for (;;) {
+                        for (; ; ) {
                             if (!winRmClient.receiveOutput(toCallersStdout, toCallersStderr))
                                 break;
                         }
@@ -201,8 +198,8 @@ public class CifsWinRmConnection extends CifsConnection {
                             winRmClient.deleteShell();
                             processTerminated = true;
                         }
-                        if(outputReaderThreadException[0] != null) {
-                            if(outputReaderThreadException[0] instanceof RuntimeException) {
+                        if (outputReaderThreadException[0] != null) {
+                            if (outputReaderThreadException[0] instanceof RuntimeException) {
                                 throw (RuntimeException) outputReaderThreadException[0];
                             } else {
                                 throw new RuntimeIOException(format("Cannot execute command [%s] on [%s]", obfuscatedCmd, CifsWinRmConnection.this), outputReaderThreadException[0]);
@@ -229,7 +226,7 @@ public class CifsWinRmConnection extends CifsConnection {
                 public synchronized int exitValue() {
                     if (!processTerminated) {
                         throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCmd,
-                            CifsWinRmConnection.this));
+                                CifsWinRmConnection.this));
                     }
 
                     return winRmClient.exitValue();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -27,16 +27,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.List;
-
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
+
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
@@ -225,7 +224,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
             }
         } else {
             throw new RuntimeIOException(format("Cannot move/rename cifs:%s: file/directory %s  to non-cifs:%s: file/directory %s",
-                connection.cifsConnectionType.toString().toLowerCase(), this, connection.cifsConnectionType.toString().toLowerCase(), dest));
+                    connection.cifsConnectionType.toString().toLowerCase(), this, connection.cifsConnectionType.toString().toLowerCase(), dest));
         }
     }
 
@@ -399,7 +398,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
     public String toString() {
         return getConnection() + "/" + getPath();
     }
-    
+
     private static Logger logger = LoggerFactory.getLogger(CifsFile.class);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,17 +22,15 @@
  */
 package com.xebialabs.overthere;
 
+import java.util.List;
+import org.testng.annotations.Test;
+
 import static com.google.common.base.Joiner.on;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-
-import java.util.List;
-
-import org.testng.annotations.Test;
-
-import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
 
 public class CmdLineTest {
 
@@ -84,7 +82,7 @@ public class CmdLineTest {
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = "\"" + argumentWithSpaces + "\"";
         String encodedArgumentWithSpecialChars = "\"heretheycome'\"\"\\;()${}*?andthatwasem\"";
-        String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
+        String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
         assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
@@ -99,7 +97,7 @@ public class CmdLineTest {
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
         String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}\\*\\?andthatwasem";
-        String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
+        String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
         assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
@@ -114,7 +112,7 @@ public class CmdLineTest {
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
         String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}\\*\\?andthatwasem";
-        String[] encodedCmdArray = { encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars };
+        String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
         assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));

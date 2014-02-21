@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -25,7 +25,6 @@ package com.xebialabs.overthere;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.List;
-
 import com.google.common.base.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -50,8 +49,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds {@link CmdLineArgument#arg(String) a regular argument} to the command line.
      *
-     * @param arg
-     *            the argument string to add.
+     * @param arg the argument string to add.
      * @return this.
      */
     public CmdLine addArgument(String arg) {
@@ -62,8 +60,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds {@link CmdLineArgument#password(String) a password argument} to the command line.
      *
-     * @param arg
-     *            the argument string to add.
+     * @param arg the argument string to add.
      * @return this.
      */
     public CmdLine addPassword(String arg) {
@@ -74,8 +71,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds {@link CmdLineArgument#raw(String) a raw argument} to the command line.
      *
-     * @param arg
-     *            the argument string to add.
+     * @param arg the argument string to add.
      * @return this.
      */
     public CmdLine addRaw(String arg) {
@@ -85,7 +81,8 @@ public class CmdLine implements Serializable {
 
     /**
      * Adds a {@link MessageFormat} compatible templated fragment to the command line as a series of {@link CmdLineArgument#arg(String) regular arguments}.
-     * @param template The {@link MessageFormat} compatible templated fragment.
+     *
+     * @param template  The {@link MessageFormat} compatible templated fragment.
      * @param variables The variables that are substituted in the template.
      * @return this.
      */
@@ -101,8 +98,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds {@link CmdLineArgument#nested(CmdLine) a nested command line} to the command line.
      *
-     * @param commandLine
-     *            the command line to add.
+     * @param commandLine the command line to add.
      * @return this.
      */
     public CmdLine addNested(CmdLine commandLine) {
@@ -113,8 +109,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds an {@link CmdLineArgument argument}.
      *
-     * @param arg
-     *            the argument to add.
+     * @param arg the argument to add.
      * @return this.
      */
     public CmdLine add(CmdLineArgument arg) {
@@ -126,8 +121,7 @@ public class CmdLine implements Serializable {
     /**
      * Adds a list of {@link CmdLineArgument arguments}.
      *
-     * @param args
-     *            the arguments to add.
+     * @param args the arguments to add.
      * @return this.
      */
     public CmdLine add(List<CmdLineArgument> args) {
@@ -150,10 +144,8 @@ public class CmdLine implements Serializable {
      * {@link CmdLineArgument#toString(OperatingSystemFamily, boolean) converted to their string representation} and
      * then returned as an array.
      *
-     * @param os
-     *            the operating system on which the result will be executed.
-     * @param forLogging
-     *            <code>true</code> if these string representations will be used for logging.
+     * @param os         the operating system on which the result will be executed.
+     * @param forLogging <code>true</code> if these string representations will be used for logging.
      * @return an array with the string representations of the command line arguments.
      */
     public String[] toCommandArray(final OperatingSystemFamily os, final boolean forLogging) {
@@ -170,10 +162,8 @@ public class CmdLine implements Serializable {
      * Converts this command line to a single String for execution on (or logging to) a specific target operating
      * system.
      *
-     * @param os
-     *            the operating system on which the result will be executed.
-     * @param forLogging
-     *            <code>true</code> if the created command line will be used for logging.
+     * @param os         the operating system on which the result will be executed.
+     * @param forLogging <code>true</code> if the created command line will be used for logging.
      * @return the command line as a single string
      */
     public String toCommandLine(final OperatingSystemFamily os, final boolean forLogging) {
@@ -200,8 +190,7 @@ public class CmdLine implements Serializable {
     /**
      * Builds a simple command line from one or more strings. For each string, a regular argument is created.
      *
-     * @param args
-     *            the regular arguments
+     * @param args the regular arguments
      * @return the created command line
      */
     public static CmdLine build(String... args) {

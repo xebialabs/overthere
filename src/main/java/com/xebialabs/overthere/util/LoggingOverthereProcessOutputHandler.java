@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,8 +22,9 @@
  */
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import org.slf4j.Logger;
+
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
 
 /**
  * Implementation of the {@link OverthereProcessOutputHandler} interface that sends the output to the specified logger.
@@ -57,9 +58,8 @@ public class LoggingOverthereProcessOutputHandler implements OverthereProcessOut
 
     /**
      * Creates a {@link LoggingOverthereProcessOutputHandler}.
-     * 
-     * @param logger
-     *            the logger to send the output to.
+     *
+     * @param logger the logger to send the output to.
      * @return the created {@link LoggingOverthereProcessOutputHandler}.
      * @deprecated Use {@link LoggingOverthereExecutionOutputHandler#loggingOutputHandler(org.slf4j.Logger)} or {@link LoggingOverthereExecutionOutputHandler#loggingErrorHandler(org.slf4j.Logger)}}.
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -26,10 +26,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 
-import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 
 /**
@@ -46,7 +60,7 @@ class SshSudoConnection extends SshScpConnection {
     protected final boolean sudoQuoteCommand;
 
     protected final boolean sudoPreserveAttributesOnCopyFromTempFile;
-    
+
     protected final boolean sudoPreserveAttributesOnCopyToTempFile;
 
     protected final boolean sudoOverrideUmask;
@@ -66,7 +80,7 @@ class SshSudoConnection extends SshScpConnection {
         CmdLine cmd;
         if (startsWithPseudoCommand(commandLine, NOSUDO_PSEUDO_COMMAND)) {
             logger.trace("Not prefixing command line with sudo statement because the " + NOSUDO_PSEUDO_COMMAND
-                + " pseudo command was present, but the pseudo command will be stripped");
+                    + " pseudo command was present, but the pseudo command will be stripped");
             logger.trace("Replacing: {}", commandLine);
             cmd = stripPrefixedPseudoCommand(commandLine);
             logger.trace("With     : {}", cmd);

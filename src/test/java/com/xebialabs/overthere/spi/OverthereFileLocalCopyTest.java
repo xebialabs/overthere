@@ -8,14 +8,21 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import com.google.common.io.OutputSupplier;
 
-import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.TemporaryFolder;
 
 import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class OverthereFileLocalCopyTest {
 

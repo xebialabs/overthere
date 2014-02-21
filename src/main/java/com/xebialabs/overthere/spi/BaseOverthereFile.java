@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -25,7 +25,11 @@ package com.xebialabs.overthere.spi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.OverthereFileCopier;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -84,6 +88,7 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
 
     /**
      * Copies this file or directory (recursively) to a (new) destination in the same connection.
+     *
      * @param source The source file or directory
      */
     protected void localCopyFrom(OverthereFile source) {

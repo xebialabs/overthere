@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -24,13 +24,6 @@ package com.xebialabs.overthere.ssh;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import net.schmizz.sshj.common.SSHException;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.connection.channel.direct.Signal;
-import net.schmizz.sshj.transport.TransportException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +32,14 @@ import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 
-import static java.lang.String.format;
+import net.schmizz.sshj.common.SSHException;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.connection.channel.direct.Signal;
+import net.schmizz.sshj.transport.TransportException;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.format;
 
 class SshProcess implements OverthereProcess {
     private SshConnection connection;
@@ -51,7 +49,7 @@ class SshProcess implements OverthereProcess {
     private int exitValue = -1;
 
     SshProcess(final SshConnection connection, final OperatingSystemFamily os, final Session session, final CmdLine commandLine) throws TransportException,
-        ConnectionException {
+            ConnectionException {
         this.connection = connection;
         this.session = session;
         this.obfuscatedCommandLine = commandLine.toCommandLine(os, true);
@@ -81,14 +79,14 @@ class SshProcess implements OverthereProcess {
 
     @Override
     public synchronized int waitFor() {
-        if(command == null) {
+        if (command == null) {
             return exitValue;
         }
 
         try {
             command.join();
             Integer exitStatus = command.getExitStatus();
-            logger.info("Command [{}] on {} returned exit code {}", new Object[] { obfuscatedCommandLine, connection, exitStatus });
+            logger.info("Command [{}] on {} returned exit code {}", new Object[]{obfuscatedCommandLine, connection, exitStatus});
             closeSession();
             if (exitStatus == null) {
                 logger.warn("Command [{}] on {} could not be started. Returning exit code -1", obfuscatedCommandLine, connection);
@@ -104,7 +102,7 @@ class SshProcess implements OverthereProcess {
 
     @Override
     public synchronized void destroy() {
-        if(command == null) {
+        if (command == null) {
             return;
         }
 
@@ -116,10 +114,10 @@ class SshProcess implements OverthereProcess {
             closeSession();
         }
     }
-    
+
     @Override
     public synchronized int exitValue() {
-        if(command != null) {
+        if (command != null) {
             throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCommandLine, connection));
         }
 

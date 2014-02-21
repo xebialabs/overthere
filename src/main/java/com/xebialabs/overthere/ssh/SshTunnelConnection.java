@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,19 +22,6 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Closeables;
-import com.google.common.util.concurrent.Monitor;
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -44,11 +31,29 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.io.Closeables;
+import com.google.common.util.concurrent.Monitor;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereExecutionOutputHandler;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
 import static java.lang.String.format;
@@ -208,7 +213,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
             try {
                 int firstPort = Math.max(startFrom, lastBoundPort.get() + 1);
                 int port = firstPort;
-                for (;;) {
+                for (; ; ) {
                     logger.trace("Trying to bind to port {}", port);
                     ServerSocket socket = tryBind(port);
                     if (socket != null) {
@@ -217,13 +222,13 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
                         return socket;
                     }
 
-                    if(port == MAX_PORT) {
+                    if (port == MAX_PORT) {
                         port = startFrom;
                     } else {
                         port++;
                     }
 
-                    if(port == firstPort) {
+                    if (port == firstPort) {
                         throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
                     }
                 }

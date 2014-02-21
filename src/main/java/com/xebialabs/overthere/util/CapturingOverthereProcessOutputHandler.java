@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -32,6 +32,7 @@ import static java.util.Collections.unmodifiableList;
 
 /**
  * An implementation of the {@link OverthereProcessOutputHandler} that captures the output in variables.
+ *
  * @deprecated See {@link CapturingOverthereExecutionOutputHandler}
  */
 @Deprecated
@@ -65,7 +66,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured regular output lines.
-     * 
+     *
      * @return a list of captured regular output lines.
      */
     public List<String> getOutputLines() {
@@ -74,7 +75,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured regular output, with the lines separated by "\n".
-     * 
+     *
      * @return the captured regular output as one string.
      */
     public String getOutput() {
@@ -83,7 +84,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured error output lines.
-     * 
+     *
      * @return a list of captured error output lines.
      */
     public List<String> getErrorLines() {
@@ -92,7 +93,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured error output, with the lines separated by "\n".
-     * 
+     *
      * @return the captured error output as one string.
      */
     public String getError() {
@@ -101,7 +102,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured regular and error output lines.
-     * 
+     *
      * @return a list of captured error regular and output lines.
      */
     public List<String> getAllLines() {
@@ -110,7 +111,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Returns the captured regular and error output, with the lines separated by "\n".
-     * 
+     *
      * @return the captured regular and error output as one string.
      */
     public String getAll() {
@@ -119,7 +120,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
 
     /**
      * Creates a {@link CapturingOverthereProcessOutputHandler}.
-     * 
+     *
      * @return the created {@link CapturingOverthereProcessOutputHandler}.
      * @deprecated Use {@link com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler#capturingHandler()}
      */

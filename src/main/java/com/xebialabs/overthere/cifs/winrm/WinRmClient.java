@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -44,13 +44,11 @@ import java.security.UnrecoverableKeyException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -77,7 +75,6 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
@@ -118,7 +115,7 @@ public class WinRmClient {
     private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
     private boolean kerberosUseHttpSpn;
     private boolean kerberosAddPortToSpn;
-    private boolean kerberosDebug;    
+    private boolean kerberosDebug;
 
     private String shellId;
     private String commandId;
@@ -127,10 +124,10 @@ public class WinRmClient {
 
     public WinRmClient(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort) {
         int posOfAtSign = username.indexOf('@');
-        if(posOfAtSign >= 0) {
+        if (posOfAtSign >= 0) {
             String u = username.substring(0, posOfAtSign);
             String d = username.substring(posOfAtSign + 1);
-            if(d.toUpperCase().equals(d)) {
+            if (d.toUpperCase().equals(d)) {
                 this.username = username;
             } else {
                 this.username = u + "@" + d.toUpperCase();
@@ -173,11 +170,11 @@ public class WinRmClient {
         final Document requestDocument = getRequestDocument(Action.WS_COMMAND, ResourceURI.RESOURCE_URI_CMD, OptionSet.RUN_COMMAND, bodyContent);
 
         Document responseDocument = sendRequest(requestDocument, SoapAction.COMMAND_LINE);
-        
+
         commandId = getFirstElement(responseDocument, ResponseExtractor.COMMAND_ID);
 
         logger.debug("Received WinRM Execute Command response to shell {}: command with ID {} was started", shellId, commandId);
-        
+
         return commandId;
     }
 
@@ -191,7 +188,7 @@ public class WinRmClient {
         Document responseDocument = sendRequest(requestDocument, SoapAction.RECEIVE);
 
         logger.debug("Received WinRM Receive Output response for command {} in shell {}", commandId, shellId);
-        
+
         handleStream(responseDocument, ResponseExtractor.STDOUT, stdout);
         handleStream(responseDocument, ResponseExtractor.STDERR, stderr);
 
@@ -276,7 +273,7 @@ public class WinRmClient {
             logger.trace("Found exit code {}", exitCode);
             try {
                 exitValue = Integer.parseInt(exitCode);
-            } catch(NumberFormatException exc) {
+            } catch (NumberFormatException exc) {
                 logger.error("Cannot parse exit code {}, setting it to -1", exc);
                 exitValue = -1;
             }
@@ -326,7 +323,7 @@ public class WinRmClient {
     }
 
     private void addHeaders(SoapMessageBuilder.EnvelopeBuilder envelope, Action action, ResourceURI resourceURI, OptionSet optionSet)
-        throws URISyntaxException {
+            throws URISyntaxException {
         HeaderBuilder header = envelope.header();
         header.to(targetURL.toURI()).replyTo(new URI("http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous"));
         header.maxEnvelopeSize(winRmEnvelopSize);
@@ -368,10 +365,10 @@ public class WinRmClient {
             result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
         } catch (LoginException e) {
             throw new WinRmRuntimeIOException("Login failure sending message on " + targetURL + " error: " + e.getMessage(),
-                privilegedSendMessage.getRequestDocument(), null, e);
+                    privilegedSendMessage.getRequestDocument(), null, e);
         } catch (PrivilegedActionException e) {
             throw new WinRmRuntimeIOException("Failure sending message on " + targetURL + " error: " + e.getMessage(),
-                privilegedSendMessage.getRequestDocument(), null, e.getException());
+                    privilegedSendMessage.getRequestDocument(), null, e.getException());
         }
         return result;
     }
@@ -424,7 +421,7 @@ public class WinRmClient {
 
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new WinRmRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
-                    targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
+                        targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
             }
 
             final String responseBody = handleResponse(response, context);
@@ -450,7 +447,7 @@ public class WinRmClient {
         if (enableKerberos) {
             String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
             httpclient.getAuthSchemes().register(KERBEROS,
-                new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+                    new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
             httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
             configureAuthentication(httpclient, KERBEROS, new KerberosPrincipal(username));
             configureAuthentication(httpclient, SPNEGO, new KerberosPrincipal(username));
@@ -460,7 +457,7 @@ public class WinRmClient {
     }
 
     private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
-        KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+            KeyManagementException, KeyStoreException, UnrecoverableKeyException {
 
         if (!"https".equalsIgnoreCase(targetURL.getProtocol())) {
             return;

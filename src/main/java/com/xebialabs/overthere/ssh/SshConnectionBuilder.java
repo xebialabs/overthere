@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -415,29 +415,29 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
 
         switch (sshConnectionType) {
-        case TUNNEL:
-            connection = new SshTunnelConnection(type, options, mapper);
-            break;
-        case SFTP:
-            connection = new SshSftpUnixConnection(type, options, mapper);
-            break;
-        case SFTP_CYGWIN:
-            connection = new SshSftpCygwinConnection(type, options, mapper);
-            break;
-        case SFTP_WINSSHD:
-            connection = new SshSftpWinSshdConnection(type, options, mapper);
-            break;
-        case SCP:
-            connection = new SshScpConnection(type, options, mapper);
-            break;
-        case SUDO:
-            connection = new SshSudoConnection(type, options, mapper);
-            break;
-        case INTERACTIVE_SUDO:
-            connection = new SshInteractiveSudoConnection(type, options, mapper);
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);
+            case TUNNEL:
+                connection = new SshTunnelConnection(type, options, mapper);
+                break;
+            case SFTP:
+                connection = new SshSftpUnixConnection(type, options, mapper);
+                break;
+            case SFTP_CYGWIN:
+                connection = new SshSftpCygwinConnection(type, options, mapper);
+                break;
+            case SFTP_WINSSHD:
+                connection = new SshSftpWinSshdConnection(type, options, mapper);
+                break;
+            case SCP:
+                connection = new SshScpConnection(type, options, mapper);
+                break;
+            case SUDO:
+                connection = new SshSudoConnection(type, options, mapper);
+                break;
+            case INTERACTIVE_SUDO:
+                connection = new SshInteractiveSudoConnection(type, options, mapper);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);
         }
     }
 

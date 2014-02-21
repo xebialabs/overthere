@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -36,7 +36,7 @@ public enum CifsConnectionType {
      * A CIFS connection to a Windows host that uses a Java implementation WinRM to execute commands.
      */
     WINRM_INTERNAL,
-    
+
     /**
      * A CIFS connection  to a Windows host that uses the <code>winrs</code> command native to Windows to execute commands.
      * <em>N.B.:</em> This implementation only works when Overthere runs on Windows.

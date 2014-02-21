@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -24,7 +24,6 @@ package com.xebialabs.overthere.ssh;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import com.google.common.collect.Lists;
 
 import com.xebialabs.overthere.OperatingSystemFamily;
@@ -58,23 +57,23 @@ public class SshFileTest {
 
     @DataProvider(name = "pathsForSplit")
     public Object[][] createPathsForSplit() {
-        return new Object[][] {
-            { "/tmp", UNIX, parts("tmp") },
-            { "/tmp/", UNIX, parts("tmp") },
-            { "/tmp/foo", UNIX, parts("tmp", "foo") },
-            { "/tmp/foo/", UNIX, parts("tmp", "foo") },
-            { "/tmp//foo", UNIX, parts("tmp", "foo") },
-            { "C:", WINDOWS, parts("C:") },
-            { "C:\\", WINDOWS, parts("C:") },
-            { "C:\\WINDOWS", WINDOWS, parts("C:", "WINDOWS") },
-            { "C:\\WINDOWS\\", WINDOWS, parts("C:", "WINDOWS") },
-            { "C:\\WINDOWS\\TEMP", WINDOWS, parts("C:", "WINDOWS", "TEMP") },
-            { "C:\\WINDOWS\\TEMP\\", WINDOWS, parts("C:", "WINDOWS", "TEMP") },
-            { "C:/", WINDOWS, parts("C:") },
-            { "C:/WINDOWS", WINDOWS, parts("C:", "WINDOWS") },
-            { "C:/WINDOWS/", WINDOWS, parts("C:", "WINDOWS") },
-            { "C:/WINDOWS/TEMP", WINDOWS, parts("C:", "WINDOWS", "TEMP") },
-            { "C:/WINDOWS/TEMP/", WINDOWS, parts("C:", "WINDOWS", "TEMP") },
+        return new Object[][]{
+                {"/tmp", UNIX, parts("tmp")},
+                {"/tmp/", UNIX, parts("tmp")},
+                {"/tmp/foo", UNIX, parts("tmp", "foo")},
+                {"/tmp/foo/", UNIX, parts("tmp", "foo")},
+                {"/tmp//foo", UNIX, parts("tmp", "foo")},
+                {"C:", WINDOWS, parts("C:")},
+                {"C:\\", WINDOWS, parts("C:")},
+                {"C:\\WINDOWS", WINDOWS, parts("C:", "WINDOWS")},
+                {"C:\\WINDOWS\\", WINDOWS, parts("C:", "WINDOWS")},
+                {"C:\\WINDOWS\\TEMP", WINDOWS, parts("C:", "WINDOWS", "TEMP")},
+                {"C:\\WINDOWS\\TEMP\\", WINDOWS, parts("C:", "WINDOWS", "TEMP")},
+                {"C:/", WINDOWS, parts("C:")},
+                {"C:/WINDOWS", WINDOWS, parts("C:", "WINDOWS")},
+                {"C:/WINDOWS/", WINDOWS, parts("C:", "WINDOWS")},
+                {"C:/WINDOWS/TEMP", WINDOWS, parts("C:", "WINDOWS", "TEMP")},
+                {"C:/WINDOWS/TEMP/", WINDOWS, parts("C:", "WINDOWS", "TEMP")},
         };
     }
 
@@ -85,19 +84,19 @@ public class SshFileTest {
 
     @DataProvider(name = "pathsForJoin")
     public Object[][] createPathsForJoin() {
-        return new Object[][] {
-            { parts(), UNIX, "/" },
-            { parts("tmp"), UNIX, "/tmp" },
-            { parts("tmp", "foo"), UNIX, "/tmp/foo" },
-            { parts("C:"), WINDOWS, "C:\\" },
-            { parts("C:", "WINDOWS"), WINDOWS, "C:\\WINDOWS" },
-            { parts("C:", "WINDOWS", "TEMP"), WINDOWS, "C:\\WINDOWS\\TEMP" },
+        return new Object[][]{
+                {parts(), UNIX, "/"},
+                {parts("tmp"), UNIX, "/tmp"},
+                {parts("tmp", "foo"), UNIX, "/tmp/foo"},
+                {parts("C:"), WINDOWS, "C:\\"},
+                {parts("C:", "WINDOWS"), WINDOWS, "C:\\WINDOWS"},
+                {parts("C:", "WINDOWS", "TEMP"), WINDOWS, "C:\\WINDOWS\\TEMP"},
         };
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void shouldNotAllowEmptyWindowsPath() {
-        SshFile.checkWindowsPath(Lists.<String> newArrayList(), WINDOWS);
+        SshFile.checkWindowsPath(Lists.<String>newArrayList(), WINDOWS);
     }
 
 }

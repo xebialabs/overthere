@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -23,8 +23,6 @@
 package com.xebialabs.overthere;
 
 import java.util.concurrent.atomic.AtomicReference;
-
-import com.google.common.base.Preconditions;
 
 import com.xebialabs.overcast.CloudHost;
 

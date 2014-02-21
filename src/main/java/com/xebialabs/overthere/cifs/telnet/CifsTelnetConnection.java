@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -29,13 +29,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
@@ -46,16 +44,15 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static java.lang.String.format;
 
 /**
  * A connection to a Windows host using CIFS and Telnet.
- *
+ * <p/>
  * Limitations:
  * <ul>
  * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
@@ -142,7 +139,7 @@ public class CifsTelnetConnection extends CifsConnection {
                             logger.debug("Errorlevel string found: {}", errorlevelString);
 
                             try {
-                                synchronized(exitValue) {
+                                synchronized (exitValue) {
                                     exitValue[0] = Integer.parseInt(errorlevelString);
                                 }
                             } catch (NumberFormatException exc) {
@@ -214,14 +211,14 @@ public class CifsTelnetConnection extends CifsConnection {
                         throw new RuntimeIOException(format("Cannot disconnect from %s", CifsTelnetConnection.this), exc);
                     }
                 }
-                
+
                 @Override
                 public synchronized int exitValue() {
-                    if(tc.isConnected()) {
+                    if (tc.isConnected()) {
                         throw new IllegalThreadStateException(format("Process for command [%s] on %s is still running", obfuscatedCmd, CifsTelnetConnection.this));
                     }
 
-                    synchronized(exitValue) {
+                    synchronized (exitValue) {
                         return exitValue[0];
                     }
                 }
@@ -234,15 +231,15 @@ public class CifsTelnetConnection extends CifsConnection {
     }
 
     private static void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout,
-        final String expectedString) throws IOException {
+                                final String expectedString) throws IOException {
         receive(stdout, outputBuf, toCallersStdout, expectedString, null);
     }
 
     private static void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout,
-        final String expectedString, final String unexpectedString) throws IOException {
+                                final String expectedString, final String unexpectedString) throws IOException {
         boolean lastCharWasCr = false;
         boolean lastCharWasEsc = false;
-        for (;;) {
+        for (; ; ) {
             int cInt = stdout.read();
             if (cInt == -1) {
                 throw new IOException("End of stream reached");
@@ -252,19 +249,19 @@ public class CifsTelnetConnection extends CifsConnection {
             final String outputBufStr = outputBuf.toString();
             char c = (char) cInt;
             switch (c) {
-            case '\r':
-                handleReceivedLine(outputBuf, outputBufStr, toCallersStdout);
-                break;
-            case '\n':
-                if (!lastCharWasCr) {
+                case '\r':
                     handleReceivedLine(outputBuf, outputBufStr, toCallersStdout);
-                }
-                break;
-            case '[':
-                if (lastCharWasEsc) {
-                    throw new RuntimeIOException(
-                        "VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).");
-                }
+                    break;
+                case '\n':
+                    if (!lastCharWasCr) {
+                        handleReceivedLine(outputBuf, outputBufStr, toCallersStdout);
+                    }
+                    break;
+                case '[':
+                    if (lastCharWasEsc) {
+                        throw new RuntimeIOException(
+                                "VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).");
+                    }
             }
             lastCharWasCr = (c == '\r');
             lastCharWasEsc = (c == 27);
@@ -288,7 +285,7 @@ public class CifsTelnetConnection extends CifsConnection {
     }
 
     private static void handleReceivedLine(final ByteArrayOutputStream outputBuf, final String outputBufStr, final PipedOutputStream toCallersStdout)
-        throws IOException {
+            throws IOException {
         if (!outputBufStr.contains(DETECTABLE_WINDOWS_PROMPT)) {
             toCallersStdout.write(outputBuf.toByteArray());
             toCallersStdout.flush();

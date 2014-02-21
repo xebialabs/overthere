@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,16 +22,17 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
+import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_INTERACTIVE_PASSWORD;
@@ -57,7 +58,7 @@ class SshInteractiveSudoConnection extends SshSudoConnection {
         checkArgument(!passwordPromptRegex.endsWith("?"), SUDO_PASSWORD_PROMPT_REGEX + " should not end in a wildcard");
         checkArgument(sudoInteractivePassword != null, "Cannot start a ssh:%s: connection without a password", sshConnectionType.toString().toLowerCase());
         if (!allocateDefaultPty && allocatePty == null) {
-            logger.warn("An ssh:{}: connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY +"].", sshConnectionType.toString().toLowerCase());
+            logger.warn("An ssh:{}: connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY + "].", sshConnectionType.toString().toLowerCase());
             allocatePty = OVERRIDE_ALLOCATE_PTY;
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,19 +22,18 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import static java.lang.String.format;
-import static java.util.regex.Pattern.quote;
-
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.regex.Pattern;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Iterables;
+
+import static java.lang.String.format;
+import static java.util.regex.Pattern.quote;
 
 class PathMapper {
     private static final String DRIVE_DESIGNATOR = ":";
@@ -62,11 +61,10 @@ class PathMapper {
     /**
      * Attempts to use provided path-to-share mappings to convert the given local path to a remotely accessible path,
      * using the longest matching prefix if available.
-     * <p>
+     * <p/>
      * Falls back to using administrative shares if none of the explicit mappings applies to the path to convert.
-     * 
-     * @param path
-     *            the local path to convert
+     *
+     * @param path the local path to convert
      * @return the remotely accessible path (using shares) at which the local path can be accessed using SMB
      */
     @VisibleForTesting
@@ -81,13 +79,12 @@ class PathMapper {
         }, null);
         // the share + the remainder of the path if found, otherwise the path with ':' replaced by '$'
         return ((mappedPathPrefix != null) ? sharesForPaths.get(mappedPathPrefix) + path.substring(mappedPathPrefix.length()) : path.substring(0, 1)
-            + ADMIN_SHARE_DESIGNATOR
-            + path.substring(2));
+                + ADMIN_SHARE_DESIGNATOR
+                + path.substring(2));
     }
 
     /**
-     * @param path
-     *            the remotely accessible path to convert (minus the host name, i.e. beginning with the share)
+     * @param path the remotely accessible path to convert (minus the host name, i.e. beginning with the share)
      * @return the local path (using drive letters) corresponding to the path that is remotely accessible using SMB
      */
     @VisibleForTesting

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,11 +22,10 @@
  */
 package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
-
 import java.net.URI;
 import java.util.List;
+import org.dom4j.Element;
+import org.dom4j.QName;
 
 import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_ADDRESSING;
 import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WSMAN_DMTF;
@@ -81,7 +80,7 @@ public class HeaderBuilder {
     // TODO maybe split this up with a SelectorBuilder?
     public HeaderBuilder withShellId(String shellId) {
         header.addElement(QName.get("SelectorSet", NS_WSMAN_DMTF)).addElement(QName.get("Selector", NS_WSMAN_DMTF)).addAttribute("Name", "ShellId")
-            .addText(shellId);
+                .addText(shellId);
         return this;
     }
 

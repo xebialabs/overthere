@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -24,6 +24,7 @@ package com.xebialabs.overthere;
 
 /**
  * Handler that gets sent the output (stdout and stderr) of an {@link OverthereProcess}.
+ *
  * @deprecated Replaced with the {@link OverthereExecutionOutputHandler}
  */
 @Deprecated
@@ -31,25 +32,22 @@ public interface OverthereProcessOutputHandler {
 
     /**
      * Invoked when an executed command generates a single character of output (stdout).
-     * 
-     * @param c
-     *            the character of output generated.
+     *
+     * @param c the character of output generated.
      */
     void handleOutput(char c);
 
     /**
      * Invoked when an executed command generated a line of output (stdout).
-     * 
-     * @param line
-     *            the line of output generated.
+     *
+     * @param line the line of output generated.
      */
     void handleOutputLine(String line);
 
     /**
      * Invoked when an executed command generated a line of error (stderr).
-     * 
-     * @param line
-     *            the line of output generated.
+     *
+     * @param line the line of output generated.
      */
     void handleErrorLine(String line);
 

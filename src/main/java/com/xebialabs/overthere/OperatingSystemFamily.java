@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -63,7 +63,7 @@ public enum OperatingSystemFamily {
     private final String defaultTemporaryDirectoryPath;
 
     private OperatingSystemFamily(char fileSeparatorChar, char pathSeparatorChar, String lineSeparator, String commandSepator, String scriptExtension,
-        String defaultTemporaryDirectoryPath) {
+                                  String defaultTemporaryDirectoryPath) {
         this.scriptExtension = scriptExtension;
         this.lineSeparator = lineSeparator;
         this.defaultTemporaryDirectoryPath = defaultTemporaryDirectoryPath;
@@ -84,8 +84,7 @@ public enum OperatingSystemFamily {
     /**
      * Converts a text to use the {@link #getLineSeparator() line separator} of this operating system family.
      *
-     * @param text
-     *            the text to convert.
+     * @param text the text to convert.
      * @return the converted text.
      */
     public String convertText(String text) {

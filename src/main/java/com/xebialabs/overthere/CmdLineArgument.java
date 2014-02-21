@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -49,9 +49,8 @@ public abstract class CmdLineArgument implements Serializable {
 
     /**
      * Creates a regular argument.
-     * 
-     * @param arg
-     *            the argument string.
+     *
+     * @param arg the argument string.
      * @return the created argument.
      */
     public static CmdLineArgument arg(String arg) {
@@ -62,9 +61,8 @@ public abstract class CmdLineArgument implements Serializable {
     /**
      * Creates a password argument. When encoded for execution, a password argument is encoded like a regular argument.
      * When encoded for logging, a password argument is always encoded as eight stars (********).
-     * 
-     * @param arg
-     *            the argument string.
+     *
+     * @param arg the argument string.
      * @return the created argument.
      */
     public static CmdLineArgument password(String arg) {
@@ -83,9 +81,8 @@ public abstract class CmdLineArgument implements Serializable {
     /**
      * Creates a nested command line argument. When encoded for execution or for logging, a nested command will be
      * quoted. Useful for instance when executing su -c '<nestedcommand>'
-     * 
-     * @param line
-     *            the nested command line
+     *
+     * @param line the nested command line
      * @return the created command
      */
     public static CmdLineArgument nested(CmdLine line) {
@@ -95,11 +92,9 @@ public abstract class CmdLineArgument implements Serializable {
 
     /**
      * Returns a string representation of this argument.
-     * 
-     * @param os
-     *            the {@link OperatingSystemFamily operating system} to encode for.
-     * @param forLogging
-     *            <code>true</code> if this string representation will be used for logging.
+     *
+     * @param os         the {@link OperatingSystemFamily operating system} to encode for.
+     * @param forLogging <code>true</code> if this string representation will be used for logging.
      * @return the string representation of this argument.
      */
     public final String toString(OperatingSystemFamily os, boolean forLogging) {
@@ -110,13 +105,10 @@ public abstract class CmdLineArgument implements Serializable {
 
     /**
      * Builds a string representation of this argument.
-     * 
-     * @param os
-     *            the {@link OperatingSystemFamily operating system} to encode for.
-     * @param forLogging
-     *            <code>true</code> if this string representation will be used for logging.
-     * @param builder
-     *            the {@link StringBuilder} to append to.
+     *
+     * @param os         the {@link OperatingSystemFamily operating system} to encode for.
+     * @param forLogging <code>true</code> if this string representation will be used for logging.
+     * @param builder    the {@link StringBuilder} to append to.
      */
     public abstract void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder);
 
@@ -127,23 +119,23 @@ public abstract class CmdLineArgument implements Serializable {
         }
 
         switch (os) {
-        case WINDOWS:
-            if (!containsAny(str, SPECIAL_CHARS_WINDOWS)) {
-                builder.append(str);
-            } else {
-                encodeArgumentWithSpecialCharactersForWindows(str, builder);
-            }
-            break;
-        case UNIX:
-        case ZOS:
-            if (!containsAny(str, SPECIAL_CHARS_UNIX)) {
-                builder.append(str);
-            } else {
-                encodeArgumentWithSpecialCharactersForUnix(str, builder);
-            }
-            break;
-        default:
-            throw new RuntimeException("Unknown os " + os);
+            case WINDOWS:
+                if (!containsAny(str, SPECIAL_CHARS_WINDOWS)) {
+                    builder.append(str);
+                } else {
+                    encodeArgumentWithSpecialCharactersForWindows(str, builder);
+                }
+                break;
+            case UNIX:
+            case ZOS:
+                if (!containsAny(str, SPECIAL_CHARS_UNIX)) {
+                    builder.append(str);
+                } else {
+                    encodeArgumentWithSpecialCharactersForUnix(str, builder);
+                }
+                break;
+            default:
+                throw new RuntimeException("Unknown os " + os);
         }
     }
 

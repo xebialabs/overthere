@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,11 +22,11 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import org.testng.annotations.Test;
+import com.google.common.collect.ImmutableMap;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-
-import com.google.common.collect.ImmutableMap;
-import org.testng.annotations.Test;
 
 /**
  * Unit tests for {@link PathMapper}.
@@ -49,7 +49,7 @@ public class PathMapperTest {
     @Test
     public void usesLongestExplicitMappingForSharedPath() {
         mapper = new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share",
-            "c:\\Windows\\Temp", "temp-share", "c:", "c-share"));
+                "c:\\Windows\\Temp", "temp-share", "c:", "c-share"));
         assertThat(mapper.toSharedPath("c:\\Windows\\Temp\\file.txt"), is("temp-share\\file.txt"));
     }
 
@@ -62,13 +62,13 @@ public class PathMapperTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedOrAdminShare() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
-            .toLocalPath("temp-share\\file.txt");
+                .toLocalPath("temp-share\\file.txt");
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void failsIfSharedPathIsNotExplicitlyMappedAndTooShort() {
         new PathMapper(ImmutableMap.of("c:\\Windows", "windows-share"))
-            .toLocalPath("s");
+                .toLocalPath("s");
     }
 
     @Test

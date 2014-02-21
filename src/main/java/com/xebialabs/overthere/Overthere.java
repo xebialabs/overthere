@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2013, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2014, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -22,23 +22,14 @@
  */
 package com.xebialabs.overthere;
 
-import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
-import nl.javadude.scannit.Configuration;
-import nl.javadude.scannit.Scannit;
-import nl.javadude.scannit.scanner.TypeAnnotationScanner;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.local.LocalConnection;
@@ -47,6 +38,13 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.ssh.SshTunnelConnection;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+
+import nl.javadude.scannit.Configuration;
+import nl.javadude.scannit.Scannit;
+import nl.javadude.scannit.scanner.TypeAnnotationScanner;
+
+import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.
@@ -57,7 +55,7 @@ public class Overthere {
     private static final Logger logger = LoggerFactory.getLogger(Overthere.class);
 
     private static final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
-        new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
+            new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
 
     static {
         final Scannit scannit = new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner()));
@@ -78,11 +76,9 @@ public class Overthere {
 
     /**
      * Creates a connection.
-     * 
-     * @param protocol
-     *            The protocol to use, e.g. "local".
-     * @param options
-     *            A set of options to use for the connection.
+     *
+     * @param protocol The protocol to use, e.g. "local".
+     * @param options  A set of options to use for the connection.
      * @return the connection.
      */
     public static OverthereConnection getConnection(String protocol, final ConnectionOptions options) {
@@ -111,7 +107,7 @@ public class Overthere {
             final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortMapper.class);
             OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
 
-            if(!(connectionBuilder instanceof LocalConnection)) {
+            if (!(connectionBuilder instanceof LocalConnection)) {
                 logger.info("Connecting to {}", connectionBuilder);
             } else {
                 logger.debug("Connecting to {}", connectionBuilder);
