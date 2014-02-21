@@ -103,7 +103,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
 
     /**
-     * Default value (<code>1025</code>) for the connection option that specifies from what port onwards to locate an
+     * Default value (<code>1024</code>) for the connection option that specifies from what port onwards to locate an
      * empty port for a local port forward in an {@link SshTunnelConnection tunnel}
      */
     public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1024;
