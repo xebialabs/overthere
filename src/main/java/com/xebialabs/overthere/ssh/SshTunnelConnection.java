@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.Monitor;
 import com.xebialabs.overthere.*;
@@ -40,8 +41,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -58,19 +59,21 @@ import static java.net.InetSocketAddress.createUnresolved;
  */
 public class SshTunnelConnection extends SshConnection implements AddressPortMapper {
 
-    private static final Monitor M = new Monitor();
-    static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
-    private static final int MAX_PORT = 65536;
+    private static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
+
+    private static final int MAX_PORT = 65535;
 
     private Map<InetSocketAddress, InetSocketAddress> localPortForwards = newHashMap();
 
     private List<PortForwarder> portForwarders = newArrayList();
 
-    private Integer startPortRange;
+    private int startPortRange;
 
-    public SshTunnelConnection(final String protocol, final ConnectionOptions options, AddressPortMapper mapper) {
+    private final Monitor M = new Monitor();
+
+    public SshTunnelConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper);
-        this.startPortRange = options.get(PORT_ALLOCATION_RANGE_START, PORT_ALLOCATION_RANGE_START_DEFAULT);
+        this.startPortRange = options.getInteger(PORT_ALLOCATION_RANGE_START, PORT_ALLOCATION_RANGE_START_DEFAULT);
     }
 
     @Override
@@ -97,7 +100,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
                 return localPortForwards.get(address);
             }
 
-            ServerSocket serverSocket = PORT_MANAGER.get().leaseNewPort(startPortRange);
+            ServerSocket serverSocket = PORT_MANAGER.get().bindToNextFreePort(startPortRange);
             portForwarders.add(startForwarder(address, serverSocket));
 
             InetSocketAddress localAddress = createUnresolved("localhost", serverSocket.getLocalPort());
@@ -174,8 +177,8 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
         @Override
         public void run() {
-            LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(), remoteAddress.getHostName(),
-                remoteAddress.getPort());
+            LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(),
+                    remoteAddress.getHostName(), remoteAddress.getPort());
             LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, localSocket);
             try {
                 latch.countDown();
@@ -188,7 +191,6 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         @Override
         public void close() throws IOException {
             localSocket.close();
-            PORT_MANAGER.get().returnPort(localSocket);
             try {
                 this.join();
             } catch (InterruptedException e) {
@@ -198,42 +200,39 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
     }
 
     static class TunnelPortManager {
-        private static final Set<Integer> portsHandedOut = newHashSet();
-        private static Monitor M = new Monitor();
+        private AtomicInteger lastBoundPort = new AtomicInteger(0);
+        private Monitor M = new Monitor();
 
-        ServerSocket leaseNewPort(Integer startFrom) {
+        ServerSocket bindToNextFreePort(int startFrom) {
             M.enter();
             try {
-                for (int port = startFrom; port < MAX_PORT; port++) {
-                    if (isLeased(port)) {
-                        continue;
-                    }
-
+                int firstPort = Math.max(startFrom, lastBoundPort.get() + 1);
+                int port = firstPort;
+                for (;;) {
+                    logger.trace("Trying to bind to port {}", port);
                     ServerSocket socket = tryBind(port);
                     if (socket != null) {
-                        portsHandedOut.add(port);
+                        logger.debug("Successfully bound to port {}.", port);
+                        lastBoundPort.set(port);
                         return socket;
                     }
+
+                    if(port == MAX_PORT) {
+                        port = startFrom;
+                    } else {
+                        port++;
+                    }
+
+                    if(port == firstPort) {
+                        throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
+                    }
                 }
-                throw new IllegalStateException(format("Could not find a single free port in the range [%s-%s]...", startFrom, MAX_PORT));
             } finally {
                 M.leave();
             }
         }
 
-        synchronized void returnPort(ServerSocket socket) {
-            M.enter();
-            try {
-                portsHandedOut.remove(socket.getLocalPort());
-            } finally {
-                M.leave();
-            }
-        }
-
-        private boolean isLeased(int port) {
-            return portsHandedOut.contains(port);
-        }
-
+        @VisibleForTesting
         protected ServerSocket tryBind(int localPort) {
             try {
                 ServerSocket ss = new ServerSocket();

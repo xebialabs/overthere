@@ -45,10 +45,8 @@ public class SshTunnelConnectionTest {
             }
         };
 
-        ServerSocket serverSocket = tunnelPortManager.leaseNewPort(1025);
-        ServerSocket serverSocket2 = tunnelPortManager.leaseNewPort(1025);
+        ServerSocket serverSocket = tunnelPortManager.bindToNextFreePort(1025);
+        ServerSocket serverSocket2 = tunnelPortManager.bindToNextFreePort(1025);
         assertThat(serverSocket.getLocalPort(), Matchers.not(equalTo(serverSocket2.getLocalPort())));
-        tunnelPortManager.returnPort(serverSocket);
-        tunnelPortManager.returnPort(serverSocket2);
     }
 }
