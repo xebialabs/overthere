@@ -165,7 +165,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * Default value (<code>true</code>) for the connection option that specifies whether files are copied <em>from</em>
      * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
      */
-    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = true;
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = false;
 
     /**
      * Connection option (Boolean) that specifies whether files are copied <em>to</em> the connection temporary
@@ -177,7 +177,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * Default value (<code>true</code>) for the connection option that specifies whether files are copied <em>to</em>
      * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
      */
-    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = true;
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = false;
 
     /**
      * Connection option (Boolean) that specifies whether or not to quote the original command when it is prefixed with

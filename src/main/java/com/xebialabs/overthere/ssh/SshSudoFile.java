@@ -172,10 +172,8 @@ class SshSudoFile extends SshScpFile {
     void copyToTempFile(OverthereFile tempFile) {
         logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
 
-        boolean sudoPreserveAttributesOnCopyToTempFile = ((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile;
-
         String defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
-        if (sudoPreserveAttributesOnCopyToTempFile) {
+        if (((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile) {
             defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
         }
 
@@ -210,13 +208,12 @@ class SshSudoFile extends SshScpFile {
             targetPath = this.getParentFile().getPath();
         }
 
-        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND);
-
         String defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
         if (((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile) {
             defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
         }
-        cpCmdLine.addTemplatedFragment(getCommand(SUDO_COPY_FROM_TEMP_FILE_COMMAND, defaultCommand), tempFile.getPath(), targetPath);
+        CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
+                .addTemplatedFragment(getCommand(SUDO_COPY_FROM_TEMP_FILE_COMMAND, defaultCommand), tempFile.getPath(), targetPath);
 
         CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
