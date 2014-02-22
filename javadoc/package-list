@@ -2,9 +2,8 @@ com.xebialabs.overthere
 com.xebialabs.overthere.cifs
 com.xebialabs.overthere.cifs.telnet
 com.xebialabs.overthere.cifs.winrm
-com.xebialabs.overthere.cifs.winrm.connector
-com.xebialabs.overthere.cifs.winrm.exception
-com.xebialabs.overthere.cifs.winrm.tokengenerator
+com.xebialabs.overthere.cifs.winrm.soap
+com.xebialabs.overthere.cifs.winrs
 com.xebialabs.overthere.local
 com.xebialabs.overthere.spi
 com.xebialabs.overthere.ssh
