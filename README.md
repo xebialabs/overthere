@@ -76,7 +76,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 <a name="programming_overthere"></a>
 # Programming Overthere
 
-To program Overthere, browse the source code, check the examples and browse the Overthere <a href="http://docs.xebialabs.com/overthere/javadoc/">Javadoc</a>.
+To program Overthere, browse the source code, check the examples and browse the Overthere <a href="http://xebialabs.github.io/overthere/javadoc">Javadoc</a>.
 
 For a more thorough introduction to Overthere, check the [presentation on Overthere](http://www.slideshare.net/vpartington/presentation-about-overthere-for-jfall-2011) that I gave for J-Fall 2011, a Java conference in the Netherlands (in English).
 

@@ -7,7 +7,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -27,7 +26,7 @@ public class ExecuteOnWindows {
 		OverthereConnection connection = Overthere.getConnection("cifs", options);
 
 		try {
-			connection.execute(consoleHandler(), CmdLine.build("type", "\\windows\\system32\\drivers\\etc\\hosts"));
+			connection.execute(CmdLine.build("type", "\\windows\\system32\\drivers\\etc\\hosts"));
 		} finally {
 			connection.close();
 		}

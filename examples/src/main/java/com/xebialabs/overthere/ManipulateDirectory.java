@@ -7,7 +7,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 
 import java.io.IOException;
 
@@ -28,7 +27,7 @@ public class ManipulateDirectory {
 		options.set(CONNECTION_TYPE, SFTP);
 		OverthereConnection connection = Overthere.getConnection("ssh", options);
 		try {
-			connection.execute(consoleHandler(), CmdLine.build("cp", "-r", "/var/log/apt", "/tmp/logs1"));
+			connection.execute(CmdLine.build("cp", "-r", "/var/log/apt", "/tmp/logs1"));
 			OverthereFile logs1 = connection.getFile("/tmp/logs1");
 			OverthereFile logs2 = connection.getFile("/tmp/logs2");
 			logs2.delete();

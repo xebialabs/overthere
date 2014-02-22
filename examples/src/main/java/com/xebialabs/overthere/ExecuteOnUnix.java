@@ -7,7 +7,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -25,7 +24,7 @@ public class ExecuteOnUnix {
 		options.set(CONNECTION_TYPE, SFTP);
 		OverthereConnection connection = Overthere.getConnection("ssh", options);
 		try {
-			connection.execute(consoleHandler(), CmdLine.build("cat", "/etc/motd"));
+			connection.execute(CmdLine.build("cat", "/etc/motd"));
 		} finally {
 			connection.close();
 		}

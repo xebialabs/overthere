@@ -7,7 +7,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,7 +37,7 @@ public class WriteFile {
 			} finally {
 				w.close();
 			}
-			connection.execute(consoleHandler(), CmdLine.build("cat", "/tmp/new-motd"));
+			connection.execute(CmdLine.build("cat", "/tmp/new-motd"));
 		} finally {
 			connection.close();
 		}

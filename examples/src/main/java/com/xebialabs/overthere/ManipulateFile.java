@@ -7,7 +7,6 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static com.xebialabs.overthere.util.ConsoleOverthereProcessOutputHandler.consoleHandler;
 
 import java.io.IOException;
 
@@ -28,7 +27,7 @@ public class ManipulateFile {
 		options.set(CONNECTION_TYPE, SFTP);
 		OverthereConnection connection = Overthere.getConnection("ssh", options);
 		try {
-			connection.execute(consoleHandler(), CmdLine.build("cp", "/etc/motd", "/tmp/motd1"));
+			connection.execute(CmdLine.build("cp", "/etc/motd", "/tmp/motd1"));
 			OverthereFile motd1 = connection.getFile("/tmp/motd1");
 			OverthereFile motd2 = connection.getFile("/tmp/motd2");
 			motd2.delete();
