@@ -46,6 +46,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static java.lang.String.format;
@@ -151,7 +152,7 @@ public class CifsTelnetConnection extends CifsConnection {
                     } catch (IOException exc) {
                         throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, CifsTelnetConnection.this), exc);
                     } finally {
-                        Closeables.closeQuietly(toCallersStdout);
+                        closeQuietly(toCallersStdout);
                     }
                 }
             };
@@ -206,7 +207,7 @@ public class CifsTelnetConnection extends CifsConnection {
                         tc.disconnect();
                         logger.info("Disconnected from {}", CifsTelnetConnection.this);
 
-                        Closeables.closeQuietly(toCallersStdout);
+                        closeQuietly(toCallersStdout);
                     } catch (IOException exc) {
                         throw new RuntimeIOException(format("Cannot disconnect from %s", CifsTelnetConnection.this), exc);
                     }

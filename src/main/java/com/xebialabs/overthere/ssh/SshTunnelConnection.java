@@ -54,6 +54,7 @@ import net.schmizz.sshj.transport.TransportException;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
 import static java.lang.String.format;
@@ -91,7 +92,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
     public void doClose() {
         logger.debug("Closing tunnel.");
         for (PortForwarder portForwarder : portForwarders) {
-            Closeables.closeQuietly(portForwarder);
+            closeQuietly(portForwarder);
         }
 
         super.doClose();

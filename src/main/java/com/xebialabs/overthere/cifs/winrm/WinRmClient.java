@@ -88,6 +88,7 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
 import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
 
+import static com.google.common.io.Closeables.closeQuietly;
 import static org.apache.http.auth.AuthScope.ANY_HOST;
 import static org.apache.http.auth.AuthScope.ANY_PORT;
 import static org.apache.http.auth.AuthScope.ANY_REALM;
@@ -95,6 +96,7 @@ import static org.apache.http.client.params.AuthPolicy.BASIC;
 import static org.apache.http.client.params.AuthPolicy.KERBEROS;
 import static org.apache.http.client.params.AuthPolicy.SPNEGO;
 import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
+import static org.apache.http.util.EntityUtils.consume;
 
 /**
  * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
@@ -532,9 +534,9 @@ public class WinRmClient {
                 writer.write(buffer, 0, n);
             }
         } finally {
-            Closeables.closeQuietly(reader);
-            Closeables.closeQuietly(is);
-            EntityUtils.consume(response.getEntity());
+            closeQuietly(reader);
+            closeQuietly(is);
+            consume(response.getEntity());
         }
 
         return writer.toString();

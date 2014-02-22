@@ -60,6 +60,7 @@ import net.schmizz.sshj.userauth.password.Resource;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -259,7 +260,7 @@ abstract class SshConnection extends BaseOverthereConnection {
                     Session.Shell shell = session.startShell();
                     shell.close();
                 } finally {
-                    Closeables.closeQuietly(session);
+                    closeQuietly(session);
                 }
             }
 

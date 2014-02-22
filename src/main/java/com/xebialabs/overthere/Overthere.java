@@ -43,6 +43,7 @@ import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
 
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
@@ -96,7 +97,7 @@ public class Overthere {
         try {
             return buildConnection(protocol, options, mapper);
         } catch (RuntimeException exc) {
-            Closeables.closeQuietly(mapper);
+            closeQuietly(mapper);
             throw exc;
         }
     }

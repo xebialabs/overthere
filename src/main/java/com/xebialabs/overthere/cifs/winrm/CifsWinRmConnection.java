@@ -45,6 +45,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
@@ -140,7 +141,7 @@ public class CifsWinRmConnection extends CifsConnection {
                     } catch (Exception exc) {
                         inputReaderTheaException[0] = exc;
                     } finally {
-                        Closeables.closeQuietly(callersStdin);
+                        closeQuietly(fromCallersStdin);
                     }
                 }
             };
@@ -159,8 +160,8 @@ public class CifsWinRmConnection extends CifsConnection {
                     } catch (Exception exc) {
                         outputReaderThreadException[0] = exc;
                     } finally {
-                        Closeables.closeQuietly(toCallersStdout);
-                        Closeables.closeQuietly(toCallersStderr);
+                        closeQuietly(toCallersStdout);
+                        closeQuietly(toCallersStderr);
                     }
                 }
             };
