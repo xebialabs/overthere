@@ -111,8 +111,8 @@ public class CifsWinRmConnection extends CifsConnection {
 
         final WinRmClient winRmClient = createWinrmClient();
         try {
-            final PipedInputStream toCallersStdin = new PipedInputStream();
-            final PipedOutputStream callersStdin = new PipedOutputStream(toCallersStdin);
+            final PipedInputStream fromCallersStdin = new PipedInputStream();
+            final PipedOutputStream callersStdin = new PipedOutputStream(fromCallersStdin);
             final PipedInputStream callersStdout = new PipedInputStream();
             final PipedOutputStream toCallersStdout = new PipedOutputStream(callersStdout);
             final PipedInputStream callersStderr = new PipedInputStream();
@@ -128,7 +128,7 @@ public class CifsWinRmConnection extends CifsConnection {
                     try {
                         byte[] buf = new byte[STDIN_BUF_SIZE];
                         for (; ; ) {
-                            int n = toCallersStdin.read(buf);
+                            int n = fromCallersStdin.read(buf);
                             if (n == -1)
                                 break;
                             if (n == 0)
@@ -197,6 +197,7 @@ public class CifsWinRmConnection extends CifsConnection {
                             outputReaderThread.join();
                         } finally {
                             winRmClient.deleteShell();
+                            closeQuietly(callersStdin);
                             processTerminated = true;
                         }
                         if (outputReaderThreadException[0] != null) {
@@ -220,6 +221,7 @@ public class CifsWinRmConnection extends CifsConnection {
 
                     winRmClient.signal();
                     winRmClient.deleteShell();
+                    closeQuietly(callersStdin);
                     processTerminated = true;
                 }
 
