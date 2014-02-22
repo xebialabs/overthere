@@ -889,7 +889,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <table>
 <tr>
 	<th align="left" valign="top"><a name="tunneling_portAllocationRangeStart"></a>portAllocationRangeStart</th>
-	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is <code>1025</code>.</td>
+	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is <code>1024</code>.</td>
 </tr>
 </table>
 
