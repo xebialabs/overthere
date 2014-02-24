@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.WindowsCloudHostListener;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;

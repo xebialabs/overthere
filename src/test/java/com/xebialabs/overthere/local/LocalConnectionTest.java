@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereUtils;

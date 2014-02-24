@@ -26,7 +26,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.WindowsCloudHostListener;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;

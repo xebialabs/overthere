@@ -26,7 +26,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereConnectionItestBase;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.UnixCloudHostListener;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
