@@ -156,7 +156,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 logger.trace("Creating holder directory {} for temporary file with name {}", f, name);
                 f.mkdir();
                 OverthereFile t = f.getFile(name);
-                logger.debug("Created temporary file {}", t);
+                logger.debug("Generated temporary file name {}", t);
                 return t;
             }
         }
