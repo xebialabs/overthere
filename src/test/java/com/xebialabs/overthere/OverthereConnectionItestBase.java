@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ import nl.javadude.assumeng.AssumptionListener;
 
 import static com.google.common.io.ByteStreams.copy;
 import static com.google.common.io.ByteStreams.readFully;
+import static com.google.common.io.ByteStreams.toByteArray;
 import static com.google.common.io.ByteStreams.write;
 import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.CmdLineArgument.SPECIAL_CHARS_UNIX;
@@ -65,6 +67,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
+import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -73,6 +76,7 @@ import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandle
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
+import static java.lang.String.format;
 import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -521,126 +525,13 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
-    public void shouldCopyRemoteFileToRemoteLocationOnSameConnection() throws IOException {
-        File smallFile = temp.newFile("small.dat");
-        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
-        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
-
-        OverthereFile remoteSmallCopy = connection.getTempFile("copy-of-small.dat");
-        remoteSmallFile.copyTo(remoteSmallCopy);
-
-        assertThat(remoteSmallCopy.exists(), equalTo(true));
-    }
-
-    @Test
-    public void shouldCopyRemoteDirectoryToRemoteLocationOnSameConnection() throws IOException {
-        File directory = temp.newFolder("folder");
-        File smallFile = new File(directory, "small.dat");
-        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteDir = connection.getTempFile("remote-dir");
-        LocalFile.valueOf(directory).copyTo(remoteDir);
-
-        assertThat(remoteDir.exists(), equalTo(true));
-        assertThat(remoteDir.getFile("small.dat").exists(), equalTo(true));
-
-        OverthereFile remoteCopy = connection.getTempFile("remote-dir");
-        remoteDir.copyTo(remoteCopy);
-
-        assertThat(remoteCopy.exists(), equalTo(true));
-        assertThat(remoteCopy.getFile("small.dat").exists(), equalTo(true));
-    }
-
-    @Test
-    public void shouldCopyRemoteFileOverRemoteExistingFileOnSameConnection() throws IOException {
-        File smallFile = temp.newFile("small.dat");
-        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
-        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
-
-        OverthereFile remoteSmallCopy = connection.getTempFile("copy-of-small.dat");
-        writeData(remoteSmallCopy, "I exist".getBytes());
-        remoteSmallFile.copyTo(remoteSmallCopy);
-
-        assertThat(readBytes(remoteSmallCopy, SMALL_FILE_SIZE), equalTo(bytes));
-    }
-
-    @Test
-    public void shouldCopyRemoteDirectoryOverRemoteExistingDirectoryOnSameConnection() throws IOException {
-        File directory = temp.newFolder("folder");
-        File smallFile = new File(directory, "small.dat");
-        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteDir = connection.getTempFile("remote-dir");
-        LocalFile.valueOf(directory).copyTo(remoteDir);
-
-        OverthereFile remoteCopy = connection.getTempFile("remote-dir");
-        remoteCopy.mkdir();
-        OverthereFile remoteSmallCopy = remoteCopy.getFile("small.dat");
-        writeData(remoteSmallCopy, "I exist".getBytes());
-
-        remoteDir.copyTo(remoteCopy);
-
-        // Check that we haven't copied into, but over.
-        assertThat("Should not have copied into the existing remote directory, but over it", !remoteCopy.getFile("remote-dir").exists());
-
-        assertThat(readBytes(remoteSmallCopy, SMALL_FILE_SIZE), equalTo(bytes));
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void shouldNotCopyRemoteFileIntoRemoteExistingDirectoryOnSameConnection() throws IOException {
-        File smallFile = temp.newFile("small.dat");
-        writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteSmallFile = connection.getTempFile("small.dat");
-        LocalFile.valueOf(smallFile).copyTo(remoteSmallFile);
-
-        OverthereFile dir = connection.getTempFile("dir");
-        dir.mkdir();
-        remoteSmallFile.copyTo(dir);
-        fail("Should not succeed copying file to directory in local mode");
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    public void shouldNotCopyRemoteDirectoryOntoExistingFileOnSameConnection() throws IOException {
-        File directory = temp.newFolder("folder");
-        File smallFile = new File(directory, "small.dat");
-        byte[] bytes = writeRandomBytes(smallFile, SMALL_FILE_SIZE);
-
-        OverthereFile remoteDir = connection.getTempFile("remote-dir");
-        LocalFile.valueOf(directory).copyTo(remoteDir);
-
-        OverthereFile tempFile = connection.getTempFile("file.dat");
-        writeData(tempFile, "Hello!".getBytes());
-
-        remoteDir.copyTo(tempFile);
-        fail("Should not succeed copying directory to file in local mode");
-    }
-
-    @Test
     public void shouldWriteLargeFile() throws IOException {
         byte[] largeFileContentsWritten = generateRandomBytes(LARGE_FILE_SIZE);
 
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
         OverthereUtils.write(largeFileContentsWritten, remoteLargeFile);
 
-        byte[] largeFileContentsRead = readBytes(remoteLargeFile, LARGE_FILE_SIZE);
-
-        assertThat(largeFileContentsRead, equalTo(largeFileContentsWritten));
-    }
-
-    private byte[] readBytes(OverthereFile remoteLargeFile, int size) throws IOException {
-        byte[] largeFileContentsRead = new byte[size];
-        InputStream largeIn = remoteLargeFile.getInputStream();
-        try {
-            readFully(largeIn, largeFileContentsRead);
-        } finally {
-            closeQuietly(largeIn);
-        }
-        return largeFileContentsRead;
+        assertThat(readFile(remoteLargeFile), equalTo(largeFileContentsWritten));
     }
 
     @Test
@@ -651,7 +542,7 @@ public abstract class OverthereConnectionItestBase {
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
         LocalFile.valueOf(largeFile).copyTo(remoteLargeFile);
 
-        assertThat(readBytes(remoteLargeFile, LARGE_FILE_SIZE), equalTo(largeFileContentsWritten));
+        assertThat(readFile(remoteLargeFile), equalTo(largeFileContentsWritten));
     }
 
     @Test
@@ -669,8 +560,7 @@ public abstract class OverthereConnectionItestBase {
         try {
             assertThat(targetFile.exists(), is(true));
         } finally {
-            // When using a sudo connection, the target folder has different rights to the temp folder it was created
-            // in.
+            // When using a sudo connection, the target folder has different rights to the temp folder it was created in.
             targetDir.deleteRecursively();
         }
     }
@@ -693,53 +583,421 @@ public abstract class OverthereConnectionItestBase {
     }
 
     @Test
-    public void shouldCopyDirectoryContentToOtherLocation() {
-        OverthereFile tempDir = connection.getTempFile("tempdir");
-        tempDir.mkdir();
-        // Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
-        OverthereFile target = connection.getFile(tempDir.getPath() + "/targetFolder");
+    public void shouldCopyLocalFileToNonExistentRemoteFile() {
+        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFile();
 
-        OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
-        OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
-        OverthereUtils.write("Some test data", "UTF-8", sourceFile);
+        populateSourceFile(srcFile);
 
-        sourceFolder.copyTo(target);
+        srcFile.copyTo(dstFile);
 
-        try {
-            assertThat(target.getFile("sourceFile").exists(), is(true));
-        } finally {
-            // When using a sudo connection, the target folder has different rights to the temp folder it was created
-            // in.
-            target.deleteRecursively();
-        }
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
     }
 
     @Test
-    public void shouldCopyDirectoryContentToExistingOtherLocation() {
-        OverthereFile tempDir = connection.getTempFile("tempdir");
-        tempDir.mkdir();
+    public void shouldCopyLocalFileToExistentRemoteFile() {
+        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFile();
 
-        // Make sure targetFolder is not seen as a temporary folder. Sudo connection handles temp files differently.
-        OverthereFile targetFolder = connection.getFile(tempDir.getPath() + "/targetFolder");
-        targetFolder.mkdir();
+        populateSourceFile(srcFile);
+        populateExistentDestinationFile(dstFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyLocalFileToNonExistentRemoteFileWithDifferentName() {
+        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
+
+        populateSourceFile(srcFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyLocalFileToExistentRemoteFileWithDifferentName() {
+        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
+
+        populateSourceFile(srcFile);
+        populateExistentDestinationFile(dstFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyRemoteFileToNonExistentRemoteFile() {
+        OverthereFile srcFile = getRemoteSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFile();
+
+        populateSourceFile(srcFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyRemoteFileToExistentRemoteFile() {
+        OverthereFile srcFile = getRemoteSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFile();
+
+        populateSourceFile(srcFile);
+        populateExistentDestinationFile(dstFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyRemoteFileToNonExistentRemoteFileWithDifferentName() {
+        OverthereFile srcFile = getRemoteSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
+
+        populateSourceFile(srcFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyRemoteFileToExistentRemoteFileWithDifferentName() {
+        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
+
+        populateSourceFile(srcFile);
+        populateExistentDestinationFile(dstFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectory() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectory();
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectory() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectory();
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentName() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentName() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectory() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectory();
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectory() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectory();
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentName() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentName() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithTrailingPathSeparator() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithTrailingPathSeparator() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+        OverthereFile srcDir = getLocalSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithTrailingPathSeparator() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithTrailingPathSeparator() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    @Test
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+        OverthereFile srcDir = getRemoteSourceDirectory();
+        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    }
+
+
+
+    private static final String SOURCE_DIR_NAME = "dir-to-copy";
+
+    private static final String DESTINATION_DIR_ALTERNATIVE_NAME = "dir-to-copy-with-different-name";
+
+    private static byte[] SOURCE_FILE_CONTENTS = "This file should be copied".getBytes();
+
+    private static final String SOURCE_FILE_NAME = "file-to-copy.txt";
+
+    private static final String DESTINATION_FILE_ALTERNATIVE_NAME = "file-to-copy-with-different-name.txt";
+
+    private static byte[] EXISTENT_DEST_FILE_CONTENT = "This file should be overwritten".getBytes();
+
+    private static final String OTHER_DEST_FILE_NAME = "file-to-be-left-as-is.txt";
+
+    private static byte[] OTHER_DEST_FILE_CONTENT = "This should be left as-is".getBytes();
+
+    private OverthereFile getLocalSourceFile() {
+        return getLocalConnection().getTempFile(SOURCE_FILE_NAME);
+    }
+
+    private OverthereFile getRemoteSourceFile() {
+        return connection.getTempFile(SOURCE_FILE_NAME);
+    }
+
+    private OverthereFile getRemoteDestinationFile() {
+        return connection.getTempFile(SOURCE_FILE_NAME);
+    }
+
+    private OverthereFile getRemoteDestinationFileWithDifferentName() {
+        return connection.getTempFile(DESTINATION_FILE_ALTERNATIVE_NAME);
+    }
+
+    private void populateSourceFile(final OverthereFile srcFile) {
+        writeData(srcFile, SOURCE_FILE_CONTENTS);
+    }
+
+    private void populateExistentDestinationFile(final OverthereFile dstFile) {
+        writeData(dstFile, EXISTENT_DEST_FILE_CONTENT);
+    }
+
+    private void assertSourceFileWasCopiedToDestinationFile(final OverthereFile dstFile) {
+        assertFile(dstFile, SOURCE_FILE_CONTENTS);
+    }
+
+    private OverthereFile getLocalSourceDirectory() {
+        return getLocalConnection().getTempFile(SOURCE_DIR_NAME);
+    }
+
+    private OverthereFile getRemoteSourceDirectory() {
+        return connection.getTempFile(SOURCE_DIR_NAME);
+    }
+
+    private OverthereFile getRemoteDestinationDirectory() {
+        return connection.getTempFile(SOURCE_DIR_NAME);
+    }
+
+    private OverthereFile getRemoteDestinationDirectoryWithDifferentName() {
+        return connection.getTempFile(DESTINATION_DIR_ALTERNATIVE_NAME);
+    }
+
+    private OverthereFile addPathSeparator(OverthereFile dir) {
+        return connection.getFile(dir.getPath() + connection.getHostOperatingSystem().getPathSeparator());
+    }
+
+    private void populateSourceDirectory(final OverthereFile srcDir) {
+        srcDir.mkdir();
+        OverthereFile fileInSrcDir = srcDir.getFile(SOURCE_FILE_NAME);
+        writeData(fileInSrcDir, SOURCE_FILE_CONTENTS);
+    }
+
+    private void populateExistentDestinationDirectory(final OverthereFile dstDir) {
+        dstDir.mkdir();
+        OverthereFile fileInDestDir = dstDir.getFile(SOURCE_FILE_NAME);
+        writeData(fileInDestDir, EXISTENT_DEST_FILE_CONTENT);
+        OverthereFile otherFileInDestDir = dstDir.getFile(OTHER_DEST_FILE_NAME);
+        writeData(otherFileInDestDir, OTHER_DEST_FILE_CONTENT);
+    }
+
+    private void assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(final OverthereFile dstDir) {
+        assertDir(dstDir);
+        assertFile(dstDir.getFile(SOURCE_FILE_NAME), SOURCE_FILE_CONTENTS);
+        assertThat(dstDir.getFile(OTHER_DEST_FILE_NAME).exists(), is(false));
+    }
+
+    private void assertSourceDirectoryWasCopiedToExistentDestinationDirectory(final OverthereFile dstDir) {
+        assertDir(dstDir);
+        assertFile(dstDir.getFile(SOURCE_FILE_NAME), SOURCE_FILE_CONTENTS);
+        assertFile(dstDir.getFile(OTHER_DEST_FILE_NAME), OTHER_DEST_FILE_CONTENT);
+    }
+
+    private void assertDir(final OverthereFile dir) {
+        assertThat(format("Directory [%s] does not exist", dir), dir.exists(), is(true));
+        assertThat(format("Directory [%s] is not a directory", dir), dir.isDirectory(), is(true));
+    }
+
+    private void assertFile(final OverthereFile file, final byte[] expectedContents) {
+        assertThat(format("File [%s] does not exist", file), file.exists(), is(true));
+        assertThat(format("File [%s] is not a regular file", file), file.isFile(), is(true));
+        byte[] actualContents = readFile(file);
+        assertThat(format("File [%s] does not have the expected contents", file), Arrays.equals(actualContents, expectedContents), is(true));
+    }
+
+    private byte[] readFile(final OverthereFile file) {
         try {
-            OverthereFile sourceFolder = LocalFile.valueOf(temp.newFolder("sourceFolder"));
-            OverthereFile sourceFile = sourceFolder.getFile("sourceFile");
-            OverthereUtils.write("Some test data", "UTF-8", sourceFile);
-
-            sourceFolder.copyTo(targetFolder);
-
-            OverthereFile targetFile = targetFolder.getFile("sourceFile");
-            assertThat(targetFile.exists(), is(true));
-            assertThat(OverthereUtils.read(targetFile, "UTF-8"), equalTo("Some test data"));
-
-            OverthereUtils.write("Some new test data", "UTF-8", sourceFile);
-            sourceFolder.copyTo(targetFolder);
-            assertThat("Expected new file data to be written to the correct location", OverthereUtils.read(targetFile, "UTF-8"), equalTo("Some new test data"));
-        } finally {
-            // When using a sudo connection, the target folder has different rights to the temp folder it was created in.
-            targetFolder.deleteRecursively();
+            return toByteArray(new InputSupplier<InputStream>() {
+                @Override
+                public InputStream getInput() throws IOException {
+                    return file.getInputStream();
+                }
+            });
+        } catch (IOException exc) {
+            throw new RuntimeIOException(format("Cannot read file [%s]", file), exc);
         }
+
     }
 
     @Test
@@ -862,13 +1120,17 @@ public abstract class OverthereConnectionItestBase {
         assertThat(bytes, equalTo("++++++++++".getBytes()));
     }
 
-    private static void writeData(final OverthereFile tempFile, byte[] data) throws IOException {
-        write(data, new OutputSupplier<OutputStream>() {
-            @Override
-            public OutputStream getOutput() throws IOException {
-                return tempFile.getOutputStream();
-            }
-        });
+    private static void writeData(final OverthereFile destFile, byte[] data) {
+        try {
+            write(data, new OutputSupplier<OutputStream>() {
+                @Override
+                public OutputStream getOutput() throws IOException {
+                    return destFile.getOutputStream();
+                }
+            });
+        } catch (IOException exc) {
+            throw new RuntimeIOException(format("Cannot write data to %s", destFile), exc);
+        }
     }
 
     protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
