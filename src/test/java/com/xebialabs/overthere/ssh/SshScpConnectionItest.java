@@ -55,7 +55,7 @@ public class SshScpConnectionItest extends OverthereConnectionItestBase {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SCP);
-        options.set(ADDRESS, "ec2-54-228-156-36.eu-west-1.compute.amazonaws.com");
+        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, "overthere");
         options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(
