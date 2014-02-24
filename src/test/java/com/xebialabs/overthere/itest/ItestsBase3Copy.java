@@ -251,9 +251,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithTrailingPathSeparator() {
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithTrailingFileSeparator() {
         OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
 
         populateSourceDirectory(srcDir);
 
@@ -263,9 +263,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithTrailingPathSeparator() {
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithTrailingFileSeparator() {
         OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
 
         populateSourceDirectory(srcDir);
         populateExistentDestinationDirectory(dstDir);
@@ -276,9 +276,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+    public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
         OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
 
         populateSourceDirectory(srcDir);
 
@@ -288,9 +288,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+    public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
         OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
 
         populateSourceDirectory(srcDir);
         populateExistentDestinationDirectory(dstDir);
@@ -301,9 +301,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithTrailingPathSeparator() {
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithTrailingFileSeparator() {
         OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
 
         populateSourceDirectory(srcDir);
 
@@ -313,9 +313,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithTrailingPathSeparator() {
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithTrailingFileSeparator() {
         OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectory());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
 
         populateSourceDirectory(srcDir);
         populateExistentDestinationDirectory(dstDir);
@@ -326,9 +326,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
         OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
 
         populateSourceDirectory(srcDir);
 
@@ -338,9 +338,9 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     @Test
-    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrainlingPathSeparator() {
+    public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
         OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = addPathSeparator(getRemoteDestinationDirectoryWithDifferentName());
+        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
 
         populateSourceDirectory(srcDir);
         populateExistentDestinationDirectory(dstDir);
@@ -394,8 +394,8 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
         return connection.getTempFile(DESTINATION_DIR_ALTERNATIVE_NAME);
     }
 
-    private OverthereFile addPathSeparator(OverthereFile dir) {
-        return connection.getFile(dir.getPath() + connection.getHostOperatingSystem().getPathSeparator());
+    private OverthereFile appendFileSeparator(OverthereFile dir) {
+        return connection.getFile(dir.getPath() + connection.getHostOperatingSystem().getFileSeparator());
     }
 
     private void populateSourceDirectory(final OverthereFile srcDir) {
