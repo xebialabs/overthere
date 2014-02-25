@@ -24,6 +24,7 @@ package com.xebialabs.overthere.cifs.winrs;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
@@ -31,6 +32,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
+import static com.xebialabs.overthere.util.TestUtils.*;
 
 public class CifsWinRsConnectionTest {
 
@@ -47,25 +49,29 @@ public class CifsWinRsConnectionTest {
         options.set(ADDRESS, "localhost");
     }
 
-    @Test
+    @Test(dataProvider = "runOnlyOnWindows")
     @SuppressWarnings("resource")
     public void shouldSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(dataProvider = "runOnlyOnWindows", expectedExceptions = IllegalArgumentException.class)
     @SuppressWarnings("resource")
     public void shouldNotSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
-    @Test
+    @Test(dataProvider = "runOnlyOnWindows")
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
+    @DataProvider
+    public Object[][] runOnlyOnWindows() {
+        return isWindowsOs() ? SINGLE_NO_ARG_INVOCATION : NO_INVOCATIONS;
+    }
 }
