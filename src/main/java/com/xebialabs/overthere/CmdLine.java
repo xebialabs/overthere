@@ -88,8 +88,12 @@ public class CmdLine implements Serializable {
      */
     public CmdLine addTemplatedFragment(String template, Object... variables) {
         for (String arg : template.split("\\s+")) {
-            String fragment = MessageFormat.format(arg, variables);
-            addArgument(fragment);
+            if(arg.matches(".*\\{\\d+}\\.*")) {
+                String fragment = MessageFormat.format(arg, variables);
+                addArgument(fragment);
+            } else {
+                addRaw(arg);
+            }
         }
         return this;
     }

@@ -109,27 +109,73 @@ public class ConnectionOptions {
     public static final String JUMPSTATION = "jumpstation";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command to execute when doing a local copy on the remote host.
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote Unix host.
      */
-    public static final String LOCAL_COPY_COMMAND = "localCopyCommand";
+    public static final String FILE_COPY_COMMAND_FOR_UNIX = "fileCopyCommandForUnix";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) for the common connection option that specifies the command to execute on a UNIX host
-     * when doing a local copy.
+     * Default value (<code>cp -p {0} {1}</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a file on a remote Unix host.
      */
-    public static final String LOCAL_COPY_COMMAND_UNIX_DEFAULT_VALUE = "cp -pRf {0} {1}";
+    public static final String FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE = "cp -p {0} {1}";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) for the common connection option that specifies the command to execute on a Z/OS host
-     * when doing a local copy.
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote Unix host.
      */
-    public static final String LOCAL_COPY_COMMAND_ZOS_DEFAULT_VALUE = "cp -pRf {0} {1}";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX = "directoryCopyCommandForUnix";
 
     /**
-     * Default value (<code>copy {0} {1}</code>) for the common connection option that specifies the command to execute on a Windows host
-     * when doing a local copy.
+     * Default value (<code>tar cC {0} . | tar xmC {1} .</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a directory on a remote Unix host.
+     *
+     * Alternative values:
+     * <ul><code>find {0} -depth 1 -exec cp -pr {} {1} ;</code></ul>
      */
-    public static final String LOCAL_COPY_COMMAND_WINDOWS_DEFAULT_VALUE = "xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE = "tar c -C {0} . | tar xm -C {1}";
+
+    /**
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote Windows host.
+     */
+    public static final String FILE_COPY_COMMAND_FOR_WINDOWS = "fileCopyCommandForWindows";
+
+    /**
+     * Default value (<code>copy {0} {1} /y</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a file on a remote Windows host.
+     */
+    public static final String FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE = "copy {0} {1} /y";
+
+    /**
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote Windows host.
+     */
+    public static final String DIRECTORY_COPY_COMMAND_FOR_WINDOWS = "directoryCopyCommandForWindows";
+
+    /**
+     * Default value (<code>xcopy {0} {1} /i /y /s /e /h /q</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a directory on a remote Windows host.
+     */
+    public static final String DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE = "xcopy {0} {1} /i /y /s /e /h /q";
+
+    /**
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote z/OS host.
+     */
+    public static final String FILE_COPY_COMMAND_FOR_ZOS = "fileCopyCommandForZos";
+
+    /**
+     * Default value (<code>cp -p {0} {1}</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a file on a remote z/OS host.
+     */
+    public static final String FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE = "cp -p {0} {1}";
+
+    /**
+     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote z/OS host.
+     */
+    public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS = "directoryCopyCommandForZos";
+
+    /**
+     * Default value (<code>tar cC {0} . | tar xmC {1} .</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
+     * command used to copy a directory on a remote z/OS host.
+     */
+    public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE = "tar cC {0} . | tar xmC {1}";
 
     private final Map<String, Object> options;
 

@@ -36,6 +36,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
@@ -170,6 +171,11 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     }
 
     @Override
+    protected void shortCircuitCopyFrom(OverthereFile source) {
+        copyFrom(source);
+    }
+
+    @Override
     public void renameTo(OverthereFile dest) {
         if (!(dest instanceof LocalFile)) {
             throw new RuntimeIOException("Destination is not a " + LocalFile.class.getName());
@@ -178,7 +184,6 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
         if (!file.renameTo(((LocalFile) dest).file)) {
             throw new RuntimeIOException("Cannot rename " + this + " to " + dest);
         }
-
     }
 
     @Override

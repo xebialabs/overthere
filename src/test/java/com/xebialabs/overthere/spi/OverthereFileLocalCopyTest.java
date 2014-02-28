@@ -65,7 +65,7 @@ public class OverthereFileLocalCopyTest {
         BaseOverthereFile spy = mock(BaseOverthereFile.class);
         when(spy.getConnection()).thenReturn((BaseOverthereConnection) connection);
         tempFile.copyTo(spy);
-        verify(spy, times(1)).localCopyFrom(tempFile);
+        verify(spy, times(1)).shortCircuitCopyFrom(tempFile);
     }
 
     @Test

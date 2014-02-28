@@ -26,8 +26,14 @@ import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshConnectionType;
 
 import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -359,22 +365,24 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     private OverthereFile getRemoteDestinationFile() {
-        return connection.getTempFile(SOURCE_FILE_NAME);
+        return connection.getFile(connection.getTempFile(SOURCE_FILE_NAME).getPath());
     }
 
     private OverthereFile getRemoteDestinationFileWithDifferentName() {
-        return connection.getTempFile(DESTINATION_FILE_ALTERNATIVE_NAME);
+        return connection.getFile(connection.getTempFile(DESTINATION_FILE_ALTERNATIVE_NAME).getPath());
     }
 
-    private void populateSourceFile(final OverthereFile srcFile) {
+    private void populateSourceFile(OverthereFile srcFile) {
         writeData(srcFile, SOURCE_FILE_CONTENTS);
     }
 
-    private void populateExistentDestinationFile(final OverthereFile dstFile) {
+    private void populateExistentDestinationFile(OverthereFile dstFile) {
         writeData(dstFile, EXISTENT_DEST_FILE_CONTENT);
     }
 
-    private void assertSourceFileWasCopiedToDestinationFile(final OverthereFile dstFile) {
+    private void assertSourceFileWasCopiedToDestinationFile(OverthereFile dstFile) {
+        dstFile = connection.getFile(dstFile.getPath());
+
         assertFile(dstFile, SOURCE_FILE_CONTENTS);
     }
 
@@ -387,38 +395,40 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     private OverthereFile getRemoteDestinationDirectory() {
-        return connection.getTempFile(SOURCE_DIR_NAME);
+        return connection.getFile(connection.getTempFile(SOURCE_DIR_NAME).getPath());
     }
 
     private OverthereFile getRemoteDestinationDirectoryWithDifferentName() {
-        return connection.getTempFile(DESTINATION_DIR_ALTERNATIVE_NAME);
+        return connection.getFile(connection.getTempFile(DESTINATION_DIR_ALTERNATIVE_NAME).getPath());
     }
 
     private OverthereFile appendFileSeparator(OverthereFile dir) {
         return connection.getFile(dir.getPath() + connection.getHostOperatingSystem().getFileSeparator());
     }
 
-    private void populateSourceDirectory(final OverthereFile srcDir) {
+    private void populateSourceDirectory(OverthereFile srcDir) {
         srcDir.mkdir();
         OverthereFile fileInSrcDir = srcDir.getFile(SOURCE_FILE_NAME);
         writeData(fileInSrcDir, SOURCE_FILE_CONTENTS);
     }
 
-    private void populateExistentDestinationDirectory(final OverthereFile dstDir) {
+    private void populateExistentDestinationDirectory(OverthereFile dstDir) {
         dstDir.mkdir();
-        OverthereFile fileInDestDir = dstDir.getFile(SOURCE_FILE_NAME);
-        writeData(fileInDestDir, EXISTENT_DEST_FILE_CONTENT);
         OverthereFile otherFileInDestDir = dstDir.getFile(OTHER_DEST_FILE_NAME);
         writeData(otherFileInDestDir, OTHER_DEST_FILE_CONTENT);
     }
 
-    private void assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(final OverthereFile dstDir) {
+    private void assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(OverthereFile dstDir) {
+        dstDir = connection.getFile(dstDir.getPath());
+
         assertDir(dstDir);
         assertFile(dstDir.getFile(SOURCE_FILE_NAME), SOURCE_FILE_CONTENTS);
         assertThat(dstDir.getFile(OTHER_DEST_FILE_NAME).exists(), is(false));
     }
 
-    private void assertSourceDirectoryWasCopiedToExistentDestinationDirectory(final OverthereFile dstDir) {
+    private void assertSourceDirectoryWasCopiedToExistentDestinationDirectory(OverthereFile dstDir) {
+        dstDir = connection.getFile(dstDir.getPath());
+
         assertDir(dstDir);
         assertFile(dstDir.getFile(SOURCE_FILE_NAME), SOURCE_FILE_CONTENTS);
         assertFile(dstDir.getFile(OTHER_DEST_FILE_NAME), OTHER_DEST_FILE_CONTENT);

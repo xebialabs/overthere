@@ -26,13 +26,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereFileCopier;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_ZOS;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_UNIX;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_ZOS;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
+import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
+import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
+import static java.lang.String.format;
 
 /**
  * A file system object (file, directory, etc.) on a remote system that is accessible through an
@@ -76,7 +92,7 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
 
         if (getConnection().equals(dest.getConnection())) {
-            ((BaseOverthereFile<?>) dest).localCopyFrom(this);
+            ((BaseOverthereFile<?>) dest).shortCircuitCopyFrom(this);
         } else {
             ((BaseOverthereFile<?>) dest).copyFrom(this);
         }
@@ -86,44 +102,56 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         OverthereFileCopier.copy(source, this);
     }
 
-    /**
-     * Copies this file or directory (recursively) to a (new) destination in the same connection.
-     *
-     * @param source The source file or directory
-     */
-    protected void localCopyFrom(OverthereFile source) {
-        OverthereFile dest = this;
-        if (isDirectory() && source.isDirectory() && getName().equals(source.getName())) {
-            dest = getParentFile();
+    protected void shortCircuitCopyFrom(OverthereFile source) {
+        checkArgument(source.exists(), "Source file [%s] does not exist", source);
+
+        boolean srcIsDir = source.isDirectory();
+        if (exists()) {
+            if (srcIsDir) {
+                checkArgument(isDirectory(), "Cannot copy source directory [%s] to target file [%s]", source, this);
+            } else {
+                checkArgument(!isDirectory(), "Cannot copy source file [%s] to target directory [%s]", source, this);
+            }
+        } else {
+            if (srcIsDir) {
+                mkdir();
+            }
         }
 
-        checkArgument(!exists() || (source.isDirectory() == dest.isDirectory()), "Cannot local copy files into directories or vice-versa for [source %s %s to destination %s %s]", typeOf(source), source.getPath(), typeOf(this), getPath());
-        OperatingSystemFamily hostOperatingSystem = source.getConnection().getHostOperatingSystem();
-        CmdLine cmdLine = new CmdLine();
-        String defaultValue = null;
-        switch (hostOperatingSystem) {
-            case WINDOWS:
-                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_WINDOWS_DEFAULT_VALUE;
-                break;
+        String copyCommandTemplate;
+        switch (source.getConnection().getHostOperatingSystem()) {
             case UNIX:
-                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_UNIX_DEFAULT_VALUE;
+                if (srcIsDir) {
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_UNIX, DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE);
+                } else {
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_UNIX, FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE);
+                }
+                break;
+            case WINDOWS:
+                if (srcIsDir) {
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_WINDOWS, DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE);
+                } else {
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_WINDOWS, FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE);
+                }
                 break;
             case ZOS:
-                defaultValue = ConnectionOptions.LOCAL_COPY_COMMAND_ZOS_DEFAULT_VALUE;
+                if (srcIsDir) {
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_ZOS, DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE);
+                } else {
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_ZOS, FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE);
+                }
                 break;
+            default:
+                throw new IllegalArgumentException(format("Unknown operating system [%s]", source.getConnection().getHostOperatingSystem()));
         }
+        CmdLine cmdLine = new CmdLine().addTemplatedFragment(copyCommandTemplate, source.getPath(), getPath());
 
-        String commandTemplate = getConnection().getOptions().get(ConnectionOptions.LOCAL_COPY_COMMAND, defaultValue);
-        cmdLine.addTemplatedFragment(commandTemplate, source.getPath(), dest.getPath());
-
-        logger.debug("Going to execute command [{}] on [{}]", cmdLine, source.getConnection());
-        source.getConnection().execute(cmdLine);
+        CapturingOverthereExecutionOutputHandler capturedStderr = capturingHandler();
+        int errno = source.getConnection().execute(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedStderr), cmdLine);
+        if (errno != 0) {
+            throw new RuntimeIOException(format("Cannot copy [%s] to [%s] on [%s]: %s (errno=%d)", source.getPath(), getPath(), getConnection(), capturedStderr.getOutput(), errno));
+        }
     }
-
-    private String typeOf(OverthereFile overthereFile) {
-        return overthereFile.isDirectory() ? "directory" : "file";
-    }
-
 
     /**
      * Subclasses MUST implement toString properly.

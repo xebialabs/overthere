@@ -31,11 +31,13 @@ import com.google.common.io.InputSupplier;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.local.LocalConnection;
 import com.xebialabs.overthere.local.LocalFile;
 
 import nl.javadude.assumeng.Assumption;
 
 import static com.google.common.io.ByteStreams.copy;
+import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -74,21 +76,16 @@ public abstract class ItestsBase7Misc extends ItestsBase6Windows {
     }
 
     @Test
-    public void shouldTruncateExistingTargetFileOnCopy() throws Exception {
-        final OverthereFile existingDestination = connection.getTempFile("existing");
+    public void shouldTruncateExistingTargetFileOnCopyFromLocal() throws Exception {
+        final OverthereFile existingDestination = connection.getFile(connection.getTempFile("existing").getPath());
         writeData(existingDestination, "**********\n**********\n**********\n**********\n**********\n".getBytes());
-        final OverthereFile newSource = connection.getTempFile("newContents");
+
+        final OverthereFile newSource = getLocalConnection().getTempFile("newContents");
         writeData(newSource, "++++++++++".getBytes());
+
         newSource.copyTo(existingDestination);
 
-        ByteArrayOutputStream to = new ByteArrayOutputStream();
-        copy(new InputSupplier<InputStream>() {
-            @Override
-            public InputStream getInput() throws IOException {
-                return existingDestination.getInputStream();
-            }
-        }, to);
-        byte[] bytes = to.toByteArray();
+        byte[] bytes = readFile(existingDestination);
         assertThat(bytes.length, equalTo(10));
         assertThat(bytes, equalTo("++++++++++".getBytes()));
     }
