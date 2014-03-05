@@ -24,18 +24,22 @@ package com.xebialabs.overthere.ssh;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COMMAND_PREFIX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT;
@@ -43,43 +47,42 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATT
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_QUOTE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
-import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 
 /**
  * A connection to a Unix host using SSH w/ SUDO.
  */
-class SshSudoConnection extends SshScpConnection {
+class SshSudoConnection extends SshElevatedUserConnection {
 
-    public static final String NOSUDO_PSEUDO_COMMAND = "nosudo";
-
-    protected final String sudoUsername;
-
-    protected final String sudoCommandPrefix;
-
-    protected final boolean sudoQuoteCommand;
-
-    protected final boolean sudoPreserveAttributesOnCopyFromTempFile;
-
-    protected final boolean sudoPreserveAttributesOnCopyToTempFile;
-
-    protected final boolean sudoOverrideUmask;
-
-    public SshSudoConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SshSudoConnection(final String type, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(type, options, mapper);
-        this.sudoUsername = options.get(SUDO_USERNAME);
-        this.sudoCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
-        this.sudoQuoteCommand = options.getBoolean(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
-        this.sudoPreserveAttributesOnCopyFromTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT);
-        this.sudoPreserveAttributesOnCopyToTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT);
-        this.sudoOverrideUmask = options.get(SUDO_OVERRIDE_UMASK, SUDO_OVERRIDE_UMASK_DEFAULT);
+
+        elevatedUsername = options.get(SUDO_USERNAME);
+        elevatedPassword = null;
+        elevatedPasswordPromptRegex = null;
+
+        elevationCommandPrefix = options.get(SUDO_COMMAND_PREFIX, SUDO_COMMAND_PREFIX_DEFAULT);
+        quoteCommand = options.getBoolean(SUDO_QUOTE_COMMAND, SUDO_QUOTE_COMMAND_DEFAULT);
+        preserveAttributesOnCopyFromTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT);
+        preserveAttributesOnCopyToTempFile = options.getBoolean(SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE, SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT);
+        overrideUmask = options.getBoolean(SUDO_OVERRIDE_UMASK, SUDO_OVERRIDE_UMASK_DEFAULT);
+
+        copyFromTempFileCommand = options.get(SUDO_COPY_FROM_TEMP_FILE_COMMAND, preserveAttributesOnCopyFromTempFile ? SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES : SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES);
+        copyToTempFileCommand = options.get(SUDO_COPY_TO_TEMP_FILE_COMMAND, preserveAttributesOnCopyToTempFile ? SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES : SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES);
+        overrideUmaskCommand = options.get(SUDO_OVERRIDE_UMASK_COMMAND, SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT);
+        tempMkdirCommand = options.get(SUDO_TEMP_MKDIR_COMMAND, SUDO_TEMP_MKDIR_COMMAND_DEFAULT);
+        tempMkdirsCommand = options.get(SUDO_TEMP_MKDIRS_COMMAND, SUDO_TEMP_MKDIRS_COMMAND_DEFAULT);
     }
 
     @Override
     protected CmdLine processCommandLine(final CmdLine commandLine) {
         CmdLine cmd;
-        if (startsWithPseudoCommand(commandLine, NOSUDO_PSEUDO_COMMAND)) {
-            logger.trace("Not prefixing command line with sudo statement because the " + NOSUDO_PSEUDO_COMMAND
+        if (startsWithPseudoCommand(commandLine, NOELEVATION_PSEUDO_COMMAND)) {
+            logger.trace("Not prefixing command line with sudo statement because the " + NOELEVATION_PSEUDO_COMMAND
                     + " pseudo command was present, but the pseudo command will be stripped");
             logger.trace("Replacing: {}", commandLine);
             cmd = stripPrefixedPseudoCommand(commandLine);
@@ -93,7 +96,7 @@ class SshSudoConnection extends SshScpConnection {
             } else {
                 cmd = commandLine;
             }
-            cmd = prefixWithSudoCommand(cmd);
+            cmd = prefixWithElevationCommand(cmd);
             if (nocd) {
                 cmd = prefixWithPseudoCommand(cmd, NOCD_PSEUDO_COMMAND);
             }
@@ -102,45 +105,6 @@ class SshSudoConnection extends SshScpConnection {
         return super.processCommandLine(cmd);
     }
 
-    @VisibleForTesting
-    CmdLine prefixWithSudoCommand(final CmdLine commandLine) {
-        CmdLine commandLineWithSudo = new CmdLine();
-        commandLineWithSudo.addTemplatedFragment(sudoCommandPrefix, sudoUsername);
-        if (sudoQuoteCommand) {
-            commandLineWithSudo.addNested(commandLine);
-        } else {
-            for (CmdLineArgument a : commandLine.getArguments()) {
-                commandLineWithSudo.add(a);
-                if (a.toString(os, false).equals("|") || a.toString(os, false).equals(";")) {
-                    commandLineWithSudo.addTemplatedFragment(sudoCommandPrefix, sudoUsername);
-                }
-            }
-        }
-        return commandLineWithSudo;
-    }
-
-    @Override
-    public OverthereFile getFile(String hostPath) throws RuntimeIOException {
-        return new SshSudoFile(this, hostPath, false);
-    }
-
-    @Override
-    public OverthereFile getFile(final OverthereFile parent, final String child) throws RuntimeIOException {
-        checkParentFile(parent);
-        return new SshSudoFile(this, constructPath(parent, child), ((SshSudoFile) parent).isTempFile());
-    }
-
-    @Override
-    protected OverthereFile getFileForTempFile(final OverthereFile parent, final String name) {
-        checkParentFile(parent);
-        return new SshSudoFile(this, constructPath(parent, name), true);
-    }
-
-    @Override
-    public String toString() {
-        return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + ":" + sudoUsername + "@" + host + ":" + port;
-    }
-
-    private static Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
+    private Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
 
 }

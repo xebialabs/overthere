@@ -44,8 +44,8 @@ import static com.xebialabs.overthere.WindowsCloudHostListener.getOptionsForTunn
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
@@ -66,8 +66,8 @@ public class CifsTelnetConnectionWithRegularUserItest extends OverthereConnectio
         options.set(CONNECTION_TYPE, TELNET);
 
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, DEFAULT_TELNET_PORT);
-        options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+        options.set(PORT, PORT_DEFAULT_TELNET);
+        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
 
         options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
         options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);

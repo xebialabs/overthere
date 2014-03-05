@@ -36,8 +36,8 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 
@@ -51,8 +51,8 @@ public class CifsWinRmConnectionTest {
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(PASSWORD, "foobar");
-        options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
-        options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+        options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
+        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
         options.set(ADDRESS, "localhost");
     }
 

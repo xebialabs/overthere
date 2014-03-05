@@ -30,15 +30,15 @@ import com.xebialabs.overthere.OverthereFile;
 /**
  * An output stream to a file on a host connected through SSH w/ SUDO.
  */
-class SshSudoOutputStream extends OutputStream {
+class SshElevatedUserOutputStream extends OutputStream {
 
-    private SshSudoFile destFile;
+    private SshElevatedUserFile destFile;
 
     private OverthereFile tempFile;
 
     private OutputStream tempFileOutputStream;
 
-    public SshSudoOutputStream(SshSudoFile destFile, OverthereFile tempFile) {
+    public SshElevatedUserOutputStream(SshElevatedUserFile destFile, OverthereFile tempFile) {
         this.destFile = destFile;
         this.tempFile = tempFile;
         tempFileOutputStream = tempFile.getOutputStream();

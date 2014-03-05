@@ -33,17 +33,17 @@ import com.xebialabs.overthere.util.OverthereFileCopier;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX;
-import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS;
-import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_ZOS;
-import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_UNIX;
-import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_UNIX_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS;
-import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_ZOS;
-import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_ZOS_DEFAULT;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
@@ -122,23 +122,23 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         switch (source.getConnection().getHostOperatingSystem()) {
             case UNIX:
                 if (srcIsDir) {
-                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_UNIX, DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_UNIX, DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT);
                 } else {
-                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_UNIX, FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_UNIX, FILE_COPY_COMMAND_FOR_UNIX_DEFAULT);
                 }
                 break;
             case WINDOWS:
                 if (srcIsDir) {
-                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_WINDOWS, DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_WINDOWS, DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT);
                 } else {
-                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_WINDOWS, FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_WINDOWS, FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT);
                 }
                 break;
             case ZOS:
                 if (srcIsDir) {
-                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_ZOS, DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(DIRECTORY_COPY_COMMAND_FOR_ZOS, DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT);
                 } else {
-                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_ZOS, FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE);
+                    copyCommandTemplate = getConnection().getOptions().get(FILE_COPY_COMMAND_FOR_ZOS, FILE_COPY_COMMAND_FOR_ZOS_DEFAULT);
                 }
                 break;
             default:

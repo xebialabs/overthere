@@ -20,63 +20,55 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.telnet;
+package com.xebialabs.overthere.ssh;
 
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.UnixCloudHostListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import com.xebialabs.overthere.WindowsCloudHostListener;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_USERNAME;
-import static com.xebialabs.overthere.WindowsCloudHostListener.getOptionsForTunnel;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SU_PASSWORD;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SU_USERNAME;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SU;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
-public class CifsTelnetConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
+@Listeners({UnixCloudHostListener.class})
+public class SshSuConnectionItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
-        return CIFS_PROTOCOL;
+        return SSH_PROTOCOL;
     }
 
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
-
-        options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, TELNET);
-
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, PORT_DEFAULT_TELNET);
-        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
-
-        options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
-        options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
-
-        options.set(JUMPSTATION, getOptionsForTunnel());
-
+        options.set(OPERATING_SYSTEM, UNIX);
+        options.set(CONNECTION_TYPE, SU);
+        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        options.set(PORT, 22);
+        options.set(USERNAME, "overthere");
+        options.set(PASSWORD, "overhere");
+        options.set(SU_USERNAME, "root");
+        options.set(SU_PASSWORD, "ubuntu");
+        options.set(ALLOCATE_DEFAULT_PTY, true);
         return options;
     }
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return CifsTelnetConnection.class.getName();
+        return SshSuConnection.class.getName();
     }
 
 }

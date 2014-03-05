@@ -35,147 +35,129 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 public class ConnectionOptions {
 
     /**
-     * Connection option for all protocols that specifies the operating system to connect to. This is used to determine
-     * how to encode paths and commands and to determine the default temporary directory path.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#os">the online documentation</a>
      */
     public static final String OPERATING_SYSTEM = "os";
 
     /**
-     * Connection option for most protocols that specifies the directory in which the connection-scope temporary
-     * directory is created. Any {@link OverthereConnection#getTempFile(String)} temporary file created, will be created
-     * in this directory.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#tmp">the online documentation</a>
      */
     public static final String TEMPORARY_DIRECTORY_PATH = "tmp";
 
     /**
-     * Connection option (Boolean) for most protocols that specifies whether to delete the connection-scope temporary
-     * directory when the connection is closed.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#tmpDeleteOnDisconnect">the online documentation</a>
      */
     public static final String TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = "tmpDeleteOnDisconnect";
 
     /**
-     * Default value (<code>true</code>) for the connection option that specifies whether to delete the connection-scope
-     * temporary directory when the connection is closed.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#tmpDeleteOnDisconnect">the online documentation</a>
      */
-    public static final boolean DEFAULT_TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT = true;
+    public static final boolean TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT = true;
 
     /**
-     * Connection option (Integer) for most protocol that specifies how many times to retry creating a unique temporary file
-     * name before giving up.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#tmpFileCreationRetries">the online documentation</a>
      */
     public static final String TEMPORARY_FILE_CREATION_RETRIES = "tmpFileCreationRetries";
 
     /**
-     * Default value (<code>100</code>) for the connection option that specifies how many times to retry creating a
-     * unique temporary file name before giving up.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#tmpFileCreationRetries">the online documentation</a>
      */
-    public static final int DEFAULT_TEMPORARY_FILE_CREATION_RETRIES = 100;
+    public static final int TEMPORARY_FILE_CREATION_RETRIES_DEFAULT = 100;
 
     /**
-     * Connection option (Integer) for all protocol that specifies the connection timeout in milliseconds to use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#connectionTimeoutMillis">the online documentation</a>
      */
     public static final String CONNECTION_TIMEOUT_MILLIS = "connectionTimeoutMillis";
 
     /**
-     * Default value (<code>120000</code>) for the connection option that specifies the connection timeout in
-     * milliseconds to use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#connectionTimeoutMillis">the online documentation</a>
      */
-    public static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 120000;
+    public static final int CONNECTION_TIMEOUT_MILLIS_DEFAULT = 120000;
 
     /**
-     * Common connection option that specifies the address to connect to.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#address">the online documentation</a>
      */
     public static final String ADDRESS = "address";
 
     /**
-     * Common connection option that specifies the port to connect to.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#port">the online documentation</a>
      */
     public static final String PORT = "port";
 
     /**
-     * Common connection option that specifies the username with which to connect.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#username">the online documentation</a>
      */
     public static final String USERNAME = "username";
 
     /**
-     * Common connection option that specifies the password with which to connect.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#password">the online documentation</a>
      */
     public static final String PASSWORD = "password";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the {@link ConnectionOptions connection
-     * options} to be used to create a tunnel.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#jumpstation">the online documentation</a>
      */
     public static final String JUMPSTATION = "jumpstation";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote Unix host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForUnix">the online documentation</a>
      */
     public static final String FILE_COPY_COMMAND_FOR_UNIX = "fileCopyCommandForUnix";
 
     /**
-     * Default value (<code>cp -p {0} {1}</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a file on a remote Unix host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForUnix">the online documentation</a>
      */
-    public static final String FILE_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE = "cp -p {0} {1}";
+    public static final String FILE_COPY_COMMAND_FOR_UNIX_DEFAULT = "cp -p {0} {1}";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote Unix host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForUnix">the online documentation</a>
      */
     public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX = "directoryCopyCommandForUnix";
 
     /**
-     * Default value (<code>tar cC {0} . | tar xmC {1} .</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a directory on a remote Unix host.
-     *
-     * Alternative values:
-     * <ul><code>find {0} -depth 1 -exec cp -pr {} {1} ;</code></ul>
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForUnix">the online documentation</a>
      */
-    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT_VALUE = "tar c -C {0} . | tar xm -C {1}";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT = "tar c -C {0} . | tar xm -C {1}";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote Windows host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForWindows">the online documentation</a>
      */
     public static final String FILE_COPY_COMMAND_FOR_WINDOWS = "fileCopyCommandForWindows";
 
     /**
-     * Default value (<code>copy {0} {1} /y</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a file on a remote Windows host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForWindows">the online documentation</a>
      */
-    public static final String FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE = "copy {0} {1} /y";
+    public static final String FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT = "copy {0} {1} /y";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote Windows host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForWindows">the online documentation</a>
      */
     public static final String DIRECTORY_COPY_COMMAND_FOR_WINDOWS = "directoryCopyCommandForWindows";
 
     /**
-     * Default value (<code>xcopy {0} {1} /i /y /s /e /h /q</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a directory on a remote Windows host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForWindows">the online documentation</a>
      */
-    public static final String DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT_VALUE = "xcopy {0} {1} /i /y /s /e /h /q";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_WINDOWS_DEFAULT = "xcopy {0} {1} /i /y /s /e /h /q";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a file on a remote z/OS host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForZos">the online documentation</a>
      */
     public static final String FILE_COPY_COMMAND_FOR_ZOS = "fileCopyCommandForZos";
 
     /**
-     * Default value (<code>cp -p {0} {1}</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a file on a remote z/OS host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForZos">the online documentation</a>
      */
-    public static final String FILE_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE = "cp -p {0} {1}";
+    public static final String FILE_COPY_COMMAND_FOR_ZOS_DEFAULT = "cp -p {0} {1}";
 
     /**
-     * Common connection option (<code>ConnectionOptions</code>) that specifies the command used to copy a directory on a remote z/OS host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForZos">the online documentation</a>
      */
     public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS = "directoryCopyCommandForZos";
 
     /**
-     * Default value (<code>tar cC {0} . | tar xmC {1} .</code>) for the common connection option (<code>ConnectionOptions</code>) that specifies the
-     * command used to copy a directory on a remote z/OS host.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForZos">the online documentation</a>
      */
-    public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT_VALUE = "tar cC {0} . | tar xmC {1}";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT = "tar cC {0} . | tar xmC {1}";
 
     private final Map<String, Object> options;
 

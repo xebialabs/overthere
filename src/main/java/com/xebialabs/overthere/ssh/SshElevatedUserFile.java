@@ -35,39 +35,29 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIRS_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_TEMP_MKDIR_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshSudoConnection.NOSUDO_PSEUDO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshElevatedUserConnection.NOELEVATION_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
 import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandler.multiHandler;
 
 /**
- * A file on a host connected through SSH w/ SUDO.
+ * A file on a host connected through SSH w/ SU, SUDO or INTERACTIVE_SUDO.
  */
-class SshSudoFile extends SshScpFile {
+class SshElevatedUserFile extends SshScpFile {
 
+    private static Logger logger = LoggerFactory.getLogger(SshElevatedUserFile.class);
     private boolean isTempFile;
 
     /**
-     * Constructs a SshSudoHostFile
+     * Constructs a SshElevatedUserFile
      *
      * @param connection the connection connected to the host
      * @param remotePath the path of the file on the host
      * @param isTempFile is <code>true</code> if this is a temporary file; <code>false</code> otherwise
      */
-    public SshSudoFile(SshSudoConnection connection, String remotePath, boolean isTempFile) {
+    public SshElevatedUserFile(SshElevatedUserConnection connection, String remotePath, boolean isTempFile) {
         super(connection, remotePath);
         this.isTempFile = isTempFile;
     }
@@ -75,21 +65,21 @@ class SshSudoFile extends SshScpFile {
     @Override
     protected int executeCommand(OverthereExecutionOutputHandler outHandler, OverthereExecutionOutputHandler errHandler, CmdLine commandLine) {
         if (isTempFile) {
-            commandLine = SshConnection.prefixWithPseudoCommand(commandLine, NOSUDO_PSEUDO_COMMAND);
+            commandLine = SshConnection.prefixWithPseudoCommand(commandLine, NOELEVATION_PSEUDO_COMMAND);
         }
         return super.executeCommand(outHandler, errHandler, commandLine);
     }
 
     @Override
     public OverthereFile getFile(String name) {
-        SshSudoFile f = (SshSudoFile) super.getFile(name);
+        SshElevatedUserFile f = (SshElevatedUserFile) super.getFile(name);
         f.isTempFile = this.isTempFile;
         return f;
     }
 
     @Override
     public OverthereFile getParentFile() {
-        SshSudoFile f = (SshSudoFile) super.getParentFile();
+        SshElevatedUserFile f = (SshElevatedUserFile) super.getParentFile();
         f.isTempFile = this.isTempFile;
         return f;
     }
@@ -110,8 +100,8 @@ class SshSudoFile extends SshScpFile {
         if (isTempFile) {
             return super.getOutputStream();
         } else {
-            logger.debug("Opening ssh:sudo: output stream to write to file {}", this);
-            return new SshSudoOutputStream(this, connection.getTempFile(getName()));
+            logger.debug("Opening " + SSH_PROTOCOL + ":{}: output stream to write to file {}", connection.sshConnectionType.toString().toLowerCase(), this);
+            return new SshElevatedUserOutputStream(this, connection.getTempFile(getName()));
         }
     }
 
@@ -119,7 +109,7 @@ class SshSudoFile extends SshScpFile {
     public void mkdir() throws RuntimeIOException {
         if (isTempFile) {
             logger.debug("Creating world-writable directory, with sticky bit (mode 01777)");
-            mkdir(getCommand(SUDO_TEMP_MKDIR_COMMAND, SUDO_TEMP_MKDIR_COMMAND_DEFAULT));
+            mkdir(((SshElevatedUserConnection) connection).tempMkdirCommand);
         } else {
             super.mkdir();
         }
@@ -129,7 +119,7 @@ class SshSudoFile extends SshScpFile {
     public void mkdirs() throws RuntimeIOException {
         if (isTempFile) {
             logger.debug("Creating world-writable directories, with sticky bit (mode 01777)");
-            mkdir(getCommand(SUDO_TEMP_MKDIRS_COMMAND, SUDO_TEMP_MKDIRS_COMMAND_DEFAULT));
+            mkdir(((SshElevatedUserConnection) connection).tempMkdirsCommand);
         } else {
             super.mkdirs();
         }
@@ -154,12 +144,11 @@ class SshSudoFile extends SshScpFile {
     }
 
     private void overrideUmask(OverthereFile remoteFile) {
-        boolean sudoOverrideUmask = ((SshSudoConnection) connection).sudoOverrideUmask;
-        if (sudoOverrideUmask) {
+        if (((SshElevatedUserConnection) connection).overrideUmask) {
             logger.debug("Overriding umask by recursively setting permissions on files and/or directories copied with scp to be readable and executable (if needed) by group and other");
 
-            CmdLine chmodCmdLine = CmdLine.build(NOSUDO_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND)
-                    .addTemplatedFragment(getCommand(SUDO_OVERRIDE_UMASK_COMMAND, SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT), remoteFile.getPath());
+            CmdLine chmodCmdLine = CmdLine.build(NOELEVATION_PSEUDO_COMMAND, NOCD_PSEUDO_COMMAND)
+                    .addTemplatedFragment(((SshElevatedUserConnection) connection).overrideUmaskCommand, remoteFile.getPath());
 
             CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
             int errno = connection.execute(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedOutput), chmodCmdLine);
@@ -172,13 +161,8 @@ class SshSudoFile extends SshScpFile {
     void copyToTempFile(OverthereFile tempFile) {
         logger.debug("Copying actual file {} to temporary file {} before download", this, tempFile);
 
-        String defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
-        if (((SshSudoConnection) connection).sudoPreserveAttributesOnCopyToTempFile) {
-            defaultCommand = SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
-        }
-
         CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(SUDO_COPY_TO_TEMP_FILE_COMMAND, defaultCommand), this.getPath(), tempFile.getPath());
+                .addTemplatedFragment(((SshElevatedUserConnection) connection).copyToTempFileCommand, this.getPath(), tempFile.getPath());
 
         CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
@@ -187,9 +171,8 @@ class SshSudoFile extends SshScpFile {
             throw new RuntimeIOException("Cannot copy actual file " + this + " to temporary file " + tempFile + " before download: " + errorMessage);
         }
 
-        // TODO: Do we need to extract this to a separate command, or re-use the SUDO_OVERRIDE_UMASK_COMMAND?
         CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(SUDO_OVERRIDE_UMASK_COMMAND, SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT), tempFile.getPath());
+                .addTemplatedFragment(((SshElevatedUserConnection) connection).overrideUmaskCommand, tempFile.getPath());
 
         CapturingOverthereExecutionOutputHandler chmodCapturedOutput = capturingHandler();
         int chmodResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), chmodCapturedOutput), multiHandler(loggingErrorHandler(logger), chmodCapturedOutput), chmodCmdLine);
@@ -208,12 +191,8 @@ class SshSudoFile extends SshScpFile {
             targetPath = this.getParentFile().getPath();
         }
 
-        String defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES;
-        if (((SshSudoConnection) connection).sudoPreserveAttributesOnCopyFromTempFile) {
-            defaultCommand = SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES;
-        }
         CmdLine cpCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(SUDO_COPY_FROM_TEMP_FILE_COMMAND, defaultCommand), tempFile.getPath(), targetPath);
+                .addTemplatedFragment(((SshElevatedUserConnection) connection).copyFromTempFileCommand, tempFile.getPath(), targetPath);
 
         CapturingOverthereExecutionOutputHandler cpCapturedOutput = capturingHandler();
         int cpResult = getConnection().execute(multiHandler(loggingOutputHandler(logger), cpCapturedOutput), multiHandler(loggingErrorHandler(logger), cpCapturedOutput), cpCmdLine);
@@ -230,17 +209,15 @@ class SshSudoFile extends SshScpFile {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SshSudoFile)) {
+        if (!(obj instanceof SshElevatedUserFile)) {
             return false;
         }
-        return super.equals(obj) && isTempFile == ((SshSudoFile) obj).isTempFile;
+        return super.equals(obj) && isTempFile == ((SshElevatedUserFile) obj).isTempFile;
     }
 
     @Override
     public int hashCode() {
         return super.hashCode() + Boolean.valueOf(isTempFile).hashCode();
     }
-
-    private static Logger logger = LoggerFactory.getLogger(SshSudoFile.class);
 
 }

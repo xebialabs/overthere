@@ -127,7 +127,7 @@ public class SshSudoConnectionSudoCommandTest {
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
-        List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+        List<CmdLineArgument> prefixed = connection.prefixWithElevationCommand(cmdLine).getArguments();
         assertThat(prefixed.size(), equalTo(9));
         assertThat(prefixed.get(0).toString(UNIX, false), equalTo("sudo"));
         assertThat(prefixed.get(5).toString(UNIX, false), equalTo("sudo"));
@@ -141,7 +141,7 @@ public class SshSudoConnectionSudoCommandTest {
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw("|").addArgument("b");
-        List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+        List<CmdLineArgument> prefixed = connection.prefixWithElevationCommand(cmdLine).getArguments();
         assertThat(prefixed.size(), equalTo(4));
         assertThat(prefixed.get(0).toString(UNIX, false), equalTo("su"));
         assertThat(prefixed.get(1).toString(UNIX, false), equalTo("-u"));
@@ -155,7 +155,7 @@ public class SshSudoConnectionSudoCommandTest {
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
-        List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+        List<CmdLineArgument> prefixed = connection.prefixWithElevationCommand(cmdLine).getArguments();
         assertThat(prefixed.size(), equalTo(9));
         assertThat(prefixed.get(0).toString(UNIX, false), equalTo("sudo"));
         assertThat(prefixed.get(5).toString(UNIX, false), equalTo("sudo"));
@@ -169,7 +169,7 @@ public class SshSudoConnectionSudoCommandTest {
         SshSudoConnection connection = new SshSudoConnection(SSH_PROTOCOL, connectionOptions, resolver);
 
         CmdLine cmdLine = new CmdLine().addArgument("a").addRaw(";").addArgument("b");
-        List<CmdLineArgument> prefixed = connection.prefixWithSudoCommand(cmdLine).getArguments();
+        List<CmdLineArgument> prefixed = connection.prefixWithElevationCommand(cmdLine).getArguments();
         assertThat(prefixed.size(), equalTo(4));
         assertThat(prefixed.get(0).toString(UNIX, false), equalTo("su"));
         assertThat(prefixed.get(1).toString(UNIX, false), equalTo("-u"));

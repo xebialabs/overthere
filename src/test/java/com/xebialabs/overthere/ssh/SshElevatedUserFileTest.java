@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SshSudoFileTest {
+public class SshElevatedUserFileTest {
 
     public static final String REMOTE_PATH = "/tmp/file.txt";
     private SshSudoConnection connection;
@@ -45,16 +45,16 @@ public class SshSudoFileTest {
 
     @Test
     public void shouldNotBeEqualWhenOneIsTempAndAnotherIsNot() {
-        SshSudoFile f1 = new SshSudoFile(connection, REMOTE_PATH, false);
-        SshSudoFile f2 = new SshSudoFile(connection, REMOTE_PATH, true);
+        SshElevatedUserFile f1 = new SshElevatedUserFile(connection, REMOTE_PATH, false);
+        SshElevatedUserFile f2 = new SshElevatedUserFile(connection, REMOTE_PATH, true);
         assertThat(f1, is(not(f2)));
         assertThat(f1.hashCode(), is(not(f2.hashCode())));
     }
 
     @Test
     public void shouldBeEqual() {
-        SshSudoFile f1 = new SshSudoFile(connection, REMOTE_PATH, false);
-        SshSudoFile f2 = new SshSudoFile(connection, REMOTE_PATH, false);
+        SshElevatedUserFile f1 = new SshElevatedUserFile(connection, REMOTE_PATH, false);
+        SshElevatedUserFile f2 = new SshElevatedUserFile(connection, REMOTE_PATH, false);
         assertThat(f1, is(f2));
         assertThat(f1.hashCode(), is(f2.hashCode()));
     }

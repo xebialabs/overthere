@@ -44,9 +44,9 @@ import static com.xebialabs.overthere.WindowsCloudHostListener.getOptionsForTunn
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
@@ -70,9 +70,9 @@ public class CifsWinRmConnectionOverHttpsWithAdministrativeUserItest extends Ove
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
 
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, DEFAULT_WINRM_HTTPS_PORT);
-        options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
-        options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
+        options.set(PORT, PORT_DEFAULT_WINRM_HTTPS);
+        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
+        options.set(WINRM_CONTEXT, WINRM_CONTEXT_DEFAULT);
         options.set(WINRM_ENABLE_HTTPS, true);
         options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
         options.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);

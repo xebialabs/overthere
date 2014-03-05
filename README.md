@@ -102,19 +102,24 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <table>
 <tr>
 	<th align="left" valign="top"><a name="os"></a>os</th>
-	<td>The operating system of the remote host. Can be <code>UNIX</code>, <code>WINDOWS</code> or <code>ZOS</code>. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
+	<td>The operating system of the remote host. This property can be set to <code>UNIX</code>, <code>WINDOWS</code>, and <code>ZOS</code> and is used to
+	    determine how to encode paths and commands and to determine the default temporary directory path. This property is required for all protocols, except
+	    for the <strong>local</strong> protocol where it is automatically determined.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="address"></a>address</th>
-	<td>The address of the remote host, either an IP address or a DNS name. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
+	<td>The address of the remote host, either an IP address or a DNS name. This property is required for all protocols, except for the <strong>local</strong>
+	    protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="port"></a>port</th>
-	<td>The port to use when connecting to the remote host. The interpretation and the default value for this connection option depend on the protocol that is used.</td>
+	<td>The port to use when connecting to the remote host. The interpretation and the default value for this connection option depend on the protocol that is
+	    used.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="username"></a>username</th>
-	<td>The username to use when connecting to the remote host. This property is required for all protocols, except for the <strong>local</strong> protocol.</td>
+	<td>The username to use when connecting to the remote host. This property is required for all protocols, except for the <strong>local</strong>
+	protocol.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="password"></a>password</th>
@@ -122,7 +127,11 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmp"></a>tmp</th>
-	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory, e.g. <code>/tmp/overthere-20111128T132600-7234435.tmp</code>, to store temporary files for the duration of the connection.<br/>The default value is <code>tmp</code> for UNIX and z/OS hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol where the default is the value of the <code>java.io.tmpdir</code> system property.</td>
+	<td>The temporary directory. For each connection, a <em>connection temporary directory</em> with a name like
+	    <code>overthere-20111128T132600-7234435.tmp</code> is created within this temporary directory, e.g.
+	    <code>/tmp/overthere-20111128T132600-7234435.tmp</code>, to store temporary files for the duration of the connection.<br/> The default value is
+	    <code>tmp</code> for UNIX and z/OS hosts and <code>C:\windows\temp</code> for Windows hosts, except for the <strong>local</strong> protocol where
+	    the default is the value of the <code>java.io.tmpdir</code> system property.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="tmpFileCreationRetries"></a>tmpFileCreationRetries</th>
@@ -134,22 +143,50 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="connectionTimeoutMillis"></a>connectionTimeoutMillis</th>
-	<td>The number of milliseconds Overthere waits for a connection to a remote host to be established. The default value is <code>120000</code>, i.e. 2 minutes.</td>
+	<td>The number of milliseconds Overthere waits for a connection to a remote host to be established. The default value is <code>120000</code>, i.e.
+	    2 minutes.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
-	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a jumpstation.</td>
+	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See
+	    <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a
+	    jumpstation.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="localCopyCommand"></a>localCopyCommand</th>
-	<td>The command used when copying files for which both source and destination are on the same remote machine. Instead of streaming the files over the local host, the file is copied locally to the remote host. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is:
-		<ul>
-			<li><strong>UNIX:</strong> <code>cp -pRF {0} {1}</code></li>
-			<li><strong>Z/OS:</strong> <code>cp -pRF {0} {1}</code></li>
-			<li><strong>WINDOWS:</strong> <code>xcopy {0} {1} /S /E /Y /O /X /Q /I /K /R /H</code></li>
-		</ul>
-	</td>
+    <th align="left" valign="top"><a name="fileCopyCommandForUnix"></a>fileCopyCommandForUnix</th>
+    <td>The command to use when copying a file on a Unix host. The string <code>{0}</code> is replaced with the path of the source file, the string
+        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>copy {0} {1} /y</code>.</td>
 </tr>
+<tr>
+    <th align="left" valign="top"><a name="directoryCopyCommandForUnix"></a>directoryCopyCommandForUnix</th>
+    <td>The command to use when copying a directory on a Unix host. The string <code>{0}</code> is replaced with the path of the source directory, the string
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>txcopy {0} {1} /i /y /s /e /h /q</code>.</td>
+</tr>
+<tr>
+    <th align="left" valign="top"><a name="fileCopyCommandForWindows"></a>fileCopyCommandForWindows</th>
+    <td>The command to use when copying a file on a Windows host. The string <code>{0}</code> is replaced with the path of the source file, the string
+        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>cp -p {0} {1}</code>.</td>
+</tr>
+<tr>
+    <th align="left" valign="top"><a name="directoryCopyCommandForWindows"></a>directoryCopyCommandForWindows</th>
+    <td>The command to use when copying a directory on a Windows host. The string <code>{0}</code> is replaced with the path of the source directory, the string
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>tar cC {0} . | tar xmC {1} .</code>. If the
+        <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
+        command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
+</tr>
+<tr>
+    <th align="left" valign="top"><a name="fileCopyCommandForZos"></a>fileCopyCommandForZos</th>
+    <td>The command to use when copying a file on a z/OS host. The string <code>{0}</code> is replaced with the path of the source file, the string
+        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>cp -p {0} {1}</code>.</td>
+</tr>
+<tr>
+    <th align="left" valign="top"><a name="directoryCopyCommandForZos"></a>directoryCopyCommandForZos</th>
+    <td>The command to use when copying a directory on a z/OS host. The string <code>{0}</code> is replaced with the path of the source directory, the string
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>tar cC {0} . | tar xmC {1} .</code>. If the
+        <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
+        command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
+</tr>
+
 </table>
 
 Apart from these common connection options, some protocols define additional protocol-specific connection options. These are documented below, with the corresponding protocol.
@@ -240,7 +277,7 @@ This may be caused by the sudo command waiting for the user to enter his passwor
 
 1. Use the [`NOPASSWD`](http://www.gratisoft.us/sudo/sudoers.man.html#nopasswd_and_passwd) tag in your `/etc/sudoers` file.
 2. Use the [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo) connection type instead of the [__SUDO__](ssh_host_setup_sudo) connection type.
-3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshInteractiveSudoPasswordHandlingStream` category to `TRACE` and examine the output.
+3. If you are already using the __INTERACTIVE_SUDO__ connection type and you still get this error, please verify that you have correctly configured the [__sudoPasswordPromptRegex__](#ssh_sudoPasswordPromptRegex) option. If you have trouble determining the proper value for the __sudoPasswordPromptRegex__ connection option, set the log level for the `com.xebialabs.overthere.ssh.SshElevatedPasswordHandlingStream` category to `TRACE` and examine the output.
 
 <a name="ssh_connection_options"></a>
 ### SSH connection options
@@ -251,25 +288,53 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 <tr>
 	<th align="left" valign="top"><a name="ssh_connectionType"></a>connectionType</th>
 	<td>Specifies how the SSH protocol is used. One of the following values must be set:<ul>
-		<li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host or a z/OS host. Unless <code>sudo</code> or a similar command is needed to execute commands, this is the best and fastest option to choose for Unix and z/OS hosts.</li>
-		<li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> -  uses SFTP to transfer files, to a Windows host running OpenSSH on Cygwin.</li>
-		<li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
-		<li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host. Not needed unless your SSH server has disabled the SFTP subsystem.</li>
-		<li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>sudoUsername</strong> connection option is required and specifies the user that <em>does</em> have the necessary permissions. See below for a more detailed description.</li>
-	<li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar to the <strong>SUDO</strong> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to authenticate with a private key file.</li>
-	</ul></td>
+            <li><strong><a href="#ssh_host_setup_sftp">SFTP</a></strong> - uses SFTP to transfer files, to a Unix host or a z/OS host, and SSH to execute
+                commands. Requires the SFTP subsystem of the SSH server on the target host to be enabled.</li>
+            <li><strong>SCP</strong> - uses SCP to transfer files, to a Unix host, and SSH to execute commands. Can be faster than SFTP, especially over high
+                latency networks.</li>
+            <li><strong>SU</strong> - uses SCP to transfer files, to a Unix host. Uses the
+                <a href="http://en.wikipedia.org/wiki/Su"><code>su</code></a> command to execute commands. Select this connection type if the
+                <strong>username</strong> you are connecting with does not have the right permissions to manipulate the files that need to be manipulated
+                and/or to execute the commands that need to be executed. <br/>If this connection type is selected, the <strong>suUsername</strong> and
+                <strong>suPassword</strong> connection option are required and specify the username/password combination that <em>do</em> have the necessary
+                permissions.</li>
+            <li><strong><a href="#ssh_host_setup_sudo">SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the
+                <a href="http://en.wikipedia.org/wiki/Sudo"><code>sudo</code></a> command, configured with <strong>NOPASSWD</strong> for all commands, to
+                execute commands. Select this connection type if the <strong>username</strong> you are connecting with does not have the right permissions to
+                manipulate the files that need to be manipulated and/or to execute the commands that need to be executed. <br/>If this connection type is
+                selected, the <strong>sudoUsername</strong> connection option is required and specifies the user that <em>does</em> have the necessary
+                permissions. See below for a more detailed description.</li>
+            <li><strong><a href="#ssh_host_setup_interactive_sudo">INTERACTIVE_SUDO</a></strong> - uses SCP to transfer files, to a Unix host. Uses the
+                <code>sudo</code> command, <em>not</em> been configured with <strong>NOPASSWD</strong> for all commands, to execute commands. This is similar
+                to the <strong>SUDO</strong> connection type but also detects the password prompt that is shown by the <code>sudo</code> command when the login
+                user (<strong>username</strong>) tries to execute a commands as the privileged user (<strong>sudoUsername</strong>) when that command has not
+                been configured in <code>/etc/sudoers</code> with <strong>NOPASSWD</strong>. <br/><strong>N.B.:</strong> Because the password of the login user
+                is needed to answer this prompt, this connection type is incompatible with the <strong>privateKeyFile</strong> option that can be used to
+                authenticate with a private key file.</li>
+            <li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> - uses SFTP to transfer files, to a Windows host running OpenSSH on
+                Cygwin.</li>
+            <li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
+	    </ul>
+	    The connection property <code>port</code> specifies the port on which the SSH server listens. The default value for is <code>22</code> for all
+	    connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suUsername"></a>suUsername</th>
+	<td>The username of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suPassword"></a>suPassword</th>
+	<td>The password of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoUsername"></a>sudoUsername</th>
 	<td>The username of the user that can manipulate the files that need to be manipulated and that can execute the commands that need to be executed.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="ssh_sudoInteractivePassword"></a>sudoInteractivePassword</th>
-	<td>Specifies the password to use for keyboard-interactive password prompts resulting from executing commands having a <a href="#ssh_sudoCommandPrefix"><strong>sudoCommandPrefix</strong></a> that require a different password to that used to establish the connection. Example <code>su - privilegeduser -c 'start server1'</code>.  When empty, the default password used for making the connection is used.
-	<br/>
-	<strong>N.B.:</strong> This connection option is only applicable for the <strong>INTERACTIVE_SUDO</strong> connection type.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_privateKeyFile"></a>privateKeyFile</th>
@@ -287,7 +352,13 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_allocatePty"></a>allocatePty</th>
-	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option.<br/>If the <a href="#ssh_host_setup_interactive_sudo"><strong>INTERACTIVE_SUDO</strong></a> connection type is used, the default value is <code>vt220:80:24:0:0</code>. Otherwise the default value is unset.
+	<td>If set, the SSH server is requested to allocate a pty (<a href="http://en.wikipedia.org/wiki/Pseudo_terminal">pseudo terminal</a>) for the process with
+	    the setting specified by this option. The format is <code>TERM:COLS:ROWS:WIDTH:HEIGHT</code>, e.g. <code>xterm:80:24:0:0</code>. If set, this option
+	    overrides the <a href="#ssh_allocateDefaultPty"><strong>allocateDefaultPty</strong></a> option.<br/>
+	    If the <a href="#ssh_host_setup_interactive_sudo"><strong>INTERACTIVE_SUDO</strong></a> connection type is used, the default value is
+	    <code>vt220:80:24:0:0</code>. Otherwise the default is to not allocate a pty.<br/>
+	    All su and sudo implementations require a pty to be allocated for when displaying a password prompt, some sudo implementations even require it when
+	    not displaying a password prompt.Some SSH server implementations (notably OpenSSH on AIX 5.3) close the connection when an unknown one is allocated.
 	</td>
 </tr>
 <tr>
@@ -295,14 +366,62 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<td>The regular expression to look for in keyboard-interactive prompts before sending the password. The default value is <code>.*Password:[ ]?</code>. When the SSH server is configured to not allow <a href="http://www.ietf.org/rfc/rfc4252.txt">password authentication</a> but is configured to allow <a href="http://www.ietf.org/rfc/rfc4256.txt">keyboard-interactive authentication</a> using passwords, Overthere will compare the interactive-keyboard prompt against this regular expression and send the value of the <strong>password</strong> option when they match. The default value is <code>.*Password:[ ]?</code></td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="ssh_openShellBeforeExecute"></a>openShellBeforeExecute</th>
+	<td>If set to <code>true</code>, Overthere will open and close a shell immediately before executing a command on an ssh host. This is useful when the connecting user does not yet have a homedir, but this is created for him on the fly on the host. A setup commonly seen when user management is done through LDAP.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suCommandPrefix"></a>suCommandPrefix</th>
+	<td>The command to prefix to the command to be executed to execute it as <strong>suUsername</strong>. The string <code>{0}</code> is replaced with the
+	    value of <strong>suUsername</strong>. The default value is <code>su - {0} -c</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suOverrideUmask"></a>suOverrideUmask</th>
+	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with
+	    scp. The default value is <code>true</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suPasswordPromptRegex"></a>suPasswordPromptRegex</th>
+	<td>The regular expression to be used when looking for su password prompts. When the connection type is set to <strong>INTERACTIVE_su</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suPreserveAttributesOnCopyFromTempFile"></a>suPreserveAttributesOnCopyFromTempFile</th>
+	<td>If set to <code>true</code>, files are copied <strong>from</strong> the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suPreserveAttributesOnCopyToTempFile"></a>suPreserveAttributesOnCopyToTempFile</th>
+	<td>If set to <code>true</code>, files are copied <strong>to</strong> the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_suQuoteCommand"></a>suQuoteCommand</th>
+	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>suCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>su -u privilegeduser start server1</code> to <code>su privilegeduser -c 'start server1'</code>. The default value is <code>false</code>.
+	<br/>
+	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
+</tr>
+
+
+
+
+<tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"></a>sudoCommandPrefix</th>
-	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the value of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>. 
+	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the
+	    value of <strong>sudoUsername</strong>. The default value is <code>sudo -u {0}</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoOverrideUmask"></a>sudoOverrideUmask</th>
-	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with scp. The default value is <code>true</code>.
+	<td>If set to <code>true</code>, Overthere will explicitly change the permissions with <code>chmod -R go+rX</code> after uploading a file or directory with
+	    scp. The default value is <code>true</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
@@ -329,10 +448,6 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>sudoCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>sudo -u privilegeduser start server1</code> to <code>su privilegeduser -c 'start server1'</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="ssh_openShellBeforeExecute"></a>openShellBeforeExecute</th>
-	<td>If set to <code>true</code>, Overthere will open and close a shell immediately before executing a command on an ssh host. This is useful when the connecting user does not yet have a homedir, but this is created for him on the fly on the host. A setup commonly seen when user management is done through LDAP.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_deleteDirectoryCommand"></a>deleteDirectoryCommand</th>
@@ -755,9 +870,14 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 <tr>
 	<th align="left" valign="top"><a name="cifs_connectionType"></a>connectionType</th>
 	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:<ul>
-		<li><strong><a href="#cifs_host_setup_winrm">WINRM_INTERNAL</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS. A Java implementation of WinRM used.</li>
-		<li><strong><a href="#cifs_host_setup_winrm">WINRM_NATIVE</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and <code>5986</code> for HTTPS. The native Windows implementation of WinRM is used, i.e. the <code>winrs</code> command.</li>
-		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM_INTERNAL</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The
+		    <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and
+		    <code>5986</code> for HTTPS. A Java implementation of WinRM used.</li>
+		<li><strong><a href="#cifs_host_setup_winrm">WINRM_NATIVE</a></strong> - uses WinRM over HTTP(S) to execute remote commands.
+		    The <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP
+		    and <code>5986</code> for HTTPS. The native Windows implementation of WinRM is used, i.e. the <code>winrs</code> command.</li>
+		<li><strong><a href="#cifs_host_setup_telnet">TELNET</a></strong> - uses Telnet to execute remote commands. The <strong>port</strong>
+		    connection option specifies the Telnet port to connect to. The default value is <code>23</code>.</li>
 	</ul></td>
 </tr>
 <tr>
@@ -766,7 +886,9 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_pathShareMappings"></a>pathShareMappings</a></th>
-	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -> <code>WebSphere</code>. If a path is not explicitly mapped to a share, an administrative share will be used. The default value is to use no path/share mappings, i.e. to use only administrative shares.</td>
+	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -&gt;
+	<code>WebSphere</code>. If a path is not explicitly mapped to a share, an administrative share will be used. The default value is to use no
+	path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrmEnableHttps"></a>winrmEnableHttps</th>

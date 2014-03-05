@@ -39,13 +39,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_ALLOW_DELEGATE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_COMPRESSION;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_NOECHO;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_NOPROFILE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_PROXY_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_UNENCRYPTED;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_COMPRESSION_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOECHO_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOPROFILE_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_PROTOCOL_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPTED_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_ALLOW_DELEGATE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_COMPRESSION;
@@ -85,7 +85,7 @@ public class CifsWinrsConnection extends CifsConnection {
     private void connectToWinrsProxy(ConnectionOptions options) {
         logger.debug("Connecting to winrs proxy");
 
-        String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, DEFAULT_WINRS_PROXY_PROTOCOL);
+        String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, WINRS_PROXY_PROTOCOL_DEFAULT);
         ConnectionOptions winrsProxyConnectionOptions = options.get(WINRS_PROXY_CONNECTION_OPTIONS, new ConnectionOptions());
         winrsProxyConnection = Overthere.getConnection(winrsProxyProtocol, winrsProxyConnectionOptions);
     }
@@ -112,22 +112,22 @@ public class CifsWinrsConnection extends CifsConnection {
         if (workingDirectory != null) {
             winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
         }
-        if (options.getBoolean(WINRS_NOECHO, DEFAULT_WINRS_NOECHO)) {
+        if (options.getBoolean(WINRS_NOECHO, WINRS_NOECHO_DEFAULT)) {
             winrsCmd.addArgument("-noecho");
         }
-        if (options.getBoolean(WINRS_NOPROFILE, DEFAULT_WINRS_NOPROFILE)) {
+        if (options.getBoolean(WINRS_NOPROFILE, WINRS_NOPROFILE_DEFAULT)) {
             winrsCmd.addArgument("-noprofile");
         }
         if (options.getBoolean(WINRS_ALLOW_DELEGATE, DEFAULT_WINRS_ALLOW_DELEGATE)) {
             winrsCmd.addArgument("-allowdelegate");
         }
-        if (options.getBoolean(WINRS_COMPRESSION, DEFAULT_WINRS_COMPRESSION)) {
+        if (options.getBoolean(WINRS_COMPRESSION, WINRS_COMPRESSION_DEFAULT)) {
             winrsCmd.addArgument("-compression");
         }
-        if (options.getBoolean(WINRS_UNENCRYPTED, DEFAULT_WINRS_UNENCRYPTED)) {
+        if (options.getBoolean(WINRS_UNENCRYPTED, WINRS_UNENCRYPTED_DEFAULT)) {
             winrsCmd.addArgument("-unencrypted");
         }
-        if (options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS)) {
+        if (options.getBoolean(WINRM_ENABLE_HTTPS, WINRM_ENABLE_HTTPS_DEFAULT)) {
             winrsCmd.addArgument("-usessl");
         }
         winrsCmd.add(cmd.getArguments());

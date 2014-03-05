@@ -51,234 +51,209 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String CIFS_PROTOCOL = "cifs";
 
     /**
-     * Connection option (<code>CifsConnectionType</code>) that specifies the {@link CifsConnectionType CIFS connection
-     * type} to use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_connectionType">the online documentation</a>
      */
     public static final String CONNECTION_TYPE = "connectionType";
 
     /**
-     * Default port (<code>23</code>) used when the {@link #CONNECTION_TYPE CIFS connection type} is {#link
-     * {@link CifsConnectionType#TELNET TELNET}.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_connectionType">the online documentation</a>
      */
-    public static final int DEFAULT_TELNET_PORT = 23;
+    public static final int PORT_DEFAULT_TELNET = 23;
 
     /**
-     * Default port (<code>5985</code>) used when the {@link #WINRM_ENABLE_HTTPS} is set to <tt>false</tt>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_connectionType">the online documentation</a>
      */
-    public static final int DEFAULT_WINRM_HTTP_PORT = 5985;
+    public static final int PORT_DEFAULT_WINRM_HTTP = 5985;
 
     /**
-     * Default port (<code>5985</code>) used when the {@link #WINRM_ENABLE_HTTPS} is set to <tt>true</tt>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_connectionType">the online documentation</a>
      */
-    public static final int DEFAULT_WINRM_HTTPS_PORT = 5986;
+    public static final int PORT_DEFAULT_WINRM_HTTPS = 5986;
 
     /**
-     * Connection option (Integer) that specifies the CIFS port to connect to.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_cifsPort">the online documentation</a>
      */
     public static final String CIFS_PORT = "cifsPort";
 
     /**
-     * Default value (<code>445</code>) for the {@link ConnectionOptions connection option} used to specify the CIFS
-     * port to connect to.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_cifsPort">the online documentation</a>
      */
-    public static final int DEFAULT_CIFS_PORT = 445;
+    public static final int CIFS_PORT_DEFAULT = 445;
 
     /**
-     * Connection option (<code>Map&lt;String, String&gt;</code>) that specifies the path to share mappings to use for
-     * CIFS, specified as a <tt>Map&lt;String, String&gt;</tt>, e.g. "C:\IBM\WebSphere" -> "WebSphere". If a path is not
-     * explicitly mapped to a share the administrative share will be used..
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
      */
     public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
 
     /**
-     * Default value (empty map) for the {@link ConnectionOptions connection option} used to specify the path to share
-     * mappings to use for CIFS.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
      */
     public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
 
     /**
-     * Connection option (Boolean) that specifies whether to use HTTPS for WinRM.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmEnableHttps">the online documentation</a>
      */
     public static final String WINRM_ENABLE_HTTPS = "winrmEnableHttps";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to use HTTPS for WinRM.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmEnableHttps">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRM_ENABLE_HTTPS = false;
+    public static final boolean WINRM_ENABLE_HTTPS_DEFAULT = false;
 
     /**
-     * Connection option (String) that specifies the context (URI) used by WinRM.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmContext">the online documentation</a>
      */
     public static final String WINRM_CONTEXT = "winrmContext";
 
     /**
-     * Default value (<code>/wsman</code>) for the connection option used to specify the context (URI) used by WinRM.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmContext">the online documentation</a>
      */
-    public static final String DEFAULT_WINRM_CONTEXT = "/wsman";
+    public static final String WINRM_CONTEXT_DEFAULT = "/wsman";
 
     /**
-     * Connection option (Integer) that specifies the WinRM envelop size in bytes to use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmEnvelopSize">the online documentation</a>
      */
     public static final String WINRM_ENVELOP_SIZE = "winrmEnvelopSize";
 
     /**
-     * Default value (<code>153600</code>) for the connection option used to specify the WinRM envelop size in bytes to
-     * use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmEnvelopSize">the online documentation</a>
      */
-    public static final int DEFAULT_WINRM_ENVELOP_SIZE = 153600;
+    public static final int WINRM_ENVELOP_SIZE_DEFAULT = 153600;
 
     /**
-     * Connection option (<code>WinrmHttpsCertificateTrustStrategy</code>) that specifies the
-     * {@link WinrmHttpsCertificateTrustStrategy} for WinRM HTTPS connections.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsCertificateTrustStrategy">the online documentation</a>
      */
     public static final String WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = "winrmHttpsCertificateTrustStrategy";
 
     /**
-     * Default value ({@link WinrmHttpsCertificateTrustStrategy#STRICT}) of the {@link ConnectionOptions connection
-     * option} used to specify the {@link WinrmHttpsCertificateTrustStrategy} for WinRM HTTPS connections.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsCertificateTrustStrategy">the online documentation</a>
      */
-    public static final WinrmHttpsCertificateTrustStrategy DEFAULT_WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY = STRICT;
+    public static final WinrmHttpsCertificateTrustStrategy WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY_DEFAULT = STRICT;
 
     /**
-     * Connection option (<code>WinrmHttpsHostnameVerificationStrategy</code>) that specifies the
-     * {@link WinrmHttpsHostnameVerificationStrategy} for WinRM HTTPS connections.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsHostnameVerificationStrategy">the online documentation</a>
      */
     public static final String WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = "winrmHttpsHostnameVerificationStrategy";
 
     /**
-     * Default value ({@link WinrmHttpsHostnameVerificationStrategy#BROWSER_COMPATIBLE}) of the
-     * {@link ConnectionOptions connection option} used to specify the {@link WinrmHttpsHostnameVerificationStrategy}
-     * for WinRM HTTPS connections.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsHostnameVerificationStrategy">the online documentation</a>
      */
-    public static final WinrmHttpsHostnameVerificationStrategy DEFAULT_WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY = BROWSER_COMPATIBLE;
+    public static final WinrmHttpsHostnameVerificationStrategy WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY_DEFAULT = BROWSER_COMPATIBLE;
 
     /**
-     * Connection option (Boolean) that specifies whether to enable debug output for Kerberos authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosDebug">the online documentation</a>
      */
     public static final String WINRM_KERBEROS_DEBUG = "winrmKerberosDebug";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to enable debug output for
-     * Kerberos authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosDebug">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRM_KERBEROS_DEBUG = false;
+    public static final boolean WINRM_KERBEROS_DEBUG_DEFAULT = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to use the <code>HTTP</code> protocol in the SPN for Kerberos
-     * authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmLocale">the online documentation</a>
+     */
+    public static final String WINRM_LOCALE = "";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmLocale">the online documentation</a>
+     */
+    public static final String WINRM_LOCALE_DEFAULT = "en-US";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosUseHttpSpn">the online documentation</a>
      */
     public static final String WINRM_KERBEROS_USE_HTTP_SPN = "winrmKerberosUseHttpSpn";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to use the <code>HTTP</code>
-     * protocol in the SPN for Kerberos authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosUseHttpSpn">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRM_KERBEROS_USE_HTTP_SPN = false;
+    public static final boolean WINRM_KERBEROS_USE_HTTP_SPN_DEFAULT = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to add the port to the SPN for Kerberos authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosAddPortToSpn">the online documentation</a>
      */
     public static final String WINRM_KERBEROS_ADD_PORT_TO_SPN = "winrmKerberosAddPortToSpn";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to add the port to the SPN
-     * for Kerberos authentication.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosAddPortToSpn">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRM_KERBEROS_ADD_PORT_TO_SPN = false;
+    public static final boolean WINRM_KERBEROS_ADD_PORT_TO_SPN_DEFAULT = false;
 
     /**
-     * Connection option (String) that specifies the WinRM locale to use.
-     */
-    public static final String WINRM_LOCALE = "winrmLocale";
-
-    /**
-     * Default value (<code>en-US</code>) for the connection option used to specify the WinRM locale to use.
-     */
-    public static final String DEFAULT_WINRM_LOCALE = "en-US";
-
-    /**
-     * Connection option (String) that specifies the WinRM timeout in <a
-     * href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmTimeout">the online documentation</a>
      */
     public static final String WINRM_TIMEMOUT = "winrmTimeout";
 
     /**
-     * Default value (<code>PT60.000S</code>) for the connection option used to specify the WinRM timeout.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmTimeout">the online documentation</a>
      */
     public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
     /**
-     * Connection option (Boolean) that specifies whether to allow the user's credentials to be passed to the remote
-     * host. Corresponds to the <code>winrs</code> command option <code>-noprofile</code>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsAllowDelegate">the online documentation</a>
      */
     public static final String WINRS_ALLOW_DELEGATE = "winrsAllowDelegate";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to allow the user's
-     * credentials to be passed to the remote machine
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsAllowDelegate">the online documentation</a>
      */
     public static final boolean DEFAULT_WINRS_ALLOW_DELEGATE = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to enable compression. Corresponds to the <code>winrs</code>
-     * command option <code>-compression</code>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsCompression">the online documentation</a>
      */
     public static final String WINRS_COMPRESSION = "winrsCompression";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to enable compression.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsCompression">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRS_COMPRESSION = false;
+    public static final boolean WINRS_COMPRESSION_DEFAULT = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to disable echo. Corresponds to the <code>winrs</code> command
-     * option <code>-noecho</code>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsNoecho">the online documentation</a>
      */
     public static final String WINRS_NOECHO = "winrsNoecho";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to disable echo.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsNoecho">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRS_NOECHO = false;
+    public static final boolean WINRS_NOECHO_DEFAULT = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to disable loading the user profile before executing the
-     * command. Corresponds to the <code>winrs</code> command option <code>-noprofile</code>.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsNoprofile">the online documentation</a>
      */
     public static final String WINRS_NOPROFILE = "winrsNoprofile";
 
     /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to disable loading the user
-     * profile before executing the command.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsNoprofile">the online documentation</a>
      */
-    public static final boolean DEFAULT_WINRS_NOPROFILE = false;
+    public static final boolean WINRS_NOPROFILE_DEFAULT = false;
 
     /**
-     * Connection option (Boolean) that specifies whether to disable encryption. Corresponds to the <code>winrs</code>
-     * command option <code>-unencrypted</code>.
-     */
-    public static final String WINRS_UNENCRYPTED = "winrsUnencrypted";
-
-    /**
-     * Default value (<code>false</code>) for the connection option used to specify whether to disable encryption.
-     */
-    public static final boolean DEFAULT_WINRS_UNENCRYPTED = false;
-
-    /**
-     * Connection option (String) that specifies the protocol for the "winrs proxy".
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsProxyProtocol">the online documentation</a>
      */
     public static final String WINRS_PROXY_PROTOCOL = "winrsProxyProtocol";
 
     /**
-     * Default value (<code>local</code>) for the connection option that specifies the protocol for the "winrs proxy".
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsProxyProtocol">the online documentation</a>
      */
-    public static final String DEFAULT_WINRS_PROXY_PROTOCOL = LOCAL_PROTOCOL;
+    public static final String WINRS_PROXY_PROTOCOL_DEFAULT = LOCAL_PROTOCOL;
 
     /**
-     * Connection option (<code>ConnectionOptions</code>) that specifies the {@link ConnectionOptions connection
-     * options} to be used for the "winrs proxy".
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsProxyConnectionOptions">the online documentation</a>
      */
     public static final String WINRS_PROXY_CONNECTION_OPTIONS = "winrsProxyConnectionOptions";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsUnencrypted">the online documentation</a>
+     */
+    public static final String WINRS_UNENCRYPTED = "winrsUnencrypted";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsUnencrypted">the online documentation</a>
+     */
+    public static final boolean WINRS_UNENCRYPTED_DEFAULT = false;
 
     private OverthereConnection connection;
 

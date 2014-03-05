@@ -42,372 +42,426 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String SSH_PROTOCOL = "ssh";
 
     /**
-     * Connection option (Boolean) that specifies whether a default pty ( <code>dummy:80:24:0:0</code>) should be
-     * allocated when executing a command. All sudo implementations require it for interactive sudo, some even require
-     * it for normal sudo. Some SSH server implementations (notably OpenSSH on AIX 5.3) crash when it is allocated.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_connectionType">the online documentation</a>
+     */
+    public static final int PORT_DEFAULT_SSH = 22;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_allocateDefaultPty">the online documentation</a>
      */
     public static final String ALLOCATE_DEFAULT_PTY = "allocateDefaultPty";
 
     /**
-     * Default value (<code>false</code>) for the connection option that specifies whether a default pty should be
-     * allocated when executing a command.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_allocateDefaultPty">the online documentation</a>
      */
     public static final boolean ALLOCATE_DEFAULT_PTY_DEFAULT = false;
 
     /**
-     * Connection option (String) that specifies a specific pty that should be allocated when executing a command. The
-     * format is TERM:COLS:ROWS:WIDTH:HEIGTH e.g. <code>xterm:80:24:0:0</code>. If <code>null</code> or an empty string
-     * is specified, no pty is allocated. Overrides the {@link #ALLOCATE_DEFAULT_PTY} option.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_allocatePty">the online documentation</a>
      */
     public static final String ALLOCATE_PTY = "allocatePty";
 
     /**
-     * Connection option (<code>SshConnectionType</code>) that specifies the {@link SshConnectionType SSH connection
-     * type} to use.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_connectionType">the online documentation</a>
      */
     public static final String CONNECTION_TYPE = "connectionType";
 
     /**
-     * Default value (<code>22</code>) for the connection option that specifies the port to connect to.
-     */
-    public static final int SSH_PORT_DEFAULT = 22;
-
-    /**
-     * Connection option (String) that specifies which regular expression to look for in keyboard-interactive prompts
-     * before sending the password.
-     */
-    public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
-
-    /**
-     * Default value (<code>.*Password:[ ]?</code>) for the connection option that specifies which regular expression to
-     * look for in keyboard-interactive prompts before sending the password.
-     */
-    public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
-
-    /**
-     * Connection option (String) that specifies the passphrase of the private key.
-     */
-    public static final String PASSPHRASE = "passphrase";
-
-    /**
-     * Connection option (String) that specifies the private key file to use. <b>N.B.:</b> Private keys cannot be used
-     * when the SSH connection type is {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} because the password
-     * is needed for the password prompts.
-     */
-    public static final String PRIVATE_KEY_FILE = "privateKeyFile";
-
-    /**
-     * Connection option (Integer) that specifies from what port onwards to locate an empty port for a local port
-     * forward in an {@link SshTunnelConnection tunnel}
-     */
-    public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
-
-    /**
-     * Default value (<code>1024</code>) for the connection option that specifies from what port onwards to locate an
-     * empty port for a local port forward in an {@link SshTunnelConnection tunnel}
-     */
-    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1024;
-
-    /**
-     * Connection option (String) that specifies the sudo command to prefix. The placeholder {0} is replaced with the
-     * value of {@link #SUDO_USERNAME}.
-     */
-    public static final String SUDO_COMMAND_PREFIX = "sudoCommandPrefix";
-
-    /**
-     * Default value (<code>sudo -u {0}</code>) for the connection option that specifies the sudo command to prefix.
-     */
-    public static final String SUDO_COMMAND_PREFIX_DEFAULT = "sudo -u {0}";
-
-    /**
-     * Connection option (String) that specifies the username to sudo to for {@link SshConnectionType#SUDO SUDO} and
-     * {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH connections.
-     */
-    public static final String SUDO_USERNAME = "sudoUsername";
-
-    /**
-     * Connection option (String) that specifies an alternate password to use for the password prompt for
-     * {@link SshConnectionType#INTERACTIVE_SUDO INTERACTIVE_SUDO} SSH connections. When empty, the default password used for making the connection is used.
-     */
-    public static final String SUDO_INTERACTIVE_PASSWORD = "sudoInteractivePassword";
-
-    /**
-     * Connection option (Boolean) that specifies whether or not to explicitly change the permissions with chmod -R
-     * go+rX after uploading a file or directory with scp. Also see {@link #SUDO_OVERRIDE_UMASK_COMMAND}.
-     */
-    public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
-
-    /**
-     * Default value (<code>true</code>) for the connection option that specifies whether or not to explicitly change
-     * the permissions with go+rX after uploading a file with scp.
-     */
-    public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = true;
-
-    /**
-     * Connection option (String) that specifies the regular expression to use when looking for in the output stream in
-     * interactive sudo before sending the password.
-     */
-    public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
-
-    /**
-     * Default value (<code>.*[Pp]assword.*:</code>) for the connection option that specifies which regular expression
-     * to look for in interactive sudo before sending the password.
-     */
-    public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
-
-    /**
-     * Connection option (Boolean) that specifies whether files are copied <em>from</em> the connection temporary
-     * directory using the <code>-p</code> flag to the <code>cp</code> command.
-     */
-    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE = "sudoPreserveAttributesOnCopyFromTempFile";
-
-    /**
-     * Default value (<code>true</code>) for the connection option that specifies whether files are copied <em>from</em>
-     * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
-     */
-    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = false;
-
-    /**
-     * Connection option (Boolean) that specifies whether files are copied <em>to</em> the connection temporary
-     * directory using the <code>-p</code> flag to the <code>cp</code> command.
-     */
-    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE = "sudoPreserveAttributesOnCopyToTempFile";
-
-    /**
-     * Default value (<code>true</code>) for the connection option that specifies whether files are copied <em>to</em>
-     * the connection temporary directory using the <code>-p</code> flag to the <code>cp</code> command.
-     */
-    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = false;
-
-    /**
-     * Connection option (Boolean) that specifies whether or not to quote the original command when it is prefixed with
-     * {@link #SUDO_COMMAND_PREFIX}.
-     */
-    public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
-
-    /**
-     * Default value (<code>false</code>) for the connection option that specifies whether or not to quote the original
-     * command.
-     */
-    public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
-
-    /**
-     * Connection option (Boolean) that specifies whether or not to open a shell directly before executing a remote
-     * command. This may be necessary in case a user does not yet have a home directory on a machine, and this is
-     * created for him when he opens a shell.
-     */
-    public static final String OPEN_SHELL_BEFORE_EXECUTE = "openShellBeforeExecute";
-
-    /**
-     * Default value (<code>false</code>) for the connection option that specifies whether or not to open a shell
-     * directory before executing a command.
-     */
-    public static final boolean OPEN_SHELL_BEFORE_EXECUTE_DEFAULT = false;
-
-    /**
-     * Connection option (String) that specifies the command used to delete a directory when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the directory to delete.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteDirectoryCommand">the online documentation</a>
      */
     public static final String DELETE_DIRECTORY_COMMAND = "deleteDirectoryCommand";
 
     /**
-     * Default value (<code>rmdir {0}</code>) for the connection option that specifies the command used to delete a
-     * directory using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteDirectoryCommand">the online documentation</a>
      */
     public static final String DELETE_DIRECTORY_COMMAND_DEFAULT = "rmdir {0}";
 
     /**
-     * Connection option (String) that specifies the command used to delete a file when using an SSH/SCP connection. The
-     * placeholder <code>{0}</code> is replaced with the file to delete.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteFileCommand">the online documentation</a>
      */
     public static final String DELETE_FILE_COMMAND = "deleteFileCommand";
 
     /**
-     * Default value (<code>rm -f {0}</code>) for the connection option that specifies the command used to delete a file
-     * using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteFileCommand">the online documentation</a>
      */
     public static final String DELETE_FILE_COMMAND_DEFAULT = "rm -f {0}";
 
     /**
-     * Connection option (String) that specifies the command used to delete recursively when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the directory/file to delete recursively.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteRecursivelyCommand">the online documentation</a>
      */
     public static final String DELETE_RECURSIVELY_COMMAND = "deleteRecursivelyCommand";
 
     /**
-     * Default value (<code>rm -rf {0}</code>) for the connection option that specifies the command used to delete
-     * recursively using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_deleteRecursivelyCommand">the online documentation</a>
      */
     public static final String DELETE_RECURSIVELY_COMMAND_DEFAULT = "rm -rf {0}";
 
     /**
-     * Connection option (String) that specifies the command used to get file information when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the file/directory to stat.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_getFileInfoCommand">the online documentation</a>
      */
     public static final String GET_FILE_INFO_COMMAND = "getFileInfoCommand";
 
     /**
-     * Default value (<code>ls -ld {0}</code>) for the connection option that specifies the command used to get file
-     * information using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_getFileInfoCommand">the online documentation</a>
      */
     public static final String GET_FILE_INFO_COMMAND_DEFAULT = "ls -ld {0}";
 
     /**
-     * Connection option (String) that specifies the command used to list files in a directory when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the directory to list.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_interactiveKeyboardAuthRegex">the online documentation</a>
+     */
+    public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_interactiveKeyboardAuthRegex">the online documentation</a>
+     */
+    public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT = ".*Password:[ ]?";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_listFilesCommand">the online documentation</a>
      */
     public static final String LIST_FILES_COMMAND = "listFilesCommand";
 
     /**
-     * Default value (<code>ls -a1 {0}</code>) for the connection option that specifies the command used to list files
-     * in a directory using an SSH/SCP connection. <em>NOTE:</em>: this *is* meant to be 'el es minus one'. Each file
-     * should go on a separate line, even if we create a pseudo-tty. Long format is NOT what we want here.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_listFilesCommand">the online documentation</a>
+     * <em>NOTE:</em>: this *is* meant to be 'el es minus one'. Each file should go on a separate line, even if we create a pseudo-tty. Long format
+     * is NOT what we want here.
      */
     public static final String LIST_FILES_COMMAND_DEFAULT = "ls -a1 {0}";
 
     /**
-     * Connection option (String) that specifies the command used to create a directory when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the directory to create.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_mkdirCommand">the online documentation</a>
      */
     public static final String MKDIR_COMMAND = "mkdirCommand";
 
     /**
-     * Default value (<code>mkdir {0}</code>) for the connection option that specifies the command used to create a
-     * directory using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_mkdirCommand">the online documentation</a>
      */
     public static final String MKDIR_COMMAND_DEFAULT = "mkdir {0}";
 
     /**
-     * Connection option (String) that specifies the command used to create a directory tree when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the directory to create.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_mkdirsCommand">the online documentation</a>
      */
     public static final String MKDIRS_COMMAND = "mkdirsCommand";
 
     /**
-     * Default value (<code>mkdir -p {0}</code>) for the connection option that specifies the command used to create a
-     * directory tree using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_mkdirsCommand">the online documentation</a>
      */
     public static final String MKDIRS_COMMAND_DEFAULT = "mkdir -p {0}";
 
     /**
-     * Connection option (String) that specifies the command used to rename a file/directory when using an SSH/SCP
-     * connection. The placeholder <code>{0}</code> is replaced with the file/directory to rename, and the placeholder
-     * <code>{1}</code> with the destination name.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_openShellBeforeExecute">the online documentation</a>
+     */
+    public static final String OPEN_SHELL_BEFORE_EXECUTE = "openShellBeforeExecute";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_openShellBeforeExecute">the online documentation</a>
+     */
+    public static final boolean OPEN_SHELL_BEFORE_EXECUTE_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
+     */
+    public static final String PASSPHRASE = "passphrase";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
+     */
+    public static final String PRIVATE_KEY_FILE = "privateKeyFile";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_portAllocationRangeStart">the online documentation</a>
+     */
+    public static final String PORT_ALLOCATION_RANGE_START = "portAllocationRangeStart";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_portAllocationRangeStart">the online documentation</a>
+     */
+    public static final int PORT_ALLOCATION_RANGE_START_DEFAULT = 1024;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_renameToCommand">the online documentation</a>
      */
     public static final String RENAME_TO_COMMAND = "renameToCommand";
 
     /**
-     * Default value (<code>mv {0} {1}</code>) for the connection option that specifies the command used to rename a
-     * file/directory using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_renameToCommand">the online documentation</a>
      */
     public static final String RENAME_TO_COMMAND_DEFAULT = "mv {0} {1}";
 
     /**
-     * Connection option (String) that specifies the command used to set the executable bit of a file/directory when
-     * using an SSH/SCP connection. The placeholder <code>{0}</code> is replaced with the file/directory to make
-     * executable.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_setExecutableCommand">the online documentation</a>
      */
     public static final String SET_EXECUTABLE_COMMAND = "setExecutableCommand";
 
     /**
-     * Default value (<code>chmod a+x {0}</code>) for the connection option that specifies the command used to make a
-     * file/directory executable using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_setExecutableCommand">the online documentation</a>
      */
     public static final String SET_EXECUTABLE_COMMAND_DEFAULT = "chmod a+x {0}";
 
     /**
-     * Connection option (String) that specifies the command used to unset the executable bit of a file/directory when
-     * using an SSH/SCP connection. The placeholder <code>{0}</code> is replaced with the file/directory to make not
-     * executable.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_setNotExecutableCommand">the online documentation</a>
      */
     public static final String SET_NOT_EXECUTABLE_COMMAND = "setNotExecutableCommand";
 
     /**
-     * Default value (<code>chmod a-x {0}</code>) for the connection option that specifies the command used to make a
-     * file/directory not executable using an SSH/SCP connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_setNotExecutableCommand">the online documentation</a>
      */
     public static final String SET_NOT_EXECUTABLE_COMMAND_DEFAULT = "chmod a-x {0}";
 
     /**
-     * Connection option (String) that specifies the command used to create a temporary directory when using an SSH/SUDO
-     * connection. The placeholder <code>{0}</code> is replaced with the directory to create. <em>Note:</em> For SUDO
-     * access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail. 1777 is
-     * world writable with the sticky bit set.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCommandPrefix">the online documentation</a>
      */
-    public static final String SUDO_TEMP_MKDIR_COMMAND = "sudoTempMkdirCommand";
+    public static final String SU_COMMAND_PREFIX = "suCommandPrefix";
 
     /**
-     * Default value (<code>mkdir -m 1777 {0}</code>) for the connection option that specifies the command used to
-     * create a temporary directory using an SSH/SUDO connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCommandPrefix">the online documentation</a>
      */
-    public static final String SUDO_TEMP_MKDIR_COMMAND_DEFAULT = "mkdir -m 1777 {0}";
+    public static final String SU_COMMAND_PREFIX_DEFAULT = "su - {0} -c";
 
     /**
-     * Connection option (String) that specifies the command used to create a temporary directory tree when using an
-     * SSH/SUDO connection. The placeholder <code>{0}</code> is replaced with the directory to create. <em>Note:</em>
-     * For SUDO access, temporary dirs also need to be writable to the connecting user, otherwise an SCP copy will fail.
-     * 1777 is world writable with the sticky bit set.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyFromTempFileCommand">the online documentation</a>
      */
-    public static final String SUDO_TEMP_MKDIRS_COMMAND = "sudoTempMkdirsCommand";
+    public static final String SU_COPY_FROM_TEMP_FILE_COMMAND = "suCopyFromTempFileCommand";
 
     /**
-     * Default value (<code>mkdir -p -m 1777 {0}</code>) for the connection option that specifies the command used to
-     * create a temporary directory using an SSH/SUDO connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyFromTempFileCommand">the online documentation</a>
      */
-    public static final String SUDO_TEMP_MKDIRS_COMMAND_DEFAULT = "mkdir -p -m 1777 {0}";
+    public static final String SU_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
     /**
-     * Connection option (String) that specifies the command used to copy files from the connection temporary directory
-     * when using an SSH/SUDO connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyFromTempFileCommand">the online documentation</a>
+     */
+    public static final String SU_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyToTempFileCommand">the online documentation</a>
+     */
+    public static final String SU_COPY_TO_TEMP_FILE_COMMAND = "suCopyToTempFileCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyToTempFileCommand">the online documentation</a>
+     */
+    public static final String SU_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suCopyToTempFileCommand">the online documentation</a>
+     */
+    public static final String SU_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suOverrideUmask">the online documentation</a>
+     */
+    public static final String SU_OVERRIDE_UMASK = "suOverrideUmask";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suOverrideUmask">the online documentation</a>
+     */
+    public static final boolean SU_OVERRIDE_UMASK_DEFAULT = true;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suOverrideUmaskCommand">the online documentation</a>
+     */
+    public static final String SU_OVERRIDE_UMASK_COMMAND = "suOverrideUmaskCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suOverrideUmaskCommand">the online documentation</a>
+     */
+    public static final String SU_OVERRIDE_UMASK_COMMAND_DEFAULT = "chmod -R go+rX {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPassword">the online documentation</a>
+     */
+    public static final String SU_PASSWORD = "suPassword";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPasswordPromptRegex">the online documentation</a>
+     */
+    public static final String SU_PASSWORD_PROMPT_REGEX = "suPasswordPromptRegex";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPasswordPromptRegex">the online documentation</a>
+     */
+    public static final String SU_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPreserveAttributesOnCopyFromTempFile">the online documentation</a>
+     */
+    public static final String SU_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE = "suPreserveAttributesOnCopyFromTempFile";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPreserveAttributesOnCopyFromTempFile">the online documentation</a>
+     */
+    public static final boolean SU_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPreserveAttributesOnCopyToTempFile">the online documentation</a>
+     */
+    public static final String SU_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE = "suPreserveAttributesOnCopyToTempFile";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPreserveAttributesOnCopyToTempFile">the online documentation</a>
+     */
+    public static final boolean SU_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suQuoteCommand">the online documentation</a>
+     */
+    public static final String SU_QUOTE_COMMAND = "suQuoteCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suQuoteCommand">the online documentation</a>
+     */
+    public static final boolean SU_QUOTE_COMMAND_DEFAULT = true;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suTempMkdirCommand">the online documentation</a>
+     */
+    public static final String SU_TEMP_MKDIR_COMMAND = "suTempMkdirCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suTempMkdirCommand">the online documentation</a>
+     */
+    public static final String SU_TEMP_MKDIR_COMMAND_DEFAULT = "mkdir -m 1777 {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suTempMkdirsCommand">the online documentation</a>
+     */
+    public static final String SU_TEMP_MKDIRS_COMMAND = "suTempMkdirsCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suTempMkdirCommand">the online documentation</a>
+     */
+    public static final String SU_TEMP_MKDIRS_COMMAND_DEFAULT = "mkdir -p -m 1777 {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suUsername">the online documentation</a>
+     */
+    public static final String SU_USERNAME = "suUsername";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCommandPrefix">the online documentation</a>
+     */
+    public static final String SUDO_COMMAND_PREFIX = "sudoCommandPrefix";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCommandPrefix">the online documentation</a>
+     */
+    public static final String SUDO_COMMAND_PREFIX_DEFAULT = "sudo -u {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyFromTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND = "sudoCopyFromTempFileCommand";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) for the connection option that specifies the command used to copy
-     * files from the connection temporary directory while preserving the file attributes using an SSH/SUDO connection.
-     * See also {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyFromTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
     /**
-     * Default value (<code>cp -r {0} {1}</code>) for the connection option that specifies the command used to copy
-     * files from the connection temporary directory while not preserving the file attributes using an SSH/SUDO
-     * connection. See also {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE}.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyFromTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_FROM_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
 
     /**
-     * Connection option (String) that specifies the command used to override the umask after copying a file or
-     * directory when using an SSH/SUDO connection. The placeholder <code>{0}</code> is replaced with the copied
-     * file/directory.
-     */
-    public static final String SUDO_OVERRIDE_UMASK_COMMAND = "sudoOverrideUmaskCommand";
-
-    /**
-     * Default value (<code>chmod -R go+rX {0}</code>) for the connection option that specifies the command used to
-     * override the umask after copying a file or directory when using an SSH/SUDO connection.
-     */
-    public static final String SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT = "chmod -R go+rX {0}";
-
-    /**
-     * Connection option (String) that specifies the command used to copy files to the connection temporary directory
-     * when using an SSH/SUDO connection.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyToTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND = "sudoCopyToTempFileCommand";
 
     /**
-     * Default value (<code>cp -pr {0} {1}</code>) for the connection option that specifies the command used to copy
-     * files to the connection temporary directory while preserving the file attributes using an SSH/SUDO connection.
-     * See {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyToTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_PRESERVE_ATTRIBUTES = "cp -pr {0} {1}";
 
     /**
-     * Default value (<code>cp -r {0} {1}</code>) for the connection option that specifies the command used to copy
-     * files to the connection temporary directory while not preserving the file attributes using an SSH/SUDO
-     * connection. See {@link #SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE}.
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoCopyToTempFileCommand">the online documentation</a>
      */
     public static final String SUDO_COPY_TO_TEMP_FILE_COMMAND_DEFAULT_NO_PRESERVE_ATTRIBUTES = "cp -r {0} {1}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoOverrideUmask">the online documentation</a>
+     */
+    public static final String SUDO_OVERRIDE_UMASK = "sudoOverrideUmask";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoOverrideUmask">the online documentation</a>
+     */
+    public static final boolean SUDO_OVERRIDE_UMASK_DEFAULT = true;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoOverrideUmaskCommand">the online documentation</a>
+     */
+    public static final String SUDO_OVERRIDE_UMASK_COMMAND = "sudoOverrideUmaskCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoOverrideUmaskCommand">the online documentation</a>
+     */
+    public static final String SUDO_OVERRIDE_UMASK_COMMAND_DEFAULT = "chmod -R go+rX {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPasswordPromptRegex">the online documentation</a>
+     */
+    public static final String SUDO_PASSWORD_PROMPT_REGEX = "sudoPasswordPromptRegex";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPasswordPromptRegex">the online documentation</a>
+     */
+    public static final String SUDO_PASSWORD_PROMPT_REGEX_DEFAULT = ".*[Pp]assword.*:";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPreserveAttributesOnCopyFromTempFile">the online documentation</a>
+     */
+    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE = "sudoPreserveAttributesOnCopyFromTempFile";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPreserveAttributesOnCopyFromTempFile">the online documentation</a>
+     */
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_FROM_TEMP_FILE_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPreserveAttributesOnCopyToTempFile">the online documentation</a>
+     */
+    public static final String SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE = "sudoPreserveAttributesOnCopyToTempFile";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoPreserveAttributesOnCopyToTempFile">the online documentation</a>
+     */
+    public static final boolean SUDO_PRESERVE_ATTRIBUTES_ON_COPY_TO_TEMP_FILE_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoQuoteCommand">the online documentation</a>
+     */
+    public static final String SUDO_QUOTE_COMMAND = "sudoQuoteCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoQuoteCommand">the online documentation</a>
+     */
+    public static final boolean SUDO_QUOTE_COMMAND_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoTempMkdirCommand">the online documentation</a>
+     */
+    public static final String SUDO_TEMP_MKDIR_COMMAND = "sudoTempMkdirCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoTempMkdirCommand">the online documentation</a>
+     */
+    public static final String SUDO_TEMP_MKDIR_COMMAND_DEFAULT = "mkdir -m 1777 {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoTempMkdirsCommand">the online documentation</a>
+     */
+    public static final String SUDO_TEMP_MKDIRS_COMMAND = "sudoTempMkdirsCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoTempMkdirsCommand">the online documentation</a>
+     */
+    public static final String SUDO_TEMP_MKDIRS_COMMAND_DEFAULT = "mkdir -p -m 1777 {0}";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_sudoUsername">the online documentation</a>
+     */
+    public static final String SUDO_USERNAME = "sudoUsername";
 
     protected SshConnection connection;
 
@@ -429,6 +483,9 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
                 break;
             case SCP:
                 connection = new SshScpConnection(type, options, mapper);
+                break;
+            case SU:
+                connection = new SshSuConnection(type, options, mapper);
                 break;
             case SUDO:
                 connection = new SshSudoConnection(type, options, mapper);

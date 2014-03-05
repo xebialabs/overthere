@@ -91,7 +91,6 @@ public class SshSudoConnectionItest extends OverthereConnectionItestBase {
         // AAAAB3NzaC1yc2EAAAADAQABAAABAQDrkl/X1IK/ytn+QvJ87D46Me3l9CfEdVBHYHpRbQHSrpGFJKBgDaA5QQ8mmHv47nrTmOOsyVuVJyxc7tWcUm0FMxEWhCMGU4/xUW4SDQyho3lE9BRlVigUo/1XrJwQqmZ95KZWGkSKlR2Av59SNvWezD4KnHxY0td/cK+quTh3XFnR/SK7cPj8H4ubJm5Wq+WZF9UM57Q6u+j+F+SIz6EyoqcV8qdSV29Rvp96rgevGl5igSaw76iqQ19Wn9F9eK5LMEdCXqxhjBYNIeCzIij/ujYBNwPDcXMSvFHekyMfSuqHf0BMm0VPO9X3RU1NF37XvbuHNLohAt/4z9jo6/Nr
         // overthere@overthere
         options.set(SUDO_USERNAME, "overthere");
-        options.set(ALLOCATE_DEFAULT_PTY, true);
         return options;
     }
 

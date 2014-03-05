@@ -43,11 +43,11 @@ import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_TELNET_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_ENABLE_HTTPS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTPS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_TELNET;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
@@ -99,7 +99,7 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
         this.password = options.get(PASSWORD);
-        int unmappedCifsPort = options.getInteger(CIFS_PORT, DEFAULT_CIFS_PORT);
+        int unmappedCifsPort = options.getInteger(CIFS_PORT, CIFS_PORT_DEFAULT);
         InetSocketAddress addressCifsPort = mapper.map(createUnresolved(unmappedAddress, unmappedCifsPort));
         this.cifsPort = addressCifsPort.getPort();
         this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
@@ -109,13 +109,13 @@ public abstract class CifsConnection extends BaseOverthereConnection {
     private int getDefaultPort(ConnectionOptions options) {
         switch (cifsConnectionType) {
             case TELNET:
-                return DEFAULT_TELNET_PORT;
+                return PORT_DEFAULT_TELNET;
             case WINRM_INTERNAL:
             case WINRM_NATIVE:
-                if (!options.getBoolean(WINRM_ENABLE_HTTPS, DEFAULT_WINRM_ENABLE_HTTPS)) {
-                    return DEFAULT_WINRM_HTTP_PORT;
+                if (!options.getBoolean(WINRM_ENABLE_HTTPS, WINRM_ENABLE_HTTPS_DEFAULT)) {
+                    return PORT_DEFAULT_WINRM_HTTP;
                 } else {
-                    return DEFAULT_WINRM_HTTPS_PORT;
+                    return PORT_DEFAULT_WINRM_HTTPS;
                 }
             default:
                 throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);

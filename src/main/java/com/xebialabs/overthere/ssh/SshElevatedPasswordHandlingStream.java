@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Detects password prompts in the output stream and sends the password in response.
  */
-class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
+class SshElevatedPasswordHandlingStream extends FilterInputStream {
     private final OutputStream remoteStdin;
     private final byte[] passwordBytes;
     private final String passwordRegex;
@@ -43,7 +43,7 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
 
     private boolean sentPassword = false;
 
-    protected SshInteractiveSudoPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password, String passwordPromptRegex) {
+    protected SshElevatedPasswordHandlingStream(InputStream remoteStdout, OutputStream remoteStdin, String password, String passwordPromptRegex) {
         super(remoteStdout);
         this.remoteStdin = remoteStdin;
         this.passwordBytes = (password + "\r\n").getBytes();
@@ -73,7 +73,7 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
     }
 
     private void handleChar(char c) {
-        if (!sentPassword) {
+//        if (!sentPassword) {
             logger.trace("Received: {}", c);
             if (c == '\n') {
                 receivedOutputBuffer.setLength(0);
@@ -95,9 +95,9 @@ class SshInteractiveSudoPasswordHandlingStream extends FilterInputStream {
                     }
                 }
             }
-        }
+//        }
     }
 
-    private static Logger logger = LoggerFactory.getLogger(SshInteractiveSudoPasswordHandlingStream.class);
+    private static Logger logger = LoggerFactory.getLogger(SshElevatedPasswordHandlingStream.class);
 
 }

@@ -48,6 +48,11 @@ public enum SshConnectionType {
     SCP,
 
     /**
+     * An SSH connection that uses SCP to transfer files, to a Unix host. Uses SU to execute commands.
+     */
+    SU,
+
+    /**
      * An SSH connection that uses SCP to transfer files, to a Unix host. Uses SUDO, configured with NOPASSWD for all
      * commands, to execute commands.
      */

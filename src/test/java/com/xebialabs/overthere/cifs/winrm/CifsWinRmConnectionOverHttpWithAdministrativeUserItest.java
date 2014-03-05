@@ -42,9 +42,9 @@ import static com.xebialabs.overthere.WindowsCloudHostListener.getOptionsForTunn
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_CONTEXT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRM_HTTP_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 
@@ -65,9 +65,9 @@ public class CifsWinRmConnectionOverHttpWithAdministrativeUserItest extends Over
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
 
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
-        options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
-        options.set(WINRM_CONTEXT, DEFAULT_WINRM_CONTEXT);
+        options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
+        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
+        options.set(WINRM_CONTEXT, WINRM_CONTEXT_DEFAULT);
 
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);

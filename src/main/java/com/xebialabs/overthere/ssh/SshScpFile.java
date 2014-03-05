@@ -49,26 +49,6 @@ import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingErrorHandler;
 import static com.xebialabs.overthere.util.LoggingOverthereExecutionOutputHandler.loggingOutputHandler;
@@ -147,7 +127,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public LsResults getFileInfo() throws RuntimeIOException {
         logger.debug("Retrieving file info of {}", this);
 
-        CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(getCommand(GET_FILE_INFO_COMMAND, GET_FILE_INFO_COMMAND_DEFAULT), getPath());
+        CmdLine lsCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.getFileInfoCommand, getPath());
         LsResults results = new LsResults();
         CapturingOverthereExecutionOutputHandler capturedOutput = capturingHandler();
         int errno = executeCommand(capturedOutput, swallow(), lsCmdLine);
@@ -285,8 +265,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public List<OverthereFile> listFiles() {
         logger.debug("Listing directory {}", this);
 
-        CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(LIST_FILES_COMMAND, LIST_FILES_COMMAND_DEFAULT), getPath());
+        CmdLine lsCmdLine = build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.listFilesCommand, getPath());
 
         CapturingOverthereExecutionOutputHandler capturedStdout = capturingHandler();
         CapturingOverthereExecutionOutputHandler capturedStderr = capturingHandler();
@@ -310,14 +289,14 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public void mkdir() {
         logger.debug("Creating directory {}", this);
 
-        mkdir(getCommand(MKDIR_COMMAND, MKDIR_COMMAND_DEFAULT));
+        mkdir(connection.mkdirCommand);
     }
 
     @Override
     public void mkdirs() {
         logger.debug("Creating directories {}", this);
 
-        mkdir(getCommand(MKDIRS_COMMAND, MKDIRS_COMMAND_DEFAULT));
+        mkdir(connection.mkdirsCommand);
     }
 
     protected void mkdir(String command) throws RuntimeIOException {
@@ -336,8 +315,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         if (dest instanceof SshScpFile) {
             SshScpFile sshScpDestFile = (SshScpFile) dest;
             if (sshScpDestFile.getConnection() == getConnection()) {
-                CmdLine mvCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                        .addTemplatedFragment(getCommand(RENAME_TO_COMMAND, RENAME_TO_COMMAND_DEFAULT), getPath(), sshScpDestFile.getPath());
+                CmdLine mvCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.renameToCommand, getPath(), sshScpDestFile.getPath());
                 executeAndThrowOnErrorCode(mvCmdLine, "Cannot rename file/directory " + this);
             } else {
                 throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
@@ -355,12 +333,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public void setExecutable(boolean executable) {
         logger.debug("Setting execute permission on {} to {}", this, executable);
 
-        CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND);
-        if (executable) {
-            chmodCmdLine.addTemplatedFragment(getCommand(SET_EXECUTABLE_COMMAND, SET_EXECUTABLE_COMMAND_DEFAULT), getPath());
-        } else {
-            chmodCmdLine.addTemplatedFragment(getCommand(SET_NOT_EXECUTABLE_COMMAND, SET_NOT_EXECUTABLE_COMMAND_DEFAULT), getPath());
-        }
+        CmdLine chmodCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(executable ? connection.setExecutableCommand : connection.setNotExecutableCommand, getPath());
         executeAndThrowOnErrorCode(chmodCmdLine, "Cannot set execute permission on file " + this + " to " + executable);
     }
 
@@ -368,8 +341,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     protected void deleteDirectory() {
         logger.debug("Deleting directory {}", this);
 
-        CmdLine rmdirCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(DELETE_DIRECTORY_COMMAND, DELETE_DIRECTORY_COMMAND_DEFAULT), getPath());
+        CmdLine rmdirCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.deleteDirectoryCommand, getPath());
         executeAndThrowOnErrorCode(rmdirCmdLine, "Cannot delete directory " + this);
     }
 
@@ -377,8 +349,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     protected void deleteFile() {
         logger.debug("Deleting file {}", this);
 
-        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(getCommand(DELETE_FILE_COMMAND, DELETE_FILE_COMMAND_DEFAULT), getPath());
-
+        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.deleteFileCommand, getPath());
         executeAndThrowOnErrorCode(rmCmdLine, "Cannot delete file " + this);
     }
 
@@ -386,9 +357,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     public void deleteRecursively() throws RuntimeIOException {
         logger.debug("Recursively deleting file or directory {}", this);
 
-        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND)
-                .addTemplatedFragment(getCommand(DELETE_RECURSIVELY_COMMAND, DELETE_RECURSIVELY_COMMAND_DEFAULT), getPath());
-
+        CmdLine rmCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.deleteRecursivelyCommand, getPath());
         executeAndThrowOnErrorCode(rmCmdLine, "Cannot recursively delete file or directory " + this);
     }
 
@@ -417,10 +386,6 @@ class SshScpFile extends SshFile<SshScpConnection> {
         if (errno != 0) {
             throw new RuntimeIOException(format("%s: %s (errno=%d)", message, capturedStderr.getOutput(), errno));
         }
-    }
-
-    protected String getCommand(String command, String commandDefault) {
-        return connection.getOptions().get(command, commandDefault);
     }
 
     protected static class OverthereFileLocalSourceFile implements LocalSourceFile {

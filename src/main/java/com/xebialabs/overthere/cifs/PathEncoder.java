@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import com.xebialabs.overthere.RuntimeIOException;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.quote;
 
@@ -57,7 +57,7 @@ class PathEncoder {
             urlPrefix.append("@");
         }
         urlPrefix.append(urlEncode(address));
-        if (cifsPort != DEFAULT_CIFS_PORT) {
+        if (cifsPort != CIFS_PORT_DEFAULT) {
             urlPrefix.append(":");
             urlPrefix.append(cifsPort);
         }

@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
@@ -75,7 +74,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PORT_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_DEFAULT_SSH;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
@@ -89,25 +88,25 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public static final String NOCD_PSEUDO_COMMAND = "nocd";
 
-    protected final SshConnectionType sshConnectionType;
+    protected SshConnectionType sshConnectionType;
 
-    protected final String host;
+    protected String host;
 
-    protected final int port;
+    protected int port;
 
-    protected final String username;
+    protected String username;
 
-    protected final String password;
+    protected String password;
 
     protected String interactiveKeyboardAuthPromptRegex;
 
-    protected final String privateKeyFile;
+    protected String privateKeyFile;
 
-    protected final String passphrase;
+    protected String passphrase;
 
-    protected final boolean allocateDefaultPty;
+    protected boolean allocateDefaultPty;
 
-    protected final boolean openShellBeforeExecute;
+    protected boolean openShellBeforeExecute;
 
     protected String allocatePty;
 
@@ -116,7 +115,6 @@ abstract class SshConnection extends BaseOverthereConnection {
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
     private static final Config config = new DefaultConfig();
-
 
     @VisibleForTesting
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
@@ -128,23 +126,23 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
-        this.sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
+        sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
         String unmappedAddress = options.get(ADDRESS);
-        int unmappedPort = options.getInteger(PORT, SSH_PORT_DEFAULT);
+        int unmappedPort = options.getInteger(PORT, PORT_DEFAULT_SSH);
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
-        this.host = addressPort.getHostName();
-        this.port = addressPort.getPort();
-        this.username = options.get(USERNAME);
-        this.password = options.getOptional(PASSWORD);
-        this.interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
-        this.privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
-        this.passphrase = options.getOptional(PASSPHRASE);
-        this.allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
-        if (this.allocateDefaultPty) {
+        host = addressPort.getHostName();
+        port = addressPort.getPort();
+        username = options.get(USERNAME);
+        password = options.getOptional(PASSWORD);
+        interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
+        privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
+        passphrase = options.getOptional(PASSPHRASE);
+        allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
+        if (allocateDefaultPty) {
             logger.warn("The " + ALLOCATE_DEFAULT_PTY + " connection option has been deprecated in favour of the " + ALLOCATE_PTY + " option. See https://github.com/xebialabs/overthere#ssh_allocatePty");
         }
-        this.allocatePty = options.getOptional(ALLOCATE_PTY);
-        this.openShellBeforeExecute = options.getBoolean(OPEN_SHELL_BEFORE_EXECUTE, OPEN_SHELL_BEFORE_EXECUTE_DEFAULT);
+        allocatePty = options.getOptional(ALLOCATE_PTY);
+        openShellBeforeExecute = options.getBoolean(OPEN_SHELL_BEFORE_EXECUTE, OPEN_SHELL_BEFORE_EXECUTE_DEFAULT);
     }
 
     protected void connect() {

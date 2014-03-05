@@ -35,7 +35,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PRO
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-public class SshInteractiveSudoPasswordHandlingStreamTest {
+public class SshElevatedPasswordHandlingStreamTest {
 
     @Mock
     private OutputStream os;
@@ -48,7 +48,7 @@ public class SshInteractiveSudoPasswordHandlingStreamTest {
     @Test
     public void shouldSendPasswordOnMatchingOutput() throws IOException {
         InputStream is = new ByteArrayInputStream("[sudo] password for user bar:".getBytes());
-        SshInteractiveSudoPasswordHandlingStream foo = new SshInteractiveSudoPasswordHandlingStream(is, os, "foo", SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
+        SshElevatedPasswordHandlingStream foo = new SshElevatedPasswordHandlingStream(is, os, "foo", SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
         readStream(foo);
         verify(os).write("foo\r\n".getBytes());
         verify(os).flush();
@@ -63,7 +63,7 @@ public class SshInteractiveSudoPasswordHandlingStreamTest {
                 "#3) With great power comes great responsibility.\r\n" +
                 "\r\n" +
                 "[sudo] password for user bar:").getBytes());
-        SshInteractiveSudoPasswordHandlingStream foo = new SshInteractiveSudoPasswordHandlingStream(is, os, "foo", SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
+        SshElevatedPasswordHandlingStream foo = new SshElevatedPasswordHandlingStream(is, os, "foo", SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
         readStream(foo);
         verify(os).write("foo\r\n".getBytes());
         verify(os).flush();
@@ -72,12 +72,12 @@ public class SshInteractiveSudoPasswordHandlingStreamTest {
     @Test
     public void shouldNotSendPasswordWhenRegexDoesntMatch() throws IOException {
         InputStream is = new ByteArrayInputStream("Password:".getBytes());
-        SshInteractiveSudoPasswordHandlingStream foo = new SshInteractiveSudoPasswordHandlingStream(is, os, "foo", ".*[Pp]assword.*>");
+        SshElevatedPasswordHandlingStream foo = new SshElevatedPasswordHandlingStream(is, os, "foo", ".*[Pp]assword.*>");
         readStream(foo);
         verifyZeroInteractions(os);
     }
 
-    private static void readStream(SshInteractiveSudoPasswordHandlingStream foo) throws IOException {
+    private static void readStream(SshElevatedPasswordHandlingStream foo) throws IOException {
         while (foo.available() > 0) {
             foo.read();
         }

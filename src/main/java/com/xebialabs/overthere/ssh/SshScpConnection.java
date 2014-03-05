@@ -30,6 +30,26 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
@@ -37,10 +57,41 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
  */
 class SshScpConnection extends SshConnection {
 
+    protected String deleteDirectoryCommand;
+
+    protected String deleteFileCommand;
+
+    protected String deleteRecursivelyCommand;
+
+    protected String getFileInfoCommand;
+
+    protected String listFilesCommand;
+
+    protected String mkdirCommand;
+
+    protected String mkdirsCommand;
+
+    protected String renameToCommand;
+
+    protected String setExecutableCommand;
+
+    protected String setNotExecutableCommand;
+
     public SshScpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
         checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
         checkArgument(os != ZOS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a z/OS operating system", sshConnectionType.toString().toLowerCase());
+
+        deleteDirectoryCommand = options.get(DELETE_DIRECTORY_COMMAND, DELETE_DIRECTORY_COMMAND_DEFAULT);
+        deleteFileCommand = options.get(DELETE_FILE_COMMAND, DELETE_FILE_COMMAND_DEFAULT);
+        deleteRecursivelyCommand = options.get(DELETE_RECURSIVELY_COMMAND, DELETE_RECURSIVELY_COMMAND_DEFAULT);
+        getFileInfoCommand = options.get(GET_FILE_INFO_COMMAND, GET_FILE_INFO_COMMAND_DEFAULT);
+        listFilesCommand = options.get(LIST_FILES_COMMAND, LIST_FILES_COMMAND_DEFAULT);
+        mkdirCommand = options.get(MKDIR_COMMAND, MKDIR_COMMAND_DEFAULT);
+        mkdirsCommand = options.get(MKDIRS_COMMAND, MKDIRS_COMMAND_DEFAULT);
+        renameToCommand = options.get(RENAME_TO_COMMAND, RENAME_TO_COMMAND_DEFAULT);
+        setExecutableCommand = options.get(SET_EXECUTABLE_COMMAND, SET_EXECUTABLE_COMMAND_DEFAULT);
+        setNotExecutableCommand = options.get(SET_NOT_EXECUTABLE_COMMAND, SET_NOT_EXECUTABLE_COMMAND_DEFAULT);
     }
 
     @Override
