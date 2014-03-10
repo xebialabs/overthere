@@ -22,15 +22,24 @@
  */
 package com.xebialabs.overthere.cifs.winrs;
 
-import com.xebialabs.overthere.ConnectionOptions;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.xebialabs.overthere.ConnectionOptions;
+
 import nl.javadude.assumeng.Assumption;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 
@@ -38,14 +47,18 @@ public class CifsWinRsConnectionTest {
 
     private ConnectionOptions options;
 
+    public static boolean onWindows() {
+        return System.getProperty("os.name", "").toLowerCase().contains("windows");
+    }
+
     @BeforeMethod
     public void setupOptions() {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_NATIVE);
         options.set(PASSWORD, "foobar");
-        options.set(PORT, DEFAULT_WINRM_HTTP_PORT);
-        options.set(CIFS_PORT, DEFAULT_CIFS_PORT);
+        options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
+        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
         options.set(ADDRESS, "localhost");
     }
 
@@ -71,9 +84,5 @@ public class CifsWinRsConnectionTest {
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
         new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
-    }
-
-    public static boolean onWindows() {
-        return System.getProperty("os.name", "").toLowerCase().contains("windows");
     }
 }
