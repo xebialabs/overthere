@@ -60,7 +60,7 @@ public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestB
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, "untrusted");
-        options.set(PASSWORD, "donttrustme");
+        options.set(PASSWORD, "zePVB,%EU84i");
         options.set(SUDO_USERNAME, "overthere");
         options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
         options.set(ALLOCATE_DEFAULT_PTY, true);

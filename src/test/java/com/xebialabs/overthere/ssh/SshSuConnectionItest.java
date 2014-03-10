@@ -59,9 +59,9 @@ public class SshSuConnectionItest extends OverthereConnectionItestBase {
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, "overthere");
-        options.set(PASSWORD, "overhere");
+        options.set(PASSWORD, "}Kp39hdb}LzM");
         options.set(SU_USERNAME, "root");
-        options.set(SU_PASSWORD, "ubuntu");
+        options.set(SU_PASSWORD, "87bC=vu@DTHx");
         options.set(ALLOCATE_DEFAULT_PTY, true);
         return options;
     }

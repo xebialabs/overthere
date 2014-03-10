@@ -56,7 +56,7 @@ public class SshSftpConnectionItest extends OverthereConnectionItestBase {
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, "overthere");
-        options.set(PASSWORD, "overhere");
+        options.set(PASSWORD, "}Kp39hdb}LzM");
         return options;
     }
 
