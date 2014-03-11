@@ -24,9 +24,9 @@ package com.xebialabs.overthere.spi;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
@@ -44,15 +44,16 @@ import com.xebialabs.overthere.RuntimeIOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
@@ -67,28 +68,20 @@ import static java.lang.String.format;
  */
 public abstract class BaseOverthereConnection implements OverthereConnection {
 
+    private static Logger logger = LoggerFactory.getLogger(BaseOverthereConnection.class);
     protected final String protocol;
-
     protected final ConnectionOptions options;
-
     protected final AddressPortMapper mapper;
-
     protected final OperatingSystemFamily os;
-
     protected final int connectionTimeoutMillis;
-
-    protected final String temporaryDirectoryPath;
-
-    protected final boolean deleteTemporaryDirectoryOnDisconnect;
-
-    protected final int temporaryFileCreationRetries;
-
     protected final boolean canStartProcess;
-
-    protected OverthereFile connectionTemporaryDirectory;
-
+    protected final String temporaryDirectoryPath;
+    protected final boolean deleteTemporaryDirectoryOnDisconnect;
+    protected final int temporaryFileCreationRetries;
+    protected final String temporaryFileHolderDirectoryNamePrefix;
+    protected final List<OverthereFile> temporaryFileHolderDirectories = newArrayList();
+    protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
-
     protected Random random = new Random();
 
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
@@ -97,10 +90,11 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null addres-port mapper");
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
         this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT);
+        this.canStartProcess = canStartProcess;
         this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
         this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT);
         this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
-        this.canStartProcess = canStartProcess;
+        this.temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
     }
 
     /**
@@ -140,34 +134,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is
      * invoked.
      *
-     * @param name the name of the temporary file. May be <code>null</code>.
-     * @return a reference to the temporary file on the host
-     */
-    @Override
-    public final OverthereFile getTempFile(String name) {
-        if (isNullOrEmpty(name)) {
-            name = "tmp";
-        }
-
-        for (int i = 0; i <= temporaryFileCreationRetries; i++) {
-            String infix = Long.toString(Math.abs(random.nextLong()));
-            OverthereFile f = getFileForTempFile(getConnectionTemporaryDirectory(), infix);
-            if (!f.exists()) {
-                logger.trace("Creating holder directory {} for temporary file with name {}", f, name);
-                f.mkdir();
-                OverthereFile t = f.getFile(name);
-                logger.debug("Generated temporary file name {}", t);
-                return t;
-            }
-        }
-        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
-    }
-
-    /**
-     * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
-     * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is
-     * invoked.
-     *
      * @param prefix the prefix string to be used in generating the file's name; must be at least three characters long
      * @param suffix the suffix string to be used in generating the file's name; may be <code>null</code>, in which case
      *               the suffix ".tmp" will be used
@@ -175,8 +141,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public final OverthereFile getTempFile(String prefix, String suffix) throws RuntimeIOException {
-        if (prefix == null)
-            throw new NullPointerException("prefix is null");
+        checkNotNull(prefix, "prefix is null");
 
         if (suffix == null) {
             suffix = ".tmp";
@@ -185,48 +150,53 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         return getTempFile(prefix + suffix);
     }
 
-    private OverthereFile getConnectionTemporaryDirectory() throws RuntimeIOException {
-        if (connectionTemporaryDirectory == null) {
-            connectionTemporaryDirectory = createConnectionTemporaryDirectory();
+    /**
+     * Creates a reference to a temporary file on the host. This file has a unique name and will be automatically
+     * removed when this connection is closed. <b>N.B.:</b> The file is not actually created until a put method is
+     * invoked.
+     *
+     * @param name the name of the temporary file. May be <code>null</code>.
+     * @return a reference to the temporary file on the host
+     */
+    @Override
+    public final synchronized OverthereFile getTempFile(String name) {
+        if (isNullOrEmpty(name)) {
+            name = "tmp";
         }
-        return connectionTemporaryDirectory;
-    }
 
-    private OverthereFile createConnectionTemporaryDirectory() {
         OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS");
-        String prefix = "overthere-" + dateFormat.format(new Date());
-        String infix = "";
-        String suffix = ".tmp";
-        for (int i = 0; i < temporaryFileCreationRetries; i++) {
-            OverthereFile tempDir = getFileForTempFile(temporaryDirectory, prefix + infix + suffix);
-            if (!tempDir.exists()) {
-                try {
-                    tempDir.mkdir();
-                    logger.info("Created connection temporary directory {}", tempDir);
-                    return tempDir;
-                } catch (RuntimeException exc) {
-                    logger.debug(format("Failed to create temporary directory %s", tempDir), exc);
-                }
+        for (int i = 0; i <= temporaryFileCreationRetries; i++) {
+            String holderName = temporaryFileHolderDirectoryNamePrefix;
+            if (temporaryFileHolderDirectoryNameSuffix > 0) {
+                holderName += "." + temporaryFileHolderDirectoryNameSuffix;
             }
-            infix = "-" + Long.toString(Math.abs(random.nextLong()));
+            OverthereFile holder = getFileForTempFile(temporaryDirectory, holderName);
+            if (!holder.exists()) {
+                logger.trace("Creating holder directory {} for temporary file with name {}", holder, name);
+                holder.mkdir();
+                temporaryFileHolderDirectories.add(holder);
+                OverthereFile tempFile = holder.getFile(name);
+                logger.debug("Generated temporary file name {}", tempFile);
+                return tempFile;
+            }
+            temporaryFileHolderDirectoryNameSuffix++;
         }
-        throw new RuntimeIOException("Cannot create connection temporary directory on " + this);
+        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
     }
 
     private void deleteConnectionTemporaryDirectory() {
-        if (connectionTemporaryDirectory != null) {
+        for (OverthereFile d : temporaryFileHolderDirectories) {
             try {
-                logger.info("Deleting connection temporary directory {}", connectionTemporaryDirectory);
-                connectionTemporaryDirectory.deleteRecursively();
+                logger.info("Deleting temporary directory {}", d);
+                d.deleteRecursively();
             } catch (RuntimeException exc) {
-                logger.warn("Got exception while deleting connection temporary directory {}. Ignoring it.", connectionTemporaryDirectory, exc);
+                logger.warn("Got exception while deleting connection temporary directory {}. Ignoring it.", d, exc);
             }
         }
     }
 
     /**
-     * Invoked by {@link #getTempFile(String)} and {@link #createConnectionTemporaryDirectory()} to create an
+     * Invoked by {@link #getTempFile(String)} and {@link #getTempFile(String)} to create an
      * {@link OverthereFile} object for a file or directory in the system or connection temporary directory.
      *
      * @param parent parent of the file to create
@@ -246,15 +216,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     }
 
     /**
-     * Returns the connection options used to construct this connection.
-     *
-     * @return the connection options.
-     */
-    public ConnectionOptions getOptions() {
-        return options;
-    }
-
-    /**
      * Sets the working directory in which commands are executed. If set to <code>null</code>, the working directory
      * that is used depends on the connection implementation.
      *
@@ -263,6 +224,15 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     @Override
     public void setWorkingDirectory(OverthereFile workingDirectory) {
         this.workingDirectory = workingDirectory;
+    }
+
+    /**
+     * Returns the connection options used to construct this connection.
+     *
+     * @return the connection options.
+     */
+    public ConnectionOptions getOptions() {
+        return options;
     }
 
     @Override
@@ -387,8 +357,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public abstract String toString();
-
-    private static Logger logger = LoggerFactory.getLogger(BaseOverthereConnection.class);
 
     @Override
     public boolean equals(Object o) {
