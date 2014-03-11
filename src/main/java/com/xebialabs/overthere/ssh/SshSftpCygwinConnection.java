@@ -37,6 +37,8 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS;
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
@@ -49,8 +51,14 @@ import static java.lang.String.format;
 class SshSftpCygwinConnection extends SshSftpConnection {
 
     public SshSftpCygwinConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+        super(type, fixOptions(options), mapper);
         checkArgument(os == WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a host that is not running Windows", sshConnectionType.toString().toLowerCase());
+    }
+
+    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
+        ConnectionOptions fixedOptions = new ConnectionOptions(options);
+        fixedOptions.set(FILE_COPY_COMMAND_FOR_WINDOWS, "cmd /c " + fixedOptions.get(FILE_COPY_COMMAND_FOR_WINDOWS, FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT));
+        return fixedOptions;
     }
 
     @Override
