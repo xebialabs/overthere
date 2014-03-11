@@ -89,7 +89,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
         OverthereFile folder = connection.getFile("C:\\overthere");
         List<OverthereFile> filesInFolder = folder.listFiles();
 
-        OverthereFile expectedFile = connection.getFile("C:\\overthere\\overhere.txt");
+        OverthereFile expectedFile = connection.getFile("C:\\overthere\\temp");
         assertThat(filesInFolder.contains(expectedFile), equalTo(true));
     }
 
@@ -124,6 +124,50 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
+    @Assumption(methods = {"onWindows"})
+    public void shouldExecuteCommandWithArgumentOnWindows() {
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("ipconfig", "/all"));
+        assertThat(res, equalTo(0));
+        assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
+    }
+
+    @Test
+    @Assumption(methods = {"onWindows"})
+    public void shouldExecuteBatchFileOnWindows() throws IOException {
+        OverthereFile scriptToRun = connection.getTempFile("helloworld.bat");
+        writeData(scriptToRun, ("@echo Hello World").getBytes("UTF-8"));
+
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build(scriptToRun.getPath()));
+        assertThat(res, equalTo(0));
+        assertThat(capturingHandler.getOutput(), containsString("Hello World"));
+    }
+
+    @Test
+    @Assumption(methods = {"onWindows"})
+    public void shouldExecuteBatchFileWithArgumentsOnWindows() throws IOException {
+        String content = "Hello from the file just uploaded";
+        OverthereFile fileToType = connection.getTempFile("hello world.txt");
+        writeData(fileToType, content.getBytes("UTF-8"));
+        OverthereFile scriptToRun = connection.getTempFile("helloworld.bat");
+        writeData(scriptToRun, ("@type %1").getBytes("UTF-8"));
+
+
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build(scriptToRun.getPath(), fileToType.getPath()));
+        assertThat(res, equalTo(0));
+        assertThat(capturingHandler.getOutput(), containsString(content));
+    }
+
+    @Test
+    @Assumption(methods = {"onWindows"})
+    public void shouldNotExecuteIncorrectCommandOnWindows() {
+        int res = connection.execute(loggingOutputHandler(logger), loggingErrorHandler(logger), CmdLine.build("this-command-does-not-exist"));
+        assertThat(res, not(equalTo(0)));
+    }
+
+    @Test
     @Assumption(methods = {"onWindows", "supportsProcess"})
     public void shouldStartProcessSimpleCommandOnWindows() throws IOException, InterruptedException {
         OverthereProcess p = connection.startProcess(CmdLine.build("ipconfig"));
@@ -140,18 +184,23 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     @Test
     @Assumption(methods = {"onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd"})
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
-        OverthereProcess process = connection.startProcess(CmdLine.build("powershell.exe", "-ExecutionPolicy", "Unrestricted", "-File", "C:\\overthere\\echoname.ps1"));
+        OverthereFile scriptToRun = connection.getTempFile("echo.ps1");
+        writeData(scriptToRun, ("Write-Host \"Enter your name the prompt\"\n" +
+                "$name = [Console]::In.ReadLine()\n" +
+                "Write-Host \"Hi $name\"").getBytes("UTF-8"));
+
+        OverthereProcess process = connection.startProcess(CmdLine.build("powershell.exe", "-ExecutionPolicy", "Unrestricted", "-File", scriptToRun.getPath()));
         try {
             OutputStream stdin = process.getStdin();
             BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getStdout()));
 
             waitForPrompt(stdout, "name");
 
-            String reply = "iiPoWeR";
+            String reply = "Vincent";
             enterPrompt(stdin, reply);
 
             String hi = waitForPrompt(stdout, "Hi");
-            assertThat(hi, containsString("iiPoWeR"));
+            assertThat(hi, containsString("Vincent"));
         } finally {
             process.waitFor();
         }
@@ -169,49 +218,6 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     private void enterPrompt(OutputStream stdin, String reply) throws IOException {
         stdin.write((reply + "\r\n").getBytes());
         stdin.flush();
-    }
-
-    @Test
-    @Assumption(methods = {"onWindows"})
-    public void shouldExecuteCommandWithArgumentOnWindows() {
-        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("ipconfig", "/all"));
-        assertThat(res, equalTo(0));
-        assertThat(capturingHandler.getOutput(), containsString("Windows IP Configuration"));
-    }
-
-    @Test
-    @Assumption(methods = {"onWindows"})
-    public void shouldExecuteBatchFileOnWindows() {
-        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("C:\\overthere\\helloworld.bat"));
-        assertThat(res, equalTo(0));
-        assertThat(capturingHandler.getOutput(), containsString("Hello World"));
-    }
-
-    @Test
-    @Assumption(methods = {"onWindows"})
-    public void shouldExecuteBatchFileWithArgumentsOnWindows() throws IOException {
-        String content = "Hello from the file just uploaded";
-        OverthereFile tempFile = connection.getTempFile("hello world", ".txt");
-        OutputStream out = tempFile.getOutputStream();
-        try {
-            out.write(content.getBytes());
-        } finally {
-            closeQuietly(out);
-        }
-
-        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("C:\\overthere\\typefile.bat", tempFile.getPath()));
-        assertThat(res, equalTo(0));
-        assertThat(capturingHandler.getOutput(), containsString(content));
-    }
-
-    @Test
-    @Assumption(methods = {"onWindows"})
-    public void shouldNotExecuteIncorrectCommandOnWindows() {
-        int res = connection.execute(loggingOutputHandler(logger), loggingErrorHandler(logger), CmdLine.build("this-command-does-not-exist"));
-        assertThat(res, not(equalTo(0)));
     }
 
     @Test

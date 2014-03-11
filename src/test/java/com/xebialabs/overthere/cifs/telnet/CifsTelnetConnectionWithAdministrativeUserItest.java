@@ -26,24 +26,18 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_USERNAME;
-import static com.xebialabs.overthere.WindowsCloudHostListener.getOptionsForTunnel;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
@@ -58,19 +52,11 @@ public class CifsTelnetConnectionWithAdministrativeUserItest extends OverthereCo
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
-
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
-
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, PORT_DEFAULT_TELNET);
-        options.set(CIFS_PORT, CIFS_PORT_DEFAULT);
-
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
-
-        options.set(JUMPSTATION, getOptionsForTunnel());
-
         return options;
     }
 

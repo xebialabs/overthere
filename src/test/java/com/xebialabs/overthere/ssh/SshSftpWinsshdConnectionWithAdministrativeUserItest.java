@@ -26,8 +26,8 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
@@ -56,7 +56,7 @@ public class SshSftpWinsshdConnectionWithAdministrativeUserItest extends Overthe
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, 22);
+        options.set(PORT, 2222);
         options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
         return options;

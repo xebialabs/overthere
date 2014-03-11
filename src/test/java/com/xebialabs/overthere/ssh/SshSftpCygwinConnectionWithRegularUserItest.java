@@ -26,8 +26,8 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
