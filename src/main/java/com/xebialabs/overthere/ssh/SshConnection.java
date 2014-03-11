@@ -290,31 +290,30 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     }
 
-    protected CmdLine processCommandLine(final CmdLine commandLine) {
-        if (startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND)) {
+    protected CmdLine processCommandLine(final CmdLine cmd) {
+        CmdLine processedCmd;
+        logger.trace("Checking whether to prefix command line with cd: {}", cmd);
+        if (startsWithPseudoCommand(cmd, NOCD_PSEUDO_COMMAND)) {
             logger.trace("Not prefixing command line with cd statement because the " + NOCD_PSEUDO_COMMAND
                     + " pseudo command was present, but the pseudo command will be stripped");
-            logger.trace("Replacing: {}", commandLine);
-            CmdLine cmd = stripPrefixedPseudoCommand(commandLine);
-            logger.trace("With     : {}", cmd);
-            return cmd;
+            processedCmd = stripPrefixedPseudoCommand(cmd);
         } else if (getWorkingDirectory() != null) {
             logger.trace("Prefixing command line with cd statement because the current working directory was set");
-            logger.trace("Replacing: {}", commandLine);
-            CmdLine cmd = new CmdLine();
-            cmd.addArgument("cd");
-            cmd.addArgument(workingDirectory.getPath());
-            cmd.addRaw(os.getCommandSeparator());
-            for (CmdLineArgument a : commandLine.getArguments()) {
-                cmd.add(a);
+            logger.trace("Replacing: {}", cmd);
+            processedCmd = new CmdLine();
+            processedCmd.addArgument("cd");
+            processedCmd.addArgument(workingDirectory.getPath());
+            processedCmd.addRaw(os.getCommandSeparator());
+            for (CmdLineArgument a : cmd.getArguments()) {
+                processedCmd.add(a);
             }
-            logger.trace("With     : {}", cmd);
-            return cmd;
         } else {
             logger.trace("Not prefixing command line with cd statement because the current working directory was not set");
-            logger.trace("Keeping  : {}", commandLine);
-            return commandLine;
+            processedCmd = cmd;
         }
+        logger.trace("Processed command line for cd                  : {}", processedCmd);
+        return processedCmd;
+
     }
 
     protected boolean startsWithPseudoCommand(final CmdLine commandLine, final String pseudoCommand) {

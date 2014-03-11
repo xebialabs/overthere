@@ -140,7 +140,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
     }
 
     @Override
-    protected CmdLine processCommandLine(CmdLine commandLine) {
+    protected CmdLine processCommandLine(CmdLine cmd) {
         throw new UnsupportedOperationException("Cannot process a command line for the tunnel.");
     }
 

@@ -24,6 +24,7 @@ package com.xebialabs.overthere.ssh;
 
 import java.io.InputStream;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
 
 import com.xebialabs.overthere.CmdLine;
@@ -89,6 +90,35 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
         }
     }
 
+    @Override
+    protected CmdLine processCommandLine(final CmdLine cmd) {
+        CmdLine processedCmd;
+        logger.trace("Checking whether to prefix command line with su/sudo: {}", cmd);
+        if (startsWithPseudoCommand(cmd, NOELEVATION_PSEUDO_COMMAND)) {
+            logger.trace("Not prefixing command line with su/sudo because the " + NOELEVATION_PSEUDO_COMMAND
+                    + " pseudo command was present, but the pseudo command will be stripped");
+            processedCmd = super.processCommandLine(stripPrefixedPseudoCommand(cmd));
+        } else if(quoteCommand) {
+            logger.trace("Quoting command line and prefixing it with su/sudo");
+            processedCmd = prefixWithElevationCommand(super.processCommandLine(cmd));
+        } else {
+            logger.trace("Prefixing command line with su/sudo");
+            boolean nocd = startsWithPseudoCommand(cmd, NOCD_PSEUDO_COMMAND);
+            if (nocd) {
+                processedCmd = stripPrefixedPseudoCommand(cmd);
+            } else {
+                processedCmd = cmd;
+            }
+            processedCmd = prefixWithElevationCommand(processedCmd);
+            if (nocd) {
+                processedCmd = prefixWithPseudoCommand(processedCmd, NOCD_PSEUDO_COMMAND);
+            }
+            processedCmd = super.processCommandLine(processedCmd);
+        }
+        logger.trace("Processed command line for su/sudo                  : {}", processedCmd);
+        return processedCmd;
+    }
+
     @VisibleForTesting
     CmdLine prefixWithElevationCommand(final CmdLine commandLine) {
         CmdLine commandLineWithSudo = new CmdLine();
@@ -127,5 +157,7 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
     public String toString() {
         return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + ":" + elevatedUsername + "@" + host + ":" + port;
     }
+
+    private Logger logger = LoggerFactory.getLogger(SshElevatedUserConnection.class);
 
 }

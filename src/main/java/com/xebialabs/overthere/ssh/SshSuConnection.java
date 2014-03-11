@@ -25,7 +25,6 @@ package com.xebialabs.overthere.ssh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
@@ -81,24 +80,6 @@ class SshSuConnection extends SshElevatedUserConnection {
         tempMkdirsCommand = options.get(SU_TEMP_MKDIRS_COMMAND, SU_TEMP_MKDIRS_COMMAND_DEFAULT);
 
         checkElevatedPasswordPromptRegex(this, SU_PASSWORD_PROMPT_REGEX, logger);
-    }
-
-    @Override
-    protected CmdLine processCommandLine(final CmdLine commandLine) {
-        if (startsWithPseudoCommand(commandLine, NOELEVATION_PSEUDO_COMMAND)) {
-            logger.trace("Not prefixing command line with su statement because the " + NOELEVATION_PSEUDO_COMMAND
-                    + " pseudo command was present, but the pseudo command will be stripped");
-            logger.trace("Replacing: {}", commandLine);
-            CmdLine cmd = super.processCommandLine(stripPrefixedPseudoCommand(commandLine));
-            logger.trace("With     : {}", cmd);
-            return cmd;
-        } else {
-            logger.trace("Prefixing command line with su statement");
-            logger.trace("Replacing: {}", commandLine);
-            CmdLine cmd = prefixWithElevationCommand(super.processCommandLine(commandLine));
-            logger.trace("With     : {}", cmd);
-            return cmd;
-        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(SshSuConnection.class);

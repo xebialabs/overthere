@@ -85,8 +85,8 @@ class SshSftpCygwinConnection extends SshSftpConnection {
     }
 
     @Override
-    protected CmdLine processCommandLine(final CmdLine commandLine) {
-        List<CmdLineArgument> args = commandLine.getArguments();
+    protected CmdLine processCommandLine(final CmdLine cmd) {
+        List<CmdLineArgument> args = cmd.getArguments();
         checkArgument(args.size() > 0, "Empty command line");
 
         String arg0 = args.get(0).toString();
@@ -100,7 +100,7 @@ class SshSftpCygwinConnection extends SshSftpConnection {
             logger.trace("Translated first element (command) of command line from Windows path [{}] to Cygwin path [{}]", arg0, arg0CygwinPath);
             return super.processCommandLine(modifiedCommandLine);
         } else {
-            return super.processCommandLine(commandLine);
+            return super.processCommandLine(cmd);
         }
     }
 

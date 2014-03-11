@@ -25,7 +25,6 @@ package com.xebialabs.overthere.ssh;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
@@ -78,33 +77,6 @@ class SshSudoConnection extends SshElevatedUserConnection {
         tempMkdirsCommand = options.get(SUDO_TEMP_MKDIRS_COMMAND, SUDO_TEMP_MKDIRS_COMMAND_DEFAULT);
     }
 
-    @Override
-    protected CmdLine processCommandLine(final CmdLine commandLine) {
-        CmdLine cmd;
-        if (startsWithPseudoCommand(commandLine, NOELEVATION_PSEUDO_COMMAND)) {
-            logger.trace("Not prefixing command line with sudo statement because the " + NOELEVATION_PSEUDO_COMMAND
-                    + " pseudo command was present, but the pseudo command will be stripped");
-            logger.trace("Replacing: {}", commandLine);
-            cmd = stripPrefixedPseudoCommand(commandLine);
-            logger.trace("With     : {}", cmd);
-        } else {
-            logger.trace("Prefixing command line with sudo statement");
-            logger.trace("Replacing: {}", commandLine);
-            boolean nocd = startsWithPseudoCommand(commandLine, NOCD_PSEUDO_COMMAND);
-            if (nocd) {
-                cmd = stripPrefixedPseudoCommand(commandLine);
-            } else {
-                cmd = commandLine;
-            }
-            cmd = prefixWithElevationCommand(cmd);
-            if (nocd) {
-                cmd = prefixWithPseudoCommand(cmd, NOCD_PSEUDO_COMMAND);
-            }
-            logger.trace("With     : {}", cmd);
-        }
-        return super.processCommandLine(cmd);
-    }
-
-    private Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSudoConnection.class);
 
 }
