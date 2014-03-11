@@ -145,7 +145,7 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
 
     @Test
     public void shouldCopyRemoteFileToExistentRemoteFileWithDifferentName() {
-        OverthereFile srcFile = getLocalSourceFile();
+        OverthereFile srcFile = getRemoteSourceFile();
         OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
 
         populateSourceFile(srcFile);
