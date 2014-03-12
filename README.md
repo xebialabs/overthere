@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.3.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.3.1</version>
+			<version>2.4.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -222,7 +222,7 @@ To connect to a remote host using the SSH protocol, you will need to install an 
 * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
 * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
 
-__N.B.:__ The __SFTP__, __SCP__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
 
 <a name="ssh_host_setup_sftp"></a>
 #### SFTP
@@ -1019,6 +1019,10 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.4.0 (12-Mar-2014)
+    * Added support for the the SU connection type, fixes issue [#102](https://github.com/xebialabs/overthere/issues/102) and reverted fix for issue [#89](https://github.com/xebialabs/overthere/issues/89).
+    * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, fixes issue [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts. 
+    * Fixed [#87](https://github.com/xebialabs/overthere/issues/87), [#88](https://github.com/xebialabs/overthere/issues/88), [#96](https://github.com/xebialabs/overthere/issues/96), [#99](https://github.com/xebialabs/overthere/issues/99), [#103](https://github.com/xebialabs/overthere/issues/103), [#104](https://github.com/xebialabs/overthere/issues/104).
 * Overthere 2.3.1 (16-Jan-2014)
     * Fixed [#89](https://github.com/xebialabs/overthere/issues/89)
     * Fixed race condition in creation of local temporary directories.
