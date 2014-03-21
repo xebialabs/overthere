@@ -165,6 +165,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         }
 
         OverthereFile temporaryDirectory = getFile(temporaryDirectoryPath);
+        RuntimeException originalExc = null;
         for (int i = 0; i <= temporaryFileCreationRetries; i++) {
             String holderName = temporaryFileHolderDirectoryNamePrefix;
             if (temporaryFileHolderDirectoryNameSuffix > 0) {
@@ -173,15 +174,26 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
             OverthereFile holder = getFileForTempFile(temporaryDirectory, holderName);
             if (!holder.exists()) {
                 logger.trace("Creating holder directory {} for temporary file with name {}", holder, name);
-                holder.mkdir();
-                temporaryFileHolderDirectories.add(holder);
-                OverthereFile tempFile = holder.getFile(name);
-                logger.debug("Generated temporary file name {}", tempFile);
-                return tempFile;
+                try {
+                    originalExc = null;
+                    holder.mkdir();
+                    temporaryFileHolderDirectories.add(holder);
+                    OverthereFile tempFile = holder.getFile(name);
+                    logger.debug("Generated temporary file name {}", tempFile);
+                    return tempFile;
+                } catch(RuntimeException exc) {
+                    originalExc = exc;
+                    logger.debug(format("Failed to create holder directory %s - Trying with the next suffix", holder), exc);
+                }
             }
             temporaryFileHolderDirectoryNameSuffix++;
         }
-        throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
+
+        if(originalExc != null) {
+            throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this, originalExc);
+        } else {
+            throw new RuntimeIOException("Cannot generate a unique temporary file name on " + this);
+        }
     }
 
     private void deleteConnectionTemporaryDirectory() {
