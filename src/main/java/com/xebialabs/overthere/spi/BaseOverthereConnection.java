@@ -87,7 +87,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
         this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
         this.options = checkNotNull(options, "Cannot create OverthereConnection with null options");
-        this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null addres-port mapper");
+        this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null address-port mapper");
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
         this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT);
         this.canStartProcess = canStartProcess;
