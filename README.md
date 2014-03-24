@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.0%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.1%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.4.0</version>
+			<version>2.4.1</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1019,6 +1019,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.4.1 (24-Mar-2014)
+    * Fixed race condition in creation of temporary directories.
 * Overthere 2.4.0 (12-Mar-2014)
     * Added support for the the SU connection type, fixes issue [#102](https://github.com/xebialabs/overthere/issues/102) and reverted fix for issue [#89](https://github.com/xebialabs/overthere/issues/89).
     * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, fixes issue [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts. 
