@@ -59,7 +59,6 @@ import net.schmizz.sshj.userauth.password.Resource;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -75,6 +74,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_DEFAULT_SSH;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;

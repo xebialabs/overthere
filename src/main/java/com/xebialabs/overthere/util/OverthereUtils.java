@@ -22,13 +22,10 @@
  */
 package com.xebialabs.overthere.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
+import com.google.common.io.Closeables;
 import com.google.common.io.InputSupplier;
 
 import com.xebialabs.overthere.OverthereFile;
@@ -161,6 +158,14 @@ public class OverthereUtils {
      */
     public static String constructPath(final OverthereFile parent, final String child) {
         return parent.getPath() + parent.getConnection().getHostOperatingSystem().getFileSeparator() + child;
+    }
+
+    public static void closeQuietly(Closeable c) {
+        try {
+            Closeables.close(c, true);
+        } catch (IOException e) {
+            // Will not happen because of true...
+        }
     }
 
 }

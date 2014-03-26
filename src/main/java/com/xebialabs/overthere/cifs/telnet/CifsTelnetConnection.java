@@ -34,7 +34,6 @@ import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.io.Closeables;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -46,9 +45,9 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**

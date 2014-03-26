@@ -42,7 +42,7 @@ import net.schmizz.sshj.xfer.FilePermission;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.google.common.io.Closeables.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**

@@ -44,7 +44,6 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT_DEFAULT;
@@ -67,6 +66,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_USE_HTTP_SPN;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**

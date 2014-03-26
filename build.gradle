@@ -42,8 +42,8 @@ configurations {
 
 dependencies {
   // General dependencies
-  compile 'com.google.guava:guava:15.0'
-  compile 'nl.javadude.scannit:scannit:1.2.0'
+  compile 'com.google.guava:guava:16.0.1'
+  compile 'nl.javadude.scannit:scannit:1.2.1'
   compile 'org.slf4j:slf4j-api:1.6.3'
   compile 'org.slf4j:jcl-over-slf4j:1.6.3'
 

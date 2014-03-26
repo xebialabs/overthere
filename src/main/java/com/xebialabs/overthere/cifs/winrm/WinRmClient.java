@@ -88,7 +88,7 @@ import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
 import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
 import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
 
-import static com.google.common.io.Closeables.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static org.apache.http.auth.AuthScope.ANY_HOST;
 import static org.apache.http.auth.AuthScope.ANY_PORT;
 import static org.apache.http.auth.AuthScope.ANY_REALM;

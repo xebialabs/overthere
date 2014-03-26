@@ -36,7 +36,6 @@ import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
@@ -54,6 +53,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOPROFILE
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_CONNECTION_OPTIONS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPTED;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 public class CifsWinrsConnection extends CifsConnection {

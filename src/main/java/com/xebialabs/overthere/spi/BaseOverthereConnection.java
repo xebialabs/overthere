@@ -45,7 +45,6 @@ import com.xebialabs.overthere.RuntimeIOException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
@@ -58,6 +57,7 @@ import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandle
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStdout;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**

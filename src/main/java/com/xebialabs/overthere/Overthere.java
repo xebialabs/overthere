@@ -43,9 +43,9 @@ import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
 
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
  * Factory object to create {@link OverthereConnection connections}.

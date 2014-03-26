@@ -39,7 +39,6 @@ import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import nl.javadude.assumeng.Assumption;
 
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
