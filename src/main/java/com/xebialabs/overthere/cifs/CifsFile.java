@@ -74,106 +74,106 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
     @Override
     public boolean exists() throws RuntimeIOException {
-        logger.debug("Checking {} for existence", this);
+        logger.debug("Checking for existence of {}", smbFile.getUncPath());
 
         try {
             return smbFile.exists();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine existence of %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine existence of %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean canRead() throws RuntimeIOException {
-        logger.debug("Checking whether {} can be read", this);
+        logger.debug("Checking whether {} can be read", smbFile.getUncPath());
 
         try {
             return smbFile.canRead();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s can be read: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s can be read: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean canWrite() throws RuntimeIOException {
-        logger.debug("Checking whether {} can be written", this);
+        logger.debug("Checking whether {} can be written", smbFile.getUncPath());
 
         try {
             return smbFile.canWrite();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s can be written: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s can be written: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean canExecute() throws RuntimeIOException {
-        logger.debug("Checking whether {} can be executed", this);
+        logger.debug("Checking whether {} can be executed", smbFile.getUncPath());
 
         try {
             return smbFile.canRead();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s can be executed: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s can be executed: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean isFile() throws RuntimeIOException {
-        logger.debug("Checking whether {} is a file", this);
+        logger.debug("Checking whether {} is a file", smbFile.getUncPath());
 
         try {
             return smbFile.isFile();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s is a file: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s is a file: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean isDirectory() throws RuntimeIOException {
-        logger.debug("Checking whether {} is a directory", this);
+        logger.debug("Checking whether {} is a directory", smbFile.getUncPath());
 
         try {
             return smbFile.isDirectory();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s is a directory: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s is a directory: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public boolean isHidden() {
-        logger.debug("Checking whether {} is hidden", this);
+        logger.debug("Checking whether {} is hidden", smbFile.getUncPath());
 
         try {
             return smbFile.isHidden();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine whether %s is hidden: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine whether %s is hidden: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public long lastModified() {
-        logger.debug("Retrieving last modification date of {}", this);
+        logger.debug("Retrieving last modification date of {}", smbFile.getUncPath());
 
         try {
             return smbFile.lastModified();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine last modification timestamp of %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine last modification timestamp of %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public long length() throws RuntimeIOException {
-        logger.debug("Retrieving length of {}", this);
+        logger.debug("Retrieving length of {}", smbFile.getUncPath());
 
         try {
             return smbFile.length();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot determine length of file %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot determine length of file %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public List<OverthereFile> listFiles() throws RuntimeIOException {
-        logger.debug("Listing directory {}", this);
+        logger.debug("Listing directory {}", smbFile.getUncPath());
 
         try {
             upgradeToDirectorySmbFile();
@@ -183,48 +183,48 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
             }
             return files;
         } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot list directory %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot list directory %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot list directory %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot list directory %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public void mkdir() throws RuntimeIOException {
-        logger.debug("Creating directory {}", this);
+        logger.debug("Creating directory {}", smbFile.getUncPath());
 
         try {
             smbFile.mkdir();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot create directory %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot create directory %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public void mkdirs() throws RuntimeIOException {
-        logger.debug("Creating directories {}", this);
+        logger.debug("Creating directories {}", smbFile.getUncPath());
 
         try {
             smbFile.mkdirs();
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot create directories %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot create directories %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public void renameTo(OverthereFile dest) throws RuntimeIOException {
-        logger.debug("Renaming {} to {}", this, dest);
+        logger.debug("Renaming {} to {}", smbFile.getUncPath(), dest);
 
         if (dest instanceof CifsFile) {
             SmbFile targetSmbFile = ((CifsFile) dest).getSmbFile();
             try {
                 smbFile.renameTo(targetSmbFile);
             } catch (SmbException exc) {
-                throw new RuntimeIOException(format("Cannot move/rename %s to %s: %s", this, dest, exc.toString()), exc);
+                throw new RuntimeIOException(format("Cannot move/rename %s to %s: %s", smbFile.getUncPath(), dest, exc.toString()), exc);
             }
         } else {
             throw new RuntimeIOException(format("Cannot move/rename cifs:%s: file/directory %s  to non-cifs:%s: file/directory %s",
-                    connection.cifsConnectionType.toString().toLowerCase(), this, connection.cifsConnectionType.toString().toLowerCase(), dest));
+                    connection.cifsConnectionType.toString().toLowerCase(), smbFile.getUncPath(), connection.cifsConnectionType.toString().toLowerCase(), dest));
         }
     }
 
@@ -235,27 +235,27 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
     @Override
     public void delete() throws RuntimeIOException {
-        logger.debug("Deleting {}", this);
+        logger.debug("Deleting {}", smbFile.getUncPath());
 
         try {
             if (smbFile.isDirectory()) {
                 upgradeToDirectorySmbFile();
                 if (smbFile.list().length > 0) {
-                    throw new RuntimeIOException(format("Cannot delete non-empty directory %s", this));
+                    throw new RuntimeIOException(format("Cannot delete non-empty directory %s", smbFile.getUncPath()));
                 }
             }
             smbFile.delete();
             refreshSmbFile();
         } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot delete %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot delete %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public void deleteRecursively() throws RuntimeIOException {
-        logger.debug("Deleting {} recursively", this);
+        logger.debug("Deleting {} recursively", smbFile.getUncPath());
 
         try {
             if (smbFile.isDirectory()) {
@@ -264,15 +264,15 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
             smbFile.delete();
             refreshSmbFile();
         } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s recursively: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot delete %s recursively: %s", smbFile.getUncPath(), exc.toString()), exc);
         } catch (SmbException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s recursively: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot delete %s recursively: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public InputStream getInputStream() throws RuntimeIOException {
-        logger.debug("Opening CIFS input stream for {}", this);
+        logger.debug("Opening CIFS input stream for {}", smbFile.getUncPath());
 
         try {
             final InputStream wrapped = smbFile.getInputStream();
@@ -321,18 +321,18 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
                 @Override
                 public void close() throws IOException {
-                    logger.debug("Closing CIFS input stream for {}", CifsFile.this);
+                    logger.debug("Closing CIFS input stream for {}", CifsFile.this.smbFile.getUncPath());
                     wrapped.close();
                 }
             };
         } catch (IOException exc) {
-            throw new RuntimeIOException(format("Cannot open %s for reading: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot open %s for reading: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
     @Override
     public OutputStream getOutputStream() {
-        logger.debug("Opening CIFS output stream for {}", this);
+        logger.debug("Opening CIFS output stream for {}", smbFile.getUncPath());
 
         try {
             final OutputStream wrapped = smbFile.getOutputStream();
@@ -361,12 +361,12 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
                 @Override
                 public void close() throws IOException {
-                    logger.debug("Closing CIFS output stream for {}", CifsFile.this);
+                    logger.debug("Closing CIFS output stream for {}", CifsFile.this.smbFile.getUncPath());
                     wrapped.close();
                 }
             };
         } catch (IOException exc) {
-            throw new RuntimeIOException(format("Cannot open %s for writing: %s", this, exc.toString()), exc);
+            throw new RuntimeIOException(format("Cannot open %s for writing: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
 
