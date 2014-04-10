@@ -29,6 +29,9 @@ repositories {
   maven {
     url 'https://oss.sonatype.org/content/repositories/releases'
   }
+  maven {
+    url 'http://www.libvirt.org/maven2/'
+  }
 }
 
 sourceCompatibility = 1.6
@@ -75,7 +78,9 @@ dependencies {
   compile 'commons-codec:commons-codec:1.6'
 
   // Test dependencies
-  testCompile 'com.xebialabs.cloud:overcast:1.1.2'
+  testCompile('com.xebialabs.cloud:overcast:1.2.1') {
+    exclude group: 'com.xebialabs.overthere', module: 'overthere'
+  }
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'
   testCompile 'org.mockito:mockito-core:1.8.5'

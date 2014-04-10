@@ -24,7 +24,7 @@ package com.xebialabs.overthere;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.xebialabs.overcast.CloudHost;
+import com.xebialabs.overcast.host.CloudHost;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

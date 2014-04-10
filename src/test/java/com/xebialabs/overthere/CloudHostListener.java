@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 
-import com.xebialabs.overcast.CloudHost;
-import com.xebialabs.overcast.CloudHostFactory;
+import com.xebialabs.overcast.host.CloudHost;
+import com.xebialabs.overcast.host.CloudHostFactory;
 
 import static java.lang.String.format;
 
