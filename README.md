@@ -160,7 +160,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <tr>
     <th align="left" valign="top"><a name="directoryCopyCommandForUnix"></a>directoryCopyCommandForUnix</th>
     <td>The command to use when copying a directory on a Unix host. The string <code>{0}</code> is replaced with the path of the source directory, the string
-        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>txcopy {0} {1} /i /y /s /e /h /q</code>.</td>
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>xcopy {0} {1} /i /y /s /e /h /q</code>.</td>
 </tr>
 <tr>
     <th align="left" valign="top"><a name="fileCopyCommandForWindows"></a>fileCopyCommandForWindows</th>
