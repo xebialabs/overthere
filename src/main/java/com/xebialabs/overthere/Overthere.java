@@ -59,7 +59,24 @@ public class Overthere {
             new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
 
     static {
-        final Scannit scannit = new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner()));
+        if (Scannit.isBooted()) {
+            logger.info("Scannit already booted, checking to see whether it has scanned 'com.xebialabs'");
+            Set<Class<?>> protocols = Scannit.getInstance().getTypesAnnotatedWith(Protocol.class);
+            if (!protocols.isEmpty()) {
+                boot(Scannit.getInstance());
+            } else {
+                boot();
+            }
+        } else {
+            boot();
+        }
+    }
+
+    private static void boot() {
+        boot(new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner())));
+    }
+
+    private static void boot(Scannit scannit) {
         final Set<Class<?>> protocolClasses = scannit.getTypesAnnotatedWith(Protocol.class);
         for (Class<?> protocol : protocolClasses) {
             if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
