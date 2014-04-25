@@ -25,6 +25,7 @@ package com.xebialabs.overthere;
 import java.io.Serializable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 
 /**
  * Represents a single command line argument.
@@ -97,11 +98,7 @@ public abstract class CmdLineArgument implements Serializable {
      * @param forLogging <code>true</code> if this string representation will be used for logging.
      * @return the string representation of this argument.
      */
-    public final String toString(OperatingSystemFamily os, boolean forLogging) {
-        StringBuilder builder = new StringBuilder();
-        buildString(os, forLogging, builder);
-        return builder.toString();
-    }
+    public abstract String toString(OperatingSystemFamily os, boolean forLogging);
 
     /**
      * Builds a string representation of this argument.
@@ -179,7 +176,7 @@ public abstract class CmdLineArgument implements Serializable {
 
         @Override
         public String toString() {
-            return arg;
+            return toString(UNIX, true);
         }
     }
 
@@ -187,6 +184,11 @@ public abstract class CmdLineArgument implements Serializable {
 
         public Raw(String arg) {
             super(arg);
+        }
+
+        @Override
+        public String toString(OperatingSystemFamily os, boolean forLogging) {
+            return arg;
         }
 
         @Override
@@ -206,6 +208,11 @@ public abstract class CmdLineArgument implements Serializable {
         }
 
         @Override
+        public String toString(OperatingSystemFamily os, boolean forLogging) {
+            return arg;
+        }
+
+        @Override
         public void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder) {
             String s = arg;
             encodeString(s, os, builder);
@@ -221,6 +228,15 @@ public abstract class CmdLineArgument implements Serializable {
         }
 
         @Override
+        public String toString(OperatingSystemFamily os, boolean forLogging) {
+            if(forLogging) {
+                return HIDDEN_PASSWORD;
+            } else {
+                return arg;
+            }
+        }
+
+        @Override
         public void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder) {
             if (forLogging) {
                 builder.append(HIDDEN_PASSWORD);
@@ -229,10 +245,6 @@ public abstract class CmdLineArgument implements Serializable {
             }
         }
 
-        @Override
-        public String toString() {
-            return HIDDEN_PASSWORD;
-        }
     }
 
     private static class Nested extends CmdLineArgument {
@@ -241,6 +253,12 @@ public abstract class CmdLineArgument implements Serializable {
 
         public Nested(CmdLine line) {
             this.line = line;
+        }
+
+        public String toString(OperatingSystemFamily os, boolean forLogging) {
+            StringBuilder builder = new StringBuilder();
+            encodeString(line.toCommandLine(os, forLogging), os, builder);
+            return builder.toString();
         }
 
         @Override
