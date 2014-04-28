@@ -186,6 +186,10 @@ Apart from selecting a protocol to use, you will also need to supply a number of
         <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
         command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
 </tr>
+<tr>
+    <th align="left" valign="top"><a name="remoteCopyBufferSize"></a>remoteCopyBufferSize</th>
+    <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>1 megabyte (1024*1024 bytes)</code>.</td>
+</tr>
 
 </table>
 

@@ -159,6 +159,16 @@ public class ConnectionOptions {
      */
     public static final String DIRECTORY_COPY_COMMAND_FOR_ZOS_DEFAULT = "tar cC {0} . | tar xmC {1}";
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCopyBufferSize">the online documentation</a>
+     */
+    public static final String REMOTE_COPY_BUFFER_SIZE = "remoteCopyBufferSize";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCopyBufferSize">the online documentation</a>
+     */
+    public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 1024 * 1024; // 1 MB
+
     private final Map<String, Object> options;
 
     private static final ImmutableSet<String> filteredKeys = ImmutableSet.of(PASSWORD, PASSPHRASE);

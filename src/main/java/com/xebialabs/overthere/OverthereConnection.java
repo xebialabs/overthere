@@ -138,6 +138,11 @@ public interface OverthereConnection extends Closeable {
     void close();
 
     /**
+     * @return The {@link com.xebialabs.overthere.ConnectionOptions} used to create this connection.
+     */
+    ConnectionOptions getOptions();
+
+    /**
      * Implementations MUST implement toString properly.
      */
     @Override

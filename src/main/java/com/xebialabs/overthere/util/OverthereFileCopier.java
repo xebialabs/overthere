@@ -30,12 +30,13 @@ import java.io.OutputStream;
 import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.OutputSupplier;
+import com.google.common.io.*;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
  * OverthereFile copy utility that uses only the input and output streams exposed by the OverthereFile to perform the
@@ -142,23 +143,33 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
         if (dstFile.exists())
             logger.debug("About to overwrite existing file {}", dstFile);
-        logger.debug("Copying file {} to {}", srcFile, dstFile);
+
+        ConnectionOptions options = srcFile.getConnection().getOptions();
+        int bufferSize = options.getInteger(ConnectionOptions.REMOTE_COPY_BUFFER_SIZE, ConnectionOptions.REMOTE_COPY_BUFFER_SIZE_DEFAULT);
+        logger.debug("Copying file {} to {} with buffer size {}", new Object[]{srcFile, dstFile, bufferSize});
 
         try {
-            ByteStreams.copy(new InputSupplier<InputStream>() {
-                                 @Override
-                                 public InputStream getInput() throws IOException {
-                                     return new BufferedInputStream(srcFile.getInputStream());
-                                 }
-                             }, new OutputSupplier<OutputStream>() {
-                                 @Override
-                                 public OutputStream getOutput() throws IOException {
-                                     return new BufferedOutputStream(dstFile.getOutputStream());
-                                 }
-                             }
-            );
+            InputStream is = srcFile.getInputStream();
+            try {
+                OutputStream os = dstFile.getOutputStream();
+                try {
+                    copy(is, os, bufferSize);
+                } finally {
+                    closeQuietly(os);
+                }
+            } finally {
+                closeQuietly(is);
+            }
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc);
+        }
+    }
+
+    private static void copy(final InputStream in, final OutputStream out, final int bufferSize) throws IOException {
+        byte[] buffer = new byte[bufferSize];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
         }
     }
 
