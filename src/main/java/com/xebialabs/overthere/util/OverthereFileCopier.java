@@ -36,6 +36,8 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 
+import static com.xebialabs.overthere.ConnectionOptions.REMOTE_COPY_BUFFER_SIZE;
+import static com.xebialabs.overthere.ConnectionOptions.REMOTE_COPY_BUFFER_SIZE_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
@@ -134,8 +136,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
      *
      * @param srcFile the source file. Must exists and must not be a directory.
      * @param dstFile the destination file. May exists but must not be a directory. Its parent directory must exist.
-     * @throws com.xebialabs.deployit.exception.RuntimeIOException
-     *          if an I/O error occurred
+     * @throws RuntimeIOException if an I/O error occurred
      */
     private static void copyFile(final OverthereFile srcFile, final OverthereFile dstFile) throws RuntimeIOException {
         checkFileExists(srcFile, SOURCE);
@@ -145,7 +146,7 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
             logger.debug("About to overwrite existing file {}", dstFile);
 
         ConnectionOptions options = srcFile.getConnection().getOptions();
-        int bufferSize = options.getInteger(ConnectionOptions.REMOTE_COPY_BUFFER_SIZE, ConnectionOptions.REMOTE_COPY_BUFFER_SIZE_DEFAULT);
+        int bufferSize = options.getInteger(REMOTE_COPY_BUFFER_SIZE, REMOTE_COPY_BUFFER_SIZE_DEFAULT);
         logger.debug("Copying file {} to {} with buffer size {}", new Object[]{srcFile, dstFile, bufferSize});
 
         try {
