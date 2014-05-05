@@ -167,7 +167,7 @@ public class ConnectionOptions {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCopyBufferSize">the online documentation</a>
      */
-    public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 1024 * 1024; // 1 MB
+    public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 64 * 1024; // 64 KB
 
     private final Map<String, Object> options;
 

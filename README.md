@@ -188,7 +188,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 </tr>
 <tr>
     <th align="left" valign="top"><a name="remoteCopyBufferSize"></a>remoteCopyBufferSize</th>
-    <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>1 megabyte (1024*1024 bytes)</code>.</td>
+    <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>64 KB (64*1024 bytes)</code>. Larger values potentially break copy operations.</td>
 </tr>
 
 </table>
