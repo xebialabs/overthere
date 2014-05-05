@@ -24,6 +24,7 @@ package com.xebialabs.overthere.itest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.OverthereFile;
@@ -43,23 +44,25 @@ public abstract class ItestsBase4Size extends ItestsBase3Copy {
 
     @Test
     public void shouldWriteLargeFile() throws IOException {
-        byte[] largeFileContentsWritten = generateRandomBytes(LARGE_FILE_SIZE);
+        byte[] expected = generateRandomBytes(LARGE_FILE_SIZE);
 
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
-        OverthereUtils.write(largeFileContentsWritten, remoteLargeFile);
+        OverthereUtils.write(expected, remoteLargeFile);
 
-        assertThat(readFile(remoteLargeFile), equalTo(largeFileContentsWritten));
+        byte[] actual = readFile(remoteLargeFile);
+        assertThat("Data read is not identical to data written", Arrays.equals(actual, expected), equalTo(true));
     }
 
     @Test
     public void shouldCopyLargeFile() throws IOException {
         File largeFile = temp.newFile("large.dat");
-        byte[] largeFileContentsWritten = writeRandomBytes(largeFile, LARGE_FILE_SIZE);
+        byte[] expected = writeRandomBytes(largeFile, LARGE_FILE_SIZE);
 
         OverthereFile remoteLargeFile = connection.getTempFile("large.dat");
         LocalFile.valueOf(largeFile).copyTo(remoteLargeFile);
 
-        assertThat(readFile(remoteLargeFile), equalTo(largeFileContentsWritten));
+        byte[] actual = readFile(remoteLargeFile);
+        assertThat("Data read is not identical to data written", Arrays.equals(actual, expected), equalTo(true));
     }
 
 
