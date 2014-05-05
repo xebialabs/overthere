@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.io.Closeables;
 import com.google.common.util.concurrent.Monitor;
 
 import com.xebialabs.overthere.CmdLine;

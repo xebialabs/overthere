@@ -22,21 +22,15 @@
  */
 package com.xebialabs.overthere.itest;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import org.testng.annotations.Test;
-import com.google.common.io.InputSupplier;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.local.LocalConnection;
 import com.xebialabs.overthere.local.LocalFile;
 
 import nl.javadude.assumeng.Assumption;
 
-import static com.google.common.io.ByteStreams.copy;
 import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

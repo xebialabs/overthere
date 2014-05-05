@@ -26,14 +26,7 @@ import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-import com.xebialabs.overthere.ssh.SshConnectionType;
-
 import static com.xebialabs.overthere.local.LocalConnection.getLocalConnection;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
-import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
 import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
