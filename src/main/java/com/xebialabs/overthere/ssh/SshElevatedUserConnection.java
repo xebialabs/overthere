@@ -122,14 +122,21 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
     @VisibleForTesting
     CmdLine prefixWithElevationCommand(final CmdLine commandLine) {
         CmdLine commandLineWithSudo = new CmdLine();
-        commandLineWithSudo.addTemplatedFragment(elevationCommandPrefix, elevatedUsername);
         if (quoteCommand) {
+            commandLineWithSudo.addTemplatedFragment(elevationCommandPrefix, elevatedUsername);
             commandLineWithSudo.addNested(commandLine);
         } else {
+            boolean shouldAddElevationCommand = true;
             for (CmdLineArgument a : commandLine.getArguments()) {
-                commandLineWithSudo.add(a);
-                if (a.toString(os, false).equals("|") || a.toString(os, false).equals(";")) {
+                if(shouldAddElevationCommand && !a.toString(os, false).equals("cd")) {
                     commandLineWithSudo.addTemplatedFragment(elevationCommandPrefix, elevatedUsername);
+                }
+                shouldAddElevationCommand = false;
+
+                commandLineWithSudo.add(a);
+
+                if (a.toString(os, false).equals("|") || a.toString(os, false).equals(";")) {
+                    shouldAddElevationCommand = true;
                 }
             }
         }
