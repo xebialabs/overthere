@@ -81,7 +81,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
     @Override
     public long lastModified() {
-        return stat().getMtime();
+        return stat().getMtime() * 1000;
     }
 
     @Override
