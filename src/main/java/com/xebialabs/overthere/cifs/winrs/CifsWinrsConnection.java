@@ -69,6 +69,7 @@ public class CifsWinrsConnection extends CifsConnection {
         super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a machine that is not running Windows", cifsConnectionType.toString().toLowerCase());
         checkArgument(mapper instanceof DefaultAddressPortMapper, "Cannot create a " + CIFS_PROTOCOL + ":%s connection when connecting through a SSH jumpstation", cifsConnectionType.toString().toLowerCase());
+        checkArgument(password.indexOf('\'') == -1 && password.indexOf('\"') == -1, "Cannot create a " + CIFS_PROTOCOL + ":%s connection with a password that contains a single quote (\') or a double quote (\")", cifsConnectionType.toString().toLowerCase());
 
         this.options = options;
 

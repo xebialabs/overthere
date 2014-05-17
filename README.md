@@ -554,6 +554,10 @@ The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en
 * WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
+### Password limitations
+
+Due to a limitation of the `winrs` command, passwords containing a single quote (`'`) or a double quote (`"`) cannot be used when using the __WINRM_NATIVE__ connection type.
+
 ### Domain accounts
 Windows domain accounts are supported by the __WINRM_INTERNAL__, __WINRM_NATIVE__ and __TELNET__ connection types, but the syntax of the username is different:
 
