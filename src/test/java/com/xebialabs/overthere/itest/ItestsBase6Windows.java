@@ -65,7 +65,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with an old-style Windows domain account");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account"));
+            assertThat(expected.getMessage(), containsString("Cannot create a " + CIFS_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account"));
         }
     }
 
@@ -78,7 +78,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
             Overthere.getConnection(protocol, incorrectUserNameOptions);
             fail("Expected not to be able to connect with a new-style Windows domain account");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot start a " + CIFS_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account"));
+            assertThat(expected.getMessage(), containsString("Cannot create a " + CIFS_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account"));
         }
     }
 
