@@ -89,8 +89,8 @@ public class CifsWinRmConnection extends CifsConnection {
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
-        checkArgument(!username.contains("\\"), "Cannot start a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
+        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
+        checkArgument(!username.contains("\\"), "Cannot create a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
         this.options = options;
     }

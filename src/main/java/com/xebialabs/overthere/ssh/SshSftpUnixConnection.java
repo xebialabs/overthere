@@ -36,7 +36,7 @@ class SshSftpUnixConnection extends SshSftpConnection {
 
     public SshSftpUnixConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os != WINDOWS, "Cannot start a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
+        checkArgument(os != WINDOWS, "Cannot create a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
     }
 
     @Override

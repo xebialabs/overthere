@@ -64,7 +64,7 @@ public class CifsWinrsConnection extends CifsConnection {
 
     public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot start a " + CIFS_PROTOCOL + ":%s connection to a machine that is not running Windows", cifsConnectionType.toString().toLowerCase());
+        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a machine that is not running Windows", cifsConnectionType.toString().toLowerCase());
         checkArgument(mapper instanceof DefaultAddressPortMapper, "Cannot create a " + CIFS_PROTOCOL + ":%s connection when connecting through a SSH jumpstation", cifsConnectionType.toString().toLowerCase());
 
         this.options = options;
