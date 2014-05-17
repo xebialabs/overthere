@@ -56,6 +56,9 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPT
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
+/**
+ * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
+ */
 public class CifsWinrsConnection extends CifsConnection {
 
     private ConnectionOptions options;

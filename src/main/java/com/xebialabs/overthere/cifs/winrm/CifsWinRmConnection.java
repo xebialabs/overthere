@@ -70,12 +70,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**
- * A connection to a Windows host using CIFS and WinRM.
- * <p/>
- * Limitations:
- * <ul>
- * <li>Cannot start a process yet. Rudimentary support is in, but it is not ready yet.</li>
- * </ul>
+ * A connection to a Windows host using CIFS and a Java implementation of WinRM.
  */
 public class CifsWinRmConnection extends CifsConnection {
 
