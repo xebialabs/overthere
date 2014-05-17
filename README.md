@@ -755,7 +755,7 @@ Some other useful commands:
 <a name="cifs_troubleshooting"></a>
 ### Troubleshooting CIFS, WinrRM and Telnet
 
-This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, pease let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
+This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, please let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
 
 For more troubleshooting tips for Kerberos, please refer to the [Kerberos troubleshooting guide in the Java SE documentation](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html).
 
@@ -1032,43 +1032,43 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 * Overthere 2.4.1 (24-Mar-2014)
     * Fixed race condition in creation of temporary directories.
 * Overthere 2.4.0 (12-Mar-2014)
-    * Added support for the the SU connection type, fixes issue [#102](https://github.com/xebialabs/overthere/issues/102) and reverted fix for issue [#89](https://github.com/xebialabs/overthere/issues/89).
-    * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, fixes issue [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts. 
+    * Added support for the the SU connection type, which fixes [#102](https://github.com/xebialabs/overthere/issues/102), and reverted the fix for [#89](https://github.com/xebialabs/overthere/issues/89).
+    * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, which fixes [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts. 
     * Fixed [#87](https://github.com/xebialabs/overthere/issues/87), [#88](https://github.com/xebialabs/overthere/issues/88), [#96](https://github.com/xebialabs/overthere/issues/96), [#99](https://github.com/xebialabs/overthere/issues/99), [#103](https://github.com/xebialabs/overthere/issues/103), [#104](https://github.com/xebialabs/overthere/issues/104).
 * Overthere 2.3.1 (16-Jan-2014)
     * Fixed [#89](https://github.com/xebialabs/overthere/issues/89)
     * Fixed race condition in creation of local temporary directories.
 * Overthere 2.3.0 (25-Oct-2013)
-    * Implemented support for `winrs`, the native WinRM implementation available on Windows hosts, fixes issue [#12|https://github.com/xebialabs/overthere/issues/12]. *N.B.:* To distinguish this connection type from the existing Java one, the connection type `WINRM` has been replaced by `WINRM_INTERNAL` (the Java implementation) and `WINRM_NATIVE` (the Windows implementation).
+    * Implemented support for `winrs`, the native WinRM implementation available on Windows hosts, which fixes [#12|https://github.com/xebialabs/overthere/issues/12]. *N.B.:* To distinguish this connection type from the existing Java one, the connection type `WINRM` has been replaced by `WINRM_INTERNAL` (the Java implementation) and `WINRM_NATIVE` (the Windows implementation).
     * Added `refreshKrb5Config=true` option to the Kerberos JAAS configuration to make sure the configuration is re-read for every request.
     * Upgraded the SSH/J 0.9.0.
     * Fixed bug that occurred when reading or writing many files over a single SFTP connection to a WinSSHD server.
 * Overthere 2.2.2 (28-Aug-2013)
     * Fixed [#81](https://github.com/xebialabs/overthere/issues/81).
 * Overthere 2.2.1 (24-Jul-2013)
-    * Fully implemented `OverthereConnection.startProcess()` for CIFS/WinRM connections, fixes issue [#54](https://github.com/xebialabs/overthere/issues/54) properly. The previous implementation did not handle `stdin`.
+    * Fully implemented `OverthereConnection.startProcess()` for CIFS/WinRM connections, which fixes [#54](https://github.com/xebialabs/overthere/issues/54) properly. The previous implementation did not handle `stdin`.
     * Fixed [#57](https://github.com/xebialabs/overthere/issues/57), [#72](https://github.com/xebialabs/overthere/issues/72), [#73](https://github.com/xebialabs/overthere/issues/73), [#76](https://github.com/xebialabs/overthere/issues/76), [#77](https://github.com/xebialabs/overthere/pull/77) and [#79](https://github.com/xebialabs/overthere/issues/79).
     * Updated documentation and troubleshooting guides for SSH, CIFS, WinRM and Kerberos.
     * Some minor code and documentation fixes.
 * Overthere 2.2.0 (07-Feb-2013)
-    * Introduced `OverthereExecutionOutputHandler` interface to allow `stderr` to also be captured character by character, fixes issue [#67](https://github.com/xebialabs/overthere/issues/67).
-    * Made the commands used for SSH/SCP, SSH/SUDO and SSH/INTERACTIVE_SUDO connections configurable, fixes issue [#52](https://github.com/xebialabs/overthere/issues/52).
+    * Introduced `OverthereExecutionOutputHandler` interface to allow `stderr` to also be captured character by character, which fixes [#67](https://github.com/xebialabs/overthere/issues/67).
+    * Made the commands used for SSH/SCP, SSH/SUDO and SSH/INTERACTIVE_SUDO connections configurable, which fixes [#52](https://github.com/xebialabs/overthere/issues/52).
     * Made `canStartProcess()` return `false` for CIFS/WinRM connections because its `startProcess` implementation does not correctly handle `stdin`, disables fix for issue [#54](https://github.com/xebialabs/overthere/issues/54).
-    * Fixed issues [#65](https://github.com/xebialabs/overthere/issues/65), [#68](https://github.com/xebialabs/overthere/issues/68) and [#70](https://github.com/xebialabs/overthere/issues/70).
+    * Fixed [#65](https://github.com/xebialabs/overthere/issues/65), [#68](https://github.com/xebialabs/overthere/issues/68) and [#70](https://github.com/xebialabs/overthere/issues/70).
     * Some minor code fixes.
     * Some not-so-minor documentation improvements: more setup and troubleshooting info for WinRM and Kerberos.
 * Overthere 2.1.1 (17-Dec-2012)
-    * Fixed issues [#61](https://github.com/xebialabs/overthere/issues/61) and [#62](https://github.com/xebialabs/overthere/issues/62).
-    * Added connection option [__openShellBeforeExecute__](#ssh_openShellBeforeExecute), fixes [#63](https://github.com/xebialabs/overthere/issues/63).
+    * Fixed [#61](https://github.com/xebialabs/overthere/issues/61) and [#62](https://github.com/xebialabs/overthere/issues/62).
+    * Added connection option [__openShellBeforeExecute__](#ssh_openShellBeforeExecute), which fixes [#63](https://github.com/xebialabs/overthere/issues/63).
 * Overthere 2.1.0 (26-Oct-2012)
-    * Re-enabled support for Windows domain accounts in CIFS/Telnet connections, fixes issue [#60](https://github.com/xebialabs/overthere/issues/60).
-    * Fixed Kerberos code to use WSMAN SPN by default, fixes [#58](https://github.com/xebialabs/overthere/issues/58).
-    * Added option to add the port to the SPN, fixes [#49](https://github.com/xebialabs/overthere/issues/49).
-    * Added support for Negotiate authentication (Kerberos only), fixes [#59](https://github.com/xebialabs/overthere/issues/59).
+    * Re-enabled support for Windows domain accounts in CIFS/Telnet connections, which fixes [#60](https://github.com/xebialabs/overthere/issues/60).
+    * Fixed Kerberos code to use WSMAN SPN by default, which fixes [#58](https://github.com/xebialabs/overthere/issues/58).
+    * Added option to add the port to the SPN, which fixes [#49](https://github.com/xebialabs/overthere/issues/49).
+    * Added support for Negotiate authentication (Kerberos only), which fixes [#59](https://github.com/xebialabs/overthere/issues/59).
     * Some minor code and documentation fixes.
 * Overthere 2.1.0-beta-1 (21-Sep-2012)
-    * Implemented `OverthereProcess.startProcess()` for CIFS/WinRM connections, fixes issue [#54](https://github.com/xebialabs/overthere/issues/54).
-    * Fixed issues [#53](https://github.com/xebialabs/overthere/issues/53) and [#55](https://github.com/xebialabs/overthere/issues/55).
+    * Implemented `OverthereProcess.startProcess()` for CIFS/WinRM connections, which fixes [#54](https://github.com/xebialabs/overthere/issues/54).
+    * Fixed [#53](https://github.com/xebialabs/overthere/issues/53) and [#55](https://github.com/xebialabs/overthere/issues/55).
     * Some minor code and documentation fixes.
 * Overthere 2.0.0 (22-Aug-2012)
     * Stable release of Overthere 2.0.0.
@@ -1090,17 +1090,17 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
     * Fixed bug in SSH tunnel port allocation code that caused the same local port to be allocated multiple times on Windows.
     * Changed license to GPLv2 with XebiaLabs FLOSS License Exception.
 * Overthere 2.0.0-beta-4 (19-Jun-2012)
-    * Fixed issue [#42](https://github.com/xebialabs/overthere/issues/42).
+    * Fixed [#42](https://github.com/xebialabs/overthere/issues/42).
     * Moved the `itest-support` sub project out to new Github repository [Overcast](https://github.com/xebialabs/overcast)
     * Updated documentation.
 * Overthere 2.0.0-beta-3 (27-Mar-2012)
     * Updated documentation.
 * Overthere 2.0.0-beta-2 (23-Mar-2012)
-	* Fixed issues [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
+	* Fixed [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
 	* Upgraded to latest jCIFS to fix issues with windows domain names and stability using tunnels.
 	* Set default pty to true in case of interactive sudo and no pty set.
 * Overthere 1.0.17 (20-Mar-2012)
-    * Fixed issues [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
+    * Fixed [#39](https://github.com/xebialabs/overthere/issues/39) and [#40](https://github.com/xebialabs/overthere/issues/40).
 * Overthere 2.0.0-beta-1 (05-Mar-2012)
     * Re-implemented SSH tunnels. Tunnels are now created on demand instead of the user having to specify the localPortForwards explicitly. This makes management of tunnels easier and prevents clashes.
     * Ported Overthere tests to use TestNG instead of JUnit.
@@ -1123,7 +1123,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
     * Made it possible to access non-administrative shares on Windows so that the CIFS connection methods can be used with regular user accounts. See the [__pathShareMappings__](#cifs_pathShareMappings) connection option.
     * Added the [__allocatePty__](#ssh_allocatePty) connection option to specify an explicit pseudo terminal to use.
 * Overthere 1.0.11 (09-Dec-2011)
-    * Fixes to the SSH/WinSSHD implementation and a few other little fixes.
+    * Fixes to the SSH/WinSSHD implementation and a few other minor fixes.
     * Added a lot of documentation.
     * Added examples project.
     * Changed license to ASLv2.
