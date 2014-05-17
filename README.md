@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.2%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.3%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.4.2</version>
+			<version>2.4.3</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1027,6 +1027,9 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 2.4.3 (17-May-2014)
+    * Fixed [#101](https://github.com/xebialabs/overthere/issues/101), [#106](https://github.com/xebialabs/overthere/issues/106), [#111](https://github.com/xebialabs/overthere/issues/111), [#112](https://github.com/xebialabs/overthere/issues/112), [#114](https://github.com/xebialabs/overthere/issues/114), [#115](https://github.com/xebialabs/overthere/issues/115) and [#116](https://github.com/xebialabs/overthere/issues/116)
+    * Some minor code and documentation fixes.
 * Overthere 2.4.2 (26-Mar-2014)
     * Bumped Guava to version 16.0.1. This ensures that overthere should work on JDK 1.7.0_51 and up.
 * Overthere 2.4.1 (24-Mar-2014)
