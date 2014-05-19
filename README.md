@@ -249,13 +249,14 @@ To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvis
 
 To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have to be set up in such a way that the user configured with the connection option __username__ can execute the commands below as the user configured with the connection option __sudoUsername__. The arguments passed to these commands depend on the exact usage of the Overthere connection. Check the `INFO` messages on the `com.xebialabs.overthere.ssh.SshConnection` category to see what commands get executed.
 
-* `ls`
-* `cp`
-* `mv`
-* `mkdir`
-* `rmdir`
-* `rm`
 * `chmod`
+* `cp`
+* `ls`
+* `mkdir`
+* `mv`
+* `rm`
+* `rmdir`
+* `tar`
 * Any other command that you want to execute.
     
 The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
