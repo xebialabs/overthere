@@ -155,24 +155,24 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <tr>
     <th align="left" valign="top"><a name="fileCopyCommandForUnix"></a>fileCopyCommandForUnix</th>
     <td>The command to use when copying a file on a Unix host. The string <code>{0}</code> is replaced with the path of the source file, the string
-        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>copy {0} {1} /y</code>.</td>
+        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>cp -p {0} {1}</code>.</td>
 </tr>
 <tr>
     <th align="left" valign="top"><a name="directoryCopyCommandForUnix"></a>directoryCopyCommandForUnix</th>
     <td>The command to use when copying a directory on a Unix host. The string <code>{0}</code> is replaced with the path of the source directory, the string
-        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>xcopy {0} {1} /i /y /s /e /h /q</code>.</td>
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>cd {1} ; tar -cf - -C {0} . | tar xpf -</code>. If the
+        <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
+        command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
 </tr>
 <tr>
     <th align="left" valign="top"><a name="fileCopyCommandForWindows"></a>fileCopyCommandForWindows</th>
     <td>The command to use when copying a file on a Windows host. The string <code>{0}</code> is replaced with the path of the source file, the string
-        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>cp -p {0} {1}</code>.</td>
+        <code>{1}</code> is replaced with the path of the destination file. The default value is <code>copy {0} {1} /y</code>.</td>
 </tr>
 <tr>
     <th align="left" valign="top"><a name="directoryCopyCommandForWindows"></a>directoryCopyCommandForWindows</th>
     <td>The command to use when copying a directory on a Windows host. The string <code>{0}</code> is replaced with the path of the source directory, the string
-        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>cd {1} ; tar -cf - -C {0} . | tar xpf -</code>. If the
-        <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
-        command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>xcopy {0} {1} /i /y /s /e /h /q</code>.</td>
 </tr>
 <tr>
     <th align="left" valign="top"><a name="fileCopyCommandForZos"></a>fileCopyCommandForZos</th>
