@@ -84,7 +84,7 @@ import static java.net.InetSocketAddress.createUnresolved;
  */
 abstract class SshConnection extends BaseOverthereConnection {
 
-    public static final String PTY_PATTERN = "(\\w+):(\\d+):(\\d+):(\\d+):(\\d+)";
+    public static final String PTY_PATTERN = "([\\w-]+):(\\d+):(\\d+):(\\d+):(\\d+)";
 
     public static final String NOCD_PSEUDO_COMMAND = "nocd";
 
