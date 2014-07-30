@@ -63,7 +63,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
     private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = Predicates.<String>not(Predicates.<String>or(equalTo("."), equalTo("..")));
 
-    private static final String PERMISSIONS_TOKEN_PATTERN = "[dl\\-]([r\\-][w\\-][xst\\-]){3}[@\\.\\+]*";
+    private static final String PERMISSIONS_TOKEN_PATTERN = "[dl\\-]([r\\-][w\\-][xsStT\\-]){3}[@\\.\\+]*";
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
@@ -177,7 +177,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
         results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
         results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
         results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
-        results.canExecute = permissions.length() >= 4 && permissions.charAt(3) == 'x';
+        results.canExecute = permissions.length() >= 4 && (permissions.charAt(3) == 'x' || permissions.charAt(3) == 's' || permissions.charAt(3) == 't');
         try {
             results.length = Integer.parseInt(size);
         } catch (NumberFormatException exc) {
