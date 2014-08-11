@@ -83,6 +83,8 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
     protected Random random = new Random();
+    private volatile Boolean isClosed;
+    private Throwable openStack;
 
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
         this.protocol = checkNotNull(protocol, "Cannot create OverthereConnection with null protocol");
@@ -96,6 +98,12 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
         this.temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
     }
+
+    protected void connected() {
+        this.isClosed = Boolean.FALSE;
+        this.openStack = new Throwable("Opened here...");
+    }
+
 
     /**
      * Return the OS family of the host.
@@ -113,15 +121,19 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public final void close() {
-        if (deleteTemporaryDirectoryOnDisconnect) {
-            deleteConnectionTemporaryDirectory();
+        try {
+            if (deleteTemporaryDirectoryOnDisconnect) {
+                deleteConnectionTemporaryDirectory();
+            }
+
+            doClose();
+
+            closeQuietly(mapper);
+
+            logger.info("Disconnected from {}", this);
+        } finally {
+            isClosed = Boolean.TRUE;
         }
-
-        doClose();
-
-        closeQuietly(mapper);
-
-        logger.info("Disconnected from {}", this);
     }
 
     /**
@@ -385,5 +397,20 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         int result = protocol.hashCode();
         result = 31 * result + options.hashCode();
         return result;
+    }
+
+    /**
+     * Make sure that the connection is cleaned up. This will log error messages if the connection is collected before it is cleaned up.
+     *
+     * @throws Throwable
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        // Only trigger if connected() method was called to set the connected state
+        if (isClosed != null && !isClosed) {
+            logger.error(String.format("Connection [%s] was not closed, closing automatically.", this), openStack);
+            closeQuietly(this);
+        }
+        super.finalize();
     }
 }

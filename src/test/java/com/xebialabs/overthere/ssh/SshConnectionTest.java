@@ -82,17 +82,23 @@ public class SshConnectionTest {
     public void shouldUsePasswordIfNoKeyfile() throws IOException {
         String password = "secret";
         connectionOptions.set(PASSWORD, password);
-        newConnectionWithClient(client).connect();
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
 
         verify(client).auth(eq("some-user"), isA(AuthMethod.class), isA(AuthMethod.class));
+        connection.close();
+
     }
 
     @Test
     public void shouldUseKeyfileIfNoPassword() throws IOException {
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
-        newConnectionWithClient(client).connect();
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
 
         verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        connection.close();
+
     }
 
     @Test
@@ -100,10 +106,13 @@ public class SshConnectionTest {
         String password = "secret";
         connectionOptions.set(PASSWORD, password);
         connectionOptions.set(PRIVATE_KEY_FILE, "/path/to/keyfile");
-        newConnectionWithClient(client).connect();
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
 
         verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
         verify(client, never()).authPassword(anyString(), anyString());
+        connection.close();
+
     }
 
     @Test
@@ -117,6 +126,7 @@ public class SshConnectionTest {
         connection.startProcess(CmdLine.build("dummy"));
 
         verify(session, times(0)).allocateDefaultPTY();
+        connection.close();
     }
 
     @Test
@@ -130,6 +140,7 @@ public class SshConnectionTest {
         connection.startProcess(CmdLine.build("dummy"));
 
         verify(session).allocateDefaultPTY();
+        connection.close();
     }
 
     @SuppressWarnings("unchecked")
@@ -144,6 +155,7 @@ public class SshConnectionTest {
         connection.startProcess(CmdLine.build("dummy"));
 
         verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
+        connection.close();
     }
 
     @SuppressWarnings("unchecked")
@@ -160,6 +172,8 @@ public class SshConnectionTest {
 
         verify(session).allocatePTY(eq("xterm"), eq(132), eq(50), eq(264), eq(100), anyMap());
         verify(session, times(0)).allocateDefaultPTY();
+        connection.close();
+
     }
 
     private SshConnection newConnectionWithClient(SSHClient client) {

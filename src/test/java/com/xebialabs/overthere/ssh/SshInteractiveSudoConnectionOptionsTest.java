@@ -41,6 +41,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -81,7 +82,8 @@ public class SshInteractiveSudoConnectionOptionsTest {
     public void shouldAcceptPasswordPromptRegex() {
         ConnectionOptions options = new ConnectionOptions(connectionOptions);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, "[Pp]assword.*:");
-        new SshInteractiveSudoConnection(SSH_PROTOCOL, options, new DefaultAddressPortMapper());
+        SshInteractiveSudoConnection connection = new SshInteractiveSudoConnection(SSH_PROTOCOL, options, new DefaultAddressPortMapper());
+        connection.close();
     }
 
     @Test
@@ -90,8 +92,13 @@ public class SshInteractiveSudoConnectionOptionsTest {
         options.set(ALLOCATE_DEFAULT_PTY, false);
         options.set(ALLOCATE_PTY, null);
         SshInteractiveSudoConnection sshInteractiveSudoConnection = new SshInteractiveSudoConnection(SSH_PROTOCOL, options, new DefaultAddressPortMapper());
-        Field allocatePty = SshConnection.class.getDeclaredField("allocatePty");
-        allocatePty.setAccessible(true);
-        assertThat((String) allocatePty.get(sshInteractiveSudoConnection), equalTo("vt220:80:24:0:0"));
+        try {
+            Field allocatePty = SshConnection.class.getDeclaredField("allocatePty");
+            allocatePty.setAccessible(true);
+            assertThat((String) allocatePty.get(sshInteractiveSudoConnection), equalTo("vt220:80:24:0:0"));
+        } finally {
+            closeQuietly(sshInteractiveSudoConnection);
+        }
+
     }
 }

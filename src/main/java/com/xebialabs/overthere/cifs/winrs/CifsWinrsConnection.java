@@ -79,6 +79,8 @@ public class CifsWinrsConnection extends CifsConnection {
             disconnectFromWinrsProxy();
             throw new IllegalArgumentException(format("Cannot create a " + CIFS_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }
+        // Make sure that we're properly cleaned up by setting the connected state.
+        connected();
     }
 
     @Override

@@ -180,6 +180,7 @@ abstract class SshConnection extends BaseOverthereConnection {
                         new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
             }
             sshClient = client;
+            connected();
         } catch (SSHException e) {
             throw new RuntimeIOException("Cannot connect to " + this, e);
         }
@@ -202,7 +203,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     @Override
     public void doClose() {
-        checkState(sshClient != null, "Already disconnected");
+        if (sshClient == null) return;
         try {
             sshClient.disconnect();
         } catch (Exception e) {
