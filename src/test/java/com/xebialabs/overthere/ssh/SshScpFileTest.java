@@ -25,8 +25,11 @@ package com.xebialabs.overthere.ssh;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SshScpFileTest {
 
@@ -36,6 +39,7 @@ public class SshScpFileTest {
     @BeforeClass
     public void setup() {
         connection = mock(SshScpConnection.class);
+        when(connection.getUserGroups()).thenReturn(new SshScpConnection.GroupDetails("staff ajvanerp"));
         sshScpFile = new SshScpFile(connection, "/foo/bar");
     }
 

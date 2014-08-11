@@ -107,6 +107,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String GET_FILE_INFO_COMMAND_DEFAULT = "ls -ld {0}";
 
     /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_getFileInfoCommand">the online documentation</a>
+     */
+    public static final String GET_USER_GROUP_DETAILS_COMMAND = "getUserGroupDetailsCommand";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_getFileInfoCommand">the online documentation</a>
+     */
+    public static final String GET_USER_GROUP_DETAILS_COMMAND_DEFAULT = "id -Gn";
+
+    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_interactiveKeyboardAuthRegex">the online documentation</a>
      */
     public static final String INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX = "interactiveKeyboardAuthRegex";

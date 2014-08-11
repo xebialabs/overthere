@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.acl.Group;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -154,6 +155,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
     }
 
     protected boolean parseLsOutputLine(LsResults results, String outputLine) {
+        SshScpConnection.GroupDetails details = connection.getUserGroups();
         StringTokenizer outputTokens = new StringTokenizer(outputLine);
         if (outputTokens.countTokens() < 5) {
             logger.debug("Not parsing ls output line [{}] because it has less than 5 tokens", outputLine);
@@ -169,15 +171,16 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         logger.debug("Parsing ls output line [{}]", outputLine);
         outputTokens.nextToken(); // inodelinks
-        outputTokens.nextToken(); // owner
-        outputTokens.nextToken(); // group
+        String owner = outputTokens.nextToken(); // owner
+        String group = outputTokens.nextToken(); // group
         String size = outputTokens.nextToken();
 
         results.isFile = permissions.length() >= 1 && permissions.charAt(0) == '-';
         results.isDirectory = permissions.length() >= 1 && permissions.charAt(0) == 'd';
-        results.canRead = permissions.length() >= 2 && permissions.charAt(1) == 'r';
-        results.canWrite = permissions.length() >= 3 && permissions.charAt(2) == 'w';
-        results.canExecute = permissions.length() >= 4 && (permissions.charAt(3) == 'x' || permissions.charAt(3) == 's' || permissions.charAt(3) == 't');
+        FilePermissions perms = new FilePermissions(owner, group, permissions);
+        results.canRead = perms.canRead(connection.username, details.getGroups());
+        results.canWrite = perms.canWrite(connection.username, details.getGroups());
+        results.canExecute = perms.canExecute(connection.username, details.getGroups());
         try {
             results.length = Integer.parseInt(size);
         } catch (NumberFormatException exc) {

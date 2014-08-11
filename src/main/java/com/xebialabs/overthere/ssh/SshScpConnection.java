@@ -22,35 +22,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import java.util.List;
+import com.google.common.base.Splitter;
+
+import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_FILE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_RECURSIVELY_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.GET_FILE_INFO_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LIST_FILES_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIRS_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.MKDIR_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.RENAME_TO_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_EXECUTABLE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SET_NOT_EXECUTABLE_COMMAND_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
+import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
+import static com.xebialabs.overthere.util.NullOverthereExecutionOutputHandler.swallow;
 
 /**
  * A connection to a Unix host using SSH w/ SCP.
@@ -58,12 +45,13 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 class SshScpConnection extends SshConnection {
 
     protected String deleteDirectoryCommand;
-
     protected String deleteFileCommand;
 
     protected String deleteRecursivelyCommand;
 
     protected String getFileInfoCommand;
+
+    protected String getUserGroupsCommand;
 
     protected String listFilesCommand;
 
@@ -86,6 +74,7 @@ class SshScpConnection extends SshConnection {
         deleteFileCommand = options.get(DELETE_FILE_COMMAND, DELETE_FILE_COMMAND_DEFAULT);
         deleteRecursivelyCommand = options.get(DELETE_RECURSIVELY_COMMAND, DELETE_RECURSIVELY_COMMAND_DEFAULT);
         getFileInfoCommand = options.get(GET_FILE_INFO_COMMAND, GET_FILE_INFO_COMMAND_DEFAULT);
+        getUserGroupsCommand = options.get(GET_USER_GROUP_DETAILS_COMMAND, GET_USER_GROUP_DETAILS_COMMAND_DEFAULT);
         listFilesCommand = options.get(LIST_FILES_COMMAND, LIST_FILES_COMMAND_DEFAULT);
         mkdirCommand = options.get(MKDIR_COMMAND, MKDIR_COMMAND_DEFAULT);
         mkdirsCommand = options.get(MKDIRS_COMMAND, MKDIRS_COMMAND_DEFAULT);
@@ -99,4 +88,26 @@ class SshScpConnection extends SshConnection {
         return new SshScpFile(this, hostPath);
     }
 
+    /**
+     * Gets the group names the logged in user belongs to.
+     * @return
+     */
+    protected GroupDetails getUserGroups() {
+        CmdLine cmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addArgument(getUserGroupsCommand);
+        CapturingOverthereExecutionOutputHandler stdoutHandler = capturingHandler();
+        execute(stdoutHandler, swallow(), cmdLine);
+        return new GroupDetails(stdoutHandler.getOutput());
+    }
+
+    static class GroupDetails {
+        private List<String> groups;
+
+        public GroupDetails(String groups) {
+            this.groups = Splitter.on(" ").splitToList(groups);
+        }
+
+        public List<String> getGroups() {
+            return groups;
+        }
+    }
 }
