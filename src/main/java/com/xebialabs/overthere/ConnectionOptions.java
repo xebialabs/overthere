@@ -24,6 +24,7 @@ package com.xebialabs.overthere;
 
 import java.util.Map;
 import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -83,6 +84,17 @@ public class ConnectionOptions {
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#port">the online documentation</a>
      */
     public static final String PORT = "port";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#bindAddress">the online
+     * documentation</a>
+     */
+    public static final String BIND_ADDRESS = "bindAddress";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#bindPort">the online documentation</a>
+     */
+    public static final String BIND_PORT = "bindPort";
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#username">the online documentation</a>
