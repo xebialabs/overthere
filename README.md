@@ -190,6 +190,14 @@ Apart from selecting a protocol to use, you will also need to supply a number of
     <th align="left" valign="top"><a name="remoteCopyBufferSize"></a>remoteCopyBufferSize</th>
     <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>64 KB (64*1024 bytes)</code>. Larger values potentially break copy operations.</td>
 </tr>
+<tr>
+    <th align="left" valign="top"><a name="localAddress"></a>localAddress</th>
+    <td>The address to use on the local machine as the source address of the connection. This property is optional and mainly useful on systems with more than one address. The default behaviour is to let the OS decide. This property is currently supported only for the SSH protocol.</td>
+</tr>
+<tr>
+    <th align="left" valign="top"><a name="localPort"></a>localPort</th>
+    <td>The port to use on the local machine as the source port of the connection. This property is optional and to be used in combination with the <code>localAddress</code> property. The default behaviour is to let the OS pick a free port. This property is currently supported only for the SSH protocol. </td>
+</tr>
 
 </table>
 
