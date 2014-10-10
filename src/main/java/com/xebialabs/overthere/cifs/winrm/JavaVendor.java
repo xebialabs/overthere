@@ -26,38 +26,11 @@ import java.util.HashMap;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
 
-class KerberosJaasConfiguration extends Configuration {
+class JavaVendor {
 
-    private boolean debug;
+	private static final boolean IBM_JAVA =  System.getProperty("java.vendor").contains("IBM");
 
-    KerberosJaasConfiguration(boolean debug) {
-        this.debug = debug;
-    }
-
-    @Override
-    public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
-        final HashMap<String, String> options = new HashMap<String, String>();
-
-        if (JavaVendor.isIBM()) {
-            options.put("refreshKrb5Config", "true");
-        } else {
-            options.put("client", "true");
-            options.put("useTicketCache", "false");
-            options.put("useKeyTab", "false");
-            options.put("doNotPrompt", "false");
-            options.put("refreshKrb5Config", "true");
-            if (debug) {
-                options.put("debug", "true");
-            }
-        }
-
-        return new AppConfigurationEntry[]{new AppConfigurationEntry(getKrb5LoginModuleName(),
-                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
-    }
-
-    private String getKrb5LoginModuleName() {
-        return (JavaVendor.isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
-            : "com.sun.security.auth.module.Krb5LoginModule");
-    }
-
+	public static boolean isIBM() {
+		return IBM_JAVA;
+	}
 }
