@@ -38,26 +38,24 @@ class KerberosJaasConfiguration extends Configuration {
     public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
         final HashMap<String, String> options = new HashMap<String, String>();
 
+        if (debug) {
+            options.put("debug", "true");
+        }
+        options.put("refreshKrb5Config", "true");
+        
         if (JavaVendor.isIBM()) {
-            options.put("refreshKrb5Config", "true");
+            options.put("credsType", "initiator");
         } else {
             options.put("client", "true");
             options.put("useTicketCache", "false");
             options.put("useKeyTab", "false");
             options.put("doNotPrompt", "false");
-            options.put("refreshKrb5Config", "true");
-            if (debug) {
-                options.put("debug", "true");
-            }
         }
 
-        return new AppConfigurationEntry[]{new AppConfigurationEntry(getKrb5LoginModuleName(),
+        return new AppConfigurationEntry[]{new AppConfigurationEntry(JavaVendor.getKrb5LoginModuleName(),
                 AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
     }
 
-    private String getKrb5LoginModuleName() {
-        return (JavaVendor.isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
-            : "com.sun.security.auth.module.Krb5LoginModule");
-    }
+    
 
 }
