@@ -190,14 +190,6 @@ Apart from selecting a protocol to use, you will also need to supply a number of
     <th align="left" valign="top"><a name="remoteCopyBufferSize"></a>remoteCopyBufferSize</th>
     <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>64 KB (64*1024 bytes)</code>. Larger values potentially break copy operations.</td>
 </tr>
-<tr>
-    <th align="left" valign="top"><a name="localAddress"></a>localAddress</th>
-    <td>The address to use on the local machine as the source address of the connection. This property is optional and mainly useful on systems with more than one address. The default behaviour is to let the OS decide. This property is currently supported only for the SSH protocol.</td>
-</tr>
-<tr>
-    <th align="left" valign="top"><a name="localPort"></a>localPort</th>
-    <td>The port to use on the local machine as the source port of the connection. This property is optional and to be used in combination with the <code>localAddress</code> property. The default behaviour is to let the OS pick a free port. This property is currently supported only for the SSH protocol. </td>
-</tr>
 
 </table>
 
@@ -551,6 +543,14 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<td>The command to be used when copying files/directories to the connection temporary directory as the sudo user. The string <code>{0}</code> is replaced with the value of the path of the file/directory being copied. The string <code>{1}</code> is replaced with the value of the target path. The default value is <code>cp -pr {0} {1}</code> if <a href="#ssh_sudoPreserveAttributesOnCopyToTempFile"><strong>sudoPreserveAttributesOnCopyToTempFile</strong></a> is set to true, otherwise the default value is <code>cp -r {0} {1}</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_localAddress"></a>localAddress</th>
+	<td>The address to use on the local machine as the source address of the connection. This property is optional and mainly useful on systems with more than one address. The default behaviour is to let the OS decide.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_localPort"></a>localPort</th>
+	<td>The port to use on the local machine as the source port of the connection. This property is optional and to be used in combination with the <a href="#ssh_localAddress"><strong>localAddress</strong></a> property. The default behaviour is to let the OS pick a free port.</td>
 </tr>
 </table>
 

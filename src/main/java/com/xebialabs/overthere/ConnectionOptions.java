@@ -86,17 +86,6 @@ public class ConnectionOptions {
     public static final String PORT = "port";
 
     /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#localAddress">the online
-     * documentation</a>
-     */
-    public static final String LOCAL_ADDRESS = "localAddress";
-
-    /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#localPort">the online documentation</a>
-     */
-    public static final String LOCAL_PORT = "localPort";
-
-    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#username">the online documentation</a>
      */
     public static final String USERNAME = "username";
