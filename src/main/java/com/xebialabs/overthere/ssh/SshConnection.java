@@ -23,22 +23,11 @@
 package com.xebialabs.overthere.ssh;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.google.common.annotations.VisibleForTesting;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 import net.schmizz.sshj.Config;
 import net.schmizz.sshj.DefaultConfig;
@@ -56,6 +45,20 @@ import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
+
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.CmdLineArgument;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -69,11 +72,13 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_ADDRESS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_PORT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE_DEFAULT;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_DEFAULT_SSH;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 import static java.lang.String.format;
@@ -93,6 +98,10 @@ abstract class SshConnection extends BaseOverthereConnection {
     protected String host;
 
     protected int port;
+
+    protected String localAddress;
+
+    protected int localPort;
 
     protected String username;
 
@@ -132,6 +141,8 @@ abstract class SshConnection extends BaseOverthereConnection {
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
         host = addressPort.getHostName();
         port = addressPort.getPort();
+        localAddress = options.getOptional(LOCAL_ADDRESS);
+        localPort = options.getInteger(LOCAL_PORT, 0);
         username = options.get(USERNAME);
         password = options.getOptional(PASSWORD);
         interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
@@ -152,7 +163,11 @@ abstract class SshConnection extends BaseOverthereConnection {
             client.addHostKeyVerifier(new PromiscuousVerifier());
 
             try {
-                client.connect(host, port);
+                if (localAddress == null) {
+                    client.connect(host, port);
+                } else {
+                    client.connect(host, port, InetAddress.getByName(localAddress), localPort);
+                }
             } catch (IOException e) {
                 throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
             }

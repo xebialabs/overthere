@@ -465,6 +465,18 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     protected SshConnection connection;
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_localAddress">the online
+     * documentation</a>
+     */
+    public static final String LOCAL_ADDRESS = "localAddress";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_localPort">the online
+     * documentation</a>
+     */
+    public static final String LOCAL_PORT = "localPort";
+
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
 

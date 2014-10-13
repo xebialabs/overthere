@@ -544,6 +544,14 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_localAddress"></a>localAddress</th>
+	<td>The address to use on the local machine as the source address of the connection. This property is optional and mainly useful on systems with more than one address. The default behaviour is to let the OS decide.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="ssh_localPort"></a>localPort</th>
+	<td>The port to use on the local machine as the source port of the connection. This property is optional and to be used in combination with the <a href="#ssh_localAddress"><strong>localAddress</strong></a> property. The default behaviour is to let the OS pick a free port.</td>
+</tr>
 </table>
 
 <a name="cifs"></a>
