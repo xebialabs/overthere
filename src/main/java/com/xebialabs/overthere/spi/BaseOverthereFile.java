@@ -22,6 +22,10 @@
  */
 package com.xebialabs.overthere.spi;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +155,24 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         if (errno != 0) {
             throw new RuntimeIOException(format("Cannot copy [%s] to [%s] on [%s]: %s (errno=%d)", source.getPath(), getPath(), getConnection(), capturedStderr.getOutput(), errno));
         }
+    }
+
+    protected InputStream asBuffered(InputStream is) {
+        if (is instanceof BufferedInputStream) {
+            return is;
+        }
+        int streamBufferSize = getConnection().streamBufferSize;
+        logger.debug("Using buffer of size [{}] for streaming from [{}]", streamBufferSize, this);
+        return new BufferedInputStream(is, streamBufferSize);
+    }
+
+    protected OutputStream asBuffered(OutputStream os) {
+        if (os instanceof BufferedOutputStream) {
+            return os;
+        }
+        int streamBufferSize = getConnection().streamBufferSize;
+        logger.debug("Using buffer of size [{}] for streaming to [{}]", streamBufferSize, this);
+        return new BufferedOutputStream(os, getConnection().streamBufferSize);
     }
 
     /**

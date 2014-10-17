@@ -210,7 +210,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             connection.getSshClient().newSCPFileTransfer().download(getPath(), tempFile.getPath());
 
             logger.debug("Opening input stream to temporary file {} to retrieve contents downloaded from {}. Temporary file will be deleted when the stream is closed", tempFile, this);
-            return new FileInputStream(tempFile) {
+            return asBuffered(new FileInputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
                     logger.debug("Closing input stream to temporary file {}", tempFile);
@@ -222,7 +222,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
                     }
 
                 }
-            };
+            });
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot open %s for reading: %s", this, exc.toString()), exc);
         }
@@ -235,7 +235,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             tempFile.deleteOnExit();
 
             logger.debug("Opening output stream to temporary file {} to store contents to be uploaded to {} when the stream is closed", tempFile, SshScpFile.this);
-            return new FileOutputStream(tempFile) {
+            return asBuffered(new FileOutputStream(tempFile) {
                 @Override
                 public void close() throws IOException {
                     logger.debug("Closing output stream to temporary file {}", tempFile);
@@ -255,7 +255,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
                         tempFile.delete();
                     }
                 }
-            };
+            });
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot open %s for writing: %s", this, exc.toString()), exc);
         }

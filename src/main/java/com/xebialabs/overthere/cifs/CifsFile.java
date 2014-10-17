@@ -276,8 +276,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
         try {
             final InputStream wrapped = smbFile.getInputStream();
-
-            return new InputStream() {
+            return asBuffered(new InputStream() {
 
                 @Override
                 public int read() throws IOException {
@@ -324,7 +323,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
                     logger.debug("Closing CIFS input stream for {}", CifsFile.this.smbFile.getUncPath());
                     wrapped.close();
                 }
-            };
+            });
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot open %s for reading: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
@@ -337,7 +336,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
         try {
             final OutputStream wrapped = smbFile.getOutputStream();
 
-            return new OutputStream() {
+            return asBuffered(new OutputStream() {
 
                 @Override
                 public void write(int b) throws IOException {
@@ -364,7 +363,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
                     logger.debug("Closing CIFS output stream for {}", CifsFile.this.smbFile.getUncPath());
                     wrapped.close();
                 }
-            };
+            });
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot open %s for writing: %s", smbFile.getUncPath(), exc.toString()), exc);
         }

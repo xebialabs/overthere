@@ -188,7 +188,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     @Override
     public InputStream getInputStream() {
         try {
-            return new FileInputStream(file);
+            return asBuffered(new FileInputStream(file));
         } catch (FileNotFoundException exc) {
             throw new RuntimeIOException("Cannot open " + this + " for reading", exc);
         }
@@ -197,7 +197,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     @Override
     public OutputStream getOutputStream() {
         try {
-            return new FileOutputStream(file);
+            return asBuffered(new FileOutputStream(file));
         } catch (FileNotFoundException exc) {
             throw new RuntimeIOException("Cannot open " + this + " for writing", exc);
         }

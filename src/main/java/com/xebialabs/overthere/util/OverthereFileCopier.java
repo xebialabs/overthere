@@ -29,6 +29,10 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
+import com.google.common.io.ByteStreams;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -142,32 +146,20 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
         if (dstFile.exists())
             logger.debug("About to overwrite existing file {}", dstFile);
 
-        ConnectionOptions options = srcFile.getConnection().getOptions();
-        int bufferSize = options.getInteger(REMOTE_COPY_BUFFER_SIZE, REMOTE_COPY_BUFFER_SIZE_DEFAULT);
-        logger.debug("Copying file {} to {} with buffer size {}", new Object[]{srcFile, dstFile, bufferSize});
-
         try {
-            InputStream is = srcFile.getInputStream();
-            try {
-                OutputStream os = dstFile.getOutputStream();
-                try {
-                    copy(is, os, bufferSize);
-                } finally {
-                    closeQuietly(os);
+            new ByteSource() {
+                @Override
+                public InputStream openStream() throws IOException {
+                    return srcFile.getInputStream();
                 }
-            } finally {
-                closeQuietly(is);
-            }
+            }.copyTo(new ByteSink() {
+                @Override
+                public OutputStream openStream() throws IOException {
+                    return dstFile.getOutputStream();
+                }
+            });
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc);
-        }
-    }
-
-    private static void copy(final InputStream in, final OutputStream out, final int bufferSize) throws IOException {
-        byte[] buffer = new byte[bufferSize];
-        int len;
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
         }
     }
 

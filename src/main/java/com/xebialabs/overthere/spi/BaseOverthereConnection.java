@@ -45,14 +45,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
-import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
@@ -80,6 +73,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final int temporaryFileCreationRetries;
     protected final String temporaryFileHolderDirectoryNamePrefix;
     protected final List<OverthereFile> temporaryFileHolderDirectories = newArrayList();
+    protected final int streamBufferSize;
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
     protected Random random = new Random();
@@ -97,6 +91,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT);
         this.temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
         this.temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
+        this.streamBufferSize = options.getInteger(REMOTE_COPY_BUFFER_SIZE, REMOTE_COPY_BUFFER_SIZE_DEFAULT);
     }
 
     protected void connected() {

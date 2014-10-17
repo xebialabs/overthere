@@ -234,7 +234,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.READ));
             final InputStream wrapped = remoteFile.new RemoteFileInputStream();
 
-            return new InputStream() {
+            return asBuffered(new InputStream() {
 
                 @Override
                 public int read() throws IOException {
@@ -286,7 +286,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                         connection.disconnectSftp(sftp);
                     }
                 }
-            };
+            });
         } catch (IOException e) {
             throw new RuntimeIOException("Cannot read from file " + this, e);
         }
@@ -301,7 +301,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
             final OutputStream wrapped = remoteFile.new RemoteFileOutputStream();
 
-            return new OutputStream() {
+            return asBuffered(new OutputStream() {
 
                 @Override
                 public void write(int b) throws IOException {
@@ -333,7 +333,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                         connection.disconnectSftp(sftp);
                     }
                 }
-            };
+            });
         } catch (IOException e) {
             throw new RuntimeIOException(format("Cannot write to %s", this), e);
         }
