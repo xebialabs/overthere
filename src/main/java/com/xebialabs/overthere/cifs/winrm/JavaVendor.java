@@ -25,37 +25,24 @@ package com.xebialabs.overthere.cifs.winrm;
 import java.util.HashMap;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
+import org.ietf.jgss.GSSContext;
 
-class KerberosJaasConfiguration extends Configuration {
+class JavaVendor {
 
-    private boolean debug;
+    private static final boolean IBM_JAVA =  System.getProperty("java.vendor").toUpperCase().contains("IBM");
 
-    KerberosJaasConfiguration(boolean debug) {
-        this.debug = debug;
+    public static boolean isIBM() {
+        return IBM_JAVA;
     }
 
-    @Override
-    public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
-        final HashMap<String, String> options = new HashMap<String, String>();
-
-        if (debug) {
-            options.put("debug", "true");
-        }
-        options.put("refreshKrb5Config", "true");
-        
-        if (JavaVendor.isIBM()) {
-            options.put("credsType", "initiator");
-        } else {
-            options.put("client", "true");
-            options.put("useTicketCache", "false");
-            options.put("useKeyTab", "false");
-            options.put("doNotPrompt", "false");
-        }
-
-        return new AppConfigurationEntry[]{new AppConfigurationEntry(JavaVendor.getKrb5LoginModuleName(),
-                AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
+    public static String getKrb5LoginModuleName() {
+        return isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
+            : "com.sun.security.auth.module.Krb5LoginModule";
     }
 
-    
-
+    public static int getSpnegoLifetime() {
+        // With IBM JDK we need to use GSSContext.INDEFINITE_LIFETIME for SPNEGO
+        // ref http://www-01.ibm.com/support/docview.wss?uid=swg1IZ54545
+        return isIBM() ? GSSContext.INDEFINITE_LIFETIME : GSSContext.DEFAULT_LIFETIME;
+    }
 }

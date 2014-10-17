@@ -69,7 +69,7 @@ class WsmanSPNegoScheme extends SPNegoScheme {
         GSSName canonicalizedName = serverName.canonicalize(oid);
 
         logger.debug("Creating SPNego GSS context for canonicalized SPN {}", canonicalizedName);
-        GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, GSSContext.DEFAULT_LIFETIME);
+        GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, JavaVendor.getSpnegoLifetime());
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
         return gssContext.initSecContext(token, 0, token.length);
