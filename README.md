@@ -390,7 +390,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_suPasswordPromptRegex"></a>suPasswordPromptRegex</th>
-	<td>The regular expression to be used when looking for su password prompts. When the connection type is set to <strong>INTERACTIVE_su</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
+	<td>The regular expression to be used when looking for su password prompts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
 </tr>
