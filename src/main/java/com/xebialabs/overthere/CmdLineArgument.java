@@ -24,7 +24,7 @@ package com.xebialabs.overthere;
 
 import java.io.Serializable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 
 /**

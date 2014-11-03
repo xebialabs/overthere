@@ -22,26 +22,20 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import net.schmizz.sshj.sftp.*;
+import net.schmizz.sshj.xfer.FilePermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
-import net.schmizz.sshj.sftp.FileAttributes;
-import net.schmizz.sshj.sftp.FileMode;
-import net.schmizz.sshj.sftp.OpenMode;
-import net.schmizz.sshj.sftp.RemoteFile;
-import net.schmizz.sshj.sftp.RemoteResourceInfo;
-import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.xfer.FilePermission;
-
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
@@ -127,7 +121,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             List<RemoteResourceInfo> ls = connection.getSharedSftpClient().ls(getSftpPath());
 
             // copy files to list, skipping . and ..
-            List<OverthereFile> files = newArrayList();
+            List<OverthereFile> files = new ArrayList<OverthereFile>();
             for (RemoteResourceInfo l : ls) {
                 String filename = l.getName();
                 if (filename.equals(".") || filename.equals("..")) {
@@ -231,7 +225,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
         try {
             final SFTPClient sftp = connection.connectSftp();
-            final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.READ));
+            final RemoteFile remoteFile = sftp.open(getSftpPath(), EnumSet.of(OpenMode.READ));
             final InputStream wrapped = remoteFile.new RemoteFileInputStream();
 
             return asBuffered(new InputStream() {
@@ -298,7 +292,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
 
         try {
             final SFTPClient sftp = connection.connectSftp();
-            final RemoteFile remoteFile = sftp.open(getSftpPath(), newHashSet(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
+            final RemoteFile remoteFile = sftp.open(getSftpPath(), EnumSet.of(OpenMode.CREAT, OpenMode.WRITE, OpenMode.TRUNC));
             final OutputStream wrapped = remoteFile.new RemoteFileOutputStream();
 
             return asBuffered(new OutputStream() {

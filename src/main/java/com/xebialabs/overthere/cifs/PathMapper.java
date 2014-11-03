@@ -22,16 +22,11 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.regex.Pattern;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSortedMap;
-import com.google.common.collect.Iterables;
 
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.quote;
 
@@ -43,19 +38,24 @@ class PathMapper {
     private final SortedMap<String, String> sharesForPaths;
     private final Map<String, String> pathsForShares;
 
-    @VisibleForTesting
     PathMapper(final Map<String, String> mappings) {
         // longest first, so reverse lexicographical order
-        ImmutableSortedMap.Builder<String, String> sharesForPath = ImmutableSortedMap.reverseOrder();
-        ImmutableMap.Builder<String, String> pathsForShare = ImmutableMap.builder();
+        SortedMap<String, String> sharesForPath = new TreeMap<String, String>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o2.compareTo(o1);
+            }
+        });
+        Map<String, String> pathsForShare = new HashMap<String, String>();
+
         for (Entry<String, String> mapping : mappings.entrySet()) {
             String pathPrefixToMatch = mapping.getKey();
             String shareForPathPrefix = mapping.getValue();
-            sharesForPath.put(pathPrefixToMatch.toLowerCase(), shareForPathPrefix);
-            pathsForShare.put(shareForPathPrefix.toLowerCase(), pathPrefixToMatch);
+            checkArgument(sharesForPath.put(pathPrefixToMatch.toLowerCase(), shareForPathPrefix) == null, "path prefix is not unique in mapping %s -> %s", pathPrefixToMatch, shareForPathPrefix);
+            checkArgument(pathsForShare.put(shareForPathPrefix.toLowerCase(), pathPrefixToMatch) == null, "share is not unique in mapping %s -> %s", shareForPathPrefix, pathPrefixToMatch);
         }
-        this.sharesForPaths = sharesForPath.build();
-        this.pathsForShares = pathsForShare.build();
+        this.sharesForPaths = Collections.unmodifiableSortedMap(sharesForPath);
+        this.pathsForShares = Collections.unmodifiableMap(pathsForShare);
     }
 
     /**
@@ -67,16 +67,16 @@ class PathMapper {
      * @param path the local path to convert
      * @return the remotely accessible path (using shares) at which the local path can be accessed using SMB
      */
-    @VisibleForTesting
     String toSharedPath(String path) {
         final String lowerCasePath = path.toLowerCase();
         // assumes correct format drive: or drive:\path
-        String mappedPathPrefix = Iterables.find(sharesForPaths.keySet(), new Predicate<String>() {
-            @Override
-            public boolean apply(String input) {
-                return lowerCasePath.startsWith(input);
+        String mappedPathPrefix = null;
+        for (String s : sharesForPaths.keySet()) {
+            if (lowerCasePath.startsWith(s)) {
+                mappedPathPrefix = s;
+                break;
             }
-        }, null);
+        }
         // the share + the remainder of the path if found, otherwise the path with ':' replaced by '$'
         return ((mappedPathPrefix != null) ? sharesForPaths.get(mappedPathPrefix) + path.substring(mappedPathPrefix.length()) : path.substring(0, 1)
                 + ADMIN_SHARE_DESIGNATOR
@@ -87,16 +87,17 @@ class PathMapper {
      * @param path the remotely accessible path to convert (minus the host name, i.e. beginning with the share)
      * @return the local path (using drive letters) corresponding to the path that is remotely accessible using SMB
      */
-    @VisibleForTesting
     String toLocalPath(String path) {
         final String lowerCasePath = path.toLowerCase();
         // assumes correct format share or share\path
-        String mappedShare = Iterables.find(pathsForShares.keySet(), new Predicate<String>() {
-            @Override
-            public boolean apply(String input) {
-                return lowerCasePath.startsWith(input);
+        String mappedShare = null;
+        for (String s : pathsForShares.keySet()) {
+            if (lowerCasePath.startsWith(s)) {
+                mappedShare = s;
+                break;
             }
-        }, null);
+        }
+
         if (mappedShare != null) {
             return pathsForShares.get(mappedShare) + path.substring(mappedShare.length());
         } else if ((path.length() >= 2) && ADMIN_SHARE_PATTERN.matcher(path.substring(0, 2)).matches()) {

@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.xebialabs.overcast.host.CloudHost;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class UnixCloudHostListener extends CloudHostListener {
 

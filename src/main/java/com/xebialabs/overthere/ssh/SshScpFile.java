@@ -28,13 +28,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
@@ -45,8 +44,6 @@ import net.schmizz.sshj.xfer.LocalFileFilter;
 import net.schmizz.sshj.xfer.LocalSourceFile;
 import net.schmizz.sshj.xfer.scp.SCPUploadClient;
 
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.CmdLine.build;
 import static com.xebialabs.overthere.ssh.SshConnection.NOCD_PSEUDO_COMMAND;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -60,8 +57,6 @@ import static java.lang.String.format;
  * A file on a host connected through SSH w/ SCP.
  */
 class SshScpFile extends SshFile<SshScpConnection> {
-
-    private static final Predicate<String> NOT_SELF_OR_PARENT_DIR = Predicates.<String>not(Predicates.<String>or(equalTo("."), equalTo("..")));
 
     private static final String PERMISSIONS_TOKEN_PATTERN = "[dl\\-]([r\\-][w\\-][xsStT\\-]){3}[@\\.\\+]*";
 
@@ -274,10 +269,10 @@ class SshScpFile extends SshFile<SshScpConnection> {
             throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedStderr.getOutput() + " (errno=" + errno + ")");
         }
 
-        List<OverthereFile> files = newArrayList();
+        List<OverthereFile> files = new ArrayList<OverthereFile>();
         for (String lsLine : capturedStdout.getOutputLines()) {
             // Filter out the '.' and '..'
-            if (NOT_SELF_OR_PARENT_DIR.apply(lsLine)) {
+            if (!(".".equals(lsLine) || "..".equals(lsLine))) {
                 files.add(connection.getFile(this, lsLine));
             }
         }
@@ -428,7 +423,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
 
         @Override
         public Iterable<? extends LocalSourceFile> getChildren(LocalFileFilter filter) throws IOException {
-            List<LocalSourceFile> files = newArrayList();
+            List<LocalSourceFile> files = new ArrayList<LocalSourceFile>();
             for (OverthereFile each : f.listFiles()) {
                 files.add(new OverthereFileLocalSourceFile(each));
             }

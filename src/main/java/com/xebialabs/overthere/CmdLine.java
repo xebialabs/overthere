@@ -24,13 +24,11 @@ package com.xebialabs.overthere;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import com.google.common.base.Function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
+import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.CmdLineArgument.arg;
 import static com.xebialabs.overthere.CmdLineArgument.nested;
 import static com.xebialabs.overthere.CmdLineArgument.password;
@@ -44,7 +42,7 @@ import static java.util.Collections.unmodifiableList;
 @SuppressWarnings("serial")
 public class CmdLine implements Serializable {
 
-    List<CmdLineArgument> arguments = newArrayList();
+    List<CmdLineArgument> arguments = new ArrayList<CmdLineArgument>();
 
     /**
      * Adds {@link CmdLineArgument#arg(String) a regular argument} to the command line.
@@ -154,12 +152,12 @@ public class CmdLine implements Serializable {
      */
     public String[] toCommandArray(final OperatingSystemFamily os, final boolean forLogging) {
         checkState(arguments.size() > 0, "Cannot encode empty command line");
-        return transform(arguments, new Function<CmdLineArgument, String>() {
-            @Override
-            public String apply(CmdLineArgument from) {
-                return from.toString(os, forLogging);
-            }
-        }).toArray(new String[arguments.size()]);
+        String[] args = new String[arguments.size()];
+        for (int i = 0; i < arguments.size(); i++) {
+            args[i] = arguments.get(i).toString(os, forLogging);
+
+        }
+        return args;
     }
 
     /**

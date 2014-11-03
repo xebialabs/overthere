@@ -22,23 +22,16 @@
  */
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.common.io.ByteSink;
-import com.google.common.io.ByteSource;
-import com.google.common.io.ByteStreams;
-
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-
-import static com.xebialabs.overthere.ConnectionOptions.REMOTE_COPY_BUFFER_SIZE;
-import static com.xebialabs.overthere.ConnectionOptions.REMOTE_COPY_BUFFER_SIZE_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
@@ -147,17 +140,21 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
             logger.debug("About to overwrite existing file {}", dstFile);
 
         try {
-            new ByteSource() {
-                @Override
-                public InputStream openStream() throws IOException {
-                    return srcFile.getInputStream();
+            InputStream is = srcFile.getInputStream();
+            try {
+                OutputStream os = dstFile.getOutputStream();
+                try {
+                    byte[] bytes = new byte[1024];
+                    int nRead;
+                    while ((nRead = is.read(bytes, 0, bytes.length)) != -1) {
+                        os.write(bytes, 0, nRead);
+                    }
+                } finally {
+                    closeQuietly(os);
                 }
-            }.copyTo(new ByteSink() {
-                @Override
-                public OutputStream openStream() throws IOException {
-                    return dstFile.getOutputStream();
-                }
-            });
+            } finally {
+                closeQuietly(is);
+            }
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc);
         }
