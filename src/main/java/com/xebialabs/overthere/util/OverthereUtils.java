@@ -22,20 +22,22 @@
  */
 package com.xebialabs.overthere.util;
 
-import java.io.*;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
-import com.google.common.io.InputSupplier;
-
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.List;
+
+import static java.lang.String.format;
 
 /**
  * Contains a number of static helper methods.
  */
 public class OverthereUtils {
 
+    private static final Logger logger = LoggerFactory.getLogger(OverthereUtils.class);
     /**
      * Reads the contents of an {@link OverthereFile} into a byte array.
      *
@@ -43,15 +45,20 @@ public class OverthereUtils {
      * @returns the byte array.
      */
     public static byte[] read(final OverthereFile from) {
+        InputStream is = from.getInputStream();
         try {
-            return ByteStreams.toByteArray(new InputSupplier<InputStream>() {
-                @Override
-                public InputStream getInput() throws IOException {
-                    return from.getInputStream();
-                }
-            });
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            int nRead;
+            byte[] bytes = new byte[1024];
+            while ((nRead = is.read(bytes, 0, bytes.length)) != -1) {
+                os.write(bytes, 0, nRead);
+            }
+
+            return os.toByteArray();
         } catch (IOException exc) {
             throw new RuntimeException(exc);
+        } finally {
+            closeQuietly(is);
         }
     }
 
@@ -63,15 +70,21 @@ public class OverthereUtils {
      * @returns the string.
      */
     public static String read(final OverthereFile from, final String charsetName) {
+        InputStream is = from.getInputStream();
         try {
-            return CharStreams.toString(new InputSupplier<Reader>() {
-                @Override
-                public Reader getInput() throws IOException {
-                    return new InputStreamReader(from.getInputStream(), charsetName);
-                }
-            });
+            InputStreamReader isr = new InputStreamReader(is, charsetName);
+            StringBuilder b = new StringBuilder();
+            int nRead;
+            char[] chars = new char[1024];
+            while ((nRead = isr.read(chars, 0, chars.length)) != -1) {
+                b.append(chars, 0, nRead);
+            }
+
+            return b.toString();
         } catch (IOException exc) {
             throw new RuntimeException(exc);
+        } finally {
+            closeQuietly(is);
         }
     }
 
@@ -161,11 +174,45 @@ public class OverthereUtils {
     }
 
     public static void closeQuietly(Closeable c) {
+        if (c == null) return;
         try {
-            Closeables.close(c, true);
+            c.close();
         } catch (IOException e) {
+            logger.warn("IOException while closing closeable", e);
             // Will not happen because of true...
         }
     }
 
+    public static void checkArgument(boolean expression, String errorMessage, Object... messageParams) {
+        if (!expression) {
+            throw new IllegalArgumentException(format(errorMessage, messageParams));
+        }
+    }
+
+    public static void checkState(boolean expression, String errorMessage, Object... messageParams) {
+        if (!expression) {
+            throw new IllegalStateException(format(errorMessage, messageParams));
+        }
+    }
+
+    public static <T> T checkNotNull(T t, String errorMessage, Object... messageParams) {
+        if (t == null) {
+            throw new NullPointerException(format(errorMessage, messageParams));
+        }
+        return t;
+    }
+
+    public static String mkString(List<String> strings, char sep) {
+        return mkString(strings, String.valueOf(sep));
+    }
+
+    public static String mkString(List<String> strings, String sep) {
+        if (strings.isEmpty()) return "";
+
+        StringBuilder b = new StringBuilder(strings.get(0));
+        for (int i = 1; i < strings.size(); i++) {
+             b.append(sep).append(strings.get(i));
+        }
+        return b.toString();
+    }
 }

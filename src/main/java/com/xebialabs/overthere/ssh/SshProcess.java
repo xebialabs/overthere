@@ -38,7 +38,7 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.connection.channel.direct.Signal;
 import net.schmizz.sshj.transport.TransportException;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static java.lang.String.format;
 
 class SshProcess implements OverthereProcess {

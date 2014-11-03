@@ -25,6 +25,7 @@ package com.xebialabs.overthere.spi;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -42,9 +43,7 @@ import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
@@ -72,7 +71,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final boolean deleteTemporaryDirectoryOnDisconnect;
     protected final int temporaryFileCreationRetries;
     protected final String temporaryFileHolderDirectoryNamePrefix;
-    protected final List<OverthereFile> temporaryFileHolderDirectories = newArrayList();
+    protected final List<OverthereFile> temporaryFileHolderDirectories = new ArrayList<OverthereFile>();
     protected final int streamBufferSize;
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
@@ -167,7 +166,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public final synchronized OverthereFile getTempFile(String name) {
-        if (isNullOrEmpty(name)) {
+        if (name == null || name.trim().isEmpty()) {
             name = "tmp";
         }
 

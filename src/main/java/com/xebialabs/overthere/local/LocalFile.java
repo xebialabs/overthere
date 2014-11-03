@@ -29,6 +29,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.xebialabs.overthere.ConnectionOptions;
@@ -36,7 +37,6 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 /**
@@ -162,7 +162,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public List<OverthereFile> listFiles() {
-        List<OverthereFile> list = newArrayList();
+        List<OverthereFile> list = new ArrayList<OverthereFile>();
         for (File each : file.listFiles()) {
             list.add(new LocalFile(connection, each));
         }

@@ -26,15 +26,17 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.Monitor;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -50,9 +52,7 @@ import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
@@ -68,13 +68,13 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
     private static final int MAX_PORT = 65535;
 
-    private Map<InetSocketAddress, InetSocketAddress> localPortForwards = newHashMap();
+    private Map<InetSocketAddress, InetSocketAddress> localPortForwards = new HashMap<InetSocketAddress, InetSocketAddress>();
 
-    private List<PortForwarder> portForwarders = newArrayList();
+    private List<PortForwarder> portForwarders = new ArrayList<PortForwarder>();
 
     private int startPortRange;
 
-    private final Monitor M = new Monitor();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public SshTunnelConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper);
@@ -99,7 +99,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
     @Override
     public InetSocketAddress map(InetSocketAddress address) {
-        M.enter();
+        lock.lock();
         try {
             if (localPortForwards.containsKey(address)) {
                 return localPortForwards.get(address);
@@ -112,7 +112,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
             localPortForwards.put(address, localAddress);
             return localAddress;
         } finally {
-            M.leave();
+            lock.unlock();
         }
     }
 
@@ -206,10 +206,10 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
     static class TunnelPortManager {
         private AtomicInteger lastBoundPort = new AtomicInteger(0);
-        private Monitor M = new Monitor();
+        private ReentrantLock lock = new ReentrantLock();
 
         ServerSocket bindToNextFreePort(int startFrom) {
-            M.enter();
+            lock.lock();
             try {
                 int firstPort = Math.max(startFrom, lastBoundPort.get() + 1);
                 int port = firstPort;
@@ -233,11 +233,10 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
                     }
                 }
             } finally {
-                M.leave();
+                lock.unlock();
             }
         }
 
-        @VisibleForTesting
         protected ServerSocket tryBind(int localPort) {
             try {
                 ServerSocket ss = new ServerSocket();

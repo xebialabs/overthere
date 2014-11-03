@@ -22,12 +22,8 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import com.google.common.collect.ImmutableSet;
-
-import static com.google.common.collect.Maps.newHashMap;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
 
 /**
@@ -172,20 +168,28 @@ public class ConnectionOptions {
 
     private final Map<String, Object> options;
 
-    private static final ImmutableSet<String> filteredKeys = ImmutableSet.of(PASSWORD, PASSPHRASE);
+    private static final Set<String> filteredKeys = getFilteredKeys();
+
+    private static Set<String> getFilteredKeys() {
+        HashSet<String> strings = new HashSet<String>();
+        strings.add(PASSWORD);
+        strings.add(PASSPHRASE);
+        return Collections.unmodifiableSet(strings);
+    }
 
     /**
      * Creates an empty options object.
      */
     public ConnectionOptions() {
-        options = newHashMap();
+        options = new HashMap<String, Object>();
     }
 
     /**
      * Creates a copy of an existing options object.
      */
     public ConnectionOptions(ConnectionOptions options) {
-        this.options = newHashMap(options.options);
+        this();
+        this.options.putAll(options.options);
     }
 
     /**

@@ -29,7 +29,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static java.lang.Character.toUpperCase;

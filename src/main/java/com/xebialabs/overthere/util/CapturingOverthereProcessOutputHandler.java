@@ -22,12 +22,12 @@
  */
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.OverthereProcessOutputHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-
-import static com.google.common.base.Joiner.on;
+import static com.xebialabs.overthere.util.OverthereUtils.mkString;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -79,7 +79,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
      * @return the captured regular output as one string.
      */
     public String getOutput() {
-        return on('\n').join(outputLines);
+        return mkString(outputLines, '\n');
     }
 
     /**
@@ -97,7 +97,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
      * @return the captured error output as one string.
      */
     public String getError() {
-        return on('\n').join(errorLines);
+        return mkString(errorLines, '\n');
     }
 
     /**
@@ -115,7 +115,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
      * @return the captured regular and error output as one string.
      */
     public String getAll() {
-        return on('\n').join(allLines);
+        return mkString(allLines, '\n');
     }
 
     /**
@@ -128,5 +128,7 @@ public final class CapturingOverthereProcessOutputHandler implements OvertherePr
     public static CapturingOverthereProcessOutputHandler capturingHandler() {
         return new CapturingOverthereProcessOutputHandler();
     }
+
+
 
 }

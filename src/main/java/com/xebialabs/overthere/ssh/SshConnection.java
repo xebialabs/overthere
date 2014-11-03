@@ -48,8 +48,6 @@ import net.schmizz.sshj.userauth.password.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
 import com.xebialabs.overthere.ConnectionOptions;
@@ -59,9 +57,9 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
+import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
@@ -125,7 +123,6 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     private static final Config config = new DefaultConfig();
 
-    @VisibleForTesting
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
         public SSHClient create() {

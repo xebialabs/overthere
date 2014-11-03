@@ -22,20 +22,15 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.util.List;
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereExecutionOutputHandler;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-import static com.google.common.collect.Lists.newArrayList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.util.OverthereUtils.mkString;
 
 /**
  * A file on a host connected through SSH.
@@ -138,8 +133,13 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
     }
 
     static List<String> splitPath(String path, OperatingSystemFamily os) {
-        Splitter s = os == WINDOWS ? WINDOWS_PATH_SPLITTER : UNIX_PATH_SPLITTER;
-        return newArrayList(s.split(path));
+        Pattern s = os == WINDOWS ? WINDOWS_PATH_SPLITTER : UNIX_PATH_SPLITTER;
+        List<String> l = new ArrayList<String>();
+        for (String p : s.split(path)) {
+            if (p.isEmpty()) continue;
+            l.add(p);
+        }
+        return l;
     }
 
     static String joinPath(List<String> pathComponents, OperatingSystemFamily os) {
@@ -150,13 +150,13 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
         }
 
         if (os == WINDOWS) {
-            String path = Joiner.on(fileSep).join(pathComponents);
+            String path = mkString(pathComponents, fileSep);
             if (pathComponents.size() == 1) {
                 path += fileSep;
             }
             return path;
         } else {
-            return fileSep + Joiner.on(fileSep).join(pathComponents);
+            return fileSep + mkString(pathComponents, fileSep);
         }
     }
 
@@ -166,8 +166,8 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
         }
     }
 
-    private static final Splitter UNIX_PATH_SPLITTER = Splitter.on('/').omitEmptyStrings();
+    private static final Pattern UNIX_PATH_SPLITTER = Pattern.compile("/");
 
-    private static final Splitter WINDOWS_PATH_SPLITTER = Splitter.on(CharMatcher.anyOf("/\\")).omitEmptyStrings();
+    private static final Pattern WINDOWS_PATH_SPLITTER = Pattern.compile("[/\\\\]");
 
 }

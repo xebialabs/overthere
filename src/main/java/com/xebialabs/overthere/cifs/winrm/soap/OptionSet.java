@@ -22,20 +22,23 @@
  */
 package com.xebialabs.overthere.cifs.winrm.soap;
 
+import java.util.ArrayList;
 import java.util.List;
-import com.google.common.collect.Lists;
 
 /**
  */
 public enum OptionSet {
 
-    OPEN_SHELL(Lists.newArrayList(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437"))),
-    RUN_COMMAND(Lists.newArrayList(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE")));
+    OPEN_SHELL(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437")),
+    RUN_COMMAND(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE"));
 
     private final List<KeyValuePair> keyValuePairs;
 
-    OptionSet(List<KeyValuePair> keyValuePairs) {
-        this.keyValuePairs = keyValuePairs;
+    OptionSet(KeyValuePair... keyValuePairs) {
+        this.keyValuePairs = new ArrayList<KeyValuePair>();
+        for (KeyValuePair keyValuePair : keyValuePairs) {
+            this.keyValuePairs.add(keyValuePair);
+        }
     }
 
     public List<KeyValuePair> getKeyValuePairs() {

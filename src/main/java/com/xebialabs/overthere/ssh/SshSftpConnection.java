@@ -33,7 +33,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import net.schmizz.sshj.sftp.SFTPClient;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 

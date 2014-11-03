@@ -25,7 +25,6 @@ package com.xebialabs.overthere.ssh;
 import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.annotations.VisibleForTesting;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.CmdLineArgument;
@@ -38,7 +37,7 @@ import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 
 /**
@@ -119,7 +118,6 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
         return processedCmd;
     }
 
-    @VisibleForTesting
     CmdLine prefixWithElevationCommand(final CmdLine commandLine) {
         CmdLine commandLineWithSudo = new CmdLine();
         if (quoteCommand) {

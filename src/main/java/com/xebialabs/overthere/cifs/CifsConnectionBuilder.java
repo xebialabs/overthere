@@ -22,8 +22,8 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import java.util.Collections;
 import java.util.Map;
-import com.google.common.collect.ImmutableMap;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
@@ -88,7 +88,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
      */
-    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = ImmutableMap.of();
+    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = Collections.emptyMap();
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmEnableHttps">the online documentation</a>

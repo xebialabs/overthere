@@ -35,7 +35,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler;
 import com.xebialabs.overthere.util.OverthereFileCopier;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.DIRECTORY_COPY_COMMAND_FOR_WINDOWS;

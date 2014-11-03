@@ -27,7 +27,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.DELETE_DIRECTORY_COMMAND;
