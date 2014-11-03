@@ -14,3 +14,4 @@ test-output/
 *.log
 .DS_Store
 velocity.log
+.idea/
