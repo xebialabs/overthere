@@ -976,7 +976,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate"></a>winrsAllowDelegate</th>
-	<td>If set to <code>false</code>, the user's credentials may be passed to the remote host. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
+	<td>If set to <code>false</code>, the user's credentials may be passed to the remote host. This option corresponds to the <code>winrs</code> command option <code>-allowdelegate</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
