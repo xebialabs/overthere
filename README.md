@@ -390,7 +390,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_suPasswordPromptRegex"></a>suPasswordPromptRegex</th>
-	<td>The regular expression to be used when looking for su password prompts. When the connection type is set to <strong>INTERACTIVE_su</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
+	<td>The regular expression to be used when looking for su password prompts. When the connection type is set to <strong>INTERACTIVE_SUDO</strong>, Overthere will look for strings that match this regular expression in the first line of the output of a command, and send the password if a match occurs. The default value is <code>.*[Pp]assword.*:</code>
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
 </tr>
@@ -408,7 +408,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="ssh_suQuoteCommand"></a>suQuoteCommand</th>
-	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>suCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>su -u privilegeduser start server1</code> to <code>su privilegeduser -c 'start server1'</code>. The default value is <code>false</code>.
+	<td>If set to <code>true</code>, the original command is added as one argument to the prefix configured with the <code>suCommandPrefix</code> connection option. This has the result of quoting the original command, which is needed for commands like <code>su</code>. Compare <code>su -u privilegeduser start server1</code> to <code>su privilegeduser -c 'start server1'</code>. The default value is <code>true</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
 </tr>
