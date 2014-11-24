@@ -114,7 +114,7 @@ public class ConnectionOptions {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForUnix">the online documentation</a>
      */
-    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT = "cd {1} ; tar -cf - -C {0} . | tar xpf -";
+    public static final String DIRECTORY_COPY_COMMAND_FOR_UNIX_DEFAULT = "tar -cf - -C {0} . | tar xpf - -C {1}";
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForWindows">the online documentation</a>
