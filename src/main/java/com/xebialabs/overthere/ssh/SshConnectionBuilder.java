@@ -62,6 +62,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     public static final String ALLOCATE_PTY = "allocatePty";
 
     /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_heartbeatInterval">the online documentation</a>
+     */
+    public static final String HEARTBEAT_INTERVAL = "heartbeatInterval";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_heartbeatInterval">the online documentation</a>
+     */
+    public static final int HEARTBEAT_INTERVAL_DEFAULT = 0;
+
+    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_connectionType">the online documentation</a>
      */
     public static final String CONNECTION_TYPE = "connectionType";

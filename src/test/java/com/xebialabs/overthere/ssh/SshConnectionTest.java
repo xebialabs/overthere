@@ -23,6 +23,10 @@
 package com.xebialabs.overthere.ssh;
 
 import java.io.IOException;
+
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.transport.Transport;
+import net.schmizz.sshj.transport.TransportException;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -43,15 +47,9 @@ import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -68,14 +66,21 @@ public class SshConnectionTest {
 
     private ConnectionOptions connectionOptions;
 
+    private Session session;
+    private Transport transport;
+
     @BeforeMethod
-    public void init() {
+    public void init() throws ConnectionException, TransportException {
         MockitoAnnotations.initMocks(this);
         connectionOptions = new ConnectionOptions();
         connectionOptions.set(CONNECTION_TYPE, SFTP);
         connectionOptions.set(OPERATING_SYSTEM, UNIX);
         connectionOptions.set(ADDRESS, "nowhere.example.com");
         connectionOptions.set(USERNAME, "some-user");
+        session = mock(Session.class);
+        when(client.startSession()).thenReturn(session);
+        transport = mock(Transport.class);
+        when(client.getTransport()).thenReturn(transport);
     }
 
     @Test
@@ -117,8 +122,6 @@ public class SshConnectionTest {
 
     @Test
     public void shouldNotAllocateDefaultPty() throws IOException {
-        Session session = mock(Session.class);
-        when(client.startSession()).thenReturn(session);
         connectionOptions.set(ALLOCATE_DEFAULT_PTY, false);
 
         SshConnection connection = newConnectionWithClient(client);
@@ -131,8 +134,6 @@ public class SshConnectionTest {
 
     @Test
     public void shouldAllocateDefaultPty() throws IOException {
-        Session session = mock(Session.class);
-        when(client.startSession()).thenReturn(session);
         connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
 
         SshConnection connection = newConnectionWithClient(client);
@@ -146,8 +147,6 @@ public class SshConnectionTest {
     @SuppressWarnings("unchecked")
     @Test
     public void shouldAllocatePty() throws IOException {
-        Session session = mock(Session.class);
-        when(client.startSession()).thenReturn(session);
         connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
 
         SshConnection connection = newConnectionWithClient(client);
@@ -161,8 +160,6 @@ public class SshConnectionTest {
     @SuppressWarnings("unchecked")
     @Test
     public void allocatePtyShouldOverrideAllocateDefaultPty() throws IOException {
-        Session session = mock(Session.class);
-        when(client.startSession()).thenReturn(session);
         connectionOptions.set(ALLOCATE_PTY, "xterm:132:50:264:100");
         connectionOptions.set(ALLOCATE_DEFAULT_PTY, true);
 
@@ -174,6 +171,25 @@ public class SshConnectionTest {
         verify(session, times(0)).allocateDefaultPTY();
         connection.close();
 
+    }
+
+    @Test
+    public void shouldUseHeartbeat() throws IOException {
+        connectionOptions.set(HEARTBEAT_INTERVAL, 30);
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+
+        verify(transport, times(1)).setHeartbeatInterval(30);
+        connection.close();
+    }
+
+    @Test
+    public void shouldUseDefaultHeartbeat() throws IOException {
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+
+        verify(transport, times(1)).setHeartbeatInterval(0);
+        connection.close();
     }
 
     private SshConnection newConnectionWithClient(SSHClient client) {

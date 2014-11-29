@@ -57,6 +57,7 @@ import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.checkState;
@@ -64,19 +65,6 @@ import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_ADDRESS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.LOCAL_PORT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.OPEN_SHELL_BEFORE_EXECUTE_DEFAULT;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_DEFAULT_SSH;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY_FILE;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
 import static java.lang.String.format;
@@ -117,6 +105,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected String allocatePty;
 
+    protected int heartbeatInterval;
+
     protected SSHClient sshClient;
 
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
@@ -146,6 +136,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         passphrase = options.getOptional(PASSPHRASE);
         allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
+        heartbeatInterval = options.getInteger(HEARTBEAT_INTERVAL, HEARTBEAT_INTERVAL_DEFAULT);
         if (allocateDefaultPty) {
             logger.warn("The " + ALLOCATE_DEFAULT_PTY + " connection option has been deprecated in favour of the " + ALLOCATE_PTY + " option. See https://github.com/xebialabs/overthere#ssh_allocatePty");
         }
@@ -158,6 +149,7 @@ abstract class SshConnection extends BaseOverthereConnection {
             SSHClient client = sshClientFactory.create();
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new PromiscuousVerifier());
+            client.getTransport().setHeartbeatInterval(heartbeatInterval);
 
             try {
                 if (localAddress == null) {
