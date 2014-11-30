@@ -367,6 +367,10 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="heartbeatInterval"></a>heartbeatInterval</th>
+	<td>Specify an interval to send keep-alives packets. Default is 0 (no keep-alive).</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="ssh_interactiveKeyboardAuthRegex"></a>interactiveKeyboardAuthRegex</th>
 	<td>The regular expression to look for in keyboard-interactive prompts before sending the password. The default value is <code>.*Password:[ ]?</code>. When the SSH server is configured to not allow <a href="http://www.ietf.org/rfc/rfc4252.txt">password authentication</a> but is configured to allow <a href="http://www.ietf.org/rfc/rfc4256.txt">keyboard-interactive authentication</a> using passwords, Overthere will compare the interactive-keyboard prompt against this regular expression and send the value of the <strong>password</strong> option when they match. The default value is <code>.*Password:[ ]?</code></td>
 </tr>
