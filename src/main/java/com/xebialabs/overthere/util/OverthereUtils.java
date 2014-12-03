@@ -99,6 +99,35 @@ public class OverthereUtils {
     }
 
     /**
+     * Writes the contents of an {@link java.io.InputStream} to an {@link OverthereFile}.
+     *
+     * @param from the {@link java.io.InputStream to read from.
+     * @param to   the file to write to.
+     */
+    public static void write(final InputStream from, final OverthereFile to) {
+        write(from, to.getOutputStream());
+    }
+
+    /**
+     * Writes the contents of an {@link java.io.InputStream} to an {@link java.io.OutputStream}.
+     *
+     * @param from the {@link java.io.InputStream} to read from.
+     * @param to the {@link java.io.OutputStream} to write to.
+     */
+    public static void write(InputStream from, OutputStream to) {
+        try {
+            byte[] bytes = new byte[1024];
+            int nRead;
+            while ((nRead = from.read(bytes, 0, bytes.length)) != -1) {
+                to.write(bytes, 0, nRead);
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeIOException(ioe);
+        }
+    }
+
+
+    /**
      * Writes the contents of a {@link String} to an {@link OverthereFile}.
      *
      * @param from        the string to copy from.

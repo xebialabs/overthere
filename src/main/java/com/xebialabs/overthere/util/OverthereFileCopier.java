@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.util.Stack;
 
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.write;
 
 /**
  * OverthereFile copy utility that uses only the input and output streams exposed by the OverthereFile to perform the
@@ -144,19 +145,15 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
             try {
                 OutputStream os = dstFile.getOutputStream();
                 try {
-                    byte[] bytes = new byte[1024];
-                    int nRead;
-                    while ((nRead = is.read(bytes, 0, bytes.length)) != -1) {
-                        os.write(bytes, 0, nRead);
-                    }
+                    write(is, os);
                 } finally {
                     closeQuietly(os);
                 }
             } finally {
                 closeQuietly(is);
             }
-        } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc);
+        } catch (RuntimeIOException exc) {
+            throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc.getCause());
         }
     }
 
