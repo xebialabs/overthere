@@ -105,7 +105,12 @@ public class OverthereUtils {
      * @param to   the file to write to.
      */
     public static void write(final InputStream from, final OverthereFile to) {
-        write(from, to.getOutputStream());
+        OutputStream toStream = to.getOutputStream();
+        try {
+            write(from, toStream);
+        } finally {
+            closeQuietly(toStream);
+        }
     }
 
     /**
