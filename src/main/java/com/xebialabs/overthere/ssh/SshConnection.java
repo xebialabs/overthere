@@ -152,7 +152,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
             if (!onlyOneNotNull(privateKey, privateKeyFile, password))
             {
-                logger.warn("You should only set one connection options between: privateKey, privateKeyFile, password. They are evaluated in this order, and latter would have no effect on the connection.");
+                String[] vars = { PRIVATE_KEY, PRIVATE_KEY_FILE, PASSWORD };
+                logger.warn("You should only set one connection options between: {}, {}, {}. They are evaluated in this order, and latter would have no effect on the connection.", vars);
             }
 
             KeyProvider keys;
