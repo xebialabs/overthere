@@ -22,13 +22,9 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Collections;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import net.schmizz.sshj.Config;
 import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
@@ -44,29 +40,19 @@ import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.CmdLineArgument;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.spi.BaseOverthereConnection;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-import static com.xebialabs.overthere.util.OverthereUtils.checkState;
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
-import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
-import static com.xebialabs.overthere.util.OverthereUtils.constructPath;
+import static com.xebialabs.overthere.util.OverthereUtils.*;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
@@ -94,6 +80,8 @@ abstract class SshConnection extends BaseOverthereConnection {
     protected String password;
 
     protected String interactiveKeyboardAuthPromptRegex;
+
+    protected String privateKey;
 
     protected String privateKeyFile;
 
@@ -133,6 +121,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         username = options.get(USERNAME);
         password = options.getOptional(PASSWORD);
         interactiveKeyboardAuthPromptRegex = options.get(INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX, INTERACTIVE_KEYBOARD_AUTH_PROMPT_REGEX_DEFAULT);
+        privateKey = options.getOptional(PRIVATE_KEY);
         privateKeyFile = options.getOptional(PRIVATE_KEY_FILE);
         passphrase = options.getOptional(PASSPHRASE);
         allocateDefaultPty = options.getBoolean(ALLOCATE_DEFAULT_PTY, ALLOCATE_DEFAULT_PTY_DEFAULT);
@@ -161,18 +150,29 @@ abstract class SshConnection extends BaseOverthereConnection {
                 throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
             }
 
-            if (privateKeyFile != null) {
-                if (password != null) {
-                    logger.warn("The " + PRIVATE_KEY_FILE + " and " + PASSWORD + " connection options have both been set for the connection {}. Ignoring "
-                            + PASSWORD
-                            + " and using " + PRIVATE_KEY_FILE + ".", this);
+            if (!onlyOneNotNull(privateKey, privateKeyFile, password))
+            {
+                logger.warn("You should only set one connection options between: privateKey, privateKeyFile, password. They are evaluated in this order, and latter would have no effect on the connection.");
+            }
+
+            KeyProvider keys;
+            if (privateKey != null) {
+                try {
+                    if (passphrase == null) {
+                        keys = client.loadKeys(privateKey, null, null);
+                    } else {
+                        keys = client.loadKeys(privateKey, null, getPassphraseFinder());
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeIOException("The supplied key is not in a recognized format", e);
                 }
-                KeyProvider keys;
+                client.authPublickey(username, keys);
+            } else if (privateKeyFile != null) {
                 try {
                     if (passphrase == null) {
                         keys = client.loadKeys(privateKeyFile);
                     } else {
-                        keys = client.loadKeys(privateKeyFile, passphrase);
+                        keys = client.loadKeys(privateKeyFile, getPassphraseFinder());
                     }
                 } catch (IOException e) {
                     throw new RuntimeIOException("Cannot read key from private key file " + privateKeyFile, e);
@@ -183,6 +183,7 @@ abstract class SshConnection extends BaseOverthereConnection {
                 client.auth(username, new AuthPassword(passwordFinder),
                         new AuthKeyboardInteractive(new RegularExpressionPasswordResponseProvider(passwordFinder, interactiveKeyboardAuthPromptRegex)));
             }
+
             sshClient = client;
             connected();
         } catch (SSHException e) {
@@ -203,6 +204,29 @@ abstract class SshConnection extends BaseOverthereConnection {
                 return false;
             }
         };
+    }
+
+    private PasswordFinder getPassphraseFinder() {
+        return new PasswordFinder() {
+
+            @Override
+            public char[] reqPassword(Resource<?> resource) {
+                return passphrase.toCharArray();
+            }
+
+            @Override
+            public boolean shouldRetry(Resource<?> resource) {
+                return false;
+            }
+        };
+    }
+
+    private boolean onlyOneNotNull(Object... objs) {
+        int guard = 0;
+        for (Object obj: objs) {
+            guard += obj != null ? 1 : 0;
+        }
+        return guard == 1;
     }
 
     @Override

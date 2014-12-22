@@ -342,6 +342,10 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SUDO</strong> and <strong>INTERACTIVE_SUDO</strong> connection types.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="ssh_privateKey"></a>privateKey</th>
+	<td>The RSA private key as String to use when connecting to the remote host. When this connection option is specified, the <strong>password</strong> and <strong>privateKeyFile</strong> connection options are ignored.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="ssh_privateKeyFile"></a>privateKeyFile</th>
 	<td>The RSA private key file to use when connecting to the remote host. When this connection option is specified, the <strong>password</strong> connection option is ignored.</td>
 </tr>
