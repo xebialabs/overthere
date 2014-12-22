@@ -46,6 +46,14 @@ configurations {
   }
 }
 
+if (JavaVersion.current().isJava8Compatible()) {
+  allprojects {
+    tasks.withType(Javadoc) {
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+
 dependencies {
   // General dependencies
   compile 'nl.javadude.scannit:scannit:1.3.1'
