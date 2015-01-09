@@ -42,7 +42,7 @@ public class OverthereUtils {
      * Reads the contents of an {@link OverthereFile} into a byte array.
      *
      * @param from the file to read from.
-     * @returns the byte array.
+     * @return the byte array.
      */
     public static byte[] read(final OverthereFile from) {
         InputStream is = from.getInputStream();
@@ -67,7 +67,7 @@ public class OverthereUtils {
      *
      * @param from        the file to read from.
      * @param charsetName the {@link java.nio.charset.Charset charset} to use.
-     * @returns the string.
+     * @return the string.
      */
     public static String read(final OverthereFile from, final String charsetName) {
         InputStream is = from.getInputStream();
@@ -101,7 +101,7 @@ public class OverthereUtils {
     /**
      * Writes the contents of an {@link java.io.InputStream} to an {@link OverthereFile}.
      *
-     * @param from the {@link java.io.InputStream to read from.
+     * @param from the {@link java.io.InputStream} to read from.
      * @param to   the file to write to.
      */
     public static void write(final InputStream from, final OverthereFile to) {
