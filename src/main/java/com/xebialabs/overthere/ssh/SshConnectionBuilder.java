@@ -176,6 +176,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
      */
+    public static final String PRIVATE_KEY = "privateKey";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
+     */
     public static final String PRIVATE_KEY_FILE = "privateKeyFile";
 
     /**

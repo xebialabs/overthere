@@ -22,39 +22,33 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.IOException;
-
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import net.schmizz.sshj.MockitoFriendlySSHClient;
+import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.Transport;
 import net.schmizz.sshj.transport.TransportException;
+import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import net.schmizz.sshj.userauth.method.AuthMethod;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
+import java.io.IOException;
 
-import net.schmizz.sshj.MockitoFriendlySSHClient;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-import net.schmizz.sshj.userauth.method.AuthMethod;
-
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SshConnection}
@@ -117,7 +111,19 @@ public class SshConnectionTest {
         verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
         verify(client, never()).authPassword(anyString(), anyString());
         connection.close();
+    }
 
+    @Test
+    public void keyShouldOverrideKeyFile() throws IOException {
+        String keyFile = "/path/to/keyfile";
+        connectionOptions.set(PRIVATE_KEY_FILE, keyFile);
+        connectionOptions.set(PRIVATE_KEY, "RANDOM");
+        SshConnection connection = newConnectionWithClient(client);
+        connection.connect();
+
+        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        verify(client, never()).authPublickey(Matchers.eq(keyFile), anyString());
+        connection.close();
     }
 
     @Test
