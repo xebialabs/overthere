@@ -1045,11 +1045,11 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 # Release History
 
 * Overthere 2.4.6 (09-Jan-2015)
-    * Upgraded Scannit to 1.3.0 to remove transitive guava dependency
-    * Upgraded Gradle to 2.2.1
-    * Fixed [#133](https://github.com/xebialabs/overthere/issues/133), [#134](https://github.com/xebialabs/overthere/issues/134), [#138](https://github.com/xebialabs/overthere/issues/138)
+    * Upgraded Scannit to 1.3.0 to remove transitive Guava dependency.
+    * Upgraded Gradle to 2.2.1.
+    * Fixed [#133](https://github.com/xebialabs/overthere/issues/133), [#134](https://github.com/xebialabs/overthere/issues/134) and [#138](https://github.com/xebialabs/overthere/issues/138).
 * Overthere 2.4.5 (27-Oct-2014)
-    * Fixed [#130](https://github.com/xebialabs/overthere/issues/130), [#131](https://github.com/xebialabs/overthere/issues/131) and [#132](https://github.com/xebialabs/overthere/issues/132) 
+    * Fixed [#130](https://github.com/xebialabs/overthere/issues/130), [#131](https://github.com/xebialabs/overthere/issues/131) and [#132](https://github.com/xebialabs/overthere/issues/132) .
 * Overthere 2.4.4 (27-Aug-2014)
     * Fixed [#123](https://github.com/xebialabs/overthere/issues/123) and [#126](https://github.com/xebialabs/overthere/issues/126).
 * Overthere 2.4.3 (17-May-2014)
