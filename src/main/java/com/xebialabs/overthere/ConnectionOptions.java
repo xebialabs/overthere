@@ -25,6 +25,7 @@ package com.xebialabs.overthere;
 import java.util.*;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
@@ -174,6 +175,7 @@ public class ConnectionOptions {
         HashSet<String> strings = new HashSet<String>();
         strings.add(PASSWORD);
         strings.add(PASSPHRASE);
+        strings.add(PRIVATE_KEY);
         return Collections.unmodifiableSet(strings);
     }
 
