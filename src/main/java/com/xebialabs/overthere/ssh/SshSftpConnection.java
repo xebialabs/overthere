@@ -23,6 +23,9 @@
 package com.xebialabs.overthere.ssh;
 
 import java.io.IOException;
+
+import net.schmizz.sshj.sftp.SFTPClient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +34,6 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import net.schmizz.sshj.sftp.SFTPClient;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
@@ -57,7 +57,9 @@ abstract class SshSftpConnection extends SshConnection {
 
     @Override
     public void doClose() {
-        checkState(sharedSftpClient != null, "Not connected to SFTP");
+        if (null == sharedSftpClient) {
+            return;
+        }
 
         disconnectSftp(sharedSftpClient);
         sharedSftpClient = null;
