@@ -29,9 +29,16 @@ import javax.security.auth.login.Configuration;
 class KerberosJaasConfiguration extends Configuration {
 
     private boolean debug;
+    private boolean ticketCache;
 
     KerberosJaasConfiguration(boolean debug) {
         this.debug = debug;
+        this.ticketCache = false;
+    }
+    
+    KerberosJaasConfiguration(boolean debug, boolean ticketCache) {
+        this.debug = debug;
+        this.ticketCache = ticketCache;
     }
 
     @Override
@@ -41,13 +48,19 @@ class KerberosJaasConfiguration extends Configuration {
         if (debug) {
             options.put("debug", "true");
         }
+        
+        if (ticketCache) {
+        	options.put("useTicketCache", "true");
+        } else {
+        	options.put("useTicketCache", "false");
+        }
+        
         options.put("refreshKrb5Config", "true");
         
         if (JavaVendor.isIBM()) {
             options.put("credsType", "initiator");
         } else {
             options.put("client", "true");
-            options.put("useTicketCache", "false");
             options.put("useKeyTab", "false");
             options.put("doNotPrompt", "false");
         }

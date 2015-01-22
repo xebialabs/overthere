@@ -115,6 +115,7 @@ public class WinRmClient {
     private boolean kerberosUseHttpSpn;
     private boolean kerberosAddPortToSpn;
     private boolean kerberosDebug;
+    private boolean kerberosTicketCache;
 
     private String shellId;
     private String commandId;
@@ -358,7 +359,7 @@ public class WinRmClient {
         final CallbackHandler handler = new ProvidedAuthCallback(username, password);
         Document result;
         try {
-            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(kerberosDebug));
+            final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(kerberosDebug, kerberosTicketCache));
             lc.login();
 
             result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
@@ -588,6 +589,10 @@ public class WinRmClient {
 
     public void setKerberosDebug(boolean kerberosDebug) {
         this.kerberosDebug = kerberosDebug;
+    }
+    
+    public void setKerberosTicketCache(boolean kerberosTicketCache) {
+        this.kerberosTicketCache = kerberosTicketCache;
     }
 
     private static Logger logger = LoggerFactory.getLogger(WinRmClient.class);
