@@ -24,8 +24,10 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import net.schmizz.keepalive.KeepAlive;
 import net.schmizz.sshj.MockitoFriendlySSHClient;
 import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.Connection;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.Transport;
@@ -61,7 +63,8 @@ public class SshConnectionTest {
     private ConnectionOptions connectionOptions;
 
     private Session session;
-    private Transport transport;
+    private Connection conn;
+    private KeepAlive keepAlive;
 
     @BeforeMethod
     public void init() throws ConnectionException, TransportException {
@@ -73,8 +76,10 @@ public class SshConnectionTest {
         connectionOptions.set(USERNAME, "some-user");
         session = mock(Session.class);
         when(client.startSession()).thenReturn(session);
-        transport = mock(Transport.class);
-        when(client.getTransport()).thenReturn(transport);
+        conn = mock(Connection.class);
+        keepAlive = mock(KeepAlive.class);
+        when(client.getConnection()).thenReturn(conn);
+        when(conn.getKeepAlive()).thenReturn(keepAlive);
     }
 
     @Test
@@ -185,7 +190,7 @@ public class SshConnectionTest {
         SshConnection connection = newConnectionWithClient(client);
         connection.connect();
 
-        verify(transport, times(1)).setHeartbeatInterval(30);
+        verify(keepAlive, times(1)).setKeepAliveInterval(30);
         connection.close();
     }
 
@@ -194,7 +199,7 @@ public class SshConnectionTest {
         SshConnection connection = newConnectionWithClient(client);
         connection.connect();
 
-        verify(transport, times(1)).setHeartbeatInterval(0);
+        verify(keepAlive, times(1)).setKeepAliveInterval(0);
         connection.close();
     }
 

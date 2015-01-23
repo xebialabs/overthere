@@ -33,6 +33,7 @@ repositories {
   maven {
     url 'http://www.libvirt.org/maven2/'
   }
+  mavenLocal()
 }
 
 sourceCompatibility = 1.6
@@ -52,7 +53,7 @@ dependencies {
   compile 'org.slf4j:jcl-over-slf4j:1.6.3'
 
   // SSH
-  compile 'net.schmizz:sshj:0.9.0'
+  compile 'com.hierynomus:sshj:0.11.0'
   runtime 'com.jcraft:jzlib:1.0.7'
   runtime 'org.bouncycastle:bcprov-jdk15on:1.49'
 
@@ -81,6 +82,7 @@ dependencies {
   // Test dependencies
   testCompile('com.xebialabs.cloud:overcast:1.2.1') {
     exclude group: 'com.xebialabs.overthere', module: 'overthere'
+    exclude group: 'net.schmizz', module: 'sshj'
   }
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'
@@ -93,6 +95,18 @@ dependencies {
   testRuntime 'ch.qos.logback:logback-classic:1.0.6'
   testRuntime('org.uncommons:reportng:1.1.2') {
     exclude group: 'org.testng', module: 'testng'
+  }
+}
+
+tasks.withType(Test) {
+  afterSuite { descriptor, result ->
+    if (descriptor.className != null) {
+      def indicator = "\u001B[32m✓\u001b[0m"
+      if (result.failedTestCount > 0) {
+        indicator = "\u001B[31m✘\u001b[0m"
+      }
+      logger.lifecycle("$indicator Test ${descriptor.name}; Executed: ${result.testCount}/\u001B[32m${result.successfulTestCount}\u001B[0m/\u001B[31m${result.failedTestCount}\u001B[0m")
+    }
   }
 }
 

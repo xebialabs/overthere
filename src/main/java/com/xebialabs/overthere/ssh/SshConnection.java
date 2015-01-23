@@ -25,6 +25,7 @@ package com.xebialabs.overthere.ssh;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
+import net.schmizz.keepalive.KeepAliveProvider;
 import net.schmizz.sshj.Config;
 import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
@@ -135,10 +136,11 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected void connect() {
         try {
+            config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
             SSHClient client = sshClientFactory.create();
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new PromiscuousVerifier());
-            client.getTransport().setHeartbeatInterval(heartbeatInterval);
+            client.getConnection().getKeepAlive().setKeepAliveInterval(heartbeatInterval);
 
             try {
                 if (localAddress == null) {
