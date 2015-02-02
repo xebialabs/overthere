@@ -221,7 +221,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
         return LOCAL_PROTOCOL + ":" + file;
     }
 
-    public static OverthereFile valueOf(File f) {
+    public static LocalFile valueOf(File f) {
         return new LocalFile(createConnection(), f);
     }
 
