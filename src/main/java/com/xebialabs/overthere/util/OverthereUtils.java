@@ -257,19 +257,30 @@ public class OverthereUtils {
     }
 
     /**
-     * Generates unique folder inside of specified base directory
-     * @param baseDir - directory where unique folder will be situated
-     * @return generated unique folder in the base directory
+     * Generates unique directory inside the specified base directory.
+     * @param baseDir directory where unique directory will be situated
+     * @return generated unique directory in the base directory
      */
     public static OverthereFile getUniqueFolder(OverthereFile baseDir) {
+        String temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
+        return getUniqueFolder(baseDir, temporaryFileHolderDirectoryNamePrefix);
+    }
+
+    /**
+     * Generates unique directory with the directoryNameBase as prefix inside of specified base directory.
+     * @param baseDir directory where unique directory will be situated
+     * @param directoryNameBase The basename the directory.
+     * @return generated unique directory in the base directory
+     */
+    public static OverthereFile getUniqueFolder(OverthereFile baseDir, String directoryNameBase) {
         ConnectionOptions options = baseDir.getConnection().getOptions();
         int temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
-        String temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
 
         RuntimeException originalExc = null;
+        int salt = new Random().nextInt(10000);
         for (int i = 0; i <= temporaryFileCreationRetries; i++) {
-            int salt = new Random().nextInt(10000);
-            OverthereFile holder = baseDir.getFile(temporaryFileHolderDirectoryNamePrefix + "." + salt + 1);
+            salt += 1;
+            OverthereFile holder = baseDir.getFile(directoryNameBase + "." + salt);
             if (!holder.exists()) {
                 logger.trace("Creating unique directory {}", holder);
                 try {
