@@ -29,6 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -255,28 +257,36 @@ public class OverthereUtils {
     }
 
     /**
-     * Generates unique temp file name by appending suffix to proposed name
-     * @param baseDir - directory where file will be situated
-     * @param fileName - proposed file name
-     * @return generated unique file in the base directory
+     * Generates unique folder inside of specified base directory
+     * @param baseDir - directory where unique folder will be situated
+     * @return generated unique folder in the base directory
      */
-    public static OverthereFile getUniqueTempFile(OverthereFile baseDir, String fileName) {
+    public static OverthereFile getUniqueFolder(OverthereFile baseDir) {
         ConnectionOptions options = baseDir.getConnection().getOptions();
-        int salt = new Random().nextInt(10000);
         int temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
+        String temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
 
-        RuntimeException exception = null;
+        RuntimeException originalExc = null;
         for (int i = 0; i <= temporaryFileCreationRetries; i++) {
-            try {
-                OverthereFile tempFile = baseDir.getFile(fileName + "." + (salt + i));
-                if (!tempFile.exists()) {
-                    return tempFile;
+            int salt = new Random().nextInt(10000);
+            OverthereFile holder = baseDir.getFile(temporaryFileHolderDirectoryNamePrefix + "." + salt + 1);
+            if (!holder.exists()) {
+                logger.trace("Creating unique directory {}", holder);
+                try {
+                    holder.mkdir();
+                    return holder;
+                } catch(RuntimeException exc) {
+                    originalExc = exc;
+                    logger.debug(format("Failed to create holder directory %s - Trying with the next suffix", holder), exc);
                 }
-            } catch (RuntimeException e) {
-                exception = e;
             }
         }
 
-        throw new RuntimeIOException("Cannot generate a unique file in base folder " + baseDir.getPath(), exception);
+        String errorText = "Cannot generate a unique directory on " + baseDir.getConnection();
+        if(originalExc != null) {
+            throw new RuntimeIOException(errorText, originalExc);
+        } else {
+            throw new RuntimeIOException(errorText);
+        }
     }
 }

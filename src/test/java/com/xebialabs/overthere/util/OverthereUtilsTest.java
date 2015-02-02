@@ -35,10 +35,10 @@ public class OverthereUtilsTest extends OverthereConnectionItestBase {
     @Test
     public void shouldGenerateUniqueTempFile() {
         OverthereFile base = LocalFile.valueOf(temp.getRoot());
-        OverthereFile fileOne = OverthereUtils.getUniqueTempFile(base, "testFile");
-        OverthereFile fileTwo = OverthereUtils.getUniqueTempFile(base, "testFile");
-        assertFalse(fileOne.exists());
-        assertFalse(fileTwo.exists());
-        assertNotEquals(fileOne.getPath(), fileTwo.getPath());
+        OverthereFile folderOne = OverthereUtils.getUniqueFolder(base);
+        OverthereFile folderTwo = OverthereUtils.getUniqueFolder(base);
+        assertTrue(folderOne.exists());
+        assertTrue(folderTwo.exists());
+        assertNotEquals(folderOne.getPath(), folderTwo.getPath());
     }
 }
