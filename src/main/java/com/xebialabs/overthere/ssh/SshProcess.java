@@ -106,13 +106,13 @@ class SshProcess implements OverthereProcess {
             return;
         }
 
-        try {
-            command.signal(Signal.KILL);
-        } catch (TransportException e) {
-            logger.warn("Could not send the KILL signal to the command, closing the session.", e);
-        } finally {
+//        try {
+//            command.signal(Signal.KILL);
+//        } catch (TransportException e) {
+//            logger.warn("Could not send the KILL signal to the command, closing the session.", e);
+//        } finally {
             closeSession();
-        }
+//        }
     }
 
     @Override
