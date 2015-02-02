@@ -115,7 +115,8 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public final void close() {
-        if (isClosed) {
+        if (isClosed == null || isClosed) {
+            isClosed = Boolean.TRUE;
             return;
         }
 
