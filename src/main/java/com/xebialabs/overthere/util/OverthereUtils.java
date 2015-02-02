@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
@@ -29,7 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
+import java.util.Random;
 
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
 import static java.lang.String.format;
 
 /**
@@ -248,5 +252,31 @@ public class OverthereUtils {
              b.append(sep).append(strings.get(i));
         }
         return b.toString();
+    }
+
+    /**
+     * Generates unique temp file name by appending suffix to proposed name
+     * @param baseDir - directory where file will be situated
+     * @param fileName - proposed file name
+     * @return generated unique file in the base directory
+     */
+    public static OverthereFile getUniqueTempFile(OverthereFile baseDir, String fileName) {
+        ConnectionOptions options = baseDir.getConnection().getOptions();
+        int salt = new Random().nextInt(10000);
+        int temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
+
+        RuntimeException exception = null;
+        for (int i = 0; i <= temporaryFileCreationRetries; i++) {
+            try {
+                OverthereFile tempFile = baseDir.getFile(fileName + "." + (salt + i));
+                if (!tempFile.exists()) {
+                    return tempFile;
+                }
+            } catch (RuntimeException e) {
+                exception = e;
+            }
+        }
+
+        throw new RuntimeIOException("Cannot generate a unique file in base folder " + baseDir.getPath(), exception);
     }
 }
