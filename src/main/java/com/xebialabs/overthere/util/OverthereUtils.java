@@ -22,14 +22,20 @@
  */
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_FILE_CREATION_RETRIES_DEFAULT;
 import static java.lang.String.format;
 
 /**
@@ -248,5 +254,50 @@ public class OverthereUtils {
              b.append(sep).append(strings.get(i));
         }
         return b.toString();
+    }
+
+    /**
+     * Generates unique directory inside the specified base directory.
+     * @param baseDir directory where unique directory will be situated
+     * @return generated unique directory in the base directory
+     */
+    public static OverthereFile getUniqueFolder(OverthereFile baseDir) {
+        String temporaryFileHolderDirectoryNamePrefix = "ot-" + (new SimpleDateFormat("yyyyMMdd'T'HHmmssSSS")).format(new Date());
+        return getUniqueFolder(baseDir, temporaryFileHolderDirectoryNamePrefix);
+    }
+
+    /**
+     * Generates unique directory with the directoryNameBase as prefix inside of specified base directory.
+     * @param baseDir directory where unique directory will be situated
+     * @param directoryNameBase The basename the directory.
+     * @return generated unique directory in the base directory
+     */
+    public static OverthereFile getUniqueFolder(OverthereFile baseDir, String directoryNameBase) {
+        ConnectionOptions options = baseDir.getConnection().getOptions();
+        int temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
+
+        RuntimeException originalExc = null;
+        int salt = new Random().nextInt(10000);
+        for (int i = 0; i <= temporaryFileCreationRetries; i++) {
+            salt += 1;
+            OverthereFile holder = baseDir.getFile(directoryNameBase + "." + salt);
+            if (!holder.exists()) {
+                logger.trace("Creating unique directory {}", holder);
+                try {
+                    holder.mkdir();
+                    return holder;
+                } catch(RuntimeException exc) {
+                    originalExc = exc;
+                    logger.debug(format("Failed to create holder directory %s - Trying with the next suffix", holder), exc);
+                }
+            }
+        }
+
+        String errorText = "Cannot generate a unique directory on " + baseDir.getConnection();
+        if(originalExc != null) {
+            throw new RuntimeIOException(errorText, originalExc);
+        } else {
+            throw new RuntimeIOException(errorText);
+        }
     }
 }
