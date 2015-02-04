@@ -30,8 +30,7 @@ import java.io.OutputStream;
 import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.OutputSupplier;
@@ -54,7 +53,6 @@ import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static java.lang.String.format;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public abstract class ItestsBase1Utils {
 
@@ -64,7 +62,7 @@ public abstract class ItestsBase1Utils {
     protected String expectedConnectionClassName;
     protected OverthereConnection connection;
 
-    @BeforeClass
+    @BeforeMethod
     public void setupHost() throws Exception {
         temp = new TemporaryFolder();
         temp.create();
@@ -82,7 +80,7 @@ public abstract class ItestsBase1Utils {
 
     protected abstract String getExpectedConnectionClassName();
 
-    @AfterClass(alwaysRun = true)
+    @AfterMethod(alwaysRun = true)
     public void disconnect() {
         if (connection != null) {
             try {
@@ -95,12 +93,9 @@ public abstract class ItestsBase1Utils {
                 System.out.println("Ignoring " + e);
             }
         }
-        temp.delete();
-    }
-
-    @BeforeMethod
-    public void assertConnection() {
-        assertThat("We're not connected!", connection != null);
+        if (temp != null) {
+            temp.delete();
+        }
     }
 
     protected static byte[] readFile(final OverthereFile f) {
