@@ -965,6 +965,12 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td>
 </tr>
 <tr>
+<th align="left" valign="top"><a name="cifs_winrmKerberosTicketCache"></a>winrmKerberosTicketCache</th>
+<td>If set to <code>true</code>, enables the use of the Kerberos ticket cache for use in authentication.  When enabled, if a password is not specfified the system ticket cache will be used as a  The default value is <code>false</code>.
+<br/>
+<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="cifs_winrmKerberosUseHttpSpn"></a>winrmKerberosUseHttpSpn</th>
 	<td>If set to <code>true</code>, the protocol <code>HTTP</code> will be used in the service principal name (SPN) for which a Kerberos ticket is requested. Otherwise the protocol <code>WSMAN</code> is used. The default value is <code>false</code>.
 	<br/>

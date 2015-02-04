@@ -66,6 +66,8 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_USE_HTTP_SPN;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_TICKET_CACHE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_TICKET_CACHE_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
@@ -245,6 +247,7 @@ public class CifsWinRmConnection extends CifsConnection {
         client.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, WINRM_KERBEROS_USE_HTTP_SPN_DEFAULT));
         client.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, WINRM_KERBEROS_ADD_PORT_TO_SPN_DEFAULT));
         client.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, WINRM_KERBEROS_DEBUG_DEFAULT));
+        client.setKerberosTicketCache(options.getBoolean(WINRM_KERBEROS_TICKET_CACHE, WINRM_KERBEROS_TICKET_CACHE_DEFAULT));
         return client;
     }
 

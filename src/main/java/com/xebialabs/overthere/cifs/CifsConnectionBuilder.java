@@ -143,12 +143,22 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosDebug">the online documentation</a>
      */
-    public static final String WINRM_KERBEROS_DEBUG = "winrmKerberosDebug";
+    public static final String WINRM_KERBEROS_DEBUG = "winrmKerberosDebug";  
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosDebug">the online documentation</a>
      */
     public static final boolean WINRM_KERBEROS_DEBUG_DEFAULT = false;
+    
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosTicketCache">the online documentation</a>
+     */
+    public static final String WINRM_KERBEROS_TICKET_CACHE = "winrmKerberosTicketCache";  
+    
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosTicketCache">the online documentation</a>
+     */
+    public static final boolean WINRM_KERBEROS_TICKET_CACHE_DEFAULT = false;  
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmLocale">the online documentation</a>
