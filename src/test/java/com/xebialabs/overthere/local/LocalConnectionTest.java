@@ -22,11 +22,8 @@
  */
 package com.xebialabs.overthere.local;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.CmdLine;
@@ -41,8 +38,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -99,6 +95,15 @@ public class LocalConnectionTest extends OverthereConnectionItestBase {
         Object read = objectsIn.readObject();
         assertThat(read, instanceOf(LocalFile.class));
         assertThat(((LocalFile) read).getPath(), equalTo(tempFile.getPath()));
+    }
+
+    @Test
+    public void deleteTemporaryFilesWhenClosed() throws IOException {
+        OverthereFile tempFile = connection.getTempFile("someFile");
+        tempFile.mkdirs();
+        assertThat(new File(tempFile.getPath()).exists(), equalTo(true));
+        connection.close();
+        assertThat(new File(tempFile.getPath()).exists(), equalTo(false));
     }
 
 }
