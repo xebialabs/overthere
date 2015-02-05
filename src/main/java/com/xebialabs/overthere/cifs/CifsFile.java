@@ -66,7 +66,11 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
     @Override
     public OverthereFile getParentFile() {
         try {
-            return new CifsFile(getConnection(), new SmbFile(smbFile.getParent(), connection.authentication));
+            String parent = smbFile.getParent();
+            if (connection.encoder.isValidUncPath(parent)) {
+                return new CifsFile(getConnection(), new SmbFile(parent, connection.authentication));
+            }
+            return null;
         } catch (MalformedURLException exc) {
             return null;
         }

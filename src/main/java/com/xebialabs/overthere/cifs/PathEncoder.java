@@ -110,4 +110,13 @@ class PathEncoder {
         return pathMapper.toLocalPath(matcher.group(1));
     }
 
+    /**
+     * Check whether the UNC path is valid.
+     * @param uncPath the UNC path to check.
+     * @return true if it is a valid UNC path.
+     */
+    final boolean isValidUncPath(String uncPath) {
+        return UNC_PATH_PATTERN.matcher(uncPath).matches();
+    }
+
 }
