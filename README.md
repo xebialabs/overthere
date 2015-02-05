@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.7%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C2.4.8%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>2.4.7</version>
+			<version>2.4.8</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1050,7 +1050,11 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
-* Overtehre 2.4.7 (02-Feb-2015)
+* Overthere 2.4.8 (05-Feb-2015)
+    * Upgraded Scannit to 1.3.1
+    * Checking whether the CifsFile.getParentFile() is valid, Fixes [#153](https://github.com/xebialabs/overthere/issues/153)
+    * Merged [#145](https://github.com/xebialabs/overthere/issues/145), adds support for using kerberos ticket cache
+* Overthere 2.4.7 (02-Feb-2015)
     * Upgraded SSHJ to 0.11.0
     * Merged [#146](https://github.com/xebialabs/overthere/issues/146), prevented SshSftpConnection from throwing exception if it was closed
     * Merged [#139](https://github.com/xebialabs/overthere/issues/139), added support for private key contents as string
