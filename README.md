@@ -147,6 +147,11 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	    2 minutes.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="soTimeoutMillis"></a>soTimeoutMillis</th>
+	<td>The number of milliseconds Overthere will waits when no data is received on an open connection before raising exception. The default value is <code>0</code>, i.e.
+	    2 minutes.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
 	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See
 	    <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a

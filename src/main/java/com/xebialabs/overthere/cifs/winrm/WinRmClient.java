@@ -64,6 +64,7 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.dom4j.Document;
@@ -116,6 +117,8 @@ public class WinRmClient {
     private boolean kerberosAddPortToSpn;
     private boolean kerberosDebug;
     private boolean kerberosTicketCache;
+    private int soTimeout;
+    private int connectionTimeout;
 
     private String shellId;
     private String commandId;
@@ -454,6 +457,9 @@ public class WinRmClient {
         }
 
         httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
+
+        HttpConnectionParams.setSoTimeout(httpclient.getParams(), soTimeout);
+        HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), connectionTimeout);
     }
 
     private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
@@ -593,6 +599,26 @@ public class WinRmClient {
     
     public void setKerberosTicketCache(boolean kerberosTicketCache) {
         this.kerberosTicketCache = kerberosTicketCache;
+    }
+
+    public int getConnectionTimeout ()
+    {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout ( int connectionTimeout )
+    {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public int getSoTimeout ()
+    {
+        return soTimeout;
+    }
+
+    public void setSoTimeout ( int soTimeout )
+    {
+        this.soTimeout = soTimeout;
     }
 
     private static Logger logger = LoggerFactory.getLogger(WinRmClient.class);
