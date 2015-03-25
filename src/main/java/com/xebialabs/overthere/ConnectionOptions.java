@@ -73,16 +73,6 @@ public class ConnectionOptions {
     public static final int CONNECTION_TIMEOUT_MILLIS_DEFAULT = 120000;
 
     /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#soTimeoutMillis">the online documentation</a>
-     */
-    public static final String SO_TIMEOUT_MILLIS = "soTimeoutMillis";
-
-    /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#soTimeoutMillis">the online documentation</a>
-     */
-    public static final int SO_TIMEOUT_MILLIS_DEFAULT = 0;
-
-    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#address">the online documentation</a>
      */
     public static final String ADDRESS = "address";
