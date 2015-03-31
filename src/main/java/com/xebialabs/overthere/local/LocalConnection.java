@@ -46,6 +46,7 @@ import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**
@@ -158,4 +159,13 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
 
+    /**
+     * Override this from {@link com.xebialabs.overthere.spi.BaseOverthereConnection#finalize()}, because the LocalConnection needn't be closed, so it should not log messages.
+     * @throws Throwable
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        closeQuietly(this);
+        super.finalize();
+    }
 }
