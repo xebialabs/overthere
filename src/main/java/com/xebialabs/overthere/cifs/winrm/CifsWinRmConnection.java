@@ -42,6 +42,7 @@ import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -68,8 +69,6 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_LOCALE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_TIMEMOUT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_TICKET_CACHE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_TICKET_CACHE_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_SO_TIMEOUT_MILLIS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_SO_TIMEOUT_MILLIS_DEFAULT;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS;
 import static com.xebialabs.overthere.ConnectionOptions.CONNECTION_TIMEOUT_MILLIS_DEFAULT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
@@ -253,7 +252,7 @@ public class CifsWinRmConnection extends CifsConnection {
         client.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, WINRM_KERBEROS_DEBUG_DEFAULT));
         client.setKerberosTicketCache(options.getBoolean(WINRM_KERBEROS_TICKET_CACHE, WINRM_KERBEROS_TICKET_CACHE_DEFAULT));
         client.setConnectionTimeout(options.getInteger(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT));
-        client.setSoTimeout(options.getInteger(WINRM_SO_TIMEOUT_MILLIS, WINRM_SO_TIMEOUT_MILLIS_DEFAULT));
+        client.setSoTimeout(options.getInteger(SOCKET_TIMEOUT_MILLIS, SOCKET_TIMEOUT_MILLIS_DEFAULT));
         return client;
     }
 

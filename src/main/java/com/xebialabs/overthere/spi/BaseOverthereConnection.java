@@ -66,6 +66,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final AddressPortMapper mapper;
     protected final OperatingSystemFamily os;
     protected final int connectionTimeoutMillis;
+    protected final int socketTimeoutMillis;
     protected final boolean canStartProcess;
     protected final String temporaryDirectoryPath;
     protected final boolean deleteTemporaryDirectoryOnDisconnect;
@@ -85,6 +86,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         this.mapper = checkNotNull(mapper, "Cannot create OverthereConnection with null address-port mapper");
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
         this.connectionTimeoutMillis = options.getInteger(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT);
+        this.socketTimeoutMillis = options.getInteger(SOCKET_TIMEOUT_MILLIS, SOCKET_TIMEOUT_MILLIS_DEFAULT);
         this.canStartProcess = canStartProcess;
         this.temporaryDirectoryPath = options.get(TEMPORARY_DIRECTORY_PATH, os.getDefaultTemporaryDirectoryPath());
         this.deleteTemporaryDirectoryOnDisconnect = options.getBoolean(TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT, TEMPORARY_DIRECTORY_DELETE_ON_DISCONNECT_DEFAULT);
