@@ -94,6 +94,7 @@ public class CifsTelnetConnection extends CifsConnection {
             tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
             logger.info("Connecting to telnet://{}@{}", username, address);
             tc.connect(address, port);
+            tc.setSoTimeout(socketTimeoutMillis);
             final InputStream stdout = tc.getInputStream();
             final OutputStream stdin = tc.getOutputStream();
             final PipedInputStream callersStdout = new PipedInputStream();

@@ -200,16 +200,6 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final String DEFAULT_WINRM_TIMEOUT = "PT60.000S";
 
-	/**
-	 * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#winrmSoTimeoutMillis">the online documentation</a>
-	 */
-	public static final String WINRM_SO_TIMEOUT_MILLIS = "winrmSoTimeoutMillis";
-
-	/**
-	 * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#soTimeoutMillis">the online documentation</a>
-	 */
-	public static final int WINRM_SO_TIMEOUT_MILLIS_DEFAULT = 0;
-
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsAllowDelegate">the online documentation</a>
      */
