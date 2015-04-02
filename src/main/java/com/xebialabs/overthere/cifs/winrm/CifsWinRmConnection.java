@@ -251,8 +251,8 @@ public class CifsWinRmConnection extends CifsConnection {
         client.setKerberosAddPortToSpn(options.getBoolean(WINRM_KERBEROS_ADD_PORT_TO_SPN, WINRM_KERBEROS_ADD_PORT_TO_SPN_DEFAULT));
         client.setKerberosDebug(options.getBoolean(WINRM_KERBEROS_DEBUG, WINRM_KERBEROS_DEBUG_DEFAULT));
         client.setKerberosTicketCache(options.getBoolean(WINRM_KERBEROS_TICKET_CACHE, WINRM_KERBEROS_TICKET_CACHE_DEFAULT));
-        client.setConnectionTimeout(options.getInteger(CONNECTION_TIMEOUT_MILLIS, CONNECTION_TIMEOUT_MILLIS_DEFAULT));
-        client.setSoTimeout(options.getInteger(SOCKET_TIMEOUT_MILLIS, SOCKET_TIMEOUT_MILLIS_DEFAULT));
+        client.setConnectionTimeout(connectionTimeoutMillis);
+        client.setSoTimeout(socketTimeoutMillis);
         return client;
     }
 
