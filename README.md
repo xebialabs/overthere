@@ -147,6 +147,11 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 	    2 minutes.</td>
 </tr>
 <tr>
+	<th align="left" valign="top"><a name="socketTimeoutMillis"></a>socketTimeoutMillis</th>
+	<td>The number of milliseconds Overthere will waits when no data is received on an open connection before raising exception. The default value is <code>0</code>, i.e.
+	    infinite timeout.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="jumpstation"></a>jumpstation</th>
 	<td>If set to a non-null value, this property contains the connection options used to connect to an SSH jumpstation (See
 	    <a href="#tunnelling">Tunnelling</a>). Recursive configuration is possible, i.e. this property is also available for the connection options of a
@@ -987,10 +992,6 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="winrmSoTimeoutMillis"></a>winrmSoTimeoutMillis</th>
-	<td>The number of milliseconds Overthere will waits when no data is received on an open connection before raising exception. The default value is <code>0</code>, meaning that read operations will not time out (infinite timeout).</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate"></a>winrsAllowDelegate</th>
