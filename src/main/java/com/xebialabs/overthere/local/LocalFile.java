@@ -22,20 +22,14 @@
  */
 package com.xebialabs.overthere.local;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
@@ -221,7 +215,11 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
         return LOCAL_PROTOCOL + ":" + file;
     }
 
-    public static LocalFile valueOf(File f) {
+    public static OverthereFile valueOf(File f) {
+        return new LocalFile(createConnection(), f);
+    }
+
+    public static LocalFile from(File f) {
         return new LocalFile(createConnection(), f);
     }
 
