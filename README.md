@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C3.0.0%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.0.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>3.0.0</version>
+			<version>4.0.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1055,19 +1055,25 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 <a name="release_history"></a>
 # Release History
 
+* Overthere 4.0.0 (17-Apr-2015)
+    * The binary incompatibility introduced in Overthere 2.4.7 and present in 2.4.8 and 3.0.0 was breaking too much libraries and code using Overthere. We've reverted the breaking change so that `LocalFile.valueOf` once again returns an `OverthereFile` and added a new `LocalFile.from` method which returns a `LocalFile`. Because this version is binary incompatible with 3.0.0 we had to bump the major version _again_ but this is one _is_ binary compatible with Overthere 2.4.6 and below.
 * Overthere 3.0.0 (14-Apr-2015)
-    * Due to a binary incompatible source code change in LocalFile, we've decided to bump the version to 3.0.0
-    * Upgraded SSHJ to 0.12.0
+    * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
+    * Because of the binary incompatiblity introduced in Overthere 2.4.7, we've decided to bump the major version and release this version of Overthere 3.0.0.
+    * Upgraded SSHJ to 0.12.0.
     * Can now configure socket timeout, fixes [#156](https://github.com/xebialabs/overthere/issues/156) and [#158](https://github.com/xebialabs/overthere/issues/158)
     * LocalConnection does not log 'Connection [LOCAL:] was not closed, closing automatically.'
 * Overthere 2.4.8 (05-Feb-2015)
-    * Upgraded Scannit to 1.3.1
+    * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
+    * Upgraded Scannit to 1.3.1.
     * Checking whether the CifsFile.getParentFile() is valid, fixes [#153](https://github.com/xebialabs/overthere/issues/153)
-    * Merged [#145](https://github.com/xebialabs/overthere/issues/145), adds support for using kerberos ticket cache
+    * Merged [#145](https://github.com/xebialabs/overthere/issues/145) which adds support for using kerberos ticket cache
 * Overthere 2.4.7 (02-Feb-2015)
-    * Upgraded SSHJ to 0.11.0
-    * Merged [#146](https://github.com/xebialabs/overthere/issues/146), prevented SshSftpConnection from throwing exception if it was closed
-    * Merged [#139](https://github.com/xebialabs/overthere/issues/139), added support for private key contents as string
+    * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
+    * Upgraded SSHJ to 0.11.0.
+    * Changed return type of `LocalFile.valueOf(java.io.File)` from `OverthereFile` to `LocalFile`. This breaks binary compatibility with Overthere 2.4.6.
+    * Merged [#146](https://github.com/xebialabs/overthere/issues/146) which prevents SshSftpConnection from throwing exception if it was closed
+    * Merged [#139](https://github.com/xebialabs/overthere/issues/139) which adds support for private key contents as string
 * Overthere 2.4.6 (09-Jan-2015)
     * Upgraded Scannit to 1.3.0 to remove transitive Guava dependency.
     * Upgraded Gradle to 2.2.1.
