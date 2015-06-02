@@ -28,15 +28,16 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
-
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
 
 import static java.lang.String.format;
 
@@ -67,10 +68,12 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
     public OverthereFile getParentFile() {
         try {
             String parent = smbFile.getParent();
-            if (connection.encoder.isValidUncPath(parent)) {
-                return new CifsFile(getConnection(), new SmbFile(parent, connection.authentication));
+            SmbFile parentSmbFile = new SmbFile(parent, connection.authentication);
+            String share = parentSmbFile.getShare();
+            if (null == share) {
+                return null;
             }
-            return null;
+            return new CifsFile(getConnection(), parentSmbFile);
         } catch (MalformedURLException exc) {
             return null;
         }
