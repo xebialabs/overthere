@@ -1058,7 +1058,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 * Overthere 4.0.1 (2-Jun-2015)
     * Correct fix for [#153](https://github.com/xebialabs/overthere/issues/153)
 * Overthere 4.0.0 (17-Apr-2015)
-    * The binary incompatibility introduced in Overthere 2.4.7 and present in 2.4.8 and 3.0.0 was breaking too much libraries and code using Overthere. We've reverted the breaking change so that `LocalFile.valueOf` once again returns an `OverthereFile` and added a new `LocalFile.from` method which returns a `LocalFile`. Because this version is binary incompatible with 3.0.0 we had to bump the major version _again_ but this is one _is_ binary compatible with Overthere 2.4.6 and below.
+    * The binary incompatibility introduced in Overthere 2.4.7 and present in 2.4.8 and 3.0.0 was breaking too many libraries and too much code using Overthere. We've reverted the breaking change so that `LocalFile.valueOf` once again returns an `OverthereFile` and added a new `LocalFile.from` method which returns a `LocalFile`. Because this version is binary incompatible with 3.0.0 we had to bump the major version _again_ but this is one _is_ binary compatible with Overthere 2.4.6 and below.
 * Overthere 3.0.0 (14-Apr-2015)
     * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
     * Because of the binary incompatiblity introduced in Overthere 2.4.7, we've decided to bump the major version and release this version of Overthere 3.0.0.
