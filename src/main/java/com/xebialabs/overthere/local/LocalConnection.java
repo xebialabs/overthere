@@ -151,15 +151,6 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     }
 
     /**
-     * Creates a connection to the local host.
-     */
-    public static OverthereConnection getLocalConnection() {
-        return Overthere.getConnection(LOCAL_PROTOCOL, new ConnectionOptions());
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
-
-    /**
      * Override this from {@link com.xebialabs.overthere.spi.BaseOverthereConnection#finalize()}, because the LocalConnection needn't be closed, so it should not log messages.
      * @throws Throwable
      */
@@ -168,4 +159,14 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         closeQuietly(this);
         super.finalize();
     }
+
+    /**
+     * Creates a connection to the local host.
+     */
+    public static OverthereConnection getLocalConnection() {
+        return Overthere.getConnection(LOCAL_PROTOCOL, new ConnectionOptions());
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
+
 }
