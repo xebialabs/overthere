@@ -148,13 +148,17 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
             default:
                 throw new IllegalArgumentException(format("Unknown operating system [%s]", source.getConnection().getHostOperatingSystem()));
         }
-        CmdLine cmdLine = new CmdLine().addTemplatedFragment(copyCommandTemplate, source.getPath(), getPath());
+        CmdLine cmdLine = postProcessShortCircuitCopyCommand(new CmdLine().addTemplatedFragment(copyCommandTemplate, source.getPath(), getPath()));
 
         CapturingOverthereExecutionOutputHandler capturedStderr = capturingHandler();
         int errno = source.getConnection().execute(loggingOutputHandler(logger), multiHandler(loggingErrorHandler(logger), capturedStderr), cmdLine);
         if (errno != 0) {
             throw new RuntimeIOException(format("Cannot copy [%s] to [%s] on [%s]: %s (errno=%d)", source.getPath(), getPath(), getConnection(), capturedStderr.getOutput(), errno));
         }
+    }
+
+    protected CmdLine postProcessShortCircuitCopyCommand(CmdLine cmd) {
+        return cmd;
     }
 
     protected InputStream asBuffered(InputStream is) {

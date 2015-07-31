@@ -49,304 +49,213 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
 
     private static byte[] OTHER_DEST_FILE_CONTENT = "This should be left as-is".getBytes();
 
+    /**
+     * Test copies from a local file to a remote file.
+     */
+
     @Test
     public void shouldCopyLocalFileToNonExistentRemoteFile() {
-        OverthereFile srcFile = getLocalSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFile();
-
-        populateSourceFile(srcFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToNonExistentFile(getLocalSourceFile(), getRemoteDestinationFile());
     }
 
     @Test
     public void shouldCopyLocalFileToExistentRemoteFile() {
-        OverthereFile srcFile = getLocalSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFile();
-
-        populateSourceFile(srcFile);
-        populateExistentDestinationFile(dstFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToExistentFile(getLocalSourceFile(), getRemoteDestinationFile());
     }
 
     @Test
     public void shouldCopyLocalFileToNonExistentRemoteFileWithDifferentName() {
-        OverthereFile srcFile = getLocalSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
-
-        populateSourceFile(srcFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToNonExistentFile(getLocalSourceFile(), getRemoteDestinationFileWithDifferentName());
     }
 
     @Test
     public void shouldCopyLocalFileToExistentRemoteFileWithDifferentName() {
-        OverthereFile srcFile = getLocalSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
-
-        populateSourceFile(srcFile);
-        populateExistentDestinationFile(dstFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToExistentFile(getLocalSourceFile(), getRemoteDestinationFileWithDifferentName());
     }
+
+
+    /**
+     * Test copies from a remote file to a remote file.
+     */
 
     @Test
     public void shouldCopyRemoteFileToNonExistentRemoteFile() {
-        OverthereFile srcFile = getRemoteSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFile();
-
-        populateSourceFile(srcFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToNonExistentFile(getRemoteSourceFile(), getRemoteDestinationFile());
     }
 
     @Test
     public void shouldCopyRemoteFileToExistentRemoteFile() {
-        OverthereFile srcFile = getRemoteSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFile();
-
-        populateSourceFile(srcFile);
-        populateExistentDestinationFile(dstFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToExistentFile(getRemoteSourceFile(), getRemoteDestinationFile());
     }
 
     @Test
     public void shouldCopyRemoteFileToNonExistentRemoteFileWithDifferentName() {
-        OverthereFile srcFile = getRemoteSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
-
-        populateSourceFile(srcFile);
-
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+        shouldCopyToNonExistentFile(getRemoteSourceFile(), getRemoteDestinationFileWithDifferentName());
     }
 
     @Test
     public void shouldCopyRemoteFileToExistentRemoteFileWithDifferentName() {
-        OverthereFile srcFile = getRemoteSourceFile();
-        OverthereFile dstFile = getRemoteDestinationFileWithDifferentName();
+        shouldCopyToExistentFile(getRemoteSourceFile(), getRemoteDestinationFileWithDifferentName());
+    }
 
-        populateSourceFile(srcFile);
-        populateExistentDestinationFile(dstFile);
+    /**
+     * Test copies from a remote (temporary) file to a remote (temporary) file.
+     */
 
-        srcFile.copyTo(dstFile);
-
-        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    @Test
+    public void shouldCopyRemoteFileToNonExistentRemoteTempFile() {
+        shouldCopyToNonExistentFile(getRemoteSourceFile(), getRemoteTempDestinationFile());
     }
 
     @Test
+    public void shouldCopyRemoteFileToExistentRemoteTempFile() {
+        shouldCopyToExistentFile(getRemoteSourceFile(), getRemoteTempDestinationFile());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempFileToNonExistentRemoteFile() {
+        shouldCopyToNonExistentFile(getRemoteTempSourceFile(), getRemoteDestinationFile());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempFileToExistentRemoteFile() {
+        shouldCopyToExistentFile(getRemoteTempSourceFile(), getRemoteDestinationFile());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempFileToNonExistentRemoteTempFile() {
+        shouldCopyToNonExistentFile(getRemoteTempSourceFile(), getRemoteTempDestinationFile());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempFileToExistentRemoteTempFile() {
+        shouldCopyToExistentFile(getRemoteTempSourceFile(), getRemoteTempDestinationFile());
+    }
+
+    /**
+     * Test copies from a local directory to a remote directory.
+     */
+
+    @Test
     public void shouldCopyLocalDirectoryToNonExistentRemoteDirectory() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectory();
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getLocalSourceDirectory(), getRemoteDestinationDirectory());
     }
 
     @Test
     public void shouldCopyLocalDirectoryToExistentRemoteDirectory() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectory();
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getLocalSourceDirectory(), getRemoteDestinationDirectory());
     }
 
     @Test
     public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentName() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getLocalSourceDirectory(), getRemoteDestinationDirectoryWithDifferentName());
     }
 
     @Test
     public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentName() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getLocalSourceDirectory(), getRemoteDestinationDirectoryWithDifferentName());
     }
+
+    /**
+     * Test copies from a remote directory to a remote directory.
+     */
 
     @Test
     public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectory() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectory();
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getRemoteSourceDirectory(), getRemoteDestinationDirectory());
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToExistentRemoteDirectory() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectory();
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getRemoteSourceDirectory(), getRemoteDestinationDirectory());
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentName() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getRemoteSourceDirectory(), getRemoteDestinationDirectoryWithDifferentName());
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentName() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = getRemoteDestinationDirectoryWithDifferentName();
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getRemoteSourceDirectory(), getRemoteDestinationDirectoryWithDifferentName());
     }
+
+    /**
+     * Test copies from a remote directory to a remote directory with a trailing file separator.
+     */
 
     @Test
     public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithTrailingFileSeparator() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getLocalSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectory()));
     }
 
     @Test
     public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithTrailingFileSeparator() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getLocalSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectory()));
     }
 
     @Test
     public void shouldCopyLocalDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getLocalSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName()));
     }
 
     @Test
     public void shouldCopyLocalDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
-        OverthereFile srcDir = getLocalSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getLocalSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName()));
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithTrailingFileSeparator() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getRemoteSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectory()));
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithTrailingFileSeparator() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectory());
-
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+        shouldCopyToExistentDirectory(getRemoteSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectory()));
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToNonExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
-
-        populateSourceDirectory(srcDir);
-
-        srcDir.copyTo(dstDir);
-
-        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+        shouldCopyToNonExistentDirectory(getRemoteSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName()));
     }
 
     @Test
     public void shouldCopyRemoteDirectoryToExistentRemoteDirectoryWithDifferentNameAndTrailingFileSeparator() {
-        OverthereFile srcDir = getRemoteSourceDirectory();
-        OverthereFile dstDir = appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName());
+        shouldCopyToExistentDirectory(getRemoteSourceDirectory(), appendFileSeparator(getRemoteDestinationDirectoryWithDifferentName()));
+    }
 
-        populateSourceDirectory(srcDir);
-        populateExistentDestinationDirectory(dstDir);
+    /**
+     * Test copies from a remote (temporary) directory to a remote (temporary) directory.
+     */
 
-        srcDir.copyTo(dstDir);
+    @Test
+    public void shouldCopyRemoteDirectoryToNonExistentRemoteTempDirectory() {
+        shouldCopyToNonExistentDirectory(getRemoteSourceDirectory(), getRemoteTempDestinationDirectory());
+    }
 
-        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
+    @Test
+    public void shouldCopyRemoteDirectoryToExistentRemoteTempDirectory() {
+        shouldCopyToExistentDirectory(getRemoteSourceDirectory(), getRemoteTempDestinationDirectory());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempDirectoryToNonExistentRemoteDirectory() {
+        shouldCopyToNonExistentDirectory(getRemoteTempSourceDirectory(), getRemoteDestinationDirectory());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempDirectoryToExistentRemoteDirectory() {
+        shouldCopyToExistentDirectory(getRemoteTempSourceDirectory(), getRemoteDestinationDirectory());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempDirectoryToNonExistentRemoteTempDirectory() {
+        shouldCopyToNonExistentDirectory(getRemoteTempSourceDirectory(), getRemoteTempDestinationDirectory());
+    }
+
+    @Test
+    public void shouldCopyRemoteTempDirectoryToExistentRemoteTempDirectory() {
+        shouldCopyToExistentDirectory(getRemoteTempSourceDirectory(), getRemoteTempDestinationDirectory());
     }
 
     private OverthereFile getLocalSourceFile() {
@@ -354,11 +263,19 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     private OverthereFile getRemoteSourceFile() {
-        return connection.getTempFile(SOURCE_FILE_NAME);
+        return connection.getFile(connection.getTempFile(SOURCE_FILE_NAME).getPath());
     }
 
     private OverthereFile getRemoteDestinationFile() {
         return connection.getFile(connection.getTempFile(SOURCE_FILE_NAME).getPath());
+    }
+
+    private OverthereFile getRemoteTempSourceFile() {
+        return connection.getTempFile(SOURCE_FILE_NAME);
+    }
+
+    private OverthereFile getRemoteTempDestinationFile() {
+        return connection.getTempFile(SOURCE_FILE_NAME);
     }
 
     private OverthereFile getRemoteDestinationFileWithDifferentName() {
@@ -384,11 +301,19 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
     }
 
     private OverthereFile getRemoteSourceDirectory() {
-        return connection.getTempFile(SOURCE_DIR_NAME);
+        return connection.getFile(connection.getTempFile(SOURCE_DIR_NAME).getPath());
     }
 
     private OverthereFile getRemoteDestinationDirectory() {
         return connection.getFile(connection.getTempFile(SOURCE_DIR_NAME).getPath());
+    }
+
+    private OverthereFile getRemoteTempSourceDirectory() {
+        return connection.getTempFile(SOURCE_DIR_NAME);
+    }
+
+    private OverthereFile getRemoteTempDestinationDirectory() {
+        return connection.getTempFile(SOURCE_DIR_NAME);
     }
 
     private OverthereFile getRemoteDestinationDirectoryWithDifferentName() {
@@ -397,6 +322,40 @@ public abstract class ItestsBase3Copy extends ItestsBase2Basics {
 
     private OverthereFile appendFileSeparator(OverthereFile dir) {
         return connection.getFile(dir.getPath() + connection.getHostOperatingSystem().getFileSeparator());
+    }
+
+    private void shouldCopyToNonExistentFile(final OverthereFile srcFile, final OverthereFile dstFile) {
+        populateSourceFile(srcFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    private void shouldCopyToExistentFile(final OverthereFile srcFile, final OverthereFile dstFile) {
+        populateSourceFile(srcFile);
+        populateExistentDestinationFile(dstFile);
+
+        srcFile.copyTo(dstFile);
+
+        assertSourceFileWasCopiedToDestinationFile(dstFile);
+    }
+
+    private void shouldCopyToNonExistentDirectory(final OverthereFile srcDir, final OverthereFile dstDir) {
+        populateSourceDirectory(srcDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToNonExistentDestinationDirectory(dstDir);
+    }
+
+    private void shouldCopyToExistentDirectory(final OverthereFile srcDir, final OverthereFile dstDir) {
+        populateSourceDirectory(srcDir);
+        populateExistentDestinationDirectory(dstDir);
+
+        srcDir.copyTo(dstDir);
+
+        assertSourceDirectoryWasCopiedToExistentDestinationDirectory(dstDir);
     }
 
     private void populateSourceDirectory(OverthereFile srcDir) {

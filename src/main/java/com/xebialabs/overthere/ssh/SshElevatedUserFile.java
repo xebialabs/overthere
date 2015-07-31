@@ -143,6 +143,15 @@ class SshElevatedUserFile extends SshScpFile {
         }
     }
 
+    @Override
+    protected CmdLine postProcessShortCircuitCopyCommand(CmdLine cmdLine) {
+        if(isTempFile) {
+            return new CmdLine().addArgument(NOELEVATION_PSEUDO_COMMAND).add(cmdLine.getArguments());
+        } else {
+            return cmdLine;
+        }
+    }
+
     private void overrideUmask(OverthereFile remoteFile) {
         if (((SshElevatedUserConnection) connection).overrideUmask) {
             logger.debug("Overriding umask by recursively setting permissions on files and/or directories copied with scp to be readable and executable (if needed) by group and other");
