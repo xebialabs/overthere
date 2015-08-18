@@ -132,10 +132,10 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
             closeQuietly(mapper);
 
-            if (!(this instanceof LocalConnection)) {
-                logger.info("Disconnected from {}", this);
-            } else {
+            if (this instanceof LocalConnection) {
                 logger.debug("Disconnected from {}", this);
+            } else {
+                logger.info("Disconnected from {}", this);
             }
         } finally {
             isClosed = Boolean.TRUE;

@@ -123,10 +123,10 @@ public class Overthere {
             final Constructor<? extends OverthereConnectionBuilder> constructor = connectionBuilderClass.getConstructor(String.class, ConnectionOptions.class, AddressPortMapper.class);
             OverthereConnectionBuilder connectionBuilder = constructor.newInstance(protocol, options, mapper);
 
-            if (!(connectionBuilder instanceof LocalConnection)) {
-                logger.info("Connecting to {}", connectionBuilder);
-            } else {
+            if (connectionBuilder instanceof LocalConnection) {
                 logger.debug("Connecting to {}", connectionBuilder);
+            } else {
+                logger.info("Connecting to {}", connectionBuilder);
             }
 
             OverthereConnection connection = connectionBuilder.connect();
