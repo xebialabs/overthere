@@ -478,8 +478,6 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final String SUDO_USERNAME = "sudoUsername";
 
-    protected SshConnection connection;
-
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_localAddress">the online
      * documentation</a>
@@ -491,6 +489,8 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      * documentation</a>
      */
     public static final String LOCAL_PORT = "localPort";
+
+    protected SshConnection connection;
 
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
