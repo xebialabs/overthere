@@ -66,7 +66,7 @@ public class SshScpFileTest {
     @Test
     public void shouldParseSymLinkOnLs() {
         SshScpFile.LsResults results = new SshScpFile.LsResults();
-        sshScpFile.parseLsOutputLine(results, "lrwxr-xr-x 10 ajvanerp  staff    340 Dec 17 15:28 build");
+        assertThat("Should parse", sshScpFile.parseLsOutputLine(results, "lrwxr-xr-x 10 ajvanerp  staff    340 Dec 17 15:28 /var/build -> build"));
         assertThat("Should be a directory", !results.isDirectory);
         assertThat("Should be executable", results.canExecute);
     }
