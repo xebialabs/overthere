@@ -70,4 +70,12 @@ public class SshScpFileTest {
         assertThat("Should be a directory", !results.isDirectory);
         assertThat("Should be executable", results.canExecute);
     }
+
+    @Test
+    public void shouldParseLsResultsPrefixedWithEscapeCodes() {
+        SshScpFile.LsResults results = new SshScpFile.LsResults();
+        assertThat("Should parse", sshScpFile.parseLsOutputLine(results, "\033H\0332Jdrwxr-xr-x 10 ajvanerp  staff    340 Dec 17 15:28 build"));
+        assertThat("Should be a directory", results.isDirectory);
+        assertThat("Should be executable", results.canExecute);
+    }
 }

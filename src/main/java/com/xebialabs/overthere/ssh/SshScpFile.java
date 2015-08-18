@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ import static java.lang.String.format;
  */
 class SshScpFile extends SshFile<SshScpConnection> {
 
-    private static final String PERMISSIONS_TOKEN_PATTERN = "[dl\\-]([r\\-][w\\-][xsStT\\-]){3}[@\\.\\+]*";
+    private static final String PERMISSIONS_TOKEN_PATTERN = ".*?([dl\\-]([r\\-][w\\-][xsStT\\-]){3}[@\\.\\+]*)";
 
     private static Pattern permissionsTokenPattern = Pattern.compile(PERMISSIONS_TOKEN_PATTERN);
 
@@ -156,10 +157,13 @@ class SshScpFile extends SshFile<SshScpConnection> {
         }
 
         String permissions = outputTokens.nextToken();
-        if (!permissionsTokenPattern.matcher(permissions).matches()) {
+        Matcher matcher = permissionsTokenPattern.matcher(permissions);
+        if (!matcher.matches()) {
             logger.debug("Not parsing ls output line [{}] because it the first token does not match the pattern for permissions [" + PERMISSIONS_TOKEN_PATTERN
                     + "]", outputLine);
             return false;
+        } else {
+            permissions = matcher.group(1);
         }
 
         logger.debug("Parsing ls output line [{}]", outputLine);
