@@ -4,7 +4,7 @@ plugins {
 }
 defaultTasks 'build'
 
-version = '4.1.0'
+version = '4.1.1-SNAPSHOT'
 group = 'com.xebialabs.overthere'
 
 apply plugin: 'idea'
