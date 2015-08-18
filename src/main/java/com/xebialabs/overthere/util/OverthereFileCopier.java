@@ -64,9 +64,8 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
 
         if (dstDir.exists()) {
             OverthereFileCopier.checkReallyIsADirectory(dstDir, DESTINATION);
-            logger.debug("About to copy files into existing directory {}", dstDir);
+            logger.trace("About to copy files into existing directory {}", dstDir);
         } else {
-            logger.debug("Creating destination directory {}", dstDir);
             dstDir.mkdir();
         }
     }
@@ -137,8 +136,9 @@ public final class OverthereFileCopier extends OverthereFileDirectoryWalker {
         checkFileExists(srcFile, SOURCE);
         checkReallyIsAFile(dstFile, DESTINATION);
 
+        logger.debug("Copying file {} to {}", srcFile, dstFile);
         if (dstFile.exists())
-            logger.debug("About to overwrite existing file {}", dstFile);
+            logger.trace("About to overwrite existing file {}", dstFile);
 
         try {
             InputStream is = srcFile.getInputStream();
