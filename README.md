@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.0.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.1.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.0.1</version>
+			<version>4.1.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1054,8 +1054,14 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 
 <a name="release_history"></a>
 # Release History
-
-* Overthere 4.0.1 (2-Jun-2015)
+* Overthere 4.1.0 (18-Aug-2015)
+    * Fixed bug where temporary files were not deleted for a CIFS/WINRM_INTERNAL or a CIFS/TELNET connection when connection was closed.
+    * Fixed bug where short-circuit copy would fail with error message "tar: can't set time on .: Not owner". This could occur when copying from/to a temporary file/directory for an SSH/SU, SSH/SUDO or SSH/INTERACTIVE_SUDO connection.
+    * Fixed bug where statting a file would fail with error message "ls -ld /path/to/dir returned 0 but its output is unparseable: ESC" for an SSH/SCP, SSH/SU, SSH/SUDO or SSH/INTERACTIVE_SUDO connection.
+    * Added logging (at DEBUG level) for local file operations.
+    * `Disconnected from local:` messages are now logged at DEBUG level instead of INFO level.
+    * Upgraded to SSH/J 0.13.0.
+* Overthere 4.0.1 (02-Jun-2015)
     * Correct fix for [#153](https://github.com/xebialabs/overthere/issues/153)
 * Overthere 4.0.0 (17-Apr-2015)
     * The binary incompatibility introduced in Overthere 2.4.7 and present in 2.4.8 and 3.0.0 was breaking too many libraries and too much code using Overthere. We've reverted the breaking change so that `LocalFile.valueOf` once again returns an `OverthereFile` and added a new `LocalFile.from` method which returns a `LocalFile`. Because this version is binary incompatible with 3.0.0 we had to bump the major version _again_ but this is one _is_ binary compatible with Overthere 2.4.6 and below.
