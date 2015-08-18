@@ -31,6 +31,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 /**
@@ -130,11 +133,15 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public void setExecutable(boolean executable) {
+        logger.debug("Setting execute permission on {} to {}", this, executable);
+
         file.setExecutable(executable);
     }
 
     @Override
     public void delete() {
+        logger.debug("Deleting {}", this);
+
         if (!file.delete()) {
             throw new RuntimeIOException("Cannot delete " + this);
         }
@@ -142,6 +149,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public void mkdir() {
+        logger.debug("Creating directory {}", this);
+
         if (!file.mkdir()) {
             throw new RuntimeIOException("Cannot mkdir " + this);
         }
@@ -149,6 +158,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public void mkdirs() {
+        logger.debug("Creating directory {}", this);
+
         if (!file.mkdirs()) {
             throw new RuntimeIOException("Cannot mkdir " + this);
         }
@@ -156,6 +167,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public List<OverthereFile> listFiles() {
+        logger.debug("Listing directory {}", this);
+
         List<OverthereFile> list = new ArrayList<OverthereFile>();
         for (File each : file.listFiles()) {
             list.add(new LocalFile(connection, each));
@@ -170,6 +183,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public void renameTo(OverthereFile dest) {
+        logger.debug("Renaming {} to {}", this, dest);
+
         if (!(dest instanceof LocalFile)) {
             throw new RuntimeIOException("Destination is not a " + LocalFile.class.getName());
         }
@@ -181,6 +196,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public InputStream getInputStream() {
+        logger.debug("Opening file input stream for {}", this);
+
         try {
             return asBuffered(new FileInputStream(file));
         } catch (FileNotFoundException exc) {
@@ -190,6 +207,8 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
 
     @Override
     public OutputStream getOutputStream() {
+        logger.debug("Opening file output stream for {}", this);
+
         try {
             return asBuffered(new FileOutputStream(file));
         } catch (FileNotFoundException exc) {
@@ -222,5 +241,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     public static LocalFile from(File f) {
         return new LocalFile(createConnection(), f);
     }
+
+    private static Logger logger = LoggerFactory.getLogger(LocalFile.class);
 
 }
