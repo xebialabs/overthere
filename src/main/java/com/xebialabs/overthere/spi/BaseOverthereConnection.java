@@ -77,7 +77,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final int streamBufferSize;
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
-    protected Random random = new Random();
     private volatile Boolean isClosed;
     private Throwable openStack;
 
