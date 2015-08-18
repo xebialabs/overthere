@@ -78,6 +78,14 @@ public class CifsTelnetConnection extends CifsConnection {
         super(type, options, mapper, true);
         checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
         checkArgument(!username.contains("@"), "Cannot create a " + CIFS_PROTOCOL + ":%s connection with a new-style Windows domain account [%s], use DOMAIN\\USER instead.", cifsConnectionType.toString().toLowerCase(), username);
+
+        // Make sure that we're properly cleaned up by setting the connected state.
+        connected();
+    }
+
+    @Override
+    public void connect() {
+        connected();
     }
 
     @Override

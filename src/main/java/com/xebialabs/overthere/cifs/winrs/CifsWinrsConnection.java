@@ -72,14 +72,17 @@ public class CifsWinrsConnection extends CifsConnection {
         checkArgument(password.indexOf('\'') == -1 && password.indexOf('\"') == -1, "Cannot create a " + CIFS_PROTOCOL + ":%s connection with a password that contains a single quote (\') or a double quote (\")", cifsConnectionType.toString().toLowerCase());
 
         this.options = options;
+    }
 
+    @Override
+    public void connect() {
         connectToWinrsProxy(options);
 
         if (winrsProxyConnection.getHostOperatingSystem() != WINDOWS) {
             disconnectFromWinrsProxy();
             throw new IllegalArgumentException(format("Cannot create a " + CIFS_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }
-        // Make sure that we're properly cleaned up by setting the connected state.
+
         connected();
     }
 

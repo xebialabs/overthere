@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnection;
@@ -93,6 +94,11 @@ public class CifsWinRmConnection extends CifsConnection {
         checkArgument(!username.contains("\\"), "Cannot create a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
 
         this.options = options;
+    }
+
+    @Override
+    public void connect() {
+        connected();
     }
 
     @Override

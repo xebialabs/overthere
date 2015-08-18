@@ -77,7 +77,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final int streamBufferSize;
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;
-    private volatile Boolean isClosed;
+    private volatile boolean isConnected;
     private Throwable openStack;
 
     protected BaseOverthereConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper, final boolean canStartProcess) {
@@ -96,10 +96,9 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     }
 
     protected void connected() {
-        this.isClosed = Boolean.FALSE;
+        this.isConnected = true;
         this.openStack = new Throwable("Opened here...");
     }
-
 
     /**
      * Return the OS family of the host.
@@ -117,8 +116,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     public final void close() {
-        if (isClosed == null || isClosed) {
-            isClosed = Boolean.TRUE;
+        if (!isConnected) {
             return;
         }
 
@@ -137,7 +135,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 logger.info("Disconnected from {}", this);
             }
         } finally {
-            isClosed = Boolean.TRUE;
+            isConnected = false;
         }
     }
 
@@ -411,8 +409,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      */
     @Override
     protected void finalize() throws Throwable {
-        // Only trigger if connected() method was called to set the connected state
-        if (isClosed != null && !isClosed) {
+        if (isConnected) {
             logger.error(String.format("Connection [%s] was not closed, closing automatically.", this), openStack);
             closeQuietly(this);
         }

@@ -265,7 +265,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final boolean WINRS_UNENCRYPTED_DEFAULT = false;
 
-    private OverthereConnection connection;
+    private CifsConnection connection;
 
     public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
@@ -287,6 +287,7 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
 
     @Override
     public OverthereConnection connect() {
+        connection.connect();
         return connection;
     }
 

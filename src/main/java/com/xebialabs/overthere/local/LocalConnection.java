@@ -85,7 +85,7 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
     @Override
     public OverthereConnection connect() {
-        this.connected();
+        connected();
         return this;
     }
 

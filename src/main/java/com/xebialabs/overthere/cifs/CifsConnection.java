@@ -122,6 +122,8 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         }
     }
 
+    protected abstract void connect();
+
     @Override
     public void doClose() {
         // no-op
