@@ -22,8 +22,11 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.KerberosCredentials;
 import org.apache.http.impl.auth.SPNegoScheme;
 import org.ietf.jgss.GSSContext;
+import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
@@ -47,29 +50,49 @@ class WsmanSPNegoScheme extends SPNegoScheme {
     }
 
     @Override
-    protected byte[] generateGSSToken(final byte[] input, final Oid oid, String authServer) throws GSSException {
+    protected byte[] generateGSSToken(final byte[] input, final Oid oid, final String authServer) throws GSSException {
+        logger.trace("WsmanSPNegoScheme.generateGSSToken invoked for authServer = {} without credentials", authServer);
+        return doGenerateGSSToken(input, oid, authServer, null);
+    }
+
+    @Override
+    protected byte[] generateGSSToken(final byte[] input, final Oid oid, final String authServer, final Credentials credentials) throws GSSException {
+        logger.trace("WsmanSPNegoScheme.generateGSSToken invoked for authServer = {} with credentials", authServer);
+        return doGenerateGSSToken(input, oid, authServer, credentials);
+    }
+
+   private byte[] doGenerateGSSToken(final byte[] input, final Oid oid, final String authServer, final Credentials credentials) throws GSSException {
         byte[] token = input;
         if (token == null) {
             token = new byte[0];
         }
 
+        final String gssAuthServer;
         if (authServer.equals("localhost")) {
             if (authServer.indexOf(':') > 0) {
-                authServer = spnAddress + ":" + spnPort;
+                gssAuthServer = spnAddress + ":" + spnPort;
             } else {
-                authServer = spnAddress;
+                gssAuthServer = spnAddress;
             }
+        } else {
+            gssAuthServer = authServer;
+        }
+        final String spn = spnServiceClass + "@" + gssAuthServer;
+
+        final GSSCredential gssCredential;
+        if (credentials instanceof KerberosCredentials) {
+            gssCredential = ((KerberosCredentials) credentials).getGSSCredential();
+        } else {
+            gssCredential = null;
         }
 
-        String spn = spnServiceClass + "@" + authServer;
-
-        logger.debug("Requesting SPNego ticket for SPN {}", spn);
+        logger.debug("Canonicalizing SPN {}", spn);
         GSSManager manager = getManager();
         GSSName serverName = manager.createName(spn, GSSName.NT_HOSTBASED_SERVICE);
         GSSName canonicalizedName = serverName.canonicalize(oid);
 
-        logger.debug("Creating SPNego GSS context for canonicalized SPN {}", canonicalizedName);
-        GSSContext gssContext = manager.createContext(canonicalizedName, oid, null, JavaVendor.getSpnegoLifetime());
+        logger.debug("Requesting SPNego ticket for canonicalized SPN {}", canonicalizedName);
+        GSSContext gssContext = manager.createContext(canonicalizedName, oid, gssCredential, JavaVendor.getSpnegoLifetime());
         gssContext.requestMutualAuth(true);
         gssContext.requestCredDeleg(true);
         return gssContext.initSecContext(token, 0, token.length);

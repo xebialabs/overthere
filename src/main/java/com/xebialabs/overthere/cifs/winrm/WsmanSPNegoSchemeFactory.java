@@ -25,6 +25,9 @@ package com.xebialabs.overthere.cifs.winrm;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
 
@@ -41,8 +44,18 @@ class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
         this.spnPort = spnPort;
     }
 
+    @Override
     public AuthScheme newInstance(final HttpParams params) {
+        logger.trace("WsmanSPNegoSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
         return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
+
+    @Override
+    public AuthScheme create(final HttpContext context) {
+        logger.trace("WsmanSPNegoSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
+    }
+
+    private Logger logger = LoggerFactory.getLogger(WsmanSPNegoSchemeFactory.class);
 
 }

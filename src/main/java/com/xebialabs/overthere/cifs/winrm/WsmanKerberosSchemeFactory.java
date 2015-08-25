@@ -25,6 +25,9 @@ package com.xebialabs.overthere.cifs.winrm;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.impl.auth.KerberosSchemeFactory;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
 
@@ -41,8 +44,17 @@ class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
         this.spnPort = spnPort;
     }
 
+    @Override
     public AuthScheme newInstance(final HttpParams params) {
+        logger.trace("WsmanKerberosSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort); }
+
+    @Override
+    public AuthScheme create(final HttpContext context) {
+        logger.trace("WsmanKerberosSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
         return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
+
+    private Logger logger = LoggerFactory.getLogger(WsmanKerberosSchemeFactory.class);
 
 }
