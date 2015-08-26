@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.1.0%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.1.1%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.1</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1054,6 +1054,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.1.1 (26-Aug-2015)
+    * Fixed bug where WINRM_INTERNAL connection with Windows domain account failed with error message "Unexpected HTTP response on http://hostname/wsman: (401)".
 * Overthere 4.1.0 (18-Aug-2015)
     * Fixed bug where temporary files were not deleted for a CIFS/WINRM_INTERNAL or a CIFS/TELNET connection when connection was closed.
     * Fixed bug where short-circuit copy would fail with error message "tar: can't set time on .: Not owner". This could occur when copying from/to a temporary file/directory for an SSH/SU, SSH/SUDO or SSH/INTERACTIVE_SUDO connection.
