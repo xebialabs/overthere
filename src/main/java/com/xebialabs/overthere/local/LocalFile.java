@@ -26,13 +26,12 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
@@ -199,7 +198,13 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
         logger.debug("Opening file input stream for {}", this);
 
         try {
-            return asBuffered(new FileInputStream(file));
+            return asBuffered(new FileInputStream(file) {
+                @Override
+                public void close() throws IOException {
+                    super.close();
+                    logger.debug("Closing file input stream for {}", this);
+                }
+            });
         } catch (FileNotFoundException exc) {
             throw new RuntimeIOException("Cannot open " + this + " for reading", exc);
         }
@@ -210,7 +215,13 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
         logger.debug("Opening file output stream for {}", this);
 
         try {
-            return asBuffered(new FileOutputStream(file));
+            return asBuffered(new FileOutputStream(file){
+                @Override
+                public void close() throws IOException {
+                    super.close();
+                    logger.debug("Closing file output stream for {}", this);
+                }
+            });
         } catch (FileNotFoundException exc) {
             throw new RuntimeIOException("Cannot open " + this + " for writing", exc);
         }
