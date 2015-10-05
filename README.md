@@ -1054,6 +1054,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.1.2 (??-???-2015)
+    * Upgraded Scannit to 1.4.0, fixes Java8 compatibility.
 * Overthere 4.1.1 (26-Aug-2015)
     * Fixed bug where WINRM_INTERNAL connection with Windows domain account failed with error message "Unexpected HTTP response on http://hostname/wsman: (401)".
 * Overthere 4.1.0 (18-Aug-2015)
