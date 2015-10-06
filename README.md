@@ -1056,11 +1056,13 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 # Release History
 * Overthere 4.2.0 (??-Oct-2015)
     * Move to Java 7
-    * Upgraded Scannit to 1.4.0, fixes Java8 compatibility.
-    * Upgraded bouncy castle to 1.52
-    * Upgraded commons-net to 3.3
     * Additional debug logging when closing streams
     * Fix typo in logging of WsmanSPNegoSchemeFactory
+    * Upgraded scannit to 1.4.0, fixes Java8 compatibility.
+    * Upgraded bouncy castle to 1.52
+    * Upgraded commons-net to 3.3
+    * Upgraded to commons-codec 1.10
+    * Upgraded to slf4j 1.7.12
 * Overthere 4.1.1 (26-Aug-2015)
     * Fixed bug where WINRM_INTERNAL connection with Windows domain account failed with error message "Unexpected HTTP response on http://hostname/wsman: (401)".
 * Overthere 4.1.0 (18-Aug-2015)
