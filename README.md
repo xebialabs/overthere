@@ -60,9 +60,8 @@ Binary releases of Overthere are not provided here, but you can download it [str
 <a name="building_overthere"></a>
 ## Building Overthere
 
-1. Install [Gradle 1.0](http://www.gradle.org/) or up.
 1. Clone the Overthere repository.
-1. Run the command `gradle clean build`.
+1. On unix run the command `./gradlew clean build`, on windows run `gradlew clean build`
 
 <a name="running_the_examples"></a>
 ## Running the examples
