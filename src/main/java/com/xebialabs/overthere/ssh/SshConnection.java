@@ -153,10 +153,8 @@ abstract class SshConnection extends BaseOverthereConnection {
                 throw new RuntimeIOException("Cannot connect to " + host + ":" + port, e);
             }
 
-            if (!onlyOneNotNull(privateKey, privateKeyFile, password))
-            {
-                String[] vars = { PRIVATE_KEY, PRIVATE_KEY_FILE, PASSWORD };
-                logger.warn("You should only set one connection options between: {}, {}, {}. They are evaluated in this order, and latter would have no effect on the connection.", vars);
+            if (!onlyOneNotNull(privateKey, privateKeyFile, password)) {
+                logger.warn("You should only set one connection options between: {}, {}, {}. They are evaluated in this order, and latter would have no effect on the connection.", PRIVATE_KEY, PRIVATE_KEY_FILE, PASSWORD);
             }
 
             KeyProvider keys;
