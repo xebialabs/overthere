@@ -1057,6 +1057,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 * Overthere 4.2.0 (??-Oct-2015)
     * Move to Java 7
     * Upgraded Scannit to 1.4.0, fixes Java8 compatibility.
+    * Upgraded bouncy castle to 1.52
+    * Upgraded commons-net to 3.3
     * Additional debug logging when closing streams
     * Fix typo in logging of WsmanSPNegoSchemeFactory
 * Overthere 4.1.1 (26-Aug-2015)
