@@ -137,16 +137,6 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
     }
 
     @Override
-    protected void copyFrom(OverthereFile source) {
-        SFTPFileTransfer fileTransfer = connection.getSharedSftpClient().getFileTransfer();
-        try {
-            fileTransfer.upload(new OverthereFileLocalSourceFile(source), getPath());
-        } catch (IOException ioe) {
-            throw new RuntimeIOException(format("Cannot upload %s to %s", source, this), ioe);
-        }
-    }
-
-    @Override
     public void mkdir() {
         logger.debug("Creating directory {}", this);
 
