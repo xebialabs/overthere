@@ -1053,6 +1053,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.2.1 (??-???-????)
+    * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.0 (??-Oct-2015)
     * Move to Java 7
     * Additional debug logging when closing streams
