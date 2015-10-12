@@ -144,10 +144,10 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             // directory into the destination, whereas we want to copy the contents into the destination.
             if (source.isDirectory() && this.exists() && !source.getName().equals(this.getName())) {
                 for (OverthereFile overthereFile : source.listFiles()) {
-                    fileTransfer.upload(new OverthereFileLocalSourceFile(overthereFile), getPath());
+                    fileTransfer.upload(new OverthereFileLocalSourceFile(overthereFile), getSftpPath());
                 }
             } else {
-                fileTransfer.upload(new OverthereFileLocalSourceFile(source), getPath());
+                fileTransfer.upload(new OverthereFileLocalSourceFile(source), getSftpPath());
             }
         } catch (IOException ioe) {
             throw new RuntimeIOException(format("Cannot upload %s to %s", source, this), ioe);
