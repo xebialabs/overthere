@@ -276,6 +276,10 @@ public class OverthereUtils {
         ConnectionOptions options = baseDir.getConnection().getOptions();
         int temporaryFileCreationRetries = options.getInteger(TEMPORARY_FILE_CREATION_RETRIES, TEMPORARY_FILE_CREATION_RETRIES_DEFAULT);
 
+        if (!baseDir.exists()) {
+          throw new RuntimeIOException("Cannot create unique directory in non existing basedir " + baseDir);
+        }
+
         RuntimeException originalExc = null;
         int salt = new Random().nextInt(10000);
         for (int i = 0; i <= temporaryFileCreationRetries; i++) {
@@ -290,10 +294,12 @@ public class OverthereUtils {
                     originalExc = exc;
                     logger.debug(format("Failed to create holder directory %s - Trying with the next suffix", holder), exc);
                 }
+            } else {
+              logger.trace("Could not create new unique directory '{}' as it exists already.'", holder);
             }
         }
 
-        String errorText = "Cannot generate a unique directory on " + baseDir.getConnection();
+        String errorText = "Cannot generate a unique directory on " + baseDir;
         if(originalExc != null) {
             throw new RuntimeIOException(errorText, originalExc);
         } else {
