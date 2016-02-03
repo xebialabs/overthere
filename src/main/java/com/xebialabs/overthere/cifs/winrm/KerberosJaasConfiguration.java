@@ -49,20 +49,26 @@ class KerberosJaasConfiguration extends Configuration {
             options.put("debug", "true");
         }
         
-        if (ticketCache) {
-        	options.put("useTicketCache", "true");
-        } else {
-        	options.put("useTicketCache", "false");
-        }
-        
         options.put("refreshKrb5Config", "true");
         
         if (JavaVendor.isIBM()) {
             options.put("credsType", "initiator");
+            
+            if (ticketCache) {
+            	options.put("useDefaultCcache", "true");
+            } else {
+            	options.put("useDefaultCcache", "false");
+            }
         } else {
             options.put("client", "true");
             options.put("useKeyTab", "false");
             options.put("doNotPrompt", "false");
+            
+            if (ticketCache) {
+            	options.put("useTicketCache", "true");
+            } else {
+            	options.put("useTicketCache", "false");
+            }
         }
 
         return new AppConfigurationEntry[]{new AppConfigurationEntry(JavaVendor.getKrb5LoginModuleName(),
