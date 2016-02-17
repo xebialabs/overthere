@@ -35,7 +35,7 @@ class KerberosJaasConfiguration extends Configuration {
         this.debug = debug;
         this.ticketCache = false;
     }
-    
+
     KerberosJaasConfiguration(boolean debug, boolean ticketCache) {
         this.debug = debug;
         this.ticketCache = ticketCache;
@@ -48,33 +48,25 @@ class KerberosJaasConfiguration extends Configuration {
         if (debug) {
             options.put("debug", "true");
         }
-        
+
         options.put("refreshKrb5Config", "true");
-        
+
         if (JavaVendor.isIBM()) {
             options.put("credsType", "initiator");
-            
-            if (ticketCache) {
-            	options.put("useDefaultCcache", "true");
-            } else {
-            	options.put("useDefaultCcache", "false");
-            }
+
+            options.put("useDefaultCcache", String.valueOf(ticketCache));
         } else {
             options.put("client", "true");
             options.put("useKeyTab", "false");
             options.put("doNotPrompt", "false");
-            
-            if (ticketCache) {
-            	options.put("useTicketCache", "true");
-            } else {
-            	options.put("useTicketCache", "false");
-            }
+
+            options.put("useTicketCache", String.valueOf(ticketCache));
         }
 
         return new AppConfigurationEntry[]{new AppConfigurationEntry(JavaVendor.getKrb5LoginModuleName(),
                 AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, options)};
     }
 
-    
+
 
 }
