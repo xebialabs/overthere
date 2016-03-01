@@ -51,6 +51,8 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CONTEXT_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENVELOP_SIZE_DEFAULT;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CLIENT_CERTIFICATE;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_CLIENT_CERTIFICATE_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY_DEFAULT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_KERBEROS_ADD_PORT_TO_SPN_DEFAULT;
@@ -251,6 +253,7 @@ public class CifsWinRmConnection extends CifsConnection {
         client.setWinRmTimeout(options.get(WINRM_TIMEMOUT, DEFAULT_WINRM_TIMEOUT));
         client.setWinRmEnvelopSize(options.get(WINRM_ENVELOP_SIZE, WINRM_ENVELOP_SIZE_DEFAULT));
         client.setWinRmLocale(options.get(WINRM_LOCALE, WINRM_LOCALE_DEFAULT));
+        client.setClientCertificate(options.getBoolean(WINRM_CLIENT_CERTIFICATE, WINRM_CLIENT_CERTIFICATE_DEFAULT));
         client.setHttpsCertTrustStrategy(options.getEnum(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.class, WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY_DEFAULT));
         client.setHttpsHostnameVerifyStrategy(options.getEnum(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.class, WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY_DEFAULT));
         client.setKerberosUseHttpSpn(options.getBoolean(WINRM_KERBEROS_USE_HTTP_SPN, WINRM_KERBEROS_USE_HTTP_SPN_DEFAULT));

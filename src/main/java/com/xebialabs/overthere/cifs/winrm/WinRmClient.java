@@ -23,6 +23,9 @@
 package com.xebialabs.overthere.cifs.winrm;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,12 +38,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -111,6 +116,7 @@ public class WinRmClient {
     private String winRmTimeout;
     private int winRmEnvelopSize;
     private String winRmLocale;
+    private boolean clientCertificate;
     private WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy;
     private WinrmHttpsHostnameVerificationStrategy httpsHostnameVerifyStrategy;
     private boolean kerberosUseHttpSpn;
@@ -408,6 +414,12 @@ public class WinRmClient {
             final HttpContext context = new BasicHttpContext();
             final HttpPost request = new HttpPost(targetURL.toURI());
 
+            /* http://www.dmtf.org/sites/default/files/standards/documents/DSP0226_1.0.0.pdf
+             * Web Services for Management (WS-Management) Specification, v1.0.0, page 119, section C.3.5 */
+            if (clientCertificate) {
+                request.setHeader("Authorization", "http://schemas.dmtf.org/wbem/wsman/1/wsman/secprofile/https/mutual");
+            }
+
             if (soapAction != null) {
                 request.setHeader("SOAPAction", soapAction.getValue());
             }
@@ -442,10 +454,12 @@ public class WinRmClient {
         }
     }
 
-    private void configureHttpClient(final DefaultHttpClient httpclient) throws GeneralSecurityException {
+    private void configureHttpClient(final DefaultHttpClient httpclient) throws GeneralSecurityException, IOException {
         configureTrust(httpclient);
 
-        configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
+        if (!clientCertificate) {
+            configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
+        }
 
         if (enableKerberos) {
             String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
@@ -463,7 +477,7 @@ public class WinRmClient {
     }
 
     private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
-            KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+            KeyManagementException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
 
         if (!"https".equalsIgnoreCase(targetURL.getProtocol())) {
             return;
@@ -471,7 +485,21 @@ public class WinRmClient {
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
         final X509HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
-        final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
+        final SSLSocketFactory socketFactory;
+
+        if (clientCertificate) {
+            KeyStore clientStore = KeyStore.getInstance("PKCS12");
+            FileInputStream instream = new FileInputStream(new File(username));
+            try {
+                clientStore.load(instream, password.toCharArray());
+            } finally {
+                instream.close();
+            }
+            socketFactory = new SSLSocketFactory(null, clientStore, password, null, null, trustStrategy, hostnameVerifier);
+        } else {
+            socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
+        }
+
         final Scheme sch = new Scheme("https", 443, socketFactory);
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
     }
@@ -575,6 +603,10 @@ public class WinRmClient {
 
     public void setWinRmLocale(String locale) {
         this.winRmLocale = locale;
+    }
+
+    public void setClientCertificate(boolean WinrmClientCertificate) {
+        this.clientCertificate = WinrmClientCertificate;
     }
 
     public void setHttpsCertTrustStrategy(WinrmHttpsCertificateTrustStrategy httpsCertTrustStrategy) {

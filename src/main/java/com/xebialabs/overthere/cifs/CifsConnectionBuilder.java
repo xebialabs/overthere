@@ -171,6 +171,18 @@ public class CifsConnectionBuilder implements OverthereConnectionBuilder {
     public static final String WINRM_LOCALE_DEFAULT = "en-US";
 
     /**
+     * Set to true for mutual HTTPS authentication
+     */
+
+    public static final String WINRM_CLIENT_CERTIFICATE = "winrmClientCertificate";
+
+    /**
+     * Default value for HTTPS mutual authentication
+     */
+
+    public static final boolean WINRM_CLIENT_CERTIFICATE_DEFAULT = false;
+
+    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosUseHttpSpn">the online documentation</a>
      */
     public static final String WINRM_KERBEROS_USE_HTTP_SPN = "winrmKerberosUseHttpSpn";
