@@ -146,6 +146,7 @@ artifacts {
 license {
   header project.file('HEADER')
   ignoreFailures true
+  exclude "**/ProxySocketFactory.java"
 }
 
 signing {

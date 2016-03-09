@@ -26,12 +26,19 @@ import java.net.InetSocketAddress;
 
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
+import javax.net.SocketFactory;
+
 public class DefaultAddressPortMapper implements AddressPortMapper {
     public static final AddressPortMapper INSTANCE = new DefaultAddressPortMapper();
 
     @Override
     public InetSocketAddress map(InetSocketAddress address) {
         return address;
+    }
+
+    @Override
+    public SocketFactory socketFactory() {
+        return SocketFactory.getDefault();
     }
 
     @Override

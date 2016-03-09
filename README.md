@@ -6,7 +6,7 @@
 	* [Depending on Overthere](#depending_on_overthere)
 	* [Building Overthere](#building_overthere)
 	* [Running the Examples](#running_the_examples)
-* [Programming Overthere](#programming_overthere) 
+* [Programming Overthere](#programming_overthere)
 * [Configuring Overthere](#configuring_overthere)
 	* [Protocols](#protocols)
 	* [Common connection options](#common_connection_options)
@@ -92,6 +92,7 @@ Overthere supports a number of protocols to connect to remote hosts:
 * [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
 * [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
 * [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
+* [__proxy__](#proxy) - a special connection that can only be used as a jumpstation protocol, which allows a connection to be created over an [HTTP](https://en.wikipedia.org/wiki/HTTP_tunnel) or [SOCKS](https://en.wikipedia.org/wiki/SOCKS) proxy.
 
 <a name="common_connection_options"></a>
 ## Common connection options
@@ -211,12 +212,12 @@ The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.
 
 ### Compatibility
 
-Overthere uses the [sshj](https://github.com/shikhar/sshj) library for SSH and supports all algorithms and formats supported by that library:
+Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH and supports all algorithms and formats supported by that library:
 
-* Ciphers: ``aes{128,192,256}-{cbc,ctr}``, ``blowfish-cbc``, ``3des-cbc``
-* Key Exchange methods: ``diffie-hellman-group1-sha1``, ``diffie-hellman-group14-sha1``
-* Signature formats: ``ssh-rsa``, ``ssh-dss``
-* MAC algorithms: ``hmac-md5``, ``hmac-md5-96``, ``hmac-sha1``, ``hmac-sha1-96``
+* Ciphers: ``aes{128,192,256}-{cbc,ctr}``, ``blowfish-{cbc,ctr}``, ``3des-{cbc,ctr}``, ``twofish{128,192,256}-{cbc,ctr}``, ``twofish-cbc``, ``serpent{128,192,256}-{cbc,ctr}``, ``idea-{cbc,ctr}``, ``cast128-{cbc,ctr}``, ``arcfour``, ``arcfour{128,256}``
+* Key Exchange methods: ``diffie-hellman-group{1,14}-sha1``, ``diffie-hellman-group-exchange-sha{1,256}``, ``ecdh-sha2-nistp{256,384,521}``, ``curve25519-sha256@libssh.org``
+* Signature formats: ``ssh-rsa``, ``ssh-dss``, ``ecdsa-sha2-nistp256``, ``ssh-ed25519``
+* MAC algorithms: ``hmac-md5``, ``hmac-md5-96``, ``hmac-sha1``, ``hmac-sha1-96``, ``hmac-sha2-256``, ``hmac-sha2-512``
 * Compression algorithms: ``zlib`` and ``zlib@openssh.com`` (delayed zlib)
 * Private Key file formats: ``pkcs8`` encoded (the format used by [OpenSSH](http://www.openssh.com/))
 
@@ -246,7 +247,7 @@ To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.n
 #### SFTP_WINSSHD
 
 To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
- 
+
 <a name="ssh_host_setup_sudo"></a>
 <a name="ssh_host_setup_interactive_sudo"></a>
 #### SUDO and INTERACTIVE_SUDO
@@ -262,7 +263,7 @@ To use the __SUDO__ connection type, the `/etc/sudoers` configuration will have 
 * `rmdir`
 * `tar`
 * Any other command that you want to execute.
-    
+
 The commands mentioned above must be configured with the __NOPASSWD__ setting in the `/etc/sudoers` file. Otherwise you will have to use the __INTERACTIVE_SUDO__ connection type. When the __INTERACTIVE_SUDO__ connection type is used, every line of the output will be matched against the regular expression configured with the __sudoPasswordPromptRegex__ connection option. If a match is found, the value of the __password__ connection option is sent.
 
 <a name="ssh_troubleshooting"></a>
@@ -611,9 +612,9 @@ To use the __TELNET__ connection type, you'll need to enable and configure the T
 
 1. (Optional) If the Telnet Server is not already installed on the remote host, add it using the __Add Features Wizard__ in the __Server Manager__ console.
 
-1. (Optional) If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, install the Telnet server according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260). 
+1. (Optional) If the remote host is running Windows Server 2003 SP1 or an x64-based version of Windows Server 2003, install the Telnet server according to [these instructions from the Microsoft Support site](http://support.microsoft.com/kb/899260).
 
-1. Enable the Telnet Server Service on the remote host according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>. 
+1. Enable the Telnet Server Service on the remote host according to <a href="http://technet.microsoft.com/en-us/library/cc732046(WS.10).aspx">these instructions on the Microsoft Technet site</a>.
 
 1. After you have started the Telnet Server, open a command prompt as the __Administrator__ user on the remote host and enter the command `tlntadmn config mode=stream` to enable stream mode.
 
@@ -666,7 +667,7 @@ To use the __WINRM_INTERNAL__ or the __WINRM_NATIVE__ connection type, you'll ne
 		winrm set winrm/config/service/Auth @{Kerberos="false"}
 
 	__N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
-	
+
 1. (Only required for __WINRM_INTERNAL__ or when the connection option [**winrsUnencrypted**](#cifs_winrsUnencrypted) is set to `true`) Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
@@ -731,7 +732,7 @@ __N.B.:__ You will only need to configure Kerberos if you are going to use Windo
 
 In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
 
-Create a file called `krb5.conf` (Unix) or `krb5.ini` (Windows) with at least the following content: 
+Create a file called `krb5.conf` (Unix) or `krb5.ini` (Windows) with at least the following content:
 
     [realms]
     EXAMPLE.COM = {
@@ -744,7 +745,7 @@ Replace the values with the name of your domain/realm and the hostname of your d
 * Solaris: `/etc/krb5/krb5.conf`
 * Windows: `C:\Windows\krb5.ini`
 
-Alternatively, place the file somewhere else and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the file you just created. 
+Alternatively, place the file somewhere else and add the following Java system property to the command line: `-Djava.security.krb5.conf=/path/to/krb5.conf`. Replace the path with the location of the file you just created.
 
 See [the Kerberos V5 System Administrator's Guide at MIT](http://web.mit.edu/kerberos/krb5-1.10/krb5-1.10.6/doc/krb5-admin.html#krb5_002econf) for more information on the `krb5.conf` format.
 
@@ -770,9 +771,9 @@ where:
 
 Some other useful commands:
 
-* List all service principal names configured for the domain: `setspn -Q */*` 
+* List all service principal names configured for the domain: `setspn -Q */*`
 * List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
- 
+
 <a name="cifs_troubleshooting"></a>
 ### Troubleshooting CIFS, WinrRM and Telnet
 
@@ -1115,7 +1116,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
     * Fixed race condition in creation of temporary directories.
 * Overthere 2.4.0 (12-Mar-2014)
     * Added support for the the SU connection type, which fixes [#102](https://github.com/xebialabs/overthere/issues/102), and reverted the fix for [#89](https://github.com/xebialabs/overthere/issues/89).
-    * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, which fixes [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts. 
+    * Improved efficiency of copy operations on remote hosts by using a copy command on that remote host instead of downloading and then uploading the file or directory, which fixes [#91](https://github.com/xebialabs/overthere/issues/91). Note that this behaviour is only invoked when copying files or directories _on_ a remote host, not when copying them _between_ remote hosts.
     * Fixed [#87](https://github.com/xebialabs/overthere/issues/87), [#88](https://github.com/xebialabs/overthere/issues/88), [#96](https://github.com/xebialabs/overthere/issues/96), [#99](https://github.com/xebialabs/overthere/issues/99), [#103](https://github.com/xebialabs/overthere/issues/103), [#104](https://github.com/xebialabs/overthere/issues/104).
 * Overthere 2.3.1 (16-Jan-2014)
     * Fixed [#89](https://github.com/xebialabs/overthere/issues/89)
@@ -1156,7 +1157,7 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
     * Stable release of Overthere 2.0.0.
     * Some minor code and documentation fixes.
 * Overthere 2.0.0-rc-1 (17-Aug-2012)
-    * Added [__sudoPreserveAttributesOnCopyFromTempFile__](#ssh_sudoPreserveAttributesOnCopyFromTempFile) and [__sudoPreserveAttributesOnCopyToTempFile__](#ssh_sudoPreserveAttributesOnCopyToTempFile) to specify whether `-p` should be used to copy files from and to the connection temporary directory when the connection type is [__SUDO__](#ssh_host_setup_sudo) or [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo). 
+    * Added [__sudoPreserveAttributesOnCopyFromTempFile__](#ssh_sudoPreserveAttributesOnCopyFromTempFile) and [__sudoPreserveAttributesOnCopyToTempFile__](#ssh_sudoPreserveAttributesOnCopyToTempFile) to specify whether `-p` should be used to copy files from and to the connection temporary directory when the connection type is [__SUDO__](#ssh_host_setup_sudo) or [__INTERACTIVE_SUDO__](#ssh_host_setup_interactive_sudo).
     * Changed default value of [__sudoOverrideUmask__](#ssh_sudoOverrideUmask) to `true`.
     * Fixed Kerberos authentication for WinRM connections which was broken by overzealouos code cleanup.
     * Upgraded to SSH/J 0.8.1.

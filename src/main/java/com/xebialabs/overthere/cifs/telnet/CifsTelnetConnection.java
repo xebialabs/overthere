@@ -98,6 +98,7 @@ public class CifsTelnetConnection extends CifsConnection {
 
         try {
             final TelnetClient tc = new TelnetClient();
+            tc.setSocketFactory(mapper.socketFactory());
             tc.setConnectTimeout(connectionTimeoutMillis);
             tc.addOptionHandler(new WindowSizeOptionHandler(299, 25, true, false, true, false));
             logger.info("Connecting to telnet://{}@{}", username, address);

@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.spi;
 
+import javax.net.SocketFactory;
 import java.io.Closeable;
 import java.net.InetSocketAddress;
 
@@ -31,6 +32,8 @@ import java.net.InetSocketAddress;
 public interface AddressPortMapper extends Closeable {
 
     InetSocketAddress map(InetSocketAddress address);
+
+    SocketFactory socketFactory();
 
     /**
      * Closes the mapper. Does not throw {@link java.io.IOException} but can throw

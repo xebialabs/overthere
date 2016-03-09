@@ -42,6 +42,7 @@ import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
 
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
+import static com.xebialabs.overthere.ConnectionOptions.PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
@@ -107,7 +108,9 @@ public class Overthere {
         ConnectionOptions jumpstationOptions = options.getOptional(JUMPSTATION);
         AddressPortMapper mapper = DefaultAddressPortMapper.INSTANCE;
         if (jumpstationOptions != null) {
-            mapper = (SshTunnelConnection) Overthere.getConnection(SSH_PROTOCOL, jumpstationOptions);
+            // In order to maintain backwards compatibility, SSH is the default.
+            String jumpProtocol = jumpstationOptions.get(PROTOCOL, SSH_PROTOCOL);
+            mapper = (SshTunnelConnection) Overthere.getConnection(jumpProtocol, jumpstationOptions);
         }
         try {
             return buildConnection(protocol, options, mapper);
