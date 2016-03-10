@@ -101,6 +101,10 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 
 <table>
 <tr>
+    <th align="left" valign="top"><a name="protocol"></a>protocol</th>
+    <td>This option is only used when it is present in the connection options of a tunnel (jumpstation) connection. It indicates which protocol is used to tunnel the other connection over. This property can be set to <code>ssh</code> or <code>proxy</code>. If this option is omitted in the jumpstation options, <code>ssh</code> is assumed.</td>
+</tr>
+<tr>
 	<th align="left" valign="top"><a name="os"></a>os</th>
 	<td>The operating system of the remote host. This property can be set to <code>UNIX</code>, <code>WINDOWS</code>, and <code>ZOS</code> and is used to
 	    determine how to encode paths and commands and to determine the default temporary directory path. This property is required for all protocols, except
@@ -1036,6 +1040,25 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 
+</table>
+
+<a name="proxy"></a>
+## Proxy
+This is a special protocol which can only be used as a tunnelling protocol. This allows another Overthere connection to connect over an [HTTP proxy](https://en.wikipedia.org/wiki/HTTP_tunnel) or [SOCKS Proxy](https://en.wikipedia.org/wiki/SOCKS).
+
+<a name="proxy_connection_options"></a>
+### Proxy connection options
+
+The Proxy protocol of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
+
+<table>
+<tr>
+    <th align="left" valign="top"><a name="proxyType"></a>proxyType</th>
+    <td>Indicates what type of proxy Overthere needs to connect to. One of the following values can be set:<ul>
+    <li><code>http</code> - Connect over an HTTP (CONNECT) proxy.</li>
+    <li><code>socks</code> - Connect over a SOCKS proxy.</li>
+    </ul>
+</tr>
 </table>
 
 <a name="tunnelling"></a>

@@ -110,7 +110,7 @@ public class Overthere {
         if (jumpstationOptions != null) {
             // In order to maintain backwards compatibility, SSH is the default.
             String jumpProtocol = jumpstationOptions.get(PROTOCOL, SSH_PROTOCOL);
-            mapper = (SshTunnelConnection) Overthere.getConnection(jumpProtocol, jumpstationOptions);
+            mapper = (AddressPortMapper) Overthere.getConnection(jumpProtocol, jumpstationOptions);
         }
         try {
             return buildConnection(protocol, options, mapper);
@@ -138,18 +138,8 @@ public class Overthere {
             return connection;
         } catch (NoSuchMethodException exc) {
             throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
-        } catch (IllegalArgumentException exc) {
+        } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException exc) {
             throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-        } catch (InstantiationException exc) {
-            throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-        } catch (IllegalAccessException exc) {
-            throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-        } catch (InvocationTargetException exc) {
-            if (exc.getCause() instanceof RuntimeException) {
-                throw (RuntimeException) exc.getCause();
-            } else {
-                throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
-            }
         }
     }
 
