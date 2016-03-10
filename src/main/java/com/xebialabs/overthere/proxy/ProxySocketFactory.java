@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.xebialabs.overthere.http;
+package com.xebialabs.overthere.proxy;
 
 import com.hierynomus.sshj.backport.JavaVersion;
 import com.hierynomus.sshj.backport.Jdk7HttpProxySocket;

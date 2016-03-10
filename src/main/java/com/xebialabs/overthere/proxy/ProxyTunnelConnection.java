@@ -20,14 +20,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.http;
+package com.xebialabs.overthere.proxy;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
 import javax.net.SocketFactory;
 import java.net.InetSocketAddress;
@@ -42,7 +41,7 @@ import static java.net.InetSocketAddress.createUnresolved;
  * proxy host.
  */
 @Protocol(name = "proxy")
-public class HttpProxyTunnelConnection extends BaseOverthereConnection implements AddressPortMapper, OverthereConnectionBuilder {
+public class ProxyTunnelConnection extends BaseOverthereConnection implements AddressPortMapper, OverthereConnectionBuilder {
     public static final int DEFAULT_PROXY_PORT = 8080;
 
     /**
@@ -59,7 +58,7 @@ public class HttpProxyTunnelConnection extends BaseOverthereConnection implement
     private final int proxyPort;
     private final Proxy.Type proxyType;
 
-    protected HttpProxyTunnelConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
+    protected ProxyTunnelConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
         super(protocol, options, mapper, false);
         String unmappedAddress = options.get(ADDRESS);
         int unmappedPort = options.getInteger(PORT, DEFAULT_PROXY_PORT);
