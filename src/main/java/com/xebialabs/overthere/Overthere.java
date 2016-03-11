@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshConnectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.xebialabs.overthere.local.LocalConnection;
@@ -43,7 +46,9 @@ import nl.javadude.scannit.scanner.TypeAnnotationScanner;
 
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionType.TUNNEL;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
@@ -110,6 +115,15 @@ public class Overthere {
         if (jumpstationOptions != null) {
             // In order to maintain backwards compatibility, SSH is the default.
             String jumpProtocol = jumpstationOptions.get(PROTOCOL, SSH_PROTOCOL);
+
+            // When the protocol type is SSH, "TUNNEL" is the only valid SSH connection type
+            if(jumpProtocol == SSH_PROTOCOL) {
+                if(!jumpstationOptions.containsKey(CONNECTION_TYPE) || jumpstationOptions.get(CONNECTION_TYPE) != TUNNEL) {
+                    jumpstationOptions = new ConnectionOptions(jumpstationOptions);
+                    jumpstationOptions.set(CONNECTION_TYPE, TUNNEL);
+                }
+            }
+
             mapper = (AddressPortMapper) Overthere.getConnection(jumpProtocol, jumpstationOptions);
         }
 
