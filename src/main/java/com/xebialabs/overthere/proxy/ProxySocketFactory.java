@@ -56,6 +56,20 @@ public class ProxySocketFactory extends SocketFactory {
     }
 
     @Override
+    public Socket createSocket() throws IOException {
+        Socket socket;
+        // Special case, pre-java8 HTTP proxies were not supported by Socket
+        if (JavaVersion.isJava7OrEarlier() && proxy.type() == Proxy.Type.HTTP) {
+            logger.trace("Using {} proxy {} (Java 7 mode)", proxy.type(), proxy.address());
+            socket = new Jdk7HttpProxySocket(proxy);
+        } else {
+            logger.trace("Using {} proxy {}", proxy.type(), proxy.address());
+            socket = new Socket(proxy);
+        }
+        return socket;
+    }
+
+    @Override
     public Socket createSocket(String address, int port) throws IOException, UnknownHostException {
         return createSocket(new InetSocketAddress(address, port), null);
     }
@@ -76,19 +90,14 @@ public class ProxySocketFactory extends SocketFactory {
     }
 
     private Socket createSocket(InetSocketAddress address, InetSocketAddress bindAddress) throws IOException {
-        Socket socket;
-        // Special case, pre-java8 HTTP proxies were not supported by Socket
-        if (JavaVersion.isJava7OrEarlier() && proxy.type() == Proxy.Type.HTTP) {
-            socket = new Jdk7HttpProxySocket(proxy);
-        } else {
-            socket = new Socket(proxy);
-        }
+        Socket socket = createSocket();
 
         if (bindAddress != null) {
+            logger.trace("Using bind address to {}", bindAddress);
             socket.bind(bindAddress);
         }
 
-        logger.info("Connecting to {}", address);
+        logger.trace("Connecting to {}", address);
         socket.connect(address, connectTimeout);
         return socket;
     }
