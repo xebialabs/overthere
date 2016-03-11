@@ -24,6 +24,8 @@ package com.xebialabs.overthere.cifs;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+
+import com.xebialabs.overthere.proxy.ProxyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,9 @@ public abstract class CifsConnection extends BaseOverthereConnection {
     public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
         super(protocol, options, mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        if(mapper instanceof ProxyConnection) {
+            throw new IllegalArgumentException("Cannot open a cifs:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
+        }
         this.unmappedAddress = options.get(ADDRESS);
         this.unmappedPort = options.get(PORT, getDefaultPort(options));
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
