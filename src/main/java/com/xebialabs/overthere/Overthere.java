@@ -112,6 +112,7 @@ public class Overthere {
             String jumpProtocol = jumpstationOptions.get(PROTOCOL, SSH_PROTOCOL);
             mapper = (AddressPortMapper) Overthere.getConnection(jumpProtocol, jumpstationOptions);
         }
+
         try {
             return buildConnection(protocol, options, mapper);
         } catch (RuntimeException exc) {
@@ -138,8 +139,14 @@ public class Overthere {
             return connection;
         } catch (NoSuchMethodException exc) {
             throw new IllegalStateException(connectionBuilderClass + " does not have a public constructor with the signature (String, ConnectionOptions, AddressPortMapper)", exc);
-        } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException exc) {
+        } catch (IllegalAccessException| IllegalArgumentException | InstantiationException exc) {
             throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+        } catch (InvocationTargetException exc) {
+            if (exc.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) exc.getCause();
+            } else {
+                throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
+            }
         }
     }
 
