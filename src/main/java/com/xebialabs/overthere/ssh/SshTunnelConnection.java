@@ -120,7 +120,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
     @Override
     public SocketFactory socketFactory() {
-        return mapper.socketFactory();
+        return SocketFactory.getDefault();
     }
 
     private PortForwarder startForwarder(InetSocketAddress remoteAddress, ServerSocket serverSocket) {
