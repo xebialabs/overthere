@@ -58,7 +58,7 @@ public class ProxyTunnelConnection extends BaseOverthereConnection implements Ad
     private final int proxyPort;
     private final Proxy.Type proxyType;
 
-    protected ProxyTunnelConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
+    public ProxyTunnelConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
         super(protocol, options, mapper, false);
         String unmappedAddress = options.get(ADDRESS);
         int unmappedPort = options.getInteger(PORT, DEFAULT_PROXY_PORT);
