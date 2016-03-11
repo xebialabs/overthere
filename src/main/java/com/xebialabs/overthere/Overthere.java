@@ -137,7 +137,7 @@ public class Overthere {
             logger.trace("Connected to {}", connection);
             return connection;
         } catch (NoSuchMethodException exc) {
-            throw new IllegalStateException(connectionBuilderClass + " does not have a constructor that takes in a String and ConnectionOptions.", exc);
+            throw new IllegalStateException(connectionBuilderClass + " does not have a public constructor with the signature (String, ConnectionOptions, AddressPortMapper)", exc);
         } catch (IllegalArgumentException | InstantiationException | InvocationTargetException | IllegalAccessException exc) {
             throw new IllegalStateException("Cannot instantiate " + connectionBuilderClass, exc);
         }
