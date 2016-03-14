@@ -201,9 +201,13 @@ public class CifsWinRmConnection extends CifsConnection {
                         try {
                             outputReaderThread.join();
                         } finally {
-                            winRmClient.deleteShell();
                             closeQuietly(callersStdin);
                             processTerminated = true;
+                            try {
+                                winRmClient.deleteShell();
+                            }catch (Throwable t){
+                                logger.warn("Failure while deleting winrm shell", t);
+                            }
                         }
                         if (outputReaderThreadException[0] != null) {
                             if (outputReaderThreadException[0] instanceof RuntimeException) {
@@ -224,10 +228,10 @@ public class CifsWinRmConnection extends CifsConnection {
                         return;
                     }
 
-                    winRmClient.signal();
-                    winRmClient.deleteShell();
                     closeQuietly(callersStdin);
                     processTerminated = true;
+                    winRmClient.signal();
+                    winRmClient.deleteShell();
                 }
 
                 @Override
