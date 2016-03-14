@@ -28,15 +28,13 @@ import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
-
 import javax.net.SocketFactory;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static java.net.InetSocketAddress.createUnresolved;
 import static java.net.Proxy.Type.HTTP;
 
@@ -44,7 +42,7 @@ import static java.net.Proxy.Type.HTTP;
  * Transparent connection that ensures that a correct SocketFactory is introduced that connects through the required
  * proxy host.
  */
-@Protocol(name = "proxy")
+@Protocol(name = PROXY_PROTOCOL)
 public class ProxyConnection extends BaseOverthereConnection implements AddressPortMapper, OverthereConnectionBuilder {
 
     /**
