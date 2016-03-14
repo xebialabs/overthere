@@ -24,20 +24,25 @@ package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.UnixCloudHostListener;
+import com.xebialabs.overthere.WindowsCloudHostListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.UnixCloudHostListener.*;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
-import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
+import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
+import static java.net.Proxy.Type.HTTP;
 
 @Test
-@Listeners({UnixCloudHostListener.class})
-public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestBase {
-
+@Listeners({UnixCloudHostListener.class, WindowsCloudHostListener.class})
+public class SshSftpCygwinConnectionWithAdministrativeUserOverHttpProxyItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
@@ -46,23 +51,26 @@ public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestB
 
     @Override
     protected ConnectionOptions getOptions() {
+        ConnectionOptions proxyOptions = new ConnectionOptions();
+        proxyOptions.set(PROTOCOL, PROXY_PROTOCOL);
+        proxyOptions.set(PROXY_TYPE, HTTP);
+        proxyOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        proxyOptions.set(PORT, 8888);
+
         ConnectionOptions options = new ConnectionOptions();
-        options.set(OPERATING_SYSTEM, UNIX);
-        options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
-        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        options.set(OPERATING_SYSTEM, WINDOWS);
+        options.set(CONNECTION_TYPE, SFTP_CYGWIN);
+        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
-        options.set(USERNAME, UNTRUSTED_UNIX_USER_USERNAME);
-        options.set(PASSWORD, UNTRUSTED_UNIX_USER_PASSWORD);
-        options.set(SUDO_USERNAME, REGULAR_UNIX_USER_USERNAME);
-        options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
-        options.set(ALLOCATE_DEFAULT_PTY, true);
-        options.set(SUDO_OVERRIDE_UMASK, true);
+        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        options.set(JUMPSTATION, proxyOptions);
         return options;
     }
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SshInteractiveSudoConnection.class.getName();
+        return SshSftpCygwinConnection.class.getName();
     }
 
 }

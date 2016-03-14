@@ -22,21 +22,16 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
@@ -57,8 +52,8 @@ public class SshSftpCygwinConnectionWithAdministrativeUserItest extends Overther
         options.set(CONNECTION_TYPE, SFTP_CYGWIN);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
-        options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
-        options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
+        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         return options;
     }
 

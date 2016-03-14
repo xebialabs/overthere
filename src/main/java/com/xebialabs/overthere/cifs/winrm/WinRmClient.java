@@ -22,51 +22,38 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.security.UnrecoverableKeyException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.cifs.winrm.soap.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.BasicUserPrincipal;
 import org.apache.http.auth.Credentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.config.Lookup;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -75,32 +62,35 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
-import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.cifs.winrm.soap.Action;
-import com.xebialabs.overthere.cifs.winrm.soap.BodyBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.HeaderBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.OptionSet;
-import com.xebialabs.overthere.cifs.winrm.soap.ResourceURI;
-import com.xebialabs.overthere.cifs.winrm.soap.SoapAction;
-import com.xebialabs.overthere.cifs.winrm.soap.SoapMessageBuilder;
-import com.xebialabs.overthere.cifs.winrm.soap.Soapy;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
+import java.io.*;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.security.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
-import static org.apache.http.auth.AuthScope.ANY_HOST;
-import static org.apache.http.auth.AuthScope.ANY_PORT;
-import static org.apache.http.auth.AuthScope.ANY_REALM;
-import static org.apache.http.client.params.AuthPolicy.BASIC;
-import static org.apache.http.client.params.AuthPolicy.KERBEROS;
-import static org.apache.http.client.params.AuthPolicy.SPNEGO;
-import static org.apache.http.client.params.ClientPNames.HANDLE_AUTHENTICATION;
+import static org.apache.http.auth.AuthScope.*;
+import static org.apache.http.client.params.AuthPolicy.*;
 import static org.apache.http.util.EntityUtils.consume;
 
 /**
  * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
  */
 public class WinRmClient {
-
+    private final SocketFactory socketFactory;
     private final String username;
     private final boolean enableKerberos;
     private final String password;
@@ -125,7 +115,7 @@ public class WinRmClient {
     private int exitValue = -1;
     private int chunk = 0;
 
-    public WinRmClient(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort) {
+    public WinRmClient(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort, final SocketFactory socketFactory) {
         int posOfAtSign = username.indexOf('@');
         if (posOfAtSign >= 0) {
             String u = username.substring(0, posOfAtSign);
@@ -145,6 +135,7 @@ public class WinRmClient {
         this.targetURL = targetURL;
         this.unmappedAddress = unmappedAddress;
         this.unmappedPort = unmappedPort;
+        this.socketFactory = socketFactory;
     }
 
     public String createShell() {
@@ -203,9 +194,9 @@ public class WinRmClient {
         /*
          * We may need to get additional output if the stream has not finished. The CommandState will change from
          * Running to Done like so:
-         * 
+         *
          * @example
-         * 
+         *
          * from... <rsp:CommandState CommandId="..."
          * State="http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Running"/> to...
          * <rsp:CommandState CommandId="..."
@@ -402,67 +393,86 @@ public class WinRmClient {
      * Internal sendRequest, performs the HTTP request and returns the result document.
      */
     private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) {
-        final DefaultHttpClient client = new DefaultHttpClient();
+        final HttpClientBuilder client = HttpClientBuilder.create();
+        HttpClientConnectionManager connectionManager = getHttpClientConnectionManager();
         try {
             configureHttpClient(client);
-            final HttpContext context = new BasicHttpContext();
-            final HttpPost request = new HttpPost(targetURL.toURI());
+            try(CloseableHttpClient httpClient = client.build()) {
+                final HttpContext context = new BasicHttpContext();
+                final HttpPost request = new HttpPost(targetURL.toURI());
 
-            if (soapAction != null) {
-                request.setHeader("SOAPAction", soapAction.getValue());
+                if (soapAction != null) {
+                    request.setHeader("SOAPAction", soapAction.getValue());
+                }
+
+                final String requestBody = toString(requestDocument);
+                logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
+
+                final HttpEntity entity = createEntity(requestBody);
+                request.setEntity(entity);
+
+                final HttpResponse response = httpClient.execute(request, context);
+
+                logResponseHeaders(response);
+
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    throw new WinRmRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
+                            targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
+                }
+
+                final String responseBody = handleResponse(response, context);
+                Document responseDocument = DocumentHelper.parseText(responseBody);
+
+                logDocument("Response body:", responseDocument);
+
+                return responseDocument;
+            } finally {
+                connectionManager.shutdown();
             }
-
-            final String requestBody = toString(requestDocument);
-            logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
-
-            final HttpEntity entity = createEntity(requestBody);
-            request.setEntity(entity);
-
-            final HttpResponse response = client.execute(request, context);
-
-            logResponseHeaders(response);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new WinRmRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
-                        targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
-            }
-
-            final String responseBody = handleResponse(response, context);
-            Document responseDocument = DocumentHelper.parseText(responseBody);
-
-            logDocument("Response body:", responseDocument);
-
-            return responseDocument;
         } catch (WinRmRuntimeIOException exc) {
             throw exc;
         } catch (Exception exc) {
             throw new WinRmRuntimeIOException("Error when sending request to " + targetURL, requestDocument, null, exc);
-        } finally {
-            client.getConnectionManager().shutdown();
         }
     }
 
-    private void configureHttpClient(final DefaultHttpClient httpclient) throws GeneralSecurityException {
-        configureTrust(httpclient);
+    private HttpClientConnectionManager getHttpClientConnectionManager() {
+        final Lookup<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
+            @Override
+            public Socket createSocket(HttpContext context) throws IOException {
+                return socketFactory.createSocket();
+            }
+        }).register("https", new SSLConnectionSocketFactory(SSLContexts.createDefault(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
+            @Override
+            public Socket createSocket(HttpContext context) throws IOException {
+                return socketFactory.createSocket();
+            }
+        }).build();
+        return new BasicHttpClientConnectionManager(socketFactoryRegistry);
+    }
 
-        configureAuthentication(httpclient, BASIC, new BasicUserPrincipal(username));
+    private void configureHttpClient(final HttpClientBuilder httpclient) throws GeneralSecurityException {
+        configureTrust(httpclient);
+        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        httpclient.setDefaultCredentialsProvider(credentialsProvider);
+
+        configureAuthentication(credentialsProvider, BASIC, new BasicUserPrincipal(username));
 
         if (enableKerberos) {
             String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
-            httpclient.getAuthSchemes().register(KERBEROS,
-                    new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
-            httpclient.getAuthSchemes().register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
-            configureAuthentication(httpclient, KERBEROS, new KerberosPrincipal(username));
-            configureAuthentication(httpclient, SPNEGO, new KerberosPrincipal(username));
+            RegistryBuilder<AuthSchemeProvider> authSchemeRegistryBuilder = RegistryBuilder.create();
+            authSchemeRegistryBuilder.register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            authSchemeRegistryBuilder.register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            httpclient.setDefaultAuthSchemeRegistry(authSchemeRegistryBuilder.build());
+            configureAuthentication(credentialsProvider, KERBEROS, new KerberosPrincipal(username));
+            configureAuthentication(credentialsProvider, SPNEGO, new KerberosPrincipal(username));
         }
 
-        httpclient.getParams().setBooleanParameter(HANDLE_AUTHENTICATION, true);
-
-        HttpConnectionParams.setSoTimeout(httpclient.getParams(), soTimeout);
-        HttpConnectionParams.setConnectionTimeout(httpclient.getParams(), connectionTimeout);
+        httpclient.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(soTimeout).build());
+        httpclient.setDefaultRequestConfig(RequestConfig.custom().setAuthenticationEnabled(true).setConnectTimeout(connectionTimeout).build());
     }
 
-    private void configureTrust(final DefaultHttpClient httpclient) throws NoSuchAlgorithmException,
+    private void configureTrust(final HttpClientBuilder httpclientBuilder) throws NoSuchAlgorithmException,
             KeyManagementException, KeyStoreException, UnrecoverableKeyException {
 
         if (!"https".equalsIgnoreCase(targetURL.getProtocol())) {
@@ -470,14 +480,14 @@ public class WinRmClient {
         }
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
-        final X509HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
-        final SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy, hostnameVerifier);
-        final Scheme sch = new Scheme("https", 443, socketFactory);
-        httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).build();
+        final HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
+        final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
+        httpclientBuilder.setSSLSocketFactory(socketFactory);
     }
 
-    private void configureAuthentication(final DefaultHttpClient httpclient, final String scheme, final Principal principal) {
-        httpclient.getCredentialsProvider().setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, scheme), new Credentials() {
+    private void configureAuthentication(CredentialsProvider provider, final String scheme, final Principal principal) {
+        provider.setCredentials(new AuthScope(ANY_HOST, ANY_PORT, ANY_REALM, scheme), new Credentials() {
             public Principal getUserPrincipal() {
                 return principal;
             }
@@ -596,7 +606,7 @@ public class WinRmClient {
     public void setKerberosDebug(boolean kerberosDebug) {
         this.kerberosDebug = kerberosDebug;
     }
-    
+
     public void setKerberosTicketCache(boolean kerberosTicketCache) {
         this.kerberosTicketCache = kerberosTicketCache;
     }

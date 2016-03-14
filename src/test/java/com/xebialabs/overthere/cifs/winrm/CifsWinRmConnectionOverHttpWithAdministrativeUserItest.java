@@ -34,8 +34,8 @@ import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_USER_ITEST_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
@@ -55,8 +55,8 @@ public class CifsWinRmConnectionOverHttpWithAdministrativeUserItest extends Over
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(USERNAME, ADMINISTRATIVE_USER_ITEST_USERNAME);
-        options.set(PASSWORD, ADMINISTRATIVE_USER_ITEST_PASSWORD);
+        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         return options;
     }
 

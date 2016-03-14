@@ -23,22 +23,29 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.UnixCloudHostListener;
 import com.xebialabs.overthere.WindowsCloudHostListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
+import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
+import static java.net.Proxy.Type.HTTP;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
-public class SshSftpWinsshdConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
+@Listeners({UnixCloudHostListener.class, WindowsCloudHostListener.class})
+public class SshScpConnectionOverSshjumpStationOverHttpProxyItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
@@ -47,19 +54,34 @@ public class SshSftpWinsshdConnectionWithAdministrativeUserItest extends Overthe
 
     @Override
     protected ConnectionOptions getOptions() {
+        ConnectionOptions proxyOptions = new ConnectionOptions();
+        proxyOptions.set(PROTOCOL, PROXY_PROTOCOL);
+        proxyOptions.set(PROXY_TYPE, HTTP);
+        proxyOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        proxyOptions.set(PORT, 8888);
+
+        ConnectionOptions jumpstationOptions = new ConnectionOptions();
+        jumpstationOptions.set(OPERATING_SYSTEM, WINDOWS);
+        jumpstationOptions.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        jumpstationOptions.set(PORT, 22);
+        jumpstationOptions.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        jumpstationOptions.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        jumpstationOptions.set(JUMPSTATION, proxyOptions);
+
         ConnectionOptions options = new ConnectionOptions();
-        options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, SFTP_WINSSHD);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, 2222);
-        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
-        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        options.set(OPERATING_SYSTEM, UNIX);
+        options.set(CONNECTION_TYPE, SCP);
+        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        options.set(PORT, 22);
+        options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
+        options.set(JUMPSTATION, jumpstationOptions);
         return options;
     }
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SshSftpWinSshdConnection.class.getName();
+        return SshScpConnection.class.getName();
     }
 
 }

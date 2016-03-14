@@ -138,6 +138,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         try {
             config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
             SSHClient client = sshClientFactory.create();
+            client.setSocketFactory(mapper.socketFactory());
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new PromiscuousVerifier());
             client.setTimeout(socketTimeoutMillis);

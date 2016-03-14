@@ -52,6 +52,8 @@ import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 
+import javax.net.SocketFactory;
+
 import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
@@ -114,6 +116,11 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public SocketFactory socketFactory() {
+        return SocketFactory.getDefault();
     }
 
     private PortForwarder startForwarder(InetSocketAddress remoteAddress, ServerSocket serverSocket) {

@@ -33,6 +33,11 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY;
 public class ConnectionOptions {
 
     /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#protocol">the online documentation</a>
+     */
+    public static final String PROTOCOL = "protocol";
+
+    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#os">the online documentation</a>
      */
     public static final String OPERATING_SYSTEM = "os";

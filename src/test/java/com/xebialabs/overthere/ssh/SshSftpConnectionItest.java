@@ -22,19 +22,16 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.UnixCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import com.xebialabs.overthere.UnixCloudHostListener;
-
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
@@ -55,8 +52,8 @@ public class SshSftpConnectionItest extends OverthereConnectionItestBase {
         options.set(CONNECTION_TYPE, SFTP);
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
-        options.set(USERNAME, "overthere");
-        options.set(PASSWORD, "}Kp39hdb}LzM");
+        options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
         return options;
     }
 

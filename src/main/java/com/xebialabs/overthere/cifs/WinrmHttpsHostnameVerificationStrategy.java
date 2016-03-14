@@ -22,24 +22,23 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 
-import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-import static org.apache.http.conn.ssl.SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
-import static org.apache.http.conn.ssl.SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
+import javax.net.ssl.HostnameVerifier;
 
 public enum WinrmHttpsHostnameVerificationStrategy {
-    STRICT(STRICT_HOSTNAME_VERIFIER),
-    BROWSER_COMPATIBLE(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER),
-    ALLOW_ALL(ALLOW_ALL_HOSTNAME_VERIFIER);
+    STRICT(new DefaultHostnameVerifier()),
+    BROWSER_COMPATIBLE(new DefaultHostnameVerifier()),
+    ALLOW_ALL(NoopHostnameVerifier.INSTANCE);
 
-    private X509HostnameVerifier verifier;
+    private HostnameVerifier verifier;
 
-    private WinrmHttpsHostnameVerificationStrategy(X509HostnameVerifier verifier) {
+    WinrmHttpsHostnameVerificationStrategy(HostnameVerifier verifier) {
         this.verifier = verifier;
     }
 
-    public X509HostnameVerifier getVerifier() {
+    public HostnameVerifier getVerifier() {
         return verifier;
     }
 }
