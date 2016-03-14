@@ -22,30 +22,22 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.UnixCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import com.xebialabs.overthere.UnixCloudHostListener;
-
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_OVERRIDE_UMASK;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
+import static com.xebialabs.overthere.UnixCloudHostListener.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.INTERACTIVE_SUDO;
 
 @Test
 @Listeners({UnixCloudHostListener.class})
 public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestBase {
+
 
     @Override
     protected String getProtocol() {
@@ -59,9 +51,9 @@ public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestB
         options.set(CONNECTION_TYPE, INTERACTIVE_SUDO);
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
-        options.set(USERNAME, "untrusted");
-        options.set(PASSWORD, "zePVB,%EU84i");
-        options.set(SUDO_USERNAME, "overthere");
+        options.set(USERNAME, UNTRUSTED_UNIX_USER_USERNAME);
+        options.set(PASSWORD, UNTRUSTED_UNIX_USER_PASSWORD);
+        options.set(SUDO_USERNAME, REGULAR_UNIX_USER_USERNAME);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
         options.set(ALLOCATE_DEFAULT_PTY, true);
         options.set(SUDO_OVERRIDE_UMASK, true);

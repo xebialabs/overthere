@@ -30,11 +30,13 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class WindowsCloudHostListener extends CloudHostListener {
 
-    public static final String ADMINISTRATIVE_USER_ITEST_USERNAME = "Administrator";
-    public static final String ADMINISTRATIVE_USER_ITEST_PASSWORD = "iW8tcaM0d";
-    public static final String REGULAR_USER_ITEST_USERNAME = "overthere";
+    public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere";
+    public static final String REGULAR_WINDOWS_USER_PASSWORD = "wLitdMy@:;<>KY9";
     // The password for the regular user includes special characters to test that they get encoded correctly
-    public static final String REGULAR_USER_ITEST_PASSWORD = "wLitdMy@:;<>KY9";
+
+    public static final String ADMINISTRATIVE_WINDOWS_USER_USERNAME = "Administrator";
+    public static final String ADMINISTRATIVE_WINDOWS_USER_PASSWORD = "iW8tcaM0d";
+
     private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
 
     public WindowsCloudHostListener() {

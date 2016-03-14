@@ -32,14 +32,12 @@ import org.testng.annotations.Test;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_USER_ITEST_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_USER_ITEST_USERNAME;
-import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
-import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
-import static com.xebialabs.overthere.ssh.SshConnectionType.TUNNEL;
-import static java.net.Proxy.Type.HTTP;
 
 @Test
 @Listeners({UnixCloudHostListener.class, WindowsCloudHostListener.class})
@@ -57,16 +55,16 @@ public class SshSftpWinsshdConnectionWithRegularUserOverSshJumpstationItest exte
         jumpstationOptions.set(OPERATING_SYSTEM, UNIX);
         jumpstationOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         jumpstationOptions.set(PORT, 22);
-        jumpstationOptions.set(USERNAME, "overthere");
-        jumpstationOptions.set(PASSWORD, "}Kp39hdb}LzM");
+        jumpstationOptions.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
+        jumpstationOptions.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
 
         ConnectionOptions options = new ConnectionOptions();
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(PORT, 2222);
-        options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
-        options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
+        options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
         options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
         options.set(JUMPSTATION, jumpstationOptions);
         return options;
