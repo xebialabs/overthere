@@ -61,17 +61,23 @@ public abstract class ItestsBase1Utils {
     protected ConnectionOptions options;
     protected String expectedConnectionClassName;
     protected OverthereConnection connection;
+    protected Exception setupException;
 
     @BeforeMethod
     public void setupHost() throws Exception {
-        temp = new TemporaryFolder();
-        temp.create();
+        try {
+            temp = new TemporaryFolder();
+            temp.create();
 
-        protocol = getProtocol();
-        options = getOptions();
-        expectedConnectionClassName = getExpectedConnectionClassName();
+            protocol = getProtocol();
+            options = getOptions();
+            expectedConnectionClassName = getExpectedConnectionClassName();
 
-        connection = Overthere.getConnection(protocol, options);
+            connection = Overthere.getConnection(protocol, options);
+        } catch(Exception exc) {
+            setupException = exc;
+            throw exc;
+        }
     }
 
     protected abstract String getProtocol();
@@ -142,60 +148,79 @@ public abstract class ItestsBase1Utils {
         return randomBytes;
     }
 
+    protected void checkConnected(String assumptionName) throws IllegalStateException {
+        if(setupException != null) {
+            throw new IllegalStateException("Cannot check " + assumptionName + " assumption because an exception was thrown while setting up the connection", setupException);
+        }
+    }
 
     public boolean notLocal() {
+        checkConnected("notLocal");
         return !protocol.equals(LOCAL_PROTOCOL);
     }
 
     public boolean notCifs() {
+        checkConnected("notCifs");
         return !protocol.equals(CIFS_PROTOCOL);
     }
 
     public boolean withPassword() {
+        checkConnected("withPassword");
         return options.containsKey("password");
     }
 
     public boolean onUnix() {
+        checkConnected("onUnix");
         return connection.getHostOperatingSystem().equals(UNIX);
     }
 
     public boolean onWindows() {
+        checkConnected("onWindows");
         return connection.getHostOperatingSystem().equals(WINDOWS);
     }
 
     public boolean onlyCifs() {
+        checkConnected("notLocal");
         return protocol.equals(CIFS_PROTOCOL);
     }
 
     public boolean onlyCifsWinrm() {
+        checkConnected("onlyCifsWinrm");
         return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(WINRM_INTERNAL);
     }
 
     public boolean onlyCifsTelnet() {
+        checkConnected("onlyCifsTelnet");
         return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(TELNET);
     }
 
     public boolean notSftpCygwin() {
+        checkConnected("notSftpCygwin");
         return !onlySftpCygwin();
     }
 
     public boolean onlySftpCygwin() {
+        checkConnected("onlySftpCygwin");
         return SshConnectionType.SFTP_CYGWIN.equals(options.get(CONNECTION_TYPE, null));
     }
 
     public boolean notSftpWinsshd() {
+        checkConnected("notSftpWinsshd");
         return !onlySftpWinsshd();
     }
 
     public boolean onlySftpWinsshd() {
+        checkConnected("onlySftpWinsshd");
         return SshConnectionType.SFTP_WINSSHD.equals(options.get(CONNECTION_TYPE, null));
     }
 
     public boolean supportsProcess() {
+        checkConnected("supportsProcess");
         return connection.canStartProcess();
     }
 
     public boolean notSupportsProcess() {
+        checkConnected("notSupportsProcess");
         return !supportsProcess();
     }
 
