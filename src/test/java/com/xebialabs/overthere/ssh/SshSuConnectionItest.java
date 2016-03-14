@@ -22,24 +22,16 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.UnixCloudHostListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import org.testng.annotations.Listeners;
+import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.ALLOCATE_DEFAULT_PTY;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SU_PASSWORD;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SU_USERNAME;
+import static com.xebialabs.overthere.UnixCloudHostListener.*;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SU;
 
 @Test
@@ -58,10 +50,10 @@ public class SshSuConnectionItest extends OverthereConnectionItestBase {
         options.set(CONNECTION_TYPE, SU);
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
-        options.set(USERNAME, "overthere");
-        options.set(PASSWORD, "}Kp39hdb}LzM");
-        options.set(SU_USERNAME, "root");
-        options.set(SU_PASSWORD, "87bC=vu@DTHx");
+        options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
+        options.set(SU_USERNAME, ROOT_UNIX_USER_USERNAME);
+        options.set(SU_PASSWORD, ROOT_UNIX_USER_PASSWORD);
         options.set(ALLOCATE_DEFAULT_PTY, true);
         return options;
     }

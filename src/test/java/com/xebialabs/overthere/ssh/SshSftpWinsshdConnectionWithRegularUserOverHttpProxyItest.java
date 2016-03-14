@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_USER_ITEST_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_USER_ITEST_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
@@ -61,8 +61,8 @@ public class SshSftpWinsshdConnectionWithRegularUserOverHttpProxyItest extends O
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(PORT, 2222);
-        options.set(USERNAME, REGULAR_USER_ITEST_USERNAME);
-        options.set(PASSWORD, REGULAR_USER_ITEST_PASSWORD);
+        options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
         options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
         options.set(JUMPSTATION, proxyOptions);
         return options;
