@@ -33,9 +33,6 @@ import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static org.testng.Assert.*;
 
-/**
- * Created by aalbul on 2/2/15.
- */
 public class OverthereUtilsTest extends OverthereConnectionItestBase {
     @Override
     protected String getProtocol() {
