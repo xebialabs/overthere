@@ -24,19 +24,24 @@ package com.xebialabs.overthere.proxy;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.UnixCloudHostListener;
 import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
 import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
+import static com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder.SSH_JUMPSTATION_PROTOCOL;
 import static java.net.Proxy.Type.HTTP;
 import static java.net.Proxy.Type.SOCKS;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,7 +49,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.fail;
 
 @Test
-public class ProxyConfigurationTest {
+@Listeners({UnixCloudHostListener.class})
+public class ProxyConfigurationItest {
 
     @Test
     public void shouldNotConnectThroughTwoProxies() {
@@ -74,27 +80,27 @@ public class ProxyConfigurationTest {
 
             fail("Expected IllegalArgumentException to be thrown");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot configure an HTTP proxy behind an SSH jumpstation"));
+            assertThat(expected.getMessage(), containsString("Cannot configure an HTTP proxy behind another proxy or behind an SSH jumpstation"));
         }
     }
 
     @Test
     public void shouldNotConnectThroughProxyBehindJumpstation() {
         try {
+            ConnectionOptions jumpstationOptions = new ConnectionOptions();
+            jumpstationOptions.set(PROTOCOL, SSH_JUMPSTATION_PROTOCOL);
+            jumpstationOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+            jumpstationOptions.set(OPERATING_SYSTEM, UNIX);
+            jumpstationOptions.set(PORT, 22);
+            jumpstationOptions.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
+            jumpstationOptions.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
+
             ConnectionOptions proxyOptions = new ConnectionOptions();
             proxyOptions.set(PROTOCOL, PROXY_PROTOCOL);
             proxyOptions.set(PROXY_TYPE, HTTP);
             proxyOptions.set(ADDRESS, "proxy2");
             proxyOptions.set(PORT, 1080);
-
-            ConnectionOptions jumpstationOptions = new ConnectionOptions();
-            jumpstationOptions.set(PROTOCOL, SSH_PROTOCOL);
-            jumpstationOptions.set(PROXY_TYPE, HTTP);
-            jumpstationOptions.set(ADDRESS, "jumpstation");
-            jumpstationOptions.set(PORT, 22);
-            jumpstationOptions.set(USERNAME, "jumpuser");
-            jumpstationOptions.set(PASSWORD, "jumppassword");
-            jumpstationOptions.set(JUMPSTATION, proxyOptions);
+            proxyOptions.set(JUMPSTATION, jumpstationOptions);
 
             ConnectionOptions options = new ConnectionOptions();
             options.set(SshConnectionBuilder.CONNECTION_TYPE, SCP);
@@ -102,13 +108,13 @@ public class ProxyConfigurationTest {
             options.set(ADDRESS, "host");
             options.set(USERNAME, "username");
             options.set(PASSWORD, "password");
-            options.set(JUMPSTATION, jumpstationOptions);
+            options.set(JUMPSTATION, proxyOptions);
 
             Overthere.getConnection(SSH_PROTOCOL, options);
 
             fail("Expected IllegalArgumentException to be thrown");
         } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot configure an HTTP proxy behind an SSH jumpstation"));
+            assertThat(expected.getMessage(), containsString("Cannot configure an HTTP proxy behind another proxy or behind an SSH jumpstation"));
         }
     }
 

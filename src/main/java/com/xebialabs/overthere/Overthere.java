@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.PROTOCOL;
-import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder.SSH_JUMPSTATION_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
@@ -100,10 +99,6 @@ public class Overthere {
      * @return the connection.
      */
     public static OverthereConnection getConnection(String protocol, final ConnectionOptions options) {
-        return getConnection(protocol, options, 0);
-    }
-
-    private static OverthereConnection getConnection(String protocol, ConnectionOptions options, int depth) {
         if (!protocols.get().containsKey(protocol)) {
             throw new IllegalArgumentException("Unknown connection protocol " + protocol);
         }
@@ -119,14 +114,9 @@ public class Overthere {
             if(jumpstationProtocol.equals(SSH_PROTOCOL)) {
                 // If the protocol is specified as "ssh", use "ssh-jumpstation" instead.
                 jumpstationProtocol = SSH_JUMPSTATION_PROTOCOL;
-            } else if(jumpstationProtocol.equals(PROXY_PROTOCOL)) {
-                // if the protocol is "proxy", check that this is the first jumpstation.
-                if(depth != 0) {
-                    throw new IllegalArgumentException("Cannot configure an HTTP proxy behind an SSH jumpstation");
-                }
             }
 
-            mapper = (AddressPortMapper) Overthere.getConnection(jumpstationProtocol, jumpstationOptions, depth + 1);
+            mapper = (AddressPortMapper) Overthere.getConnection(jumpstationProtocol, jumpstationOptions);
         }
 
         try {

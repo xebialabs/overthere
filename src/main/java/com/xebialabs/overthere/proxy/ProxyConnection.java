@@ -75,6 +75,9 @@ public class ProxyConnection extends BaseOverthereConnection implements AddressP
         if(proxyType != HTTP) {
             throw new IllegalArgumentException("Proxy of type other than HTTP not supported");
         }
+        if(options.containsKey(JUMPSTATION)) {
+            throw new IllegalArgumentException("Cannot configure an HTTP proxy behind another proxy or behind an SSH jumpstation");
+        }
     }
 
     private static ConnectionOptions augmentOptions(ConnectionOptions options) {
