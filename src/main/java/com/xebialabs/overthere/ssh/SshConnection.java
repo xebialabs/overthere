@@ -66,7 +66,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public static final String NOCD_PSEUDO_COMMAND = "nocd";
 
-    protected SshConnectionType sshConnectionType;
+    protected String protocolAndConnectionType;
 
     protected String host;
 
@@ -111,7 +111,12 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
-        sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
+        SshConnectionType connectionType = options.getOptional(CONNECTION_TYPE);
+        if(connectionType != null) {
+            protocolAndConnectionType = protocol + ":" + connectionType.toString().toLowerCase();
+        } else {
+            protocolAndConnectionType = protocol;
+        }
         String unmappedAddress = options.get(ADDRESS);
         int unmappedPort = options.getInteger(PORT, PORT_DEFAULT_SSH);
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
@@ -358,7 +363,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     @Override
     public String toString() {
-        return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + "@" + host + ":" + port;
+        return protocolAndConnectionType + "://" + username + "@" + host + ":" + port;
     }
 
     protected static CmdLine stripPrefixedPseudoCommand(final CmdLine commandLine) {

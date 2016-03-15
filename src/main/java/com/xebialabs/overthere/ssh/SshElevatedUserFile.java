@@ -100,7 +100,7 @@ class SshElevatedUserFile extends SshScpFile {
         if (isTempFile) {
             return super.getOutputStream();
         } else {
-            logger.debug("Opening " + SSH_PROTOCOL + ":{}: output stream to write to file {}", connection.sshConnectionType.toString().toLowerCase(), this);
+            logger.debug("Opening {} output stream to write to file {}", connection.protocolAndConnectionType, this);
             return new SshElevatedUserOutputStream(this, connection.getTempFile(getName()));
         }
     }

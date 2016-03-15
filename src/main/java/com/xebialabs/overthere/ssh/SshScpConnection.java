@@ -79,8 +79,8 @@ class SshScpConnection extends SshConnection {
 
     public SshScpConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os != WINDOWS, "Cannot create a " + SSH_PROTOCOL + ":%s connection to a Windows operating system", sshConnectionType.toString().toLowerCase());
-        checkArgument(os != ZOS, "Cannot create a " + SSH_PROTOCOL + ":%s connection to a z/OS operating system", sshConnectionType.toString().toLowerCase());
+        checkArgument(os != WINDOWS, "Cannot create a %s connection to a host that is running Windows", protocolAndConnectionType);
+        checkArgument(os != ZOS, "Cannot create a %s connection to a host that is running z/OS", protocolAndConnectionType);
 
         deleteDirectoryCommand = options.get(DELETE_DIRECTORY_COMMAND, DELETE_DIRECTORY_COMMAND_DEFAULT);
         deleteFileCommand = options.get(DELETE_FILE_COMMAND, DELETE_FILE_COMMAND_DEFAULT);

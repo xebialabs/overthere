@@ -496,9 +496,6 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
 
         switch (sshConnectionType) {
-            case TUNNEL:
-                connection = new SshTunnelConnection(type, options, mapper);
-                break;
             case SFTP:
                 connection = new SshSftpUnixConnection(type, options, mapper);
                 break;

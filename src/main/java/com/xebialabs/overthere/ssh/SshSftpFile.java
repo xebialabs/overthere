@@ -189,12 +189,12 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
                 }
             } else {
                 throw new RuntimeIOException(format(
-                        "Cannot move/rename ssh:%s: file/directory %s to file/directory %s because it is in a different connection",
-                        connection.sshConnectionType.toString().toLowerCase(), this, dest));
+                        "Cannot move/rename %s file/directory %s to file/directory %s because it is in a different connection",
+                        connection.protocolAndConnectionType, this, dest));
             }
         } else {
-            throw new RuntimeIOException(format("Cannot move/rename ssh:%s: file/directory %s  to non-ssh:%s: file/directory %s",
-                    connection.sshConnectionType.toString().toLowerCase(), this, connection.sshConnectionType.toString().toLowerCase(), dest));
+            throw new RuntimeIOException(format("Cannot move/rename %s file/directory %s to non-%s file/directory %s",
+                    connection.protocolAndConnectionType, this, connection.protocolAndConnectionType, dest));
         }
     }
 

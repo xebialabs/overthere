@@ -309,14 +309,12 @@ class SshScpFile extends SshFile<SshScpConnection> {
                 CmdLine mvCmdLine = CmdLine.build(NOCD_PSEUDO_COMMAND).addTemplatedFragment(connection.renameToCommand, getPath(), sshScpDestFile.getPath());
                 executeAndThrowOnErrorCode(mvCmdLine, "Cannot rename file/directory " + this);
             } else {
-                throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
-                        + " to file/directory "
-                        + dest + " because it is in a different connection");
+                throw new RuntimeIOException("Cannot rename " + connection.protocolAndConnectionType + " file/directory " + this
+                        + " to file/directory " + dest + " because it is in a different connection");
             }
         } else {
-            throw new RuntimeIOException("Cannot rename :ssh:" + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + this
-                    + " to non-:ssh:"
-                    + connection.sshConnectionType.toString().toLowerCase() + ": file/directory " + dest);
+            throw new RuntimeIOException("Cannot rename " + connection.protocolAndConnectionType + " file/directory " + this
+                    + " to non-" + connection.protocolAndConnectionType + " file/directory " + dest);
         }
     }
 

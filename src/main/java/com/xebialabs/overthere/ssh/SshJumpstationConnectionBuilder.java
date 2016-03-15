@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008-2015, XebiaLabs B.V., All rights reserved.
+ * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
  *
  *
  * Overthere is licensed under the terms of the GPLv2
@@ -23,25 +23,39 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
+import static com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder.SSH_JUMPSTATION_PROTOCOL;
 
 /**
- * A connection to a Unix host using SSH w/ SFTP.
+ * Builds SSH jumpstation connections.
  */
-class SshSftpUnixConnection extends SshSftpConnection {
+@Protocol(name = SSH_JUMPSTATION_PROTOCOL)
+public class SshJumpstationConnectionBuilder implements OverthereConnectionBuilder {
 
-    public SshSftpUnixConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
-        checkArgument(os != WINDOWS, "Cannot create a %s connection to a host that is running Windows", protocolAndConnectionType);
+    /**
+     * Name of the protocol handled by this connection builder, i.e. "ssh-jumpstation".
+     */
+    public static final String SSH_JUMPSTATION_PROTOCOL = "ssh-jumpstation";
+
+    protected SshConnection connection;
+
+    public SshJumpstationConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        connection = new SshTunnelConnection(type, options, mapper);
     }
 
     @Override
-    protected String pathToSftpPath(String path) {
-        return path;
+    public OverthereConnection connect() {
+        connection.connect();
+        return connection;
+    }
+
+    @Override
+    public String toString() {
+        return connection.toString();
     }
 
 }

@@ -22,6 +22,17 @@
  */
 package com.xebialabs.overthere;
 
+import com.xebialabs.overthere.local.LocalConnection;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+import nl.javadude.scannit.Configuration;
+import nl.javadude.scannit.Scannit;
+import nl.javadude.scannit.scanner.TypeAnnotationScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -29,28 +40,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.xebialabs.overthere.proxy.ProxyConnection;
-import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-import com.xebialabs.overthere.ssh.SshConnectionType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.xebialabs.overthere.local.LocalConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
-import com.xebialabs.overthere.spi.Protocol;
-import com.xebialabs.overthere.ssh.SshTunnelConnection;
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-
-import nl.javadude.scannit.Configuration;
-import nl.javadude.scannit.Scannit;
-import nl.javadude.scannit.scanner.TypeAnnotationScanner;
-
 import static com.xebialabs.overthere.ConnectionOptions.JUMPSTATION;
 import static com.xebialabs.overthere.ConnectionOptions.PROTOCOL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-import static com.xebialabs.overthere.ssh.SshConnectionType.TUNNEL;
+import static com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder.SSH_JUMPSTATION_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
@@ -119,16 +113,14 @@ public class Overthere {
         ConnectionOptions jumpstationOptions = options.getOptional(JUMPSTATION);
         AddressPortMapper mapper = DefaultAddressPortMapper.INSTANCE;
         if (jumpstationOptions != null) {
-            // In order to maintain backwards compatibility, SSH is the default.
-            String jumpstationProtocol = jumpstationOptions.get(PROTOCOL, SSH_PROTOCOL);
+            // For backwards compatibility, SSH-jumpstation is the default protocol.
+            String jumpstationProtocol = jumpstationOptions.get(PROTOCOL, SSH_JUMPSTATION_PROTOCOL);
 
-            // When the protocol type is SSH, "TUNNEL" is the only valid SSH connection type
             if(jumpstationProtocol.equals(SSH_PROTOCOL)) {
-                if(!jumpstationOptions.containsKey(CONNECTION_TYPE) || jumpstationOptions.get(CONNECTION_TYPE) != TUNNEL) {
-                    jumpstationOptions = new ConnectionOptions(jumpstationOptions);
-                    jumpstationOptions.set(CONNECTION_TYPE, TUNNEL);
-                }
+                // If the protocol is specified as "ssh", use "ssh-jumpstation" instead.
+                jumpstationProtocol = SSH_JUMPSTATION_PROTOCOL;
             } else if(jumpstationProtocol.equals(PROXY_PROTOCOL)) {
+                // if the protocol is "proxy", check that this is the first jumpstation.
                 if(depth != 0) {
                     throw new IllegalArgumentException("Cannot configure an HTTP proxy behind an SSH jumpstation");
                 }

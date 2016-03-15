@@ -70,7 +70,7 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
         checkArgument(!connection.elevatedPasswordPromptRegex.endsWith("?"), optionKey + " should not end in a wildcard");
 
         if (!connection.allocateDefaultPty && connection.allocatePty == null) {
-            logger.warn("An ssh:{}: connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY + "].", connection.sshConnectionType.toString().toLowerCase());
+            logger.warn("An {} connection requires a pty, allocating a pty with spec [" + OVERRIDE_ALLOCATE_PTY + "].", connection.protocolAndConnectionType);
             connection.allocatePty = OVERRIDE_ALLOCATE_PTY;
         }
     }
@@ -160,7 +160,7 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
 
     @Override
     public String toString() {
-        return "ssh:" + sshConnectionType.toString().toLowerCase() + "://" + username + ":" + elevatedUsername + "@" + host + ":" + port;
+        return protocolAndConnectionType + "://" + username + ":" + elevatedUsername + "@" + host + ":" + port;
     }
 
     private Logger logger = LoggerFactory.getLogger(SshElevatedUserConnection.class);

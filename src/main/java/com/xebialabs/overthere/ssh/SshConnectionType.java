@@ -64,9 +64,4 @@ public enum SshConnectionType {
      */
     INTERACTIVE_SUDO,
 
-    /**
-     * An SSH connection that is used for tunneling another connection through a 'jump station'. No operation on this
-     * actual connection can be performed.
-     */
-    TUNNEL
 }
