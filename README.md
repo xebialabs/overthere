@@ -19,7 +19,7 @@
 	    * [Host setup](#cifs_host_setup)
 	    * [Troubleshooting](#cifs_troubleshooting)
 	    * [Connection options](#cifs_connection_options)
-	* [Tunnelling](#tunnelling)
+	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations)
 * [Release History](#release_history)
 
 
@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.2.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.3.0%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.2.1</version>
+			<version>4.3.0</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -92,7 +92,8 @@ Overthere supports a number of protocols to connect to remote hosts:
 * [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
 * [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
 * [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
-* [__proxy__](#proxy) - a special connection that can only be used as a jumpstation protocol, which allows a connection to be created over an [HTTP](https://en.wikipedia.org/wiki/HTTP_tunnel) or [SOCKS](https://en.wikipedia.org/wiki/SOCKS) proxy.
+* [__ssh-jumpstation__](#jumpstations) - a special protocol type that can only be used as a jumpstation protocol, which allows a connection to be created over an [SSH jumpstation](https://en.wikipedia.org/wiki/Port_forwarding#Local_port_forwarding).
+* [__proxy__](#jumpstations) - a special protocol type that can only be used as a jumpstation protocol, which allows a connection to be created over an [HTTP proxy](https://en.wikipedia.org/wiki/HTTP_tunnel).
 
 <a name="common_connection_options"></a>
 ## Common connection options
@@ -1042,54 +1043,81 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 
 </table>
 
-<a name="proxy"></a>
-## Proxy
-This is a special protocol which can only be used as a tunnelling protocol. This allows another Overthere connection to connect over an [HTTP proxy](https://en.wikipedia.org/wiki/HTTP_tunnel) or [SOCKS Proxy](https://en.wikipedia.org/wiki/SOCKS).
+<a name="jumpstations"></a>
+## Jumpstations: SSH tunnels and HTTP proxies
+In some networks, certain hosts cannot be reached directly. Instead, a connection should be made through an HTTP proxy or an SSH jumpstation. Overthere supports these network topologies by allowing you to configure "jumpstations" by adding a property called `jumpstation` to the connection options that point to another set of connection options for the jumpstation.
 
-<a name="proxy_connection_options"></a>
-### Proxy connection options
+The end result looks something like this:
 
-The Proxy protocol of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
+	protocol: ssh
+	options: ConnectionOptions[
+		connectionType: SCP
+		address: dmzhost1.example.com
+		os: UNIX
+		username: dmzuser
+		password: s3cr3t
+		jumpstation: ConnectionOptions[
+			protocol: proxy
+			address: dmzproxy.exmaple.com
+			port: 8888
+		]
+	]
+
+or:
+
+	protocol: cifs
+	options: ConnectionOptions[
+		connectionType: WINRM_INTERNAL
+		address: dmzhost2.example.com
+		os: WINDOWS
+		username: Administrator
+		password: adm1n=me
+		jumpstation: ConnectionOptions[
+			protocol: ssh-jumpstation
+			address: dmzssh.example.com
+			username: jumpuser
+			password: j0mp!
+		]
+	]
+
+
+
+The `jumpstation` connection options support the same values (for as much as it makes sense) as regular connection options, with the following additions:
 
 <table>
 <tr>
-    <th align="left" valign="top"><a name="proxyType"></a>proxyType</th>
-    <td>Indicates what type of proxy Overthere needs to connect to. One of the following values can be set:<ul>
-    <li><code>http</code> - Connect over an HTTP (CONNECT) proxy.</li>
-    <li><code>socks</code> - Connect over a SOCKS proxy.</li>
-    </ul>
+	<th align="left" valign="top"><a name="jumpstations_protocol"></a>protocol</th>
+	<td>The kind of jumpstation to use. The following values can be used:<ul>
+		<li><strong>proxy</strong> - use an HTTP proxy</li>		<li><strong>ssh-jumpstation</strong> (or <strong>ssh</strong>)- set up an SSH tunnel with a local port forwarding</li>
+		</ul>
+		The default vaue is <code>ssh-jumpstation</code>.
+		</td>
 </tr>
-</table>
-
-<a name="tunnelling"></a>
-## Tunnelling
-
-Overthere supports the tunnelling of every protocol over SSH. This can be used to reach hosts that live in a DMZ which can only be reached by connecting to a different host first. This in-between host is called the jump station. In order to configure an SSH tunnel, you need to provide a set of nested connection options specifying which host is used as the jump station.
-
-When using a jumpstation to connect to the remote host, Overthere will dynamically allocate an available local port to use for the connection to the end station. Using an additional connection option, you can configure from which port onwards Overthere starts the allocation.
-
-<table>
 <tr>
-	<th align="left" valign="top"><a name="tunneling_portAllocationRangeStart"></a>portAllocationRangeStart</th>
-	<td>The port number Overthere starts with to find an available local port for setting up a tunnel. The default value is <code>1024</code>.</td>
+	<th align="left" valign="top"><a name="jumpstations_portAllocationRangeStart"></a>portAllocationRangeStart</th>
+	<td>The port number Overthere starts with to find an available local port for setting up an SSH local port forwarder. This option only applies when using the <code>ssh-jumpstation</code> protocol. The default value is <code>1024</code>.</td>
 </tr>
 </table>
 
 <a name="release_history"></a>
 # Release History
-* Overthere 4.2.2 (??-???-????)
+* Overthere 4.3.0 (15-Mar-2016)
+	* Added support for creating [SSH connections over HTTP proxies](http://www.linuxhowtos.org/Security/sshproxy.htm).
+	* Removed `TUNNEL` SSH connection type in favour of the new `ssh-jumpstation` protocol.
+	* Upgraded to SSH/J 0.15.0.
+	* Integrated pull requests [#168](https://github.com/xebialabs/overthere/pull/168) and [#169](https://github.com/xebialabs/overthere/pull/169).
 * Overthere 4.1.2 (23-Oct-2015)
     * *NOTE:* This release contains the same code as 4.2.1, except for all the library upgrades of 4.2.0
     * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.1 (21-Oct-2015)
     * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.0 (06-Oct-2015)
-    * Move to Java 7
+    * Upgraded to Java 7
     * Additional debug logging when closing streams
     * Fix typo in logging of WsmanSPNegoSchemeFactory
-    * Upgraded scannit to 1.4.0, fixes Java8 compatibility.
-    * Upgraded bouncy castle to 1.52
-    * Upgraded commons-net to 3.3
+    * Upgraded to scannit 1.4.0, fixes Java8 compatibility.
+    * Upgraded to bouncy castle 1.52
+    * Upgraded to commons-net 3.3
     * Upgraded to commons-codec 1.10
     * Upgraded to slf4j 1.7.12
 * Overthere 4.1.1 (26-Aug-2015)
