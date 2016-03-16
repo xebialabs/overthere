@@ -111,7 +111,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
-        SshConnectionType connectionType = options.getOptional(CONNECTION_TYPE);
+        SshConnectionType connectionType = options.getOptionalEnum(CONNECTION_TYPE, SshConnectionType.class);
         if(connectionType != null) {
             protocolAndConnectionType = protocol + ":" + connectionType.toString().toLowerCase();
         } else {

@@ -319,17 +319,17 @@ public class ConnectionOptions {
 
     @SuppressWarnings("unchecked")
     public <T extends Enum<T>> T getEnum(String key, Class<T> enumClazz) {
-        Object o = options.get(key);
+        T o = getEnum(key, enumClazz, null);
         if (o == null) {
             throw new IllegalArgumentException("No value specified for required connection option " + key);
-        } else if (o.getClass().equals(enumClazz)) {
-            return (T) o;
-        } else if (o instanceof String) {
-            return Enum.valueOf(enumClazz, (String) o);
         } else {
-            throw new IllegalArgumentException("Value specified for required connection option " + key + " is neither an " + enumClazz.getName()
-                    + " nor a String");
+            return o;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Enum<T>> T getOptionalEnum(String key, Class<T> enumClazz) {
+        return getEnum(key, enumClazz, null);
     }
 
     @SuppressWarnings("unchecked")
