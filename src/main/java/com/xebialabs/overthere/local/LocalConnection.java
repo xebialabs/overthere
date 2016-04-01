@@ -1,21 +1,21 @@
 /**
  * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
- * <p/>
- * <p/>
+ *
+ *
  * Overthere is licensed under the terms of the GPLv2
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most XebiaLabs Libraries.
  * There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
  * this software, see the FLOSS License Exception
  * <http://github.com/xebialabs/overthere/blob/master/LICENSE>.
- * <p/>
+ *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation; version 2
  * of the License.
- * <p/>
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * <p/>
+ *
  * You should have received a copy of the GNU General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
@@ -35,11 +35,13 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
-import static com.xebialabs.overthere.util.OverthereUtils.*;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
 /**
@@ -142,15 +144,6 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         }
     }
 
-    private String[] getArgsWithWindowsCmd(final String[] args) {
-        if (args.length == 0)
-            return args;
-        String[] a = new String[args.length + 2];
-        System.arraycopy(new String[]{"cmd", "/c"}, 0, a, 0, 2);
-        System.arraycopy(args, 0, a, 2, args.length);
-        return a;
-    }
-
     @Override
     public String toString() {
         return LOCAL_PROTOCOL + ":";
@@ -175,6 +168,15 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
     private boolean isWindows(final OperatingSystemFamily os) {
         return os == OperatingSystemFamily.WINDOWS;
+    }
+
+    private String[] getArgsWithWindowsCmd(final String[] args) {
+        if (args.length == 0)
+            return args;
+        String[] a = new String[args.length + 2];
+        System.arraycopy(new String[]{"cmd", "/c"}, 0, a, 0, 2);
+        System.arraycopy(args, 0, a, 2, args.length);
+        return a;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
