@@ -74,18 +74,12 @@ public class LocalConnectionTest extends OverthereConnectionItestBase {
     public void canExecuteCommand() {
         OverthereFile tempFile = connection.getTempFile("afile");
         OverthereUtils.write("Some text", "UTF-8", tempFile);
-        String lsCommand = connection.getHostOperatingSystem() == UNIX ? "ls" : "dir";
+        String lsCommand = connection.getHostOperatingSystem() == UNIX ? "ls" : "dir/b";
         CmdLine commandLine = CmdLine.build(lsCommand, tempFile.getParentFile().getPath());
-
-        System.out.println("HHHHHH commandline " + commandLine.toString());
-
         CapturingOverthereExecutionOutputHandler handler = capturingHandler();
 
         int res = connection.execute(handler, syserrHandler(), commandLine);
         assertThat(res, equalTo(0));
-System.out.println("HHHHHH " + tempFile.toString());
-        for (String l : handler.getOutputLines())
-            System.out.println(">>>>" + l);
         assertThat(handler.getOutputLines().contains(tempFile.getName()), equalTo(true));
     }
 
