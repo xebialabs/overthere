@@ -124,11 +124,8 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
         try {
             logger.debug("Creating " + os + " process with command line [{}]", obfuscatedCmd);
-            String[] args = cmd.toCommandArray(os, false);
-            if (isWindows(os))
-                args = getArgsWithWindowsCmd(args);
-
-            final ProcessBuilder pb = new ProcessBuilder(args);
+            CmdLine command = isWindows(os) ? getCmdForWindows(cmd) : cmd;
+            final ProcessBuilder pb = new ProcessBuilder(command.toCommandArray(os, false));
             if (wd != null) {
                 logger.debug("Setting working directory to [{}]", wd);
                 pb.directory(wd);
@@ -170,10 +167,10 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         return os == OperatingSystemFamily.WINDOWS;
     }
 
-    private static String[] getArgsWithWindowsCmd(final String[] args) {
+    private CmdLine getCmdForWindows(final CmdLine cmd) {
         CmdLine c = CmdLine.build("cmd", "/c");
-        c.add(CmdLine.build(args).getArguments());
-        return c.toCommandArray(OperatingSystemFamily.WINDOWS, false);
+        c.add(cmd.getArguments());
+        return c;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
