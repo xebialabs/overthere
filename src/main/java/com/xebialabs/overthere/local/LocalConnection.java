@@ -170,13 +170,10 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         return os == OperatingSystemFamily.WINDOWS;
     }
 
-    private String[] getArgsWithWindowsCmd(final String[] args) {
-        if (args.length == 0)
-            return args;
-        String[] a = new String[args.length + 2];
-        System.arraycopy(new String[]{"cmd", "/c"}, 0, a, 0, 2);
-        System.arraycopy(args, 0, a, 2, args.length);
-        return a;
+    private static String[] getArgsWithWindowsCmd(final String[] args) {
+        CmdLine c = CmdLine.build("cmd", "/c");
+        c.add(CmdLine.build(args).getArguments());
+        return c.toCommandArray(OperatingSystemFamily.WINDOWS, false);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
