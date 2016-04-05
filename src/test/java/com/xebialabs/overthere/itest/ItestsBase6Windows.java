@@ -22,10 +22,10 @@
  */
 package com.xebialabs.overthere.itest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import org.testng.annotations.Test;
 import com.google.common.io.CharStreams;
@@ -84,11 +84,14 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
 
     @Test
     @Assumption(methods = "onWindows")
-    public void shouldListFilesOnWindows() {
-        OverthereFile folder = connection.getFile("C:\\overthere");
+    public void shouldListFilesOnWindows() throws IOException {
+        File dir = temp.newFolder("overthere");
+        Path file = Files.createFile(Paths.get(dir.getAbsolutePath(), "test.txt"));
+
+        OverthereFile folder = connection.getFile(dir.getPath());
         List<OverthereFile> filesInFolder = folder.listFiles();
 
-        OverthereFile expectedFile = connection.getFile("C:\\overthere\\temp");
+        OverthereFile expectedFile = connection.getFile(file.toAbsolutePath().toString());
         assertThat(filesInFolder.contains(expectedFile), equalTo(true));
     }
 

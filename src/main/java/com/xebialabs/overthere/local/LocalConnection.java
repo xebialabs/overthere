@@ -24,16 +24,11 @@ package com.xebialabs.overthere.local;
 
 import java.io.File;
 import java.io.IOException;
+
+import com.xebialabs.overthere.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
@@ -129,7 +124,8 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
         try {
             logger.debug("Creating " + os + " process with command line [{}]", obfuscatedCmd);
-            final ProcessBuilder pb = new ProcessBuilder(cmd.toCommandArray(os, false));
+            CmdLine command = isWindows(os) ? getCmdForWindows(cmd) : cmd;
+            final ProcessBuilder pb = new ProcessBuilder(command.toCommandArray(os, false));
             if (wd != null) {
                 logger.debug("Setting working directory to [{}]", wd);
                 pb.directory(wd);
@@ -165,6 +161,16 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
      */
     public static OverthereConnection getLocalConnection() {
         return Overthere.getConnection(LOCAL_PROTOCOL, new ConnectionOptions());
+    }
+
+    private boolean isWindows(final OperatingSystemFamily os) {
+        return os == OperatingSystemFamily.WINDOWS;
+    }
+
+    private CmdLine getCmdForWindows(final CmdLine cmd) {
+        CmdLine c = CmdLine.build("cmd", "/c");
+        c.add(cmd.getArguments());
+        return c;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
