@@ -83,8 +83,9 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
-    @Assumption(methods = "onWindows")
-    public void shouldListFilesOnWindows() throws IOException {
+    @Assumption(methods = {"onWindows", "onlyLocal"})
+    public void shouldListFilesOnWindowsLocalHost() throws IOException {
+
         File dir = temp.newFolder("overthere");
         Path file = Files.createFile(Paths.get(dir.getAbsolutePath(), "test.txt"));
 
@@ -92,6 +93,16 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
         List<OverthereFile> filesInFolder = folder.listFiles();
 
         OverthereFile expectedFile = connection.getFile(file.toAbsolutePath().toString());
+        assertThat(filesInFolder.contains(expectedFile), equalTo(true));
+    }
+
+    @Test
+    @Assumption(methods = "onWindows")
+    public void shouldListFilesOnWindows() {
+        OverthereFile folder = connection.getFile("C:\\overthere");
+        List<OverthereFile> filesInFolder = folder.listFiles();
+
+        OverthereFile expectedFile = connection.getFile("C:\\overthere\\temp");
         assertThat(filesInFolder.contains(expectedFile), equalTo(true));
     }
 

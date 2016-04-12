@@ -159,6 +159,11 @@ public abstract class ItestsBase1Utils {
         return !protocol.equals(LOCAL_PROTOCOL);
     }
 
+    public boolean onlyLocal() {
+        checkConnected("local");
+        return protocol.equals(LOCAL_PROTOCOL);
+    }
+
     public boolean notCifs() {
         checkConnected("notCifs");
         return !protocol.equals(CIFS_PROTOCOL);
