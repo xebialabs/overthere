@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.3.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.3.2%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.3.1</version>
+			<version>4.3.2</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1101,13 +1101,16 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.3.2 (12-Apr-2016)
+    * Fixed execution of some commands on localhost when the OS is Windows.
+    * Upgraded to SSH/J 0.16.0.
 * Overthere 4.3.1 (01-Apr-2016)
     * Fixed ClassCastException that occurred when passing an SshConnectionType as a string.
 * Overthere 4.3.0 (15-Mar-2016)
     * Added support for creating [SSH connections over HTTP proxies](http://www.linuxhowtos.org/Security/sshproxy.htm).
     * Removed `TUNNEL` SSH connection type in favour of the new `ssh-jumpstation` protocol.
     * Upgraded to SSH/J 0.15.0.
-    * Integrated pull requests [#168](https://github.com/xebialabs/overthere/pull/168) and [#169](https://github.com/xebialabs/overthere/pull/169).
+    * Merged [#168](https://github.com/xebialabs/overthere/pull/168) and [#169](https://github.com/xebialabs/overthere/pull/169).
 * Overthere 4.1.2 (23-Oct-2015)
     * *NOTE:* This release contains the same code as 4.2.1, except for all the library upgrades of 4.2.0
     * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
@@ -1118,10 +1121,10 @@ The `jumpstation` connection options support the same values (for as much as it 
     * Additional debug logging when closing streams
     * Fix typo in logging of WsmanSPNegoSchemeFactory
     * Upgraded to scannit 1.4.0, fixes Java8 compatibility.
-    * Upgraded to bouncy castle 1.52
-    * Upgraded to commons-net 3.3
-    * Upgraded to commons-codec 1.10
-    * Upgraded to slf4j 1.7.12
+    * Upgraded to bouncy castle 1.52.
+    * Upgraded to commons-net 3.3.
+    * Upgraded to commons-codec 1.10.
+    * Upgraded to slf4j 1.7.12.
 * Overthere 4.1.1 (26-Aug-2015)
     * Fixed bug where WINRM_INTERNAL connection with Windows domain account failed with error message "Unexpected HTTP response on http://hostname/wsman: (401)".
 * Overthere 4.1.0 (18-Aug-2015)
