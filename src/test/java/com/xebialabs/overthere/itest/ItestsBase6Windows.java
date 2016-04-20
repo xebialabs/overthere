@@ -97,7 +97,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
-    @Assumption(methods = "onWindows")
+    @Assumption(methods = {"onWindows", "notLocal"})
     public void shouldListFilesOnWindows() {
         OverthereFile folder = connection.getFile("C:\\overthere");
         List<OverthereFile> filesInFolder = folder.listFiles();
