@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.testng.annotations.Test;
 import com.google.common.io.CharStreams;
 
@@ -196,8 +195,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
         }
     }
 
-    @Test
-    @Ignore
+    @Test(enabled = false)
     @Assumption(methods = {"onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd"})
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
         OverthereFile scriptToRun = connection.getTempFile("echo.ps1");
