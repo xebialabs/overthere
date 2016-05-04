@@ -195,7 +195,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
         }
     }
 
-    @Test(enabled = false)
+    @Test
     @Assumption(methods = {"onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd"})
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
         OverthereFile scriptToRun = connection.getTempFile("echo.ps1");
