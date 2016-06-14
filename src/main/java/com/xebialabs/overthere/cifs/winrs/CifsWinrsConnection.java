@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.util.OverthereUtils.*;
-import static com.xebialabs.overthere.util.CommandLineArgsSanitizer.sanitize;
+import static com.xebialabs.overthere.cifs.winrs.WinrsCommandLineArgsSanitizer.sanitize;
 import static java.lang.String.format;
 
 /**

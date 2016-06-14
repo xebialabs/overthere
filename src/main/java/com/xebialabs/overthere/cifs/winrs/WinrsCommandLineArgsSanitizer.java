@@ -20,9 +20,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.util;
+package com.xebialabs.overthere.cifs.winrs;
 
-public class CommandLineArgsSanitizer {
+public class WinrsCommandLineArgsSanitizer {
 
     private static final String CARAT_ESCAPE = "'`,;=()!|<>&^";
 

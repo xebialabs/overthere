@@ -20,45 +20,45 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.util;
+package com.xebialabs.overthere.cifs.winrs;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CmdLineArgumentsSanitizerTest {
+public class WinrsCmdLineArgumentsSanitizerTest {
 
     final String CARAT_ESCAPE = "'`,;=()!|<>&^";
 
     @Test
     public void shouldEscapeAmpersandsInACommandLineArgument() {
         String arg = "Password+-&";
-        assertEquals("Password+-^&", CommandLineArgsSanitizer.sanitize(arg));
+        assertEquals("Password+-^&", WinrsCommandLineArgsSanitizer.sanitize(arg));
     }
 
     @Test
     public void shouldEscapeAllInstancesOfAmpersandFromCommandLineArg() {
         String arg = "Password&&+-&";
-        assertEquals("Password^&^&+-^&", CommandLineArgsSanitizer.sanitize(arg));
+        assertEquals("Password^&^&+-^&", WinrsCommandLineArgsSanitizer.sanitize(arg));
     }
 
     @Test
     public void shouldReplaceAllCaratEscapeCharsWithCaratInACommandLineArg() {
         String arg = "Password";
         for (char c : CARAT_ESCAPE.toCharArray()) {
-            assertEquals("Password^" + c, CommandLineArgsSanitizer.sanitize(arg + c));
+            assertEquals("Password^" + c, WinrsCommandLineArgsSanitizer.sanitize(arg + c));
         }
     }
 
     @Test
     public void shouldEscapeAllCharactersIfPasswordContainsOnlySpecialChars(){
         String arg = "^&+-&";
-        assertEquals("^^^&+-^&", CommandLineArgsSanitizer.sanitize(arg));
+        assertEquals("^^^&+-^&", WinrsCommandLineArgsSanitizer.sanitize(arg));
     }
 
     @Test
     public void shouldReturnBlankStringAsIs(){
         String arg = "";
-        assertEquals("", CommandLineArgsSanitizer.sanitize(arg));
+        assertEquals("", WinrsCommandLineArgsSanitizer.sanitize(arg));
     }
 }
