@@ -95,7 +95,7 @@ public class CifsWinrsConnection extends CifsConnection {
         final CmdLine winrsCmd = new CmdLine();
         winrsCmd.addArgument("winrs");
         winrsCmd.addArgument("-remote:" + address + ":" + port);
-        winrsCmd.addArgument("-username:" + username);
+        winrsCmd.addArgument("-username:" + sanitize(username));
         winrsCmd.addPassword("-password:" + sanitize(password));
         if (workingDirectory != null) {
             winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
