@@ -98,7 +98,7 @@ public class CifsWinrsConnection extends CifsConnection {
         winrsCmd.addArgument("-username:" + sanitize(username));
         winrsCmd.addPassword("-password:" + sanitize(password));
         if (workingDirectory != null) {
-            winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
+            winrsCmd.addArgument("-directory:" + sanitize(workingDirectory.getPath()));
         }
         if (options.getBoolean(WINRS_NOECHO, WINRS_NOECHO_DEFAULT)) {
             winrsCmd.addArgument("-noecho");
