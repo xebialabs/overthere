@@ -22,38 +22,17 @@
  */
 package com.xebialabs.overthere.cifs.winrs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.DEFAULT_WINRS_ALLOW_DELEGATE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_COMPRESSION_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOECHO_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOPROFILE_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_PROTOCOL_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPTED_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_ALLOW_DELEGATE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_COMPRESSION;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOECHO;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_NOPROFILE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_CONNECTION_OPTIONS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_PROXY_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRS_UNENCRYPTED;
-import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.util.OverthereUtils.*;
+import static com.xebialabs.overthere.util.CommandLineArgsSanitizer.sanitize;
 import static java.lang.String.format;
 
 /**
@@ -117,7 +96,7 @@ public class CifsWinrsConnection extends CifsConnection {
         winrsCmd.addArgument("winrs");
         winrsCmd.addArgument("-remote:" + address + ":" + port);
         winrsCmd.addArgument("-username:" + username);
-        winrsCmd.addPassword("-password:" + password);
+        winrsCmd.addPassword("-password:" + sanitize(password));
         if (workingDirectory != null) {
             winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
         }
