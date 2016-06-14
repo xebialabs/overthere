@@ -28,7 +28,7 @@ public class CommandLineArgsSanitizer {
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
-        for (int j = 0; j < str.length(); j++) {
+        for (int j = 0; str !=null && j < str.length(); j++) {
             String c = str.substring(j, j + 1);
             if (CARAT_ESCAPE.contains(c)) {
                 builder.append("^");

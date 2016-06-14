@@ -55,4 +55,10 @@ public class CmdLineArgumentsSanitizerTest {
         String arg = "^&+-&";
         assertEquals("^^^&+-^&", CommandLineArgsSanitizer.sanitize(arg));
     }
+
+    @Test
+    public void shouldReturnBlankStringAsIs(){
+        String arg = "";
+        assertEquals("", CommandLineArgsSanitizer.sanitize(arg));
+    }
 }
