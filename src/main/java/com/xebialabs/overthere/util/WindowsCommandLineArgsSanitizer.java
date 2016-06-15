@@ -24,32 +24,46 @@ package com.xebialabs.overthere.util;
 
 public class WindowsCommandLineArgsSanitizer {
 
-    private static final String CARET_ESCAPE = "|<>&^\n\r";
+    public static final String WHITE_SPACE = " ";
 
-    private static final String SLASH_ESCAPE = "\"";
+    private static final char[] CARET_ESCAPE = new char[]{'|', '<', '>', '&', '^', '\n', '\r'};
+
+    private static final char[] SLASH_ESCAPE = new char[]{'\"'};
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
-            String c = str.substring(j, j + 1);
+            char c = str.charAt(j);
             builder.append(getEscapeString(c));
             builder.append(c);
         }
         return builder.toString();
     }
 
-    private static String getEscapeString(String str) {
-        if (CARET_ESCAPE.contains(str)) {
+    private static String getEscapeString(char str) {
+        if (contains(str, CARET_ESCAPE)) {
             return "^";
-        } else if (SLASH_ESCAPE.contains(str)) {
+        } else if (contains(str, SLASH_ESCAPE)) {
             return "\\";
         }
         return "";
     }
 
+    private static boolean contains(char c, char[] chars) {
+        for (char caret_char : chars) {
+            if (caret_char == c) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean containsAnySpecialChars(String str) {
-        String chars = CARET_ESCAPE + SLASH_ESCAPE + " ";
-        for (char c : chars.toCharArray()) {
+        return containsAnySpecialCharacter(str, SLASH_ESCAPE) || containsAnySpecialCharacter(str, CARET_ESCAPE) || str.contains(WHITE_SPACE);
+    }
+
+    private static boolean containsAnySpecialCharacter(String str,char[] chars) {
+        for (char c : chars) {
             if (str.indexOf(c) >= 0) {
                 return true;
             }

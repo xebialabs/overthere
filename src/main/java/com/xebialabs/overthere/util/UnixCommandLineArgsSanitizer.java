@@ -24,14 +24,17 @@ package com.xebialabs.overthere.util;
 
 public class UnixCommandLineArgsSanitizer {
 
-    private static final String UNIX_SHELL_CHARS = " \"';{}()&$\\|*?><\n\r\t";
+    private static final char[] UNIX_SHELL_CHARS = " \"';{}()&$\\|*?><\n\r\t".toCharArray();
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
-            String c = str.substring(j, j + 1);
-            if (UNIX_SHELL_CHARS.contains(c)) {
-                builder.append("\\");
+            char c = str.charAt(j);
+            for (char caret_char : UNIX_SHELL_CHARS) {
+                if (caret_char == c) {
+                    builder.append("\\");
+                    break;
+                }
             }
             builder.append(c);
         }
@@ -39,7 +42,7 @@ public class UnixCommandLineArgsSanitizer {
     }
 
     public static boolean containsAnySpecialChars(String str) {
-        for (char c : UNIX_SHELL_CHARS.toCharArray()) {
+        for (char c : UNIX_SHELL_CHARS) {
             if (str.indexOf(c) >= 0) {
                 return true;
             }

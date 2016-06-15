@@ -30,7 +30,7 @@ public class WindowsCmdLineArgsSanitizerTest {
 
     final String CARET_ESCAPE = "|<>&^\r";
 
-    final String SLASH_ESCAPE = "\\\"";
+    final String SLASH_ESCAPE = "\"";
 
     @Test
     public void shouldEscapeAmpersandsInACommandLineArgument() {
