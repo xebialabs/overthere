@@ -20,21 +20,40 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.util;
 
-public class WinrsCommandLineArgsSanitizer {
+public class WindowsCommandLineArgsSanitizer {
 
-    private static final String CARAT_ESCAPE = "'`,;=()!|<>&^";
+    private static final String CARET_ESCAPE = "|<>&^\n\r";
+
+    private static final String SLASH_ESCAPE = "\"";
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
-        for (int j = 0; str !=null && j < str.length(); j++) {
+        for (int j = 0; j < str.length(); j++) {
             String c = str.substring(j, j + 1);
-            if (CARAT_ESCAPE.contains(c)) {
-                builder.append("^");
-            }
+            builder.append(getEscapeString(c));
             builder.append(c);
         }
         return builder.toString();
+    }
+
+    private static String getEscapeString(String str) {
+        if (CARET_ESCAPE.contains(str)) {
+            return "^";
+        } else if (SLASH_ESCAPE.contains(str)) {
+            return "\\";
+        }
+        return "";
+    }
+
+    public static boolean containsAnySpecialChars(String str) {
+        String chars = CARET_ESCAPE + SLASH_ESCAPE + " ";
+        for (char c : chars.toCharArray()) {
+            if (str.indexOf(c) >= 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

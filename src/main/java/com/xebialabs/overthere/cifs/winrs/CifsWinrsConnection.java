@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.util.OverthereUtils.*;
-import static com.xebialabs.overthere.cifs.winrs.WinrsCommandLineArgsSanitizer.sanitize;
 import static java.lang.String.format;
 
 /**
@@ -95,10 +94,10 @@ public class CifsWinrsConnection extends CifsConnection {
         final CmdLine winrsCmd = new CmdLine();
         winrsCmd.addArgument("winrs");
         winrsCmd.addArgument("-remote:" + address + ":" + port);
-        winrsCmd.addArgument("-username:" + sanitize(username));
-        winrsCmd.addPassword("-password:" + sanitize(password));
+        winrsCmd.addArgument("-username:" + username);
+        winrsCmd.addPassword("-password:" + password);
         if (workingDirectory != null) {
-            winrsCmd.addArgument("-directory:" + sanitize(workingDirectory.getPath()));
+            winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
         }
         if (options.getBoolean(WINRS_NOECHO, WINRS_NOECHO_DEFAULT)) {
             winrsCmd.addArgument("-noecho");

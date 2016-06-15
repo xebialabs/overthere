@@ -41,7 +41,6 @@ import com.xebialabs.overthere.util.OverthereUtils;
 import nl.javadude.assumeng.Assumption;
 
 import static com.google.common.io.ByteStreams.write;
-import static com.xebialabs.overthere.CmdLineArgument.SPECIAL_CHARS_UNIX;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -55,6 +54,11 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 
 public abstract class ItestsBase5Unix extends ItestsBase4Size {
+
+    /**
+     * String containing special characters that require quoting or escaping on Unix.
+     */
+    public static final String SPECIAL_CHARS_UNIX = " '\"\\;&|()${}*?!<>";
 
     @Test
     @Assumption(methods = "onUnix")
