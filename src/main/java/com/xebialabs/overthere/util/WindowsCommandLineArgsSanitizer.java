@@ -26,27 +26,22 @@ public class WindowsCommandLineArgsSanitizer {
 
     public static final String WHITE_SPACE = " ";
 
-    private static final char[] CARET_ESCAPE = new char[]{'|', '<', '>', '&', '^', '\n', '\r'};
+    private static final char[] CARET_ESCAPE = "|<>&^\r\n".toCharArray();
 
-    private static final char[] SLASH_ESCAPE = new char[]{'\"'};
+    private static final char[] SLASH_ESCAPE = "\"".toCharArray();
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
-            builder.append(getEscapeString(c));
+            if (contains(c, CARET_ESCAPE)) {
+                builder.append('^');
+            } else if (contains(c, SLASH_ESCAPE)) {
+                builder.append('\\');
+            }
             builder.append(c);
         }
         return builder.toString();
-    }
-
-    private static String getEscapeString(char str) {
-        if (contains(str, CARET_ESCAPE)) {
-            return "^";
-        } else if (contains(str, SLASH_ESCAPE)) {
-            return "\\";
-        }
-        return "";
     }
 
     private static boolean contains(char c, char[] chars) {

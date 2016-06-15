@@ -67,6 +67,12 @@ public class WindowsCmdLineArgsSanitizerTest {
     }
 
     @Test
+    public void shouldNotEscapeSingleQuote(){
+        String arg = "a'b";
+        assertEquals("a'b", WindowsCommandLineArgsSanitizer.sanitize(arg));
+    }
+
+    @Test
     public void shouldReturnBlankStringAsIs(){
         String arg = "";
         assertEquals("", WindowsCommandLineArgsSanitizer.sanitize(arg));

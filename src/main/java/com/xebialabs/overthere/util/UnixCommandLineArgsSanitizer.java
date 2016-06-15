@@ -30,9 +30,9 @@ public class UnixCommandLineArgsSanitizer {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
-            for (char caret_char : UNIX_SHELL_CHARS) {
-                if (caret_char == c) {
-                    builder.append("\\");
+            for (char character : UNIX_SHELL_CHARS) {
+                if (character == c) {
+                    builder.append('\\');
                     break;
                 }
             }
