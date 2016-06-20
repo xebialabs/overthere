@@ -131,7 +131,13 @@ public abstract class CmdLineArgument implements Serializable {
 
     private static void encodeArgumentWithSpecialCharactersForWindows(String str, StringBuilder builder) {
         builder.append("\"");
-        builder.append(WindowsCommandLineArgsSanitizer.sanitize(str));
+        for (int j = 0; j < str.length(); j++) {
+            char c = str.charAt(j);
+            if (c == '\"') {
+                builder.append(c);
+            }
+            builder.append(c);
+        }
         builder.append("\"");
     }
 
