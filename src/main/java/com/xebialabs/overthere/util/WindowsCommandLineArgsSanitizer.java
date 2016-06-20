@@ -30,7 +30,7 @@ public class WindowsCommandLineArgsSanitizer {
 
     private static final char[] SLASH_ESCAPE = "\"".toCharArray();
 
-    public static String sanitize(String str) {
+    public static String sanitizeWinrsCommandLineArgs(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
@@ -38,6 +38,18 @@ public class WindowsCommandLineArgsSanitizer {
                 builder.append('^');
             } else if (contains(c, SLASH_ESCAPE)) {
                 builder.append('\\');
+            }
+            builder.append(c);
+        }
+        return builder.toString();
+    }
+
+    public static String sanitize(String str){
+        StringBuilder builder = new StringBuilder();
+        for (int j = 0; j < str.length(); j++) {
+            char c = str.charAt(j);
+            if (c == '\"') {
+                builder.append(c);
             }
             builder.append(c);
         }

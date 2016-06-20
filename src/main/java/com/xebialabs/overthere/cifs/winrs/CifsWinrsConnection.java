@@ -26,7 +26,6 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-import com.xebialabs.overthere.util.WindowsCommandLineArgsSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,10 +95,10 @@ public class CifsWinrsConnection extends CifsConnection {
         final CmdLine winrsCmd = new CmdLine();
         winrsCmd.addArgument("winrs");
         winrsCmd.addArgument("-remote:" + address + ":" + port);
-        winrsCmd.addArgument("-username:" + sanitize(username));
-        winrsCmd.addPassword("-password:" + sanitize(password));
+        winrsCmd.addArgument("-username:" + sanitizeWinrsCommandLineArgs(username));
+        winrsCmd.addPassword("-password:" + sanitizeWinrsCommandLineArgs(password));
         if (workingDirectory != null) {
-            winrsCmd.addArgument("-directory:" + sanitize(workingDirectory.getPath()));
+            winrsCmd.addArgument("-directory:" + sanitizeWinrsCommandLineArgs(workingDirectory.getPath()));
         }
         if (options.getBoolean(WINRS_NOECHO, WINRS_NOECHO_DEFAULT)) {
             winrsCmd.addArgument("-noecho");
