@@ -51,8 +51,6 @@ abstract class SshSftpConnection extends SshConnection {
     @Override
     protected void connect() {
         super.connect();
-
-        sharedSftpClient = connectSftp();
     }
 
     @Override
@@ -73,6 +71,9 @@ abstract class SshSftpConnection extends SshConnection {
     }
 
     SFTPClient getSharedSftpClient() {
+        if ( sharedSftpClient == null ) {
+            sharedSftpClient = connectSftp();
+        }
         return sharedSftpClient;
     }
 
