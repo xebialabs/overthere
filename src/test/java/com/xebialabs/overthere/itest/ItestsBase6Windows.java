@@ -196,6 +196,19 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
+    @Assumption(methods = {"onWindows", "supportsProcess"})
+    public void shouldStartProcessCommandWithSpecialCharactersOnWindows() throws IOException, InterruptedException {
+        OverthereProcess p = connection.startProcess(CmdLine.build("echo hello|<>&^"));
+        try {
+            String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
+            assertThat(p.waitFor(), equalTo(0));
+            assertThat(commandOutput, containsString("hello|<>&^"));
+        } finally {
+            p.waitFor();
+        }
+    }
+
+    @Test
     @Assumption(methods = {"onWindows", "supportsProcess", "notSftpCygwin", "notSftpWinsshd"})
     public void shouldStartProcessInteractiveCommandOnWindows() throws IOException, InterruptedException {
         OverthereFile scriptToRun = connection.getTempFile("echo.ps1");

@@ -22,26 +22,23 @@
  */
 package com.xebialabs.overthere.local;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.xebialabs.overthere.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
+import java.io.File;
+import java.io.IOException;
+
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
-import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.*;
 import static java.lang.String.format;
 
 /**
@@ -168,9 +165,11 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     }
 
     private CmdLine getCmdForWindows(final CmdLine cmd) {
-        CmdLine c = CmdLine.build("cmd", "/c");
+        CmdLine c = CmdLine.build("cmd", "/s", "/c");
+        c.add(CmdLineArgument.arg("\""));
         c.add(cmd.getArguments());
-        return c;
+        c.add(CmdLineArgument.arg("\""));
+        return cmd;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
