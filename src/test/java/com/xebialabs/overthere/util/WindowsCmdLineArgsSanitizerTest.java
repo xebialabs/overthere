@@ -30,8 +30,6 @@ public class WindowsCmdLineArgsSanitizerTest {
 
     final String CARET_ESCAPE = "|<>&^\r";
 
-    final String SLASH_ESCAPE = "\"";
-
     @Test
     public void shouldEscapeAmpersandsInACommandLineArgument() {
         String arg = "Password+-&";
@@ -49,14 +47,6 @@ public class WindowsCmdLineArgsSanitizerTest {
         String arg = "Password";
         for (char c : CARET_ESCAPE.toCharArray()) {
             assertEquals("Password^" + c, WindowsCommandLineArgsSanitizer.sanitize(arg + c));
-        }
-    }
-
-    @Test
-    public void shouldReplaceAllCaratEscapeCharsWithSlashInACommandLineArg() {
-        String arg = "Password";
-        for (char c : SLASH_ESCAPE.toCharArray()) {
-            assertEquals("Password\\" + c, WindowsCommandLineArgsSanitizer.sanitize(arg + c));
         }
     }
 
