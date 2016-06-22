@@ -28,16 +28,12 @@ public class WindowsCommandLineArgsSanitizer {
 
     private static final char[] CARET_ESCAPE = "|<>&^\r\n".toCharArray();
 
-    private static final char[] SLASH_ESCAPE = "\"".toCharArray();
-
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
             if (contains(c, CARET_ESCAPE)) {
                 builder.append('^');
-            } else if (contains(c, SLASH_ESCAPE)) {
-                builder.append('\\');
             }
             builder.append(c);
         }
@@ -54,7 +50,7 @@ public class WindowsCommandLineArgsSanitizer {
     }
 
     public static boolean containsAnySpecialChars(String str) {
-        return containsAnySpecialCharacter(str, SLASH_ESCAPE) || containsAnySpecialCharacter(str, CARET_ESCAPE) || str.contains(WHITE_SPACE);
+        return containsAnySpecialCharacter(str, CARET_ESCAPE) || str.contains(WHITE_SPACE);
     }
 
     private static boolean containsAnySpecialCharacter(String str,char[] chars) {
