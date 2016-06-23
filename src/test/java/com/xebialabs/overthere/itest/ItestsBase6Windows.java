@@ -128,13 +128,11 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
-    @Assumption(methods = {"onWindows"})
+    @Assumption(methods = {"onWindows", "notLocal"})
     public void shouldExecuteCommandWithSpecialCharactersOnWindows() throws IOException, InterruptedException {
-        OverthereFile scriptToRun = connection.getTempFile("helloworld.bat");
-        writeData(scriptToRun, ("@echo hello|<>&^").getBytes("UTF-8"));
-
         CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
-        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build(scriptToRun.getPath()));
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("echo hello|<>&^"));
+        assertThat(res, equalTo(0));
         assertThat(capturingHandler.getOutput(), containsString("hello|<>&^"));
     }
 
