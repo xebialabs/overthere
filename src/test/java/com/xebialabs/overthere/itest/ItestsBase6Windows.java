@@ -128,7 +128,7 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
-    @Assumption(methods = {"onWindows", "notLocal"})
+    @Assumption(methods = {"onWindows"})
     public void shouldExecuteCommandWithSpecialCharactersOnWindows() throws IOException, InterruptedException {
         CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
         int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build("echo hello|<>&^"));

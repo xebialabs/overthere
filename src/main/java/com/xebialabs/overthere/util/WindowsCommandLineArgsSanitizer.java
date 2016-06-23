@@ -24,15 +24,13 @@ package com.xebialabs.overthere.util;
 
 public class WindowsCommandLineArgsSanitizer {
 
-    public static final String WHITE_SPACE = " ";
-
-    private static final char[] CARET_ESCAPE = "|<>&^\r\n".toCharArray();
+    private static final char[] SPECIAL_CHARS = "|<>&^\r\n".toCharArray();
 
     public static String sanitize(String str) {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
-            if (contains(c, CARET_ESCAPE)) {
+            if (contains(c, SPECIAL_CHARS)) {
                 builder.append('^');
             }
             builder.append(c);
@@ -50,15 +48,12 @@ public class WindowsCommandLineArgsSanitizer {
     }
 
     public static boolean containsAnySpecialChars(String str) {
-        return containsAnySpecialCharacter(str, CARET_ESCAPE) || str.contains(WHITE_SPACE);
-    }
-
-    private static boolean containsAnySpecialCharacter(String str,char[] chars) {
-        for (char c : chars) {
+        for (char c : SPECIAL_CHARS) {
             if (str.indexOf(c) >= 0) {
                 return true;
             }
         }
         return false;
     }
+
 }

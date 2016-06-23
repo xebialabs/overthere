@@ -143,6 +143,14 @@ public class CmdLineTest {
     }
 
     @Test
+    public void shouldNotEncodeOnlyWhenToCommandLineIsCalled(){
+        CmdLine cmdLine = new CmdLine();
+        cmdLine.addArgument("-password:" + "P@ssword+-&");
+        assertThat(cmdLine.getArguments().get(0).toString(WINDOWS, false), equalTo("-password:P@ssword+-&"));
+        assertThat(cmdLine.toCommandLine(WINDOWS,false), equalTo("-password:P@ssword+-^&"));
+    }
+
+    @Test
     public void shouldEncodeNestedRaw() {
         CmdLine nestedCommandLine = new CmdLine().addArgument("rm").addRaw("*");
         assertThat(nestedCommandLine.toCommandLine(UNIX, false), equalTo("rm *"));
