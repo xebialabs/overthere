@@ -128,6 +128,17 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     }
 
     @Test
+    @Assumption(methods = {"onWindows"})
+    public void shouldExecuteCommandWithSpecialCharactersOnWindows() throws IOException, InterruptedException {
+        OverthereFile scriptToRun = connection.getTempFile("helloworld.bat");
+        writeData(scriptToRun, ("@echo hello|<>&^").getBytes("UTF-8"));
+
+        CapturingOverthereExecutionOutputHandler capturingHandler = capturingHandler();
+        int res = connection.execute(multiHandler(loggingOutputHandler(logger), capturingHandler), loggingErrorHandler(logger), CmdLine.build(scriptToRun.getPath()));
+        assertThat(capturingHandler.getOutput(), containsString("hello|<>&^"));
+    }
+
+    @Test
     @Assumption(methods = {"onWindows", "onlySftpCygwin"})
     public void shouldExecuteSimpleCommandInWorkingDirectoryOnWindowsWithSftpCygwin() {
         connection.setWorkingDirectory(connection.getFile("C:\\WINDOWS"));
@@ -190,19 +201,6 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
             assertThat(p.waitFor(), equalTo(0));
             assertThat(commandOutput, not(containsString("ipconfig")));
             assertThat(commandOutput, containsString("Windows IP Configuration"));
-        } finally {
-            p.waitFor();
-        }
-    }
-
-    @Test
-    @Assumption(methods = {"onWindows", "supportsProcess"})
-    public void shouldStartProcessCommandWithSpecialCharactersOnWindows() throws IOException, InterruptedException {
-        OverthereProcess p = connection.startProcess(CmdLine.build("echo hello|<>&^"));
-        try {
-            String commandOutput = CharStreams.toString(new InputStreamReader(p.getStdout()));
-            assertThat(p.waitFor(), equalTo(0));
-            assertThat(commandOutput, containsString("hello|<>&^"));
         } finally {
             p.waitFor();
         }

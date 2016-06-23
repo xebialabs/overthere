@@ -169,7 +169,7 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
         c.add(CmdLineArgument.arg("\""));
         c.add(cmd.getArguments());
         c.add(CmdLineArgument.arg("\""));
-        return cmd;
+        return c;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
