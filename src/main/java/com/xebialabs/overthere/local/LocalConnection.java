@@ -28,7 +28,6 @@ import com.xebialabs.overthere.spi.BaseOverthereConnection;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-import com.xebialabs.overthere.util.WindowsCommandLineArgsSanitizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
