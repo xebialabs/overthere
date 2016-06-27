@@ -24,7 +24,7 @@ package com.xebialabs.overthere.util;
 
 public class WindowsCommandLineArgsSanitizer {
 
-    private static final char[] SPECIAL_CHARS = "|<>&^\r\n".toCharArray();
+    private static final char[] SPECIAL_CHARS = " |<>&^\r\n".toCharArray();
 
     private static final String WHITE_SPACE = " ";
 
