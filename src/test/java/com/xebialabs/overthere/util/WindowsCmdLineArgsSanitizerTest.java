@@ -37,6 +37,12 @@ public class WindowsCmdLineArgsSanitizerTest {
     }
 
     @Test
+    public void shouldQuoteArgumentIfItContainsWhiteSpaces(){
+        String arg = "hello+-& world";
+        assertEquals("\"hello+-& world\"", WindowsCommandLineArgsSanitizer.sanitize(arg));
+    }
+
+    @Test
     public void shouldEscapeAllInstancesOfAmpersandFromCommandLineArg() {
         String arg = "Password&&+-&";
         assertEquals("Password^&^&+-^&", WindowsCommandLineArgsSanitizer.sanitize(arg));
