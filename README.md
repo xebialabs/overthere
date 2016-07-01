@@ -1101,6 +1101,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.3.3 (1-Jul-2016)
+    * Fixed execution of commands on Winrm Native connection if arguments contain special characters.
 * Overthere 4.3.2 (12-Apr-2016)
     * Fixed execution of some commands on localhost when the OS is Windows.
     * Upgraded to SSH/J 0.16.0.
