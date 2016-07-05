@@ -100,7 +100,7 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
-    private static final Config config = new DefaultConfig();
+    protected final Config config = new DefaultConfig();
 
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
