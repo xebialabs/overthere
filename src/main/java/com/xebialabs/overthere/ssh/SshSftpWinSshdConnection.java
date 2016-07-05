@@ -46,6 +46,13 @@ class SshSftpWinSshdConnection extends SshSftpConnection {
     }
 
     @Override
+    protected void connect() {
+        // In WinSSHd we have to wait for the server ident before sending our ident.
+        config.setWaitForServerIdentBeforeSendingClientIdent(true);
+        super.connect();
+    }
+
+    @Override
     protected String pathToSftpPath(String path) {
         String translatedPath;
         if (path.length() >= 2 && path.charAt(1) == ':') {
