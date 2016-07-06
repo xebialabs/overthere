@@ -149,8 +149,12 @@ public abstract class ItestsBase1Utils {
     }
 
     protected void checkConnected(String assumptionName) throws IllegalStateException {
-        if(setupException != null) {
+        if (setupException != null) {
             throw new IllegalStateException("Cannot check " + assumptionName + " assumption because an exception was thrown while setting up the connection", setupException);
+        }
+
+        if (connection == null) {
+            throw new IllegalStateException("There was no exception, but still the connection was null while checking the " + assumptionName + " assumption");
         }
     }
 
