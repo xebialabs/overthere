@@ -53,7 +53,7 @@ dependencies {
   compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 
   // SSH
-  compile 'com.hierynomus:sshj:0.17.1'
+  compile 'com.hierynomus:sshj:0.17.2'
   runtime 'com.jcraft:jzlib:1.0.7'
   runtime 'org.bouncycastle:bcprov-jdk15on:1.52'
 
