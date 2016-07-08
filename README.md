@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.3.2%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.3.3%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.3.2</version>
+			<version>4.3.3</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1101,9 +1101,10 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
-* Overthere 4.3.3 (1-Jul-2016)
-    * Merged [#172](https://github.com/xebialabs/overthere/pull/172): Fixed startProcess for SFTP on WinSSHd
-    * Fixed execution of commands on Winrm Native connection if arguments contain special characters.
+* Overthere 4.3.3 (8-Jul-2016)
+    * Fixed [#172](https://github.com/xebialabs/overthere/pull/172), [#176](https://github.com/xebialabs/overthere/issues/176) and [#182](https://github.com/xebialabs/overthere/issues/182).
+    * Fixed bug where execution of commands on WINRM_NATIVE connections would fail if an argument contained special characters.
+    * Upgraded to SSH/J 0.17.2 (includes fix for [SSH/J issue #252](https://github.com/hierynomus/sshj/issues/252)).
 * Overthere 4.3.2 (12-Apr-2016)
     * Fixed execution of some commands on localhost when the OS is Windows.
     * Upgraded to SSH/J 0.16.0.
