@@ -1113,16 +1113,16 @@ The `jumpstation` connection options support the same values (for as much as it 
     * Added support for creating [SSH connections over HTTP proxies](http://www.linuxhowtos.org/Security/sshproxy.htm).
     * Removed `TUNNEL` SSH connection type in favour of the new `ssh-jumpstation` protocol.
     * Upgraded to SSH/J 0.15.0.
-    * Merged [#168](https://github.com/xebialabs/overthere/pull/168) and [#169](https://github.com/xebialabs/overthere/pull/169).
+    * Fixed [#168](https://github.com/xebialabs/overthere/pull/168) and [#169](https://github.com/xebialabs/overthere/pull/169).
 * Overthere 4.1.2 (23-Oct-2015)
     * *NOTE:* This release contains the same code as 4.2.1, except for all the library upgrades of 4.2.0
-    * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
+    * Fixed [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.1 (21-Oct-2015)
-    * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
+    * Fixed [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.0 (06-Oct-2015)
-    * Upgraded to Java 7
-    * Additional debug logging when closing streams
-    * Fix typo in logging of WsmanSPNegoSchemeFactory
+    * Upgraded to Java 7.
+    * Added more debug logging when closing streams.
+    * Fix typo in logging of ``WsmanSPNegoSchemeFactory``
     * Upgraded to scannit 1.4.0, fixes Java8 compatibility.
     * Upgraded to bouncy castle 1.52.
     * Upgraded to commons-net 3.3.
@@ -1138,7 +1138,7 @@ The `jumpstation` connection options support the same values (for as much as it 
     * `Disconnected from local:` messages are now logged at DEBUG level instead of INFO level.
     * Upgraded to SSH/J 0.13.0.
 * Overthere 4.0.1 (02-Jun-2015)
-    * Correct fix for [#153](https://github.com/xebialabs/overthere/issues/153)
+    * Implemented correct fix for [#153](https://github.com/xebialabs/overthere/issues/153).
 * Overthere 4.0.0 (17-Apr-2015)
     * The binary incompatibility introduced in Overthere 2.4.7 and present in 2.4.8 and 3.0.0 was breaking too many libraries and too much code using Overthere. We've reverted the breaking change so that `LocalFile.valueOf` once again returns an `OverthereFile` and added a new `LocalFile.from` method which returns a `LocalFile`. Because this version is binary incompatible with 3.0.0 we had to bump the major version _again_ but this is one _is_ binary compatible with Overthere 2.4.6 and below.
 * Overthere 3.0.0 (14-Apr-2015)
@@ -1151,13 +1151,12 @@ The `jumpstation` connection options support the same values (for as much as it 
     * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
     * Upgraded Scannit to 1.3.1.
     * Checking whether the CifsFile.getParentFile() is valid, fixes [#153](https://github.com/xebialabs/overthere/issues/153)
-    * Merged [#145](https://github.com/xebialabs/overthere/issues/145) which adds support for using kerberos ticket cache
+    * Fixed [#145](https://github.com/xebialabs/overthere/issues/145).
 * Overthere 2.4.7 (02-Feb-2015)
     * *Please do not use this version of Overthere as it is not binary compatible with Overthere 2.4.6 and lower. Please use Overthere 4.0.0 and up.*
     * Upgraded SSHJ to 0.11.0.
     * Changed return type of `LocalFile.valueOf(java.io.File)` from `OverthereFile` to `LocalFile`. This breaks binary compatibility with Overthere 2.4.6.
-    * Merged [#146](https://github.com/xebialabs/overthere/issues/146) which prevents SshSftpConnection from throwing exception if it was closed
-    * Merged [#139](https://github.com/xebialabs/overthere/issues/139) which adds support for private key contents as string
+    * Fixed [#139](https://github.com/xebialabs/overthere/issues/139) and [#146](https://github.com/xebialabs/overthere/issues/146).
 * Overthere 2.4.6 (09-Jan-2015)
     * Upgraded Scannit to 1.3.0 to remove transitive Guava dependency.
     * Upgraded Gradle to 2.2.1.
