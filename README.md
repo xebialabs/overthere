@@ -1101,6 +1101,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.2.2 (12-Jul-2016)
+    * Upgraded to SSH/J 0.17.2 (includes fix for [SSH/J issue #252](https://github.com/hierynomus/sshj/issues/252)).
 * Overthere 4.3.3 (8-Jul-2016)
     * Fixed [#172](https://github.com/xebialabs/overthere/pull/172), [#176](https://github.com/xebialabs/overthere/issues/176) and [#182](https://github.com/xebialabs/overthere/issues/182).
     * Fixed bug where execution of commands on WINRM_NATIVE connections would fail if an argument contained special characters.
