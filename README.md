@@ -42,7 +42,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.2.1%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.2.2%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -52,7 +52,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.2.1</version>
+			<version>4.2.2</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1053,6 +1053,8 @@ When using a jumpstation to connect to the remote host, Overthere will dynamical
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.2.2 (12-Jul-2016)
+    * Upgraded to SSH/J 0.17.2 (includes fix for [SSH/J issue #252](https://github.com/hierynomus/sshj/issues/252)).
 * Overthere 4.2.1 (21-Oct-2015)
     * Merged [#165](https://github.com/xebialabs/overthere/issues/165): Fixed slowness of SFTP copy operation(s).
 * Overthere 4.2.0 (06-Oct-2015)
