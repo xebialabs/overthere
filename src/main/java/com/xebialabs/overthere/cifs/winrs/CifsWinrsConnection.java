@@ -26,8 +26,6 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
@@ -39,9 +37,9 @@ import static java.lang.String.format;
  */
 public class CifsWinrsConnection extends CifsConnection {
 
-    private ConnectionOptions options;
+    private WinrsConnection connection;
 
-    private OverthereConnection winrsProxyConnection;
+    private ConnectionOptions options;
 
     public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
@@ -54,10 +52,11 @@ public class CifsWinrsConnection extends CifsConnection {
 
     @Override
     public void connect() {
-        connectToWinrsProxy(options);
+        connection = new WinrsConnection(options, mapper, workingDirectory);
+        connection.connectToWinrsProxy(options);
 
-        if (winrsProxyConnection.getHostOperatingSystem() != WINDOWS) {
-            disconnectFromWinrsProxy();
+        if (connection.getWinrsProxyConnection().getHostOperatingSystem() != WINDOWS) {
+            connection.disconnectFromWinrsProxy();
             throw new IllegalArgumentException(format("Cannot create a " + CIFS_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }
 
@@ -66,62 +65,11 @@ public class CifsWinrsConnection extends CifsConnection {
 
     @Override
     public void doClose() {
-        disconnectFromWinrsProxy();
-    }
-
-    private void connectToWinrsProxy(ConnectionOptions options) {
-        logger.debug("Connecting to winrs proxy");
-
-        String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, WINRS_PROXY_PROTOCOL_DEFAULT);
-        ConnectionOptions winrsProxyConnectionOptions = options.get(WINRS_PROXY_CONNECTION_OPTIONS, new ConnectionOptions());
-        winrsProxyConnection = Overthere.getConnection(winrsProxyProtocol, winrsProxyConnectionOptions);
-    }
-
-    private void disconnectFromWinrsProxy() {
-        logger.debug("Disconnecting from winrs proxy");
-
-        closeQuietly(winrsProxyConnection);
+        connection.disconnectFromWinrsProxy();
     }
 
     @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
-        checkNotNull(cmd, "Cannot execute null command line");
-        checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
-
-        final String obfuscatedCmd = cmd.toCommandLine(os, true);
-        logger.info("Starting command [{}] on [{}]", obfuscatedCmd, this);
-
-        final CmdLine winrsCmd = new CmdLine();
-        winrsCmd.addArgument("winrs");
-        winrsCmd.addArgument("-remote:" + address + ":" + port);
-        winrsCmd.addArgument("-username:" + username);
-        winrsCmd.addPassword("-password:" + password);
-        if (workingDirectory != null) {
-            winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
-        }
-        if (options.getBoolean(WINRS_NOECHO, WINRS_NOECHO_DEFAULT)) {
-            winrsCmd.addArgument("-noecho");
-        }
-        if (options.getBoolean(WINRS_NOPROFILE, WINRS_NOPROFILE_DEFAULT)) {
-            winrsCmd.addArgument("-noprofile");
-        }
-        if (options.getBoolean(WINRS_ALLOW_DELEGATE, DEFAULT_WINRS_ALLOW_DELEGATE)) {
-            winrsCmd.addArgument("-allowdelegate");
-        }
-        if (options.getBoolean(WINRS_COMPRESSION, WINRS_COMPRESSION_DEFAULT)) {
-            winrsCmd.addArgument("-compression");
-        }
-        if (options.getBoolean(WINRS_UNENCRYPTED, WINRS_UNENCRYPTED_DEFAULT)) {
-            winrsCmd.addArgument("-unencrypted");
-        }
-        if (options.getBoolean(WINRM_ENABLE_HTTPS, WINRM_ENABLE_HTTPS_DEFAULT)) {
-            winrsCmd.addArgument("-usessl");
-        }
-        winrsCmd.add(cmd.getArguments());
-
-        return winrsProxyConnection.startProcess(winrsCmd);
+        return connection.startProcess(cmd);
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(CifsWinrsConnection.class);
-
 }

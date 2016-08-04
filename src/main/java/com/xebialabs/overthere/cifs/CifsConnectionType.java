@@ -22,6 +22,11 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import com.xebialabs.overthere.ConnectionOptions;
+
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;
+
 /**
  * Enumeration of CIFS connection types.
  */
@@ -41,6 +46,22 @@ public enum CifsConnectionType {
      * A CIFS connection  to a Windows host that uses the <code>winrs</code> command native to Windows to execute commands.
      * <em>N.B.:</em> This implementation only works when Overthere runs on Windows.
      */
-    WINRM_NATIVE
+    WINRM_NATIVE;
+
+    public int getDefaultPort(ConnectionOptions options) {
+        switch (this) {
+            case TELNET:
+                return PORT_DEFAULT_TELNET;
+            case WINRM_INTERNAL:
+            case WINRM_NATIVE:
+                if (!options.getBoolean(WINRM_ENABLE_HTTPS, WINRM_ENABLE_HTTPS_DEFAULT)) {
+                    return PORT_DEFAULT_WINRM_HTTP;
+                } else {
+                    return PORT_DEFAULT_WINRM_HTTPS;
+                }
+            default:
+                throw new IllegalArgumentException("Unknown CIFS connection type " + this);
+        }
+    }
 
 }
