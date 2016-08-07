@@ -19,7 +19,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
-class TelnetConnection {
+public class TelnetConnection {
 
     private static final String DETECTABLE_WINDOWS_PROMPT = "TELNET4OVERTHERE ";
 
@@ -38,7 +38,7 @@ class TelnetConnection {
     private String username;
     private CifsConnectionType connectionType = CifsConnectionType.TELNET;
 
-    TelnetConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
+    public TelnetConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
         String unmappedAddress = options.get(ADDRESS);
         int unmappedPort = options.get(PORT, connectionType.getDefaultPort(options));
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
@@ -56,7 +56,7 @@ class TelnetConnection {
         this.workingDirectory = workingDirectory;
     }
 
-    OverthereProcess startProcess(final CmdLine cmd) {
+    public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
 

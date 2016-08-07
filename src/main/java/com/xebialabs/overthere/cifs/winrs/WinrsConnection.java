@@ -17,7 +17,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.net.InetSocketAddress.createUnresolved;
 
-class WinrsConnection {
+public class WinrsConnection {
 
     private OperatingSystemFamily os;
     private OverthereFile workingDirectory;
@@ -30,7 +30,7 @@ class WinrsConnection {
 
     private OverthereConnection winrsProxyConnection;
 
-    WinrsConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
+    public WinrsConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
         this.workingDirectory = workingDirectory;
         this.options = options;
         this.os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
@@ -43,11 +43,11 @@ class WinrsConnection {
         this.password = options.get(PASSWORD);
     }
 
-    OverthereConnection getWinrsProxyConnection() {
+    public OverthereConnection getWinrsProxyConnection() {
         return this.winrsProxyConnection;
     }
 
-    OverthereConnection connectToWinrsProxy(ConnectionOptions options) {
+    public OverthereConnection connectToWinrsProxy(ConnectionOptions options) {
         logger.debug("Connecting to winrs proxy");
 
         String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, WINRS_PROXY_PROTOCOL_DEFAULT);
@@ -56,13 +56,13 @@ class WinrsConnection {
         return winrsProxyConnection;
     }
 
-    void disconnectFromWinrsProxy() {
+    public void disconnectFromWinrsProxy() {
         logger.debug("Disconnecting from winrs proxy");
 
         closeQuietly(winrsProxyConnection);
     }
 
-    OverthereProcess startProcess(final CmdLine cmd) {
+    public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
 

@@ -21,7 +21,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
-class WinRmConnection {
+public class WinRmConnection {
 
     private int connectionTimeoutMillis;
     private int socketTimeoutMillis;
@@ -37,7 +37,7 @@ class WinRmConnection {
     private final String unmappedAddress;
     private final int unmappedPort;
 
-    WinRmConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
+    public WinRmConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
         this.workingDirectory = workingDirectory;
         this.options = options;
         this.mapper = mapper;
@@ -56,7 +56,7 @@ class WinRmConnection {
 
     }
 
-    OverthereProcess startProcess(final CmdLine cmd) {
+    public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
 
