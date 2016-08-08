@@ -237,6 +237,10 @@ public class CifsWinRmConnection extends CifsConnection {
                 @Override
                 public synchronized int exitValue() {
                     if (!processTerminated) {
+                        if(!outputReaderThread.isAlive()){
+                            processTerminated = true;
+                            return winRmClient.exitValue();
+                        }
                         throw new IllegalThreadStateException(format("Process for command [%s] on [%s] is still running", obfuscatedCmd,
                                 CifsWinRmConnection.this));
                     }
