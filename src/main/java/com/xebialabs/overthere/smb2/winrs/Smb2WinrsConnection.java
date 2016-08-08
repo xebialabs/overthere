@@ -20,18 +20,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cmb2.winrs;
+package com.xebialabs.overthere.smb2.winrs;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.winrs.WinrsConnection;
 import com.xebialabs.overthere.smb2.Smb2Connection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
-import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
-import static com.xebialabs.overthere.util.OverthereUtils.*;
+import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 import static java.lang.String.format;
 
 /**
@@ -44,9 +42,10 @@ public class Smb2WinrsConnection extends Smb2Connection {
     private ConnectionOptions options;
 
     public Smb2WinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a machine that is not running Windows", cifsConnectionType.toString().toLowerCase());
-        checkArgument(mapper instanceof DefaultAddressPortMapper, "Cannot create a " + CIFS_PROTOCOL + ":%s connection when connecting through a SSH jumpstation", cifsConnectionType.toString().toLowerCase());
+        super(type, options, mapper, true);
+        ConnectionValidator.assertIsWindowsHost(os, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assetNotThroughJumpstation(mapper, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNoSingleQuoteInPassword(password, SMB2_PROTOCOL, cifsConnectionType);
         this.options = options;
     }
 
@@ -57,7 +56,7 @@ public class Smb2WinrsConnection extends Smb2Connection {
 
         if (connection.getWinrsProxyConnection().getHostOperatingSystem() != WINDOWS) {
             connection.disconnectFromWinrsProxy();
-            throw new IllegalArgumentException(format("Cannot create a " + CIFS_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
+            throw new IllegalArgumentException(format("Cannot create a " + SMB2_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }
 
         connected();

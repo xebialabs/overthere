@@ -62,6 +62,7 @@ dependencies {
 
   // SMB2/3
   compile files('libs/smbj-0.0.4-dev.jar')
+  compile 'net.engio:mbassador:1.2.4.2'
 
   // Telnet
   compile 'commons-net:commons-net:3.3'

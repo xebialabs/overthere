@@ -35,9 +35,6 @@ import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
-import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
-import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 /**
  * Builds CIFS connections.

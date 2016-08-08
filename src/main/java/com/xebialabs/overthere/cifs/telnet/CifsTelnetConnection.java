@@ -24,11 +24,10 @@ package com.xebialabs.overthere.cifs.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 
 
 /**
@@ -51,9 +50,8 @@ public class CifsTelnetConnection extends CifsConnection {
      */
     public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
-        checkArgument(!username.contains("@"), "Cannot create a " + CIFS_PROTOCOL + ":%s connection with a new-style Windows domain account [%s], use DOMAIN\\USER instead.", cifsConnectionType.toString().toLowerCase(), username);
-
+        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotNewStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
         // Make sure that we're properly cleaned up by setting the connected state.
         connected();
     }

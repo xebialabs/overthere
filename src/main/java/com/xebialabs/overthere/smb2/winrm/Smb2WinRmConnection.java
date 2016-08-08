@@ -26,14 +26,12 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
 import com.xebialabs.overthere.smb2.Smb2Connection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 
 /**
  * A connection to a Windows host using SMB2 and a Java implementation of WinRM.
@@ -45,8 +43,9 @@ public class Smb2WinRmConnection extends Smb2Connection {
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public Smb2WinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
+        super(type, options, mapper, true);
+        ConnectionValidator.assertIsWindowsHost(os, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotOldStyleWindowsDomain(username, SMB2_PROTOCOL, cifsConnectionType);
     }
 
     @Override

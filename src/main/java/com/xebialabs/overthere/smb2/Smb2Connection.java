@@ -1,3 +1,25 @@
+/**
+ * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
+ *
+ *
+ * Overthere is licensed under the terms of the GPLv2
+ * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most XebiaLabs Libraries.
+ * There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
+ * this software, see the FLOSS License Exception
+ * <http://github.com/xebialabs/overthere/blob/master/LICENSE>.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software Foundation; version 2
+ * of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this
+ * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
+ * Floor, Boston, MA 02110-1301  USA
+ */
 package com.xebialabs.overthere.smb2;
 
 import com.hierynomus.smbj.DefaultConfig;
@@ -30,19 +52,19 @@ public class Smb2Connection extends BaseOverthereConnection {
     private final SMBClient client;
     private final String hostname;
     private final int smbPort;
-    private final String username;
-    private final String password;
     private final String domain;
     private final String shareName;
     private Connection connection;
     private Session session;
     private DiskShare share;
-    // TODO refactor, backwards compatible connection type for cifs and smb
+    protected final String password;
+
     protected CifsConnectionType cifsConnectionType;
+    protected final String username;
     private int port;
 
-    protected Smb2Connection(String protocol, ConnectionOptions options, AddressPortMapper mapper) {
-        super(protocol, options, mapper, false);
+    protected Smb2Connection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
+        super(protocol, options, mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         if (mapper instanceof ProxyConnection) {
             throw new IllegalArgumentException("Cannot open a smb2:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
@@ -53,11 +75,10 @@ public class Smb2Connection extends BaseOverthereConnection {
         int unmappedPort = options.get(PORT, this.cifsConnectionType.getDefaultPort(options));
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
         hostname = addressPort.getHostName();
-        this.port = addressPort.getPort();
+        port = addressPort.getPort();
 
-        int unmappedSmbPort = options.getInteger(PORT, PORT_DEFAULT_SMB2);
+        int unmappedSmbPort = options.getInteger(SMB2_PORT, PORT_DEFAULT_SMB2);
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
-        port = smbAddressPort.getPort();
         smbPort = smbAddressPort.getPort();
         username = options.get(USERNAME);
         password = options.get(PASSWORD);

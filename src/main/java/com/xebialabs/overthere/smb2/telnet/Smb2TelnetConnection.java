@@ -23,13 +23,12 @@
 package com.xebialabs.overthere.smb2.telnet;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
 import com.xebialabs.overthere.smb2.Smb2Connection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 
 
 /**
@@ -49,8 +48,9 @@ public class Smb2TelnetConnection extends Smb2Connection {
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public Smb2TelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot create a " + SMB2_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
+        super(type, options, mapper, true);
+        ConnectionValidator.assertIsWindowsHost(os, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotNewStyleWindowsDomain(username, SMB2_PROTOCOL, cifsConnectionType);
         connected();
     }
 

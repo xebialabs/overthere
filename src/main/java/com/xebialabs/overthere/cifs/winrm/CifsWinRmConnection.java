@@ -27,10 +27,9 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 
 /**
@@ -46,9 +45,8 @@ public class CifsWinRmConnection extends CifsConnection {
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkArgument(os == WINDOWS, "Cannot create a " + CIFS_PROTOCOL + ":%s connection to a host that is not running Windows", cifsConnectionType.toString().toLowerCase());
-        checkArgument(!username.contains("\\"), "Cannot create a " + CIFS_PROTOCOL + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", cifsConnectionType.toString().toLowerCase(), username);
-
+        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotOldStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
     }
 
     @Override
