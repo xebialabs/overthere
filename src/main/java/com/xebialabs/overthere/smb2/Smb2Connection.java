@@ -22,13 +22,13 @@
  */
 package com.xebialabs.overthere.smb2;
 
+import com.hierynomus.ntlm.NtlmException;
 import com.hierynomus.smbj.DefaultConfig;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
-import com.hierynomus.smbj.share.Share;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -36,11 +36,15 @@ import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.proxy.ProxyConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.Security;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
@@ -53,15 +57,19 @@ public class Smb2Connection extends BaseOverthereConnection {
     private final String hostname;
     private final int smbPort;
     private final String domain;
-    private final String shareName;
     private Connection connection;
     private Session session;
-    private DiskShare share;
-    protected final String password;
+    private int port;
+    private Map<String, DiskShare> shareCache = new ConcurrentHashMap<>();
 
+    protected final String password;
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
-    private int port;
+    private static final String EMPTY = "";
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     protected Smb2Connection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
         super(protocol, options, mapper, canStartProcess);
@@ -82,8 +90,7 @@ public class Smb2Connection extends BaseOverthereConnection {
         smbPort = smbAddressPort.getPort();
         username = options.get(USERNAME);
         password = options.get(PASSWORD);
-        domain = options.getOptional(DOMAIN);
-        shareName = options.get(SHARE);
+        domain = options.get(DOMAIN, EMPTY);
         client = new SMBClient(new DefaultConfig());
     }
 
@@ -92,22 +99,19 @@ public class Smb2Connection extends BaseOverthereConnection {
             connection = client.connect(hostname);
             AuthenticationContext authContext = new AuthenticationContext(username, password.toCharArray(), domain);
             session = connection.authenticate(authContext);
-            Share share = session.connectShare(shareName);
-            if (!(share instanceof DiskShare)) {
-                close();
-                throw new RuntimeIOException("The share " + shareName + " is not a disk share");
-            }
-            this.share = (DiskShare) share;
         } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        } catch (NtlmException e) {
             throw new RuntimeIOException(e);
         }
         connected();
     }
 
-
     @Override
     public OverthereFile getFile(String hostPath) {
-        return new Smb2File(this, hostPath);
+        hostPath = Smb2Paths.escapeForwardSlashes(hostPath);
+        Map<String, String> pathMappings = options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT);
+        return new Smb2File(this, hostPath, pathMappings);
     }
 
     @Override
@@ -118,10 +122,14 @@ public class Smb2Connection extends BaseOverthereConnection {
     @Override
     protected void doClose() {
         try {
-            share.close();
-        } catch (IOException e) {
-            logger.warn("Exception while trying to close smb2 share", e);
+            for (DiskShare s : shareCache.values())
+                try {
+                    s.close();
+                } catch (IOException e) {
+                    logger.warn("Exception while trying to close smb2 share", e);
+                }
         } finally {
+            shareCache.clear();
             try {
                 session.close();
             } catch (IOException e) {
@@ -147,7 +155,16 @@ public class Smb2Connection extends BaseOverthereConnection {
         return "smb:" + cifsConnectionType.toString().toLowerCase() + "://" + username + "@" + hostname + ":" + smbPort + ":" + port;
     }
 
-    DiskShare getShare() {
+    protected DiskShare getShare(String shareName) {
+        DiskShare share = shareCache.get(shareName);
+        if (share == null) {
+            share = (DiskShare) session.connectShare(shareName);
+            if (!(share instanceof DiskShare)) {
+                close();
+                throw new RuntimeIOException("The share " + shareName + " is not a disk share");
+            }
+            shareCache.put(shareName, share);
+        }
         return share;
     }
 

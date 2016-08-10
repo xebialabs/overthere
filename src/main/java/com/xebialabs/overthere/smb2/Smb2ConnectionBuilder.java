@@ -26,9 +26,6 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.ConnectionBuilder;
-import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
-import com.xebialabs.overthere.cifs.winrs.CifsWinrsConnection;
 import com.xebialabs.overthere.smb2.telnet.Smb2TelnetConnection;
 import com.xebialabs.overthere.smb2.winrm.Smb2WinRmConnection;
 import com.xebialabs.overthere.smb2.winrs.Smb2WinrsConnection;
@@ -54,8 +51,6 @@ public class Smb2ConnectionBuilder extends ConnectionBuilder implements Overther
      * The Windows Domain to authenticate the user against. If not set, bla bla bla
      */
     public static final String DOMAIN = "domain";
-
-    public static final String SHARE = "share";
 
     private final Smb2Connection connection;
 
