@@ -51,6 +51,7 @@ public class Smb2WinrsConnection extends Smb2Connection {
 
     @Override
     public void connect() {
+        super.connect();
         connection = new WinrsConnection(options, mapper, workingDirectory);
         connection.connectToWinrsProxy(options);
 

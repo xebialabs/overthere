@@ -57,16 +57,6 @@ public class CifsConnectionBuilder extends ConnectionBuilder implements Overther
      */
     public static final int CIFS_PORT_DEFAULT = 445;
 
-    /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
-     */
-    public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
-
-    /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
-     */
-    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = Collections.emptyMap();
-
     private CifsConnection connection;
 
     public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {

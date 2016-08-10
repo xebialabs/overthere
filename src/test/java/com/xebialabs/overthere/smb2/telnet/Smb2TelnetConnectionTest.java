@@ -46,7 +46,6 @@ public class Smb2TelnetConnectionTest {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
-        options.set(SHARE, "smb-share");
         options.set(PASSWORD, "foobar");
         options.set(PORT, PORT_DEFAULT_TELNET);
         options.set(SMB2_PORT, PORT_DEFAULT_SMB2);

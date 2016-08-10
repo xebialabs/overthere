@@ -53,7 +53,6 @@ public class Smb2WinRsConnectionTest {
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_NATIVE);
         options.set(PASSWORD, "foobar");
-        options.set(SHARE, "smb-share");
         options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
         options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
         options.set(ADDRESS, "localhost");

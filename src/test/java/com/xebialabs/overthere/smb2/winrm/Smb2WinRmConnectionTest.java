@@ -50,7 +50,6 @@ public class Smb2WinRmConnectionTest {
         options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
         options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
         options.set(ADDRESS, "localhost");
-        options.set(SHARE, "smb-share");
     }
 
     @Test

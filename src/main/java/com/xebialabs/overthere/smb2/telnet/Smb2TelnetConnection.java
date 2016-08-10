@@ -56,6 +56,7 @@ public class Smb2TelnetConnection extends Smb2Connection {
 
     @Override
     public void connect() {
+        super.connect();
         connected();
     }
 

@@ -22,16 +22,25 @@
  */
 package com.xebialabs.overthere.smb2.winrm;
 
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnectionOverHttpWithAdministrativeUserItest;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.WindowsCloudHostListener;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.cifs.ConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends CifsWinRmConnectionOverHttpWithAdministrativeUserItest {
+public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
@@ -39,7 +48,18 @@ public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends Cifs
     }
 
     @Override
+    protected ConnectionOptions getOptions() {
+        ConnectionOptions options = new ConnectionOptions();
+        options.set(OPERATING_SYSTEM, WINDOWS);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        return options;
+    }
+
+    @Override
     protected String getExpectedConnectionClassName() {
-        return Smb2WinRmConnection.class.getName();
+        return CifsWinRmConnection.class.getName();
     }
 }

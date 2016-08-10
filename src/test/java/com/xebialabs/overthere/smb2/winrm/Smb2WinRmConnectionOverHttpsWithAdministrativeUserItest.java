@@ -22,16 +22,26 @@
  */
 package com.xebialabs.overthere.smb2.winrm;
 
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnectionOverHttpsWithAdministrativeUserItest;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.WindowsCloudHostListener;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.cifs.ConnectionBuilder.*;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends CifsWinRmConnectionOverHttpsWithAdministrativeUserItest {
+public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
@@ -41,6 +51,20 @@ public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends Cif
     @Override
     protected String getExpectedConnectionClassName() {
         return Smb2WinRmConnection.class.getName();
+    }
+
+    @Override
+    protected ConnectionOptions getOptions() {
+        ConnectionOptions options = new ConnectionOptions();
+        options.set(OPERATING_SYSTEM, WINDOWS);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        options.set(WINRM_ENABLE_HTTPS, true);
+        options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
+        options.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);
+        return options;
     }
 
 }

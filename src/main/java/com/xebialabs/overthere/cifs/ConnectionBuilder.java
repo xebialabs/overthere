@@ -22,6 +22,9 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import java.util.Collections;
+import java.util.Map;
+
 import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
 import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
@@ -222,4 +225,15 @@ public abstract class ConnectionBuilder {
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrsUnencrypted">the online documentation</a>
      */
     public static final boolean WINRS_UNENCRYPTED_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
+     */
+    public static final String PATH_SHARE_MAPPINGS = "pathShareMappings";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_pathShareMappings">the online documentation</a>
+     */
+    public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = Collections.emptyMap();
+
 }

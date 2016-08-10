@@ -30,7 +30,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static java.lang.String.format;
 import static java.util.regex.Pattern.quote;
 
-class PathMapper {
+public class PathMapper {
     private static final String DRIVE_DESIGNATOR = ":";
     private static final String ADMIN_SHARE_DESIGNATOR = "$";
     private static final Pattern ADMIN_SHARE_PATTERN = Pattern.compile("[a-zA-Z]" + quote(ADMIN_SHARE_DESIGNATOR));
@@ -38,7 +38,7 @@ class PathMapper {
     private final SortedMap<String, String> sharesForPaths;
     private final Map<String, String> pathsForShares;
 
-    PathMapper(final Map<String, String> mappings) {
+    public PathMapper(final Map<String, String> mappings) {
         // longest first, so reverse lexicographical order
         SortedMap<String, String> sharesForPath = new TreeMap<String, String>(new Comparator<String>() {
             @Override
@@ -67,7 +67,7 @@ class PathMapper {
      * @param path the local path to convert
      * @return the remotely accessible path (using shares) at which the local path can be accessed using SMB
      */
-    String toSharedPath(String path) {
+    public String toSharedPath(String path) {
         final String lowerCasePath = path.toLowerCase();
         // assumes correct format drive: or drive:\path
         String mappedPathPrefix = null;
@@ -87,7 +87,7 @@ class PathMapper {
      * @param path the remotely accessible path to convert (minus the host name, i.e. beginning with the share)
      * @return the local path (using drive letters) corresponding to the path that is remotely accessible using SMB
      */
-    String toLocalPath(String path) {
+    public String toLocalPath(String path) {
         final String lowerCasePath = path.toLowerCase();
         // assumes correct format share or share\path
         String mappedShare = null;

@@ -22,21 +22,17 @@
  */
 package com.xebialabs.overthere.smb2;
 
+import com.xebialabs.overthere.smb2.winrm.Smb2WinRmConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
+
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.*;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,11 +47,10 @@ public class Smb2FileTest {
     public void setupOptions() {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(CONNECTION_TYPE, WINRM_NATIVE);
         options.set(PASSWORD, "foobar");
         options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
         options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
-        options.set(SHARE, "smb-share");
         options.set(ADDRESS, "localhost");
     }
 
@@ -63,18 +58,16 @@ public class Smb2FileTest {
     @Test
     public void shouldReturnNullForParentFileOfRoot() {
         options.set(USERNAME, "user@domain.com");
-        CifsWinRmConnection cifsWinRmConnection = new CifsWinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
-        OverthereFile file = cifsWinRmConnection.getFile("C:\\");
+        Smb2WinRmConnection smb2WinRmConnection = new Smb2WinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smb2WinRmConnection.getFile("C:\\");
         assertThat(file.getParentFile(), nullValue());
     }
 
     @Test
     public void shouldSucceedForNonRoot() {
         options.set(USERNAME, "user@domain.com");
-        CifsWinRmConnection cifsWinRmConnection = new CifsWinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
-        OverthereFile file = cifsWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
+        Smb2WinRmConnection smb2WinRmConnection = new Smb2WinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smb2WinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
         assertThat(file.getParentFile(), not(nullValue()));
     }
-
-
 }
