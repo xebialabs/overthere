@@ -41,7 +41,6 @@ import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_U
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.DOMAIN;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
@@ -58,10 +57,9 @@ public class Smb2TelnetConnectionWithRegularUserItest extends OverthereConnectio
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
-        options.set(ADDRESS, "192.168.2.184");
-        options.set(USERNAME, "elton");
-        options.set(PASSWORD, "metoni1");
-        options.set(DOMAIN, "ELTON-PC");
+        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
         options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\temp");
         options.set(PATH_SHARE_MAPPINGS, ImmutableMap.of("C:\\overthere", "sharethere"));
         return options;
