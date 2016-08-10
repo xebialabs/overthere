@@ -38,7 +38,7 @@ import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 @Protocol(name = SMB2_PROTOCOL)
 public class Smb2ConnectionBuilder extends ConnectionBuilder implements OverthereConnectionBuilder {
 
-    public static final String SMB2_PROTOCOL = "SMB2";
+    public static final String SMB2_PROTOCOL = "smb2";
 
     /**
      * The default port for SMB2 connections over TCP/IP
