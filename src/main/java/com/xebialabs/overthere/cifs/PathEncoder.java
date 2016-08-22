@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.smb.PathMapper;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
 import static java.lang.String.format;

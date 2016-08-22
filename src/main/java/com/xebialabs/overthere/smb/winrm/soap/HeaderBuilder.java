@@ -20,18 +20,16 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.smb.winrm.soap;
 
 import java.net.URI;
 import java.util.List;
 import org.dom4j.Element;
 import org.dom4j.QName;
 
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_ADDRESSING;
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WSMAN_DMTF;
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WSMAN_MSFT;
-import static com.xebialabs.overthere.cifs.winrm.soap.Soapy.mustUnderstand;
-import static com.xebialabs.overthere.cifs.winrm.soap.Soapy.needNotUnderstand;
+import static com.xebialabs.overthere.smb.winrm.Namespaces.NS_ADDRESSING;
+import static com.xebialabs.overthere.smb.winrm.Namespaces.NS_WSMAN_DMTF;
+import static com.xebialabs.overthere.smb.winrm.Namespaces.NS_WSMAN_MSFT;
 
 public class HeaderBuilder {
     private Element header;
@@ -47,12 +45,12 @@ public class HeaderBuilder {
 
     public HeaderBuilder replyTo(URI address) {
         final Element replyTo = header.addElement(QName.get("ReplyTo", NS_ADDRESSING));
-        mustUnderstand(replyTo.addElement(QName.get("Address", NS_ADDRESSING))).addText(address.toString());
+        Soapy.mustUnderstand(replyTo.addElement(QName.get("Address", NS_ADDRESSING))).addText(address.toString());
         return this;
     }
 
     public HeaderBuilder maxEnvelopeSize(int size) {
-        mustUnderstand(header.addElement(QName.get("MaxEnvelopeSize", NS_WSMAN_DMTF))).addText("" + size);
+        Soapy.mustUnderstand(header.addElement(QName.get("MaxEnvelopeSize", NS_WSMAN_DMTF))).addText("" + size);
         return this;
     }
 
@@ -62,8 +60,8 @@ public class HeaderBuilder {
     }
 
     public HeaderBuilder withLocale(String locale) {
-        needNotUnderstand(header.addElement(QName.get("Locale", NS_WSMAN_DMTF))).addAttribute("xml:lang", locale);
-        needNotUnderstand(header.addElement(QName.get("DataLocale", NS_WSMAN_MSFT))).addAttribute("xml:lang", locale);
+        Soapy.needNotUnderstand(header.addElement(QName.get("Locale", NS_WSMAN_DMTF))).addAttribute("xml:lang", locale);
+        Soapy.needNotUnderstand(header.addElement(QName.get("DataLocale", NS_WSMAN_MSFT))).addAttribute("xml:lang", locale);
         return this;
     }
 
@@ -73,7 +71,7 @@ public class HeaderBuilder {
     }
 
     public HeaderBuilder withAction(URI uri) {
-        mustUnderstand(header.addElement(QName.get("Action", NS_ADDRESSING))).addText(uri.toString());
+        Soapy.mustUnderstand(header.addElement(QName.get("Action", NS_ADDRESSING))).addText(uri.toString());
         return this;
     }
 
@@ -85,7 +83,7 @@ public class HeaderBuilder {
     }
 
     public HeaderBuilder withResourceURI(URI uri) {
-        mustUnderstand(header.addElement(QName.get("ResourceURI", NS_WSMAN_DMTF))).addText(uri.toString());
+        Soapy.mustUnderstand(header.addElement(QName.get("ResourceURI", NS_WSMAN_DMTF))).addText(uri.toString());
         return this;
     }
 

@@ -35,7 +35,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
-import static com.xebialabs.overthere.cifs.ConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.smb.ConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 
 @Test

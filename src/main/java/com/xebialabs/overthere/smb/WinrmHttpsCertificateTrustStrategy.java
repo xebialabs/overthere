@@ -20,43 +20,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.smb;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_SOAP_ENV;
+public enum WinrmHttpsCertificateTrustStrategy {
+    STRICT(null),
+    SELF_SIGNED(new TrustSelfSignedStrategy()),
+    ALLOW_ALL(new TrustStrategy() {
+        @Override
+        public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {
+            return true;
+        }
+    });
 
-public class SoapMessageBuilder {
+    private TrustStrategy strategy;
 
-    private Document doc = DocumentHelper.createDocument();
-
-    public EnvelopeBuilder envelope() {
-        Element envelope = doc.addElement(QName.get("Envelope", NS_SOAP_ENV));
-        return new EnvelopeBuilder(envelope);
+    private WinrmHttpsCertificateTrustStrategy(TrustStrategy strategy) {
+        this.strategy = strategy;
     }
 
-    public class EnvelopeBuilder {
-        private Element envelope;
-
-        public EnvelopeBuilder(Element envelope) {
-            this.envelope = envelope;
-        }
-
-        public HeaderBuilder header() {
-            Element header = envelope.addElement(QName.get("Header", NS_SOAP_ENV));
-            return new HeaderBuilder(header);
-        }
-
-        public BodyBuilder body() {
-            Element body = envelope.addElement(QName.get("Body", NS_SOAP_ENV));
-            return new BodyBuilder(body);
-        }
-    }
-
-    public Document getDocument() {
-        return doc;
+    public TrustStrategy getStrategy() {
+        return strategy;
     }
 }

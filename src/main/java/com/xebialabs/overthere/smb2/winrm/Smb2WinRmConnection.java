@@ -26,8 +26,8 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
-import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
+import com.xebialabs.overthere.smb.ConnectionValidator;
+import com.xebialabs.overthere.smb.winrm.WinRmConnection;
 import com.xebialabs.overthere.smb2.Smb2Connection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 

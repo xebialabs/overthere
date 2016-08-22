@@ -255,11 +255,16 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
     @Override
     public void deleteRecursively() {
         String sharePath = getPathOnShare();
-        logger.debug("deleting directory recursively {}", sharePath);
-        try {
-            getShare().rmdir(sharePath, true);
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot delete recursively %s: %s", sharePath, e.toString()), e);
+        if (isFile()) {
+            logger.debug("deleting file {}", sharePath);
+            delete();
+        } else {
+            logger.debug("deleting directory recursively {}", sharePath);
+            try {
+                getShare().rmdir(sharePath, true);
+            } catch (TransportException e) {
+                throw new RuntimeIOException(format("Cannot delete recursively %s: %s", sharePath, e.toString()), e);
+            }
         }
     }
 
@@ -301,7 +306,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
     public void mkdirs() {
         String sharePath = getPathOnShare();
         logger.debug("Creating directories {}", sharePath);
-        String [] paths = Smb2Paths.getPathListFromOuterToInner(sharePath);
+        String[] paths = Smb2Paths.getPathListFromOuterToInner(sharePath);
         for (String p : paths) {
             if (!getShare().folderExists(p))
                 makeDirectory(p);

@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import com.xebialabs.overthere.smb.PathMapper;
 import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
 

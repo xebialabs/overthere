@@ -25,7 +25,7 @@ package com.xebialabs.overthere.smb2;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.cifs.ConnectionBuilder;
+import com.xebialabs.overthere.smb.ConnectionBuilder;
 import com.xebialabs.overthere.smb2.telnet.Smb2TelnetConnection;
 import com.xebialabs.overthere.smb2.winrm.Smb2WinRmConnection;
 import com.xebialabs.overthere.smb2.winrs.Smb2WinrsConnection;

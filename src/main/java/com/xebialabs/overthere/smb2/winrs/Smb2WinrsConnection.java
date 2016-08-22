@@ -23,8 +23,8 @@
 package com.xebialabs.overthere.smb2.winrs;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
-import com.xebialabs.overthere.cifs.winrs.WinrsConnection;
+import com.xebialabs.overthere.smb.ConnectionValidator;
+import com.xebialabs.overthere.smb.winrs.WinrsConnection;
 import com.xebialabs.overthere.smb2.Smb2Connection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 

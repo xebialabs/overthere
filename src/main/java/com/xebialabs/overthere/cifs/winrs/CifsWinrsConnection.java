@@ -24,7 +24,8 @@ package com.xebialabs.overthere.cifs.winrs;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
+import com.xebialabs.overthere.smb.ConnectionValidator;
+import com.xebialabs.overthere.smb.winrs.WinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
