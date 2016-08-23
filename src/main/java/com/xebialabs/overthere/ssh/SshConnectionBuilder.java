@@ -524,7 +524,11 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     @Override
     public OverthereConnection connect() {
-        connection.connect();
+        try {
+            connection.connect();
+        } catch (Exception e) {
+            connection.connect();
+        }
         return connection;
     }
 
