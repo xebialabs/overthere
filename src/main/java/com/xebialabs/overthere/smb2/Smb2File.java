@@ -90,17 +90,17 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
     @Override
     public boolean canRead() {
-        return checkAccessMask(AccessMask.GENERIC_READ);
+        return checkAccessMask(AccessMask.FILE_READ_DATA);
     }
 
     @Override
     public boolean canWrite() {
-        return checkAccessMask(AccessMask.GENERIC_WRITE);
+        return checkAccessMask(AccessMask.FILE_APPEND_DATA);
     }
 
     @Override
     public boolean canExecute() {
-        return checkAccessMask(AccessMask.GENERIC_EXECUTE);
+        return canRead();
     }
 
     @Override
