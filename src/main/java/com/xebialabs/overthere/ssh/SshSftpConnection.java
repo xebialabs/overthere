@@ -55,12 +55,10 @@ abstract class SshSftpConnection extends SshConnection {
 
     @Override
     public void doClose() {
-        if (null == sharedSftpClient) {
-            return;
+        if (sharedSftpClient != null) {
+            disconnectSftp(sharedSftpClient);
+            sharedSftpClient = null;
         }
-
-        disconnectSftp(sharedSftpClient);
-        sharedSftpClient = null;
 
         super.doClose();
     }
