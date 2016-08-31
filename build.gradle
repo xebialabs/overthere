@@ -1,3 +1,23 @@
+/*
+ * Release and publish instructions:
+ *
+ * Overthere can be automatically "closed" and "promoted" on maven central by calling gradle tasks
+ * closeRepository, promoteRepository or closeAndPromoteRepository. Archives need to be uploaded manually.
+ *
+ * For example:
+ * gradle clean build signArchives uploadArchives closeAndPromoteRepository
+ *
+ * prerequisites: Published PGP key installed and configured, authorised sonatype username and password configured
+ */
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+  }
+}
+
 // build.gradle for Overthere
 plugins {
     id "com.github.hierynomus.license" version "0.11.0"
@@ -13,6 +33,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'license'
+apply plugin: 'io.codearte.nexus-staging'
 
 repositories {
   mavenCentral()
@@ -152,6 +173,10 @@ license {
 signing {
   required { gradle.taskGraph.hasTask('uploadArchives') }
   sign configurations.archives
+}
+
+nexusStaging {
+  packageGroup = "com.xebialabs"
 }
 
 uploadArchives {
