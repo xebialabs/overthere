@@ -242,3 +242,9 @@ def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
     systemProperties[name] = project.getProperty(name)
   }
 }
+
+task dumpVersion << {
+  file(buildDir).mkdirs()
+  def out = file("$buildDir/version.dump")
+  out.write("version=$project.version")
+}
