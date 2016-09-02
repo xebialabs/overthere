@@ -48,7 +48,7 @@ public class Smb2ConnectionBuilder extends ConnectionBuilder implements Overther
     public static final String SMB2_PORT = "cifsPort";
 
     /**
-     * The Windows Domain to authenticate the user against. If not set, bla bla bla
+     * The Windows Domain to authenticate the user against. If not set blank value will be used
      */
     public static final String DOMAIN = "domain";
 

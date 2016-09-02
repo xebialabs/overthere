@@ -49,11 +49,6 @@ public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends Ove
     }
 
     @Override
-    protected String getExpectedConnectionClassName() {
-        return Smb2WinRmConnection.class.getName();
-    }
-
-    @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
@@ -67,4 +62,8 @@ public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends Ove
         return options;
     }
 
+    @Override
+    protected String getExpectedConnectionClassName() {
+        return Smb2WinRmConnection.class.getName();
+    }
 }

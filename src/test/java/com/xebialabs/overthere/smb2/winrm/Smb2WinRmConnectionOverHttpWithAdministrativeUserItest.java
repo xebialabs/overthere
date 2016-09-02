@@ -23,7 +23,6 @@
 package com.xebialabs.overthere.smb2.winrm;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -60,6 +59,6 @@ public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends Over
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return CifsWinRmConnection.class.getName();
+        return Smb2WinRmConnection.class.getName();
     }
 }
