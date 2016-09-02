@@ -20,10 +20,9 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb;
+package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 

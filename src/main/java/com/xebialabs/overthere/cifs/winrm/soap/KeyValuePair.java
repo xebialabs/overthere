@@ -20,22 +20,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm.soap;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+public class KeyValuePair {
 
-public enum ResourceURI {
+    final String key;
+    final String value;
 
-    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
-
-    private final String uri;
-
-    ResourceURI(String uri) {
-        this.uri = uri;
+    public KeyValuePair(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
-    public URI getUri() throws URISyntaxException {
-        return Soapy.getUri(uri);
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

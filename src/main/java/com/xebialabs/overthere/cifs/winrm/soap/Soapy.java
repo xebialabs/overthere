@@ -20,59 +20,52 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.cifs.winrm.WinRmRuntimeIOException;
 
-@SuppressWarnings("serial")
-public class WinRmRuntimeIOException extends RuntimeIOException {
-
-    final Document in;
-    final Document out;
-
-    public WinRmRuntimeIOException(String message, Document in, Document out, Throwable cause) {
-        super(message, cause);
-        this.in = in;
-        this.out = out;
+public class Soapy {
+    private Soapy() {
     }
 
-    public WinRmRuntimeIOException(String message) {
-        this(message, null, null, null);
-
+    public static SoapMessageBuilder newMessage() {
+        return new SoapMessageBuilder();
     }
 
-    public WinRmRuntimeIOException(String message, Throwable throwable) {
-        this(message, null, null, throwable);
+    static Element mustUnderstand(Element e) {
+        return e.addAttribute("mustUnderstand", "true");
     }
 
-    @Override
-    public String getMessage() {
-        if (in == null && out == null) {
-            return super.getMessage();
-        }
-        return String.format("%s\nRequest:\n%s\nResponse:\n%s", super.getMessage(), toString(in), toString(out));
+    static Element needNotUnderstand(Element e) {
+        return e.addAttribute("mustUnderstand", "false");
     }
 
-    private static String toString(Document doc) {
-        if (doc == null) {
-            return "[EMPTY]";
-        }
-
+    public static String toString(Document doc) {
         StringWriter stringWriter = new StringWriter();
         XMLWriter xmlWriter = new XMLWriter(stringWriter, OutputFormat.createPrettyPrint());
         try {
             xmlWriter.write(doc);
             xmlWriter.close();
         } catch (IOException e) {
-            throw new RuntimeException("error ", e);
+            throw new WinRmRuntimeIOException("Cannnot convert XML to String ", e);
         }
         return stringWriter.toString();
     }
 
+    static URI getUri(String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 }

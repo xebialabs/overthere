@@ -22,12 +22,14 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import java.util.Collections;
+import java.util.Map;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
 import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 import com.xebialabs.overthere.cifs.winrs.CifsWinrsConnection;
-import com.xebialabs.overthere.smb.ConnectionBuilder;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;

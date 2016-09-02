@@ -27,8 +27,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.smb.ConnectionValidator;
-import com.xebialabs.overthere.smb.winrm.WinRmConnection;
+import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;

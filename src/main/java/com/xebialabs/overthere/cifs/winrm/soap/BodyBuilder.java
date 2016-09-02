@@ -20,19 +20,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm.soap;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-public enum SoapAction {
+import org.dom4j.Element;
 
-    SHELL("Shell"), COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SEND("Send"), SIGNAL("Signal");
+public class BodyBuilder {
+    private Element body;
 
-    private final String value;
-
-    SoapAction(String value) {
-        this.value = value;
+    public BodyBuilder(Element body) {
+        this.body = body;
     }
 
-    public String getValue() {
-        return value;
+    public void setContent(Element content) {
+        body.add(content);
     }
 }

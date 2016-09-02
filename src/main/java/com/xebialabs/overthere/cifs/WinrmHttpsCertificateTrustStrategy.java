@@ -20,23 +20,30 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm.soap;
+package com.xebialabs.overthere.cifs;
 
-public class KeyValuePair {
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 
-    final String key;
-    final String value;
+public enum WinrmHttpsCertificateTrustStrategy {
+    STRICT(null),
+    SELF_SIGNED(new TrustSelfSignedStrategy()),
+    ALLOW_ALL(new TrustStrategy() {
+        @Override
+        public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {
+            return true;
+        }
+    });
 
-    public KeyValuePair(String key, String value) {
-        this.key = key;
-        this.value = value;
+    private TrustStrategy strategy;
+
+    private WinrmHttpsCertificateTrustStrategy(TrustStrategy strategy) {
+        this.strategy = strategy;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getValue() {
-        return value;
+    public TrustStrategy getStrategy() {
+        return strategy;
     }
 }

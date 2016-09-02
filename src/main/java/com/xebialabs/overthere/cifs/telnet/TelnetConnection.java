@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.telnet;
+package com.xebialabs.overthere.cifs.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;

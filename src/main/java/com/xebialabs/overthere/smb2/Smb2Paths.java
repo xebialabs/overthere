@@ -22,7 +22,7 @@
  */
 package com.xebialabs.overthere.smb2;
 
-import com.xebialabs.overthere.smb.PathMapper;
+import com.xebialabs.overthere.cifs.PathMapper;
 
 import java.util.ArrayList;
 import java.util.List;

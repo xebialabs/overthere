@@ -20,11 +20,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb;
+package com.xebialabs.overthere.cifs;
 
 import java.util.Collections;
 import java.util.Map;
 
+import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.STRICT;
+import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
 public abstract class ConnectionBuilder {
@@ -87,7 +89,7 @@ public abstract class ConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsCertificateTrustStrategy">the online documentation</a>
      */
-    public static final WinrmHttpsCertificateTrustStrategy WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY_DEFAULT = WinrmHttpsCertificateTrustStrategy.STRICT;
+    public static final WinrmHttpsCertificateTrustStrategy WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY_DEFAULT = STRICT;
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsHostnameVerificationStrategy">the online documentation</a>
@@ -97,7 +99,7 @@ public abstract class ConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmHttpsHostnameVerificationStrategy">the online documentation</a>
      */
-    public static final WinrmHttpsHostnameVerificationStrategy WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY_DEFAULT = WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
+    public static final WinrmHttpsHostnameVerificationStrategy WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY_DEFAULT = BROWSER_COMPATIBLE;
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_winrmKerberosDebug">the online documentation</a>

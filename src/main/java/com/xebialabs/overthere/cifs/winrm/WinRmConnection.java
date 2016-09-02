@@ -20,13 +20,12 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
-import com.xebialabs.overthere.smb.WinrmHttpsCertificateTrustStrategy;
-import com.xebialabs.overthere.smb.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

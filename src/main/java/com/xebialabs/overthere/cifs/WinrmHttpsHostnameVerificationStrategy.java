@@ -20,29 +20,25 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm;
+package com.xebialabs.overthere.cifs;
 
-import java.util.HashMap;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import org.ietf.jgss.GSSContext;
+import org.apache.http.conn.ssl.DefaultHostnameVerifier;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 
-class JavaVendor {
+import javax.net.ssl.HostnameVerifier;
 
-    private static final boolean IBM_JAVA =  System.getProperty("java.vendor").toUpperCase().contains("IBM");
+public enum WinrmHttpsHostnameVerificationStrategy {
+    STRICT(new DefaultHostnameVerifier()),
+    BROWSER_COMPATIBLE(new DefaultHostnameVerifier()),
+    ALLOW_ALL(NoopHostnameVerifier.INSTANCE);
 
-    public static boolean isIBM() {
-        return IBM_JAVA;
+    private HostnameVerifier verifier;
+
+    WinrmHttpsHostnameVerificationStrategy(HostnameVerifier verifier) {
+        this.verifier = verifier;
     }
 
-    public static String getKrb5LoginModuleName() {
-        return isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
-            : "com.sun.security.auth.module.Krb5LoginModule";
-    }
-
-    public static int getSpnegoLifetime() {
-        // With IBM JDK we need to use GSSContext.INDEFINITE_LIFETIME for SPNEGO
-        // ref http://www-01.ibm.com/support/docview.wss?uid=swg1IZ54545
-        return isIBM() ? GSSContext.INDEFINITE_LIFETIME : GSSContext.DEFAULT_LIFETIME;
+    public HostnameVerifier getVerifier() {
+        return verifier;
     }
 }

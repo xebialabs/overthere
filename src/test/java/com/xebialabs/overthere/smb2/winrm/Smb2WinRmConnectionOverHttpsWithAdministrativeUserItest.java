@@ -23,8 +23,8 @@
 package com.xebialabs.overthere.smb2.winrm;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.smb.WinrmHttpsCertificateTrustStrategy;
-import com.xebialabs.overthere.smb.WinrmHttpsHostnameVerificationStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
+import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -36,7 +36,7 @@ import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
-import static com.xebialabs.overthere.smb.ConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.ConnectionBuilder.*;
 import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
 
 @Test

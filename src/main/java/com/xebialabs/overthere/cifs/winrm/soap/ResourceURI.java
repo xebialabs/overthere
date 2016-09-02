@@ -20,43 +20,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm.soap;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import static com.xebialabs.overthere.smb.winrm.Namespaces.NS_SOAP_ENV;
+public enum ResourceURI {
 
-public class SoapMessageBuilder {
+    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
 
-    private Document doc = DocumentHelper.createDocument();
+    private final String uri;
 
-    public EnvelopeBuilder envelope() {
-        Element envelope = doc.addElement(QName.get("Envelope", NS_SOAP_ENV));
-        return new EnvelopeBuilder(envelope);
+    ResourceURI(String uri) {
+        this.uri = uri;
     }
 
-    public class EnvelopeBuilder {
-        private Element envelope;
-
-        public EnvelopeBuilder(Element envelope) {
-            this.envelope = envelope;
-        }
-
-        public HeaderBuilder header() {
-            Element header = envelope.addElement(QName.get("Header", NS_SOAP_ENV));
-            return new HeaderBuilder(header);
-        }
-
-        public BodyBuilder body() {
-            Element body = envelope.addElement(QName.get("Body", NS_SOAP_ENV));
-            return new BodyBuilder(body);
-        }
-    }
-
-    public Document getDocument() {
-        return doc;
+    public URI getUri() throws URISyntaxException {
+        return Soapy.getUri(uri);
     }
 }

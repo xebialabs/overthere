@@ -20,25 +20,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb;
+package com.xebialabs.overthere.cifs.winrm.soap;
 
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.net.ssl.HostnameVerifier;
+/**
+ */
+public enum OptionSet {
 
-public enum WinrmHttpsHostnameVerificationStrategy {
-    STRICT(new DefaultHostnameVerifier()),
-    BROWSER_COMPATIBLE(new DefaultHostnameVerifier()),
-    ALLOW_ALL(NoopHostnameVerifier.INSTANCE);
+    OPEN_SHELL(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437")),
+    RUN_COMMAND(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE"));
 
-    private HostnameVerifier verifier;
+    private final List<KeyValuePair> keyValuePairs;
 
-    WinrmHttpsHostnameVerificationStrategy(HostnameVerifier verifier) {
-        this.verifier = verifier;
+    OptionSet(KeyValuePair... keyValuePairs) {
+        this.keyValuePairs = new ArrayList<KeyValuePair>();
+        for (KeyValuePair keyValuePair : keyValuePairs) {
+            this.keyValuePairs.add(keyValuePair);
+        }
     }
 
-    public HostnameVerifier getVerifier() {
-        return verifier;
+    public List<KeyValuePair> getKeyValuePairs() {
+        return keyValuePairs;
     }
 }

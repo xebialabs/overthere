@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb.winrm;
+package com.xebialabs.overthere.cifs.winrm;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.Namespace;
