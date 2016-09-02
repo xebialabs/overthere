@@ -60,6 +60,6 @@ public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends Over
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return Smb2WinRmConnection.class.getName();
+        return CifsWinRmConnection.class.getName();
     }
 }
