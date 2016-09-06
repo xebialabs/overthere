@@ -20,32 +20,32 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrs;
+package com.xebialabs.overthere.smb.winrs;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.winrs.WinrsConnection;
-import com.xebialabs.overthere.smb2.Smb2Connection;
+import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static java.lang.String.format;
 
 /**
- * A connection to a Windows host using SMB2 and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
+ * A connection to a Windows host using SMB and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
  */
-public class Smb2WinrsConnection extends Smb2Connection {
+public class SmbWinrsConnection extends SmbConnection {
 
     private WinrsConnection connection;
 
     private ConnectionOptions options;
 
-    public Smb2WinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SmbWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, SMB2_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assetNotThroughJumpstation(mapper, SMB2_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNoSingleQuoteInPassword(password, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assetNotThroughJumpstation(mapper, SMB_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNoSingleQuoteInPassword(password, SMB_PROTOCOL, cifsConnectionType);
         this.options = options;
     }
 
@@ -57,7 +57,7 @@ public class Smb2WinrsConnection extends Smb2Connection {
 
         if (connection.getWinrsProxyConnection().getHostOperatingSystem() != WINDOWS) {
             connection.disconnectFromWinrsProxy();
-            throw new IllegalArgumentException(format("Cannot create a " + SMB2_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
+            throw new IllegalArgumentException(format("Cannot create a " + SMB_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", cifsConnectionType.toString().toLowerCase()));
         }
 
         connected();

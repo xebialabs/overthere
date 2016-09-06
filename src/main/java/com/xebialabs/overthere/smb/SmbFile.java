@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2;
+package com.xebialabs.overthere.smb;
 
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.mserref.NtStatus;
@@ -47,13 +47,13 @@ import java.util.Map;
 
 import static java.lang.String.format;
 
-public class Smb2File extends BaseOverthereFile<Smb2Connection> {
+public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     private final String hostPath;
     private boolean overwrite = true;
     private Map<String, String> pathMappings;
 
-    public Smb2File(Smb2Connection connection, String hostPath, Map<String, String> pathMappings) {
+    public SmbFile(SmbConnection connection, String hostPath, Map<String, String> pathMappings) {
         super(connection);
         this.hostPath = hostPath;
         this.pathMappings = pathMappings;
@@ -66,18 +66,18 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
     @Override
     public String getName() {
-        return Smb2Paths.getFileName(getPathOnShare());
+        return SmbPaths.getFileName(getPathOnShare());
     }
 
     @Override
     public OverthereFile getFile(String child) {
-        return new Smb2File(getConnection(), Smb2Paths.join(hostPath, child), pathMappings);
+        return new SmbFile(getConnection(), SmbPaths.join(hostPath, child), pathMappings);
     }
 
     @Override
     public OverthereFile getParentFile() {
         OverthereFile f = null;
-        String parentPath = Smb2Paths.getParentPath(getPathOnShare());
+        String parentPath = SmbPaths.getParentPath(getPathOnShare());
         if (parentPath != null)
             f = getFile(parentPath);
         return f;
@@ -144,7 +144,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
     @Override
     public InputStream getInputStream() throws RuntimeIOException {
-        logger.debug("Opening SMB2 input stream for {}", getSharePath());
+        logger.debug("Opening SMB input stream for {}", getSharePath());
         try {
             final File file = getShare().openFile(getPathOnShare(),
                     EnumSet.of(AccessMask.GENERIC_READ), SMB2CreateDisposition.FILE_OPEN);
@@ -174,7 +174,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
                 @Override
                 public void close() throws IOException {
-                    logger.debug("Closing SMB2 input stream for {}", getSharePath());
+                    logger.debug("Closing SMB input stream for {}", getSharePath());
                     wrapped.close();
                     file.close();
                 }
@@ -186,7 +186,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
     @Override
     public OutputStream getOutputStream() {
-        logger.debug("Opening SMB2 output stream for {}", getSharePath());
+        logger.debug("Opening SMB output stream for {}", getSharePath());
         try {
             SMB2CreateDisposition createDisposition = SMB2CreateDisposition.FILE_OVERWRITE_IF;
             if (!overwrite) createDisposition = SMB2CreateDisposition.FILE_CREATE;
@@ -219,7 +219,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
                 @Override
                 public void close() throws IOException {
-                    logger.debug("Closing SMB2 output stream for {}", getSharePath());
+                    logger.debug("Closing SMB output stream for {}", getSharePath());
                     wrapped.close();
                     file.close();
                 }
@@ -304,7 +304,7 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
     public void mkdirs() {
         String sharePath = getPathOnShare();
         logger.debug("Creating directories {}", sharePath);
-        String [] paths = Smb2Paths.getPathListFromOuterToInner(sharePath);
+        String [] paths = SmbPaths.getPathListFromOuterToInner(sharePath);
         for (String p : paths) {
             if (!getShare().folderExists(p))
                 makeDirectory(p);
@@ -318,10 +318,10 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
 
     @Override
     public boolean equals(Object that) {
-        if (!(that instanceof Smb2File)) {
+        if (!(that instanceof SmbFile)) {
             return false;
         }
-        return getPath().equals(((Smb2File) that).getPath());
+        return getPath().equals(((SmbFile) that).getPath());
     }
 
     @Override
@@ -340,15 +340,15 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
     }
 
     private String getSharePath() {
-        return Smb2Paths.getSharePath(hostPath, pathMappings);
+        return SmbPaths.getSharePath(hostPath, pathMappings);
     }
 
     private String getPathOnShare() {
-        return Smb2Paths.getPathOnShare(getSharePath());
+        return SmbPaths.getPathOnShare(getSharePath());
     }
 
     private DiskShare getShare() {
-        String shareName = Smb2Paths.getShareName(getSharePath());
+        String shareName = SmbPaths.getShareName(getSharePath());
         return connection.getShare(shareName);
     }
 
@@ -357,5 +357,5 @@ public class Smb2File extends BaseOverthereFile<Smb2Connection> {
         return FileAttributes.EnumUtils.isSet(attrMask, mask);
     }
 
-    private static Logger logger = LoggerFactory.getLogger(Smb2File.class);
+    private static Logger logger = LoggerFactory.getLogger(SmbFile.class);
 }

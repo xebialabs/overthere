@@ -20,32 +20,38 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrm;
+package com.xebialabs.overthere.smb.telnet;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.ConnectionValidator;
-import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
-import com.xebialabs.overthere.smb2.Smb2Connection;
+import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
+import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+
 
 /**
- * A connection to a Windows host using SMB2 and a Java implementation of WinRM.
+ * A connection to a Windows host using SMB and Telnet.
+ * <p/>
+ * Limitations:
+ * <ul>
+ * <li>Windows Telnet Service must be configured to use stream mode:<br/>
+ * <tt>&gt; tlntadmn config mode=stream</tt></li>
+ * <li>Not tested with domain accounts.</li>
+ * </ul>
  */
-public class Smb2WinRmConnection extends Smb2Connection {
+public class SmbTelnetConnection extends SmbConnection {
 
     /**
-     * Creates a {@link Smb2WinRmConnection}. Don't invoke directly. Use
+     * Creates a {@link SmbTelnetConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
-    public Smb2WinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SmbTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, SMB2_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotOldStyleWindowsDomain(username, SMB2_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotNewStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
+        connected();
     }
 
     @Override
@@ -56,8 +62,7 @@ public class Smb2WinRmConnection extends Smb2Connection {
 
     @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
-        WinRmConnection connection = new WinRmConnection(options, mapper, workingDirectory);
+        TelnetConnection connection = new TelnetConnection(options, mapper, workingDirectory);
         return connection.startProcess(cmd);
     }
-
 }

@@ -20,32 +20,28 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrs;
+package com.xebialabs.overthere.smb;
 
+import com.xebialabs.overthere.smb.winrm.SmbWinRmConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
 
-import nl.javadude.assumeng.Assumption;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.*;
-import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
+import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 
-public class Smb2WinRsConnectionTest {
+public class SmbFileTest {
 
     private ConnectionOptions options;
-
-    public static boolean onWindows() {
-        return System.getProperty("os.name", "").toLowerCase().contains("windows");
-    }
 
     @BeforeMethod
     public void setupOptions() {
@@ -54,31 +50,24 @@ public class Smb2WinRsConnectionTest {
         options.set(CONNECTION_TYPE, WINRM_NATIVE);
         options.set(PASSWORD, "foobar");
         options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
-        options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
+        options.set(SMB_PORT, PORT_DEFAULT_SMB);
         options.set(ADDRESS, "localhost");
     }
 
+
     @Test
-    @Assumption(methods = "onWindows")
-    @SuppressWarnings("resource")
-    public void shouldSupportNewStyleDomainAccount() {
+    public void shouldReturnNullForParentFileOfRoot() {
         options.set(USERNAME, "user@domain.com");
-        new Smb2WinrsConnection(SMB2_PROTOCOL, options, INSTANCE);
+        SmbWinRmConnection smbWinRmConnection = new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smbWinRmConnection.getFile("C:\\");
+        assertThat(file.getParentFile(), nullValue());
     }
 
     @Test
-    @Assumption(methods = "onWindows")
-    @SuppressWarnings("resource")
-    public void shouldSupportOldStyleDomainAccount() {
-        options.set(USERNAME, "domain\\user");
-        new Smb2WinrsConnection(SMB2_PROTOCOL, options, INSTANCE);
-    }
-
-    @Test
-    @Assumption(methods = "onWindows")
-    @SuppressWarnings("resource")
-    public void shouldSupportDomainlessAccount() {
-        options.set(USERNAME, "user");
-        new Smb2WinrsConnection(SMB2_PROTOCOL, options, INSTANCE);
+    public void shouldSucceedForNonRoot() {
+        options.set(USERNAME, "user@domain.com");
+        SmbWinRmConnection smbWinRmConnection = new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smbWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
+        assertThat(file.getParentFile(), not(nullValue()));
     }
 }

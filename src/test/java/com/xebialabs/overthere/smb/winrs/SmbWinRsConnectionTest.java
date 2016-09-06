@@ -20,12 +20,14 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrm;
+package com.xebialabs.overthere.smb.winrs;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
+
+import nl.javadude.assumeng.Assumption;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
@@ -33,44 +35,50 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.*;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
 
-public class Smb2WinRmConnectionTest {
+public class SmbWinRsConnectionTest {
 
     private ConnectionOptions options;
+
+    public static boolean onWindows() {
+        return System.getProperty("os.name", "").toLowerCase().contains("windows");
+    }
 
     @BeforeMethod
     public void setupOptions() {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(CONNECTION_TYPE, WINRM_NATIVE);
         options.set(PASSWORD, "foobar");
-        options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
         options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
+        options.set(SMB_PORT, PORT_DEFAULT_SMB);
         options.set(ADDRESS, "localhost");
     }
 
     @Test
+    @Assumption(methods = "onWindows")
     @SuppressWarnings("resource")
     public void shouldSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new Smb2WinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    @SuppressWarnings("resource")
-    public void shouldNotSupportOldStyleDomainAccount() {
-        options.set(USERNAME, "domain\\user");
-        new Smb2WinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
+        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
+    @Assumption(methods = "onWindows")
+    @SuppressWarnings("resource")
+    public void shouldSupportOldStyleDomainAccount() {
+        options.set(USERNAME, "domain\\user");
+        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test
+    @Assumption(methods = "onWindows")
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new Smb2WinRmConnection(SMB2_PROTOCOL, options, INSTANCE);
+        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
     }
-
 }

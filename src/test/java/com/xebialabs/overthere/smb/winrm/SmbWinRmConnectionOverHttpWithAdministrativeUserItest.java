@@ -20,41 +20,38 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.telnet;
+package com.xebialabs.overthere.smb.winrm;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostListener;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.cifs.ConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class Smb2TelnetConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
+public class SmbWinRmConnectionOverHttpWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
-        return SMB2_PROTOCOL;
+        return SMB_PROTOCOL;
     }
 
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(CONNECTION_TYPE, TELNET);
         options.set(OPERATING_SYSTEM, WINDOWS);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         return options;
@@ -62,7 +59,6 @@ public class Smb2TelnetConnectionWithAdministrativeUserItest extends OverthereCo
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return Smb2TelnetConnection.class.getName();
+        return SmbWinRmConnection.class.getName();
     }
-
 }

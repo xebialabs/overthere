@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2;
+package com.xebialabs.overthere.smb;
 
 import com.xebialabs.overthere.cifs.PathMapper;
 
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Smb2Paths {
+public abstract class SmbPaths {
 
     public static final char SLASH = '\\';
     public static final String EMPTY = "";

@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.telnet;
+package com.xebialabs.overthere.smb.winrm;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -33,11 +33,11 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.*;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 
-public class Smb2TelnetConnectionTest {
+public class SmbWinRmConnectionTest {
 
     private ConnectionOptions options;
 
@@ -45,31 +45,32 @@ public class Smb2TelnetConnectionTest {
     public void setupOptions() {
         options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, TELNET);
+        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(PASSWORD, "foobar");
-        options.set(PORT, PORT_DEFAULT_TELNET);
-        options.set(SMB2_PORT, PORT_DEFAULT_SMB2);
+        options.set(SMB_PORT, PORT_DEFAULT_SMB);
+        options.set(PORT, PORT_DEFAULT_WINRM_HTTP);
         options.set(ADDRESS, "localhost");
-    }
-
-    @Test(expectedExceptions = IllegalArgumentException.class)
-    @SuppressWarnings("resource")
-    public void shouldNotSupportNewStyleDomainAccount() {
-        options.set(USERNAME, "user@domain.com");
-        new Smb2TelnetConnection(SMB2_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
-    public void shouldSupportOldStyleDomainAccount() {
+    public void shouldSupportNewStyleDomainAccount() {
+        options.set(USERNAME, "user@domain.com");
+        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    @SuppressWarnings("resource")
+    public void shouldNotSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new Smb2TelnetConnection(SMB2_PROTOCOL, options, INSTANCE);
+        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new Smb2TelnetConnection(SMB2_PROTOCOL, options, INSTANCE);
+        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
     }
+
 }

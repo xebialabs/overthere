@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2;
+package com.xebialabs.overthere.smb;
 
 import com.hierynomus.ntlm.NtlmException;
 import com.hierynomus.smbj.DefaultConfig;
@@ -48,10 +48,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.*;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static java.net.InetSocketAddress.createUnresolved;
 
-public class Smb2Connection extends BaseOverthereConnection {
+public class SmbConnection extends BaseOverthereConnection {
 
     private final SMBClient client;
     private final String hostname;
@@ -73,11 +73,11 @@ public class Smb2Connection extends BaseOverthereConnection {
         }
     }
 
-    protected Smb2Connection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
+    protected SmbConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
         super(protocol, options, mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         if (mapper instanceof ProxyConnection) {
-            throw new IllegalArgumentException("Cannot open a smb2:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
+            throw new IllegalArgumentException("Cannot open a smb:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
         }
 
         String unmappedAddress = options.get(ADDRESS);
@@ -87,7 +87,7 @@ public class Smb2Connection extends BaseOverthereConnection {
         hostname = addressPort.getHostName();
         port = addressPort.getPort();
 
-        int unmappedSmbPort = options.getInteger(SMB2_PORT, PORT_DEFAULT_SMB2);
+        int unmappedSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
         smbPort = smbAddressPort.getPort();
         username = options.get(USERNAME);
@@ -111,9 +111,9 @@ public class Smb2Connection extends BaseOverthereConnection {
 
     @Override
     public OverthereFile getFile(String hostPath) {
-        hostPath = Smb2Paths.escapeForwardSlashes(hostPath);
+        hostPath = SmbPaths.escapeForwardSlashes(hostPath);
         Map<String, String> pathMappings = options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT);
-        return new Smb2File(this, hostPath, pathMappings);
+        return new SmbFile(this, hostPath, pathMappings);
     }
 
     @Override
@@ -128,20 +128,20 @@ public class Smb2Connection extends BaseOverthereConnection {
                 try {
                     s.close();
                 } catch (IOException e) {
-                    logger.warn("Exception while trying to close smb2 share", e);
+                    logger.warn("Exception while trying to close smb share", e);
                 }
         } finally {
             shareCache.clear();
             try {
                 session.close();
             } catch (IOException e) {
-                logger.warn("Exception while trying to close smb2 session", e);
+                logger.warn("Exception while trying to close smb session", e);
             } finally {
 
                 try {
                     connection.close();
                 } catch (Exception e) {
-                    logger.warn("Exception while trying to close smb2 connection", e);
+                    logger.warn("Exception while trying to close smb connection", e);
                 }
             }
         }
@@ -170,5 +170,5 @@ public class Smb2Connection extends BaseOverthereConnection {
         return share;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(Smb2Connection.class);
+    private static Logger logger = LoggerFactory.getLogger(SmbConnection.class);
 }

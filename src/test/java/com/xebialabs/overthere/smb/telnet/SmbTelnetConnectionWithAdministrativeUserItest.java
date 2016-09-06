@@ -20,50 +20,49 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrm;
+package com.xebialabs.overthere.smb.telnet;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
-import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
-import static com.xebialabs.overthere.cifs.ConnectionBuilder.*;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class Smb2WinRmConnectionOverHttpsWithAdministrativeUserItest extends OverthereConnectionItestBase {
+public class SmbTelnetConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
-        return SMB2_PROTOCOL;
+        return SMB_PROTOCOL;
     }
 
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
-        options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(CONNECTION_TYPE, TELNET);
+        options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
-        options.set(WINRM_ENABLE_HTTPS, true);
-        options.set(WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY, WinrmHttpsCertificateTrustStrategy.ALLOW_ALL);
-        options.set(WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY, WinrmHttpsHostnameVerificationStrategy.ALLOW_ALL);
         return options;
     }
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return Smb2WinRmConnection.class.getName();
+        return SmbTelnetConnection.class.getName();
     }
+
 }

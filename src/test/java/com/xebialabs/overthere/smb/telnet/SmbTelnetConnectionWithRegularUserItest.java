@@ -20,45 +20,54 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.smb2.winrm;
+package com.xebialabs.overthere.smb.telnet;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+import com.google.common.collect.ImmutableMap;
 
+import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
-import static com.xebialabs.overthere.cifs.ConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb2.Smb2ConnectionBuilder.SMB2_PROTOCOL;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class Smb2WinRmConnectionOverHttpWithAdministrativeUserItest extends OverthereConnectionItestBase {
+public class SmbTelnetConnectionWithRegularUserItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getProtocol() {
-        return SMB2_PROTOCOL;
+        return SMB_PROTOCOL;
     }
 
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, WINRM_INTERNAL);
+        options.set(CONNECTION_TYPE, TELNET);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
-        options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
+        options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
+        options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
+        options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\temp");
+        options.set(PATH_SHARE_MAPPINGS, ImmutableMap.of("C:\\overthere", "sharethere"));
         return options;
     }
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return Smb2WinRmConnection.class.getName();
+        return SmbTelnetConnection.class.getName();
     }
+
 }
