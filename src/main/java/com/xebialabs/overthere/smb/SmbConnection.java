@@ -64,7 +64,6 @@ public class SmbConnection extends BaseOverthereConnection {
     protected final String password;
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
-    protected final String domain;
 
     static {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
@@ -89,17 +88,18 @@ public class SmbConnection extends BaseOverthereConnection {
         int unmappedSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
         smbPort = smbAddressPort.getPort();
-        UserAndDomain ud = getUserNameAndDomain(options.get(USERNAME));
-        username = ud.getUsername();
-        domain = ud.getDomain();
+        username = options.get(USERNAME);
         password = options.get(PASSWORD);
         client = new SMBClient(new DefaultConfig());
     }
 
     public void connect() {
         try {
+            UserAndDomain ud = getUserNameAndDomain(username);
+            String user = ud.getUsername();
+            String domain = ud.getDomain();
             connection = client.connect(hostname);
-            AuthenticationContext authContext = new AuthenticationContext(username, password.toCharArray(), domain);
+            AuthenticationContext authContext = new AuthenticationContext(user, password.toCharArray(), domain);
             session = connection.authenticate(authContext);
         } catch (IOException e) {
             throw new RuntimeIOException(e);
