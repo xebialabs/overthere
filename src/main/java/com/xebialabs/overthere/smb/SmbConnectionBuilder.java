@@ -45,12 +45,7 @@ public class SmbConnectionBuilder extends ConnectionBuilder implements Overthere
      */
     public static final int PORT_DEFAULT_SMB = 445;
 
-    public static final String SMB_PORT = "cifsPort";
-
-    /**
-     * The Windows Domain to authenticate the user against. If not set blank value will be used
-     */
-    public static final String DOMAIN = "domain";
+    public static final String SMB_PORT = "smbPort";
 
     private final SmbConnection connection;
 

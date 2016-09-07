@@ -42,6 +42,7 @@ import nl.javadude.assumeng.Assumption;
 
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -60,27 +61,25 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
     @Test
     @Assumption(methods = {"onWindows", "onlyCifsWinrm"})
     public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccount() {
-        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
-        incorrectUserNameOptions.set(USERNAME, "DOMAIN\\user");
-        try {
-            Overthere.getConnection(protocol, incorrectUserNameOptions);
-            fail("Expected not to be able to connect with an old-style Windows domain account");
-        } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot create a " + CIFS_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account"));
-        }
+        assertWithOldStyleDomain("Cannot create a " + CIFS_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account");
+    }
+
+    @Test
+    @Assumption(methods = {"onWindows", "onlySmbWinrm"})
+    public void shouldThrowValidationMessageWhenTryingToConnectWithOldStyleWindowsDomainAccountSmb() {
+        assertWithOldStyleDomain("Cannot create a " + SMB_PROTOCOL + ":" + WINRM_INTERNAL.toString().toLowerCase() + " connection with an old-style Windows domain account");
     }
 
     @Test
     @Assumption(methods = {"onWindows", "onlyCifsTelnet"})
     public void shouldThrowValidationMessageWhenTryingToConnectWithNewStyleWindowsDomainAccount() {
-        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
-        incorrectUserNameOptions.set(USERNAME, "user@DOMAIN");
-        try {
-            Overthere.getConnection(protocol, incorrectUserNameOptions);
-            fail("Expected not to be able to connect with a new-style Windows domain account");
-        } catch (IllegalArgumentException expected) {
-            assertThat(expected.getMessage(), containsString("Cannot create a " + CIFS_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account"));
-        }
+        assertWithNewStyleDomain("Cannot create a " + CIFS_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account");
+    }
+
+    @Test
+    @Assumption(methods = {"onWindows", "onlySmbTelnet"})
+    public void shouldThrowValidationMessageWhenTryingToConnectWithNewStyleWindowsDomainAccountSmb() {
+        assertWithNewStyleDomain("Cannot create a " + SMB_PROTOCOL + ":" + TELNET.toString().toLowerCase() + " connection with a new-style Windows domain account");
     }
 
     @Test
@@ -250,4 +249,25 @@ public abstract class ItestsBase6Windows extends ItestsBase5Unix {
         assertThat(file.getPath(), equalTo("C:\\Windows\\System32"));
     }
 
+    private void assertWithOldStyleDomain(String str) {
+        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
+        incorrectUserNameOptions.set(USERNAME, "DOMAIN\\user");
+        try {
+            Overthere.getConnection(protocol, incorrectUserNameOptions);
+            fail("Expected not to be able to connect with an old-style Windows domain account");
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString(str));
+        }
+    }
+
+    private void assertWithNewStyleDomain(String str) {
+        ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
+        incorrectUserNameOptions.set(USERNAME, "user@DOMAIN");
+        try {
+            Overthere.getConnection(protocol, incorrectUserNameOptions);
+            fail("Expected not to be able to connect with a new-style Windows domain account");
+        } catch (IllegalArgumentException expected) {
+            assertThat(expected.getMessage(), containsString(str));
+        }
+    }
 }

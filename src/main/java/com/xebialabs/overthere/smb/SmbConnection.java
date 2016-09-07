@@ -56,7 +56,6 @@ public class SmbConnection extends BaseOverthereConnection {
     private final SMBClient client;
     private final String hostname;
     private final int smbPort;
-    private final String domain;
     private Connection connection;
     private Session session;
     private int port;
@@ -65,7 +64,7 @@ public class SmbConnection extends BaseOverthereConnection {
     protected final String password;
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
-    private static final String EMPTY = "";
+    protected final String domain;
 
     static {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
@@ -90,9 +89,10 @@ public class SmbConnection extends BaseOverthereConnection {
         int unmappedSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
         smbPort = smbAddressPort.getPort();
-        username = options.get(USERNAME);
+        UserAndDomain ud = getUserNameAndDomain(options.get(USERNAME));
+        username = ud.getUsername();
+        domain = ud.getDomain();
         password = options.get(PASSWORD);
-        domain = options.get(DOMAIN, EMPTY);
         client = new SMBClient(new DefaultConfig());
     }
 
@@ -168,6 +168,36 @@ public class SmbConnection extends BaseOverthereConnection {
             shareCache.put(shareName, share);
         }
         return share;
+    }
+
+    private UserAndDomain getUserNameAndDomain(String user) {
+        if (user.contains("\\")) {
+            String[] split = user.split("\\\\");
+            return new UserAndDomain(split[1], split[0]);
+        }
+        if (user.contains("@")) {
+            String[] split = user.split("@");
+            return new UserAndDomain(split[0], split[1]);
+        }
+        return new UserAndDomain(user, "");
+    }
+
+    private static class UserAndDomain {
+        String username;
+        String domain;
+
+        private UserAndDomain(String username, String domain) {
+            this.username = username;
+            this.domain = domain;
+        }
+
+        private String getUsername() {
+            return username;
+        }
+
+        private String getDomain() {
+            return domain;
+        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(SmbConnection.class);
