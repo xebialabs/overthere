@@ -133,13 +133,16 @@ public class SmbConnection extends BaseOverthereConnection {
         } finally {
             shareCache.clear();
             try {
-                session.close();
+                if(session!=null) {
+                    session.close();
+                }
             } catch (IOException e) {
                 logger.warn("Exception while trying to close smb session", e);
             } finally {
-
                 try {
-                    connection.close();
+                    if (connection != null) {
+                        connection.close();
+                    }
                 } catch (Exception e) {
                     logger.warn("Exception while trying to close smb connection", e);
                 }

@@ -56,7 +56,6 @@ public class SmbTelnetConnection extends SmbConnection {
 
     @Override
     public void connect() {
-        super.connect();
         connected();
     }
 
