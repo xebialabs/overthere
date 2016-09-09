@@ -23,7 +23,6 @@
 package com.xebialabs.overthere.smb;
 
 import com.hierynomus.msdtyp.AccessMask;
-import com.hierynomus.msdtyp.SID;
 import com.hierynomus.msdtyp.SecurityDescriptor;
 import com.hierynomus.msdtyp.SecurityInformation;
 import com.hierynomus.msdtyp.ace.ACE;
