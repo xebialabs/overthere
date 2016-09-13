@@ -1,21 +1,21 @@
 /**
  * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
- *
- *
+ * <p/>
+ * <p/>
  * Overthere is licensed under the terms of the GPLv2
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most XebiaLabs Libraries.
  * There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
  * this software, see the FLOSS License Exception
  * <http://github.com/xebialabs/overthere/blob/master/LICENSE>.
- *
+ * <p/>
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation; version 2
  * of the License.
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- *
+ * <p/>
  * You should have received a copy of the GNU General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
@@ -23,10 +23,6 @@
 package com.xebialabs.overthere.smb;
 
 import com.hierynomus.msdtyp.AccessMask;
-import com.hierynomus.msdtyp.SecurityDescriptor;
-import com.hierynomus.msdtyp.SecurityInformation;
-import com.hierynomus.msdtyp.ace.ACE;
-import com.hierynomus.msdtyp.ace.AceType;
 import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileInfo;
@@ -50,8 +46,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.hierynomus.msdtyp.AccessMask.FILE_READ_DATA;
-import static com.hierynomus.msdtyp.AccessMask.FILE_WRITE_DATA;
-import static com.hierynomus.msdtyp.ace.AceType.ACCESS_ALLOWED_ACE_TYPE;
 import static java.lang.String.format;
 
 public class SmbFile extends BaseOverthereFile<SmbConnection> {
@@ -102,7 +96,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     @Override
     public boolean canWrite() {
-        return checkAccessMask(FILE_WRITE_DATA);
+        return checkAccessMask(AccessMask.FILE_WRITE_DATA);
     }
 
     @Override
@@ -183,7 +177,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
                 public void close() throws IOException {
                     logger.debug("Closing SMB input stream for {}", getSharePath());
                     wrapped.close();
-                    file.close();
+                    getShare().close(file.getFileId());
                 }
             });
         } catch (TransportException e) {
@@ -228,7 +222,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
                 public void close() throws IOException {
                     logger.debug("Closing SMB output stream for {}", getSharePath());
                     wrapped.close();
-                    file.close();
+                    getShare().close(file.getFileId());
                 }
             });
         } catch (TransportException e) {
@@ -342,22 +336,32 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     }
 
     private boolean checkAccessMask(AccessMask mask) {
+        File file = null;
         try {
-            SecurityDescriptor securityInfo = getShare().
-                    getSecurityInfo(getPathOnShare(),  EnumSet.of(SecurityInformation.OWNER_SECURITY_INFORMATION,
-                            SecurityInformation.GROUP_SECURITY_INFORMATION, SecurityInformation.DACL_SECURITY_INFORMATION));
-            String ownerSid = securityInfo.getOwnerSid().toString();
-            for (ACE ace : securityInfo.getDacl().getAces()) {
-                String aceSid = ace.getSid().toString();
-                AceType aceType = ace.getAceHeader().getAceType();
-                if (aceSid.equals(ownerSid) && aceType.equals(ACCESS_ALLOWED_ACE_TYPE)) {
-                    return AccessMask.EnumUtils.isSet(ace.getAccessMask(), mask);
-                }
-            }
+            file = getShare().openFile(getPathOnShare(), EnumSet.of(mask), SMB2CreateDisposition.FILE_OPEN);
+            return file !=null;
         } catch (TransportException e) {
-            throw new IllegalStateException("Exception Occured while trying to query security information!");
+            throw new IllegalStateException("Exception occurred while trying to determine permissions on file", e);
+        } catch (SMBApiException e) {
+            return checkPermissions(e);
+        } finally {
+            close(file);
         }
-        return false;
+    }
+
+    private boolean checkPermissions(SMBApiException e) {
+        if (e.getStatus().equals(NtStatus.STATUS_ACCESS_DENIED)) {
+            return false;
+        }
+        throw new IllegalStateException("Exception occurred while trying to determine permissions on file", e);
+    }
+
+    private void close(File file) {
+        try {
+            getShare().close(file.getFileId());
+        } catch (TransportException e) {
+            throw new IllegalStateException("Exception occured while trying to determine permissions on file", e);
+        }
     }
 
     private String getSharePath() {
