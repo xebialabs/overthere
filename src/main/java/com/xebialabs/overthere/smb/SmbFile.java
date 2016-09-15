@@ -45,7 +45,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
-import static com.hierynomus.msdtyp.AccessMask.FILE_READ_DATA;
 import static java.lang.String.format;
 
 public class SmbFile extends BaseOverthereFile<SmbConnection> {
@@ -91,17 +90,20 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     @Override
     public boolean canRead() {
-        return checkAccessMask(FILE_READ_DATA);
+        logger.debug("Checking whether {} can be read", this.getPath());
+        return getShare().checkAccessMask(AccessMask.FILE_READ_DATA, getPathOnShare());
     }
 
     @Override
     public boolean canWrite() {
-        return checkAccessMask(AccessMask.FILE_WRITE_DATA);
+        logger.debug("Checking whether {} can be write", this.getPath());
+        return getShare().checkAccessMask(AccessMask.FILE_WRITE_DATA, getPathOnShare());
     }
 
     @Override
     public boolean canExecute() {
-        return checkAccessMask(FILE_READ_DATA);
+        logger.debug("Checking whether {} can execute", this.getPath());
+        return getShare().checkAccessMask(AccessMask.FILE_READ_DATA, getPathOnShare());
     }
 
     @Override
@@ -333,35 +335,6 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     @Override
     public String toString() {
         return getConnection() + "/" + getPath();
-    }
-
-    private boolean checkAccessMask(AccessMask mask) {
-        File file = null;
-        try {
-            file = getShare().openFile(getPathOnShare(), EnumSet.of(mask), SMB2CreateDisposition.FILE_OPEN);
-            return file !=null;
-        } catch (TransportException e) {
-            throw new IllegalStateException("Exception occurred while trying to determine permissions on file", e);
-        } catch (SMBApiException e) {
-            return checkPermissions(e);
-        } finally {
-            close(file);
-        }
-    }
-
-    private boolean checkPermissions(SMBApiException e) {
-        if (e.getStatus().equals(NtStatus.STATUS_ACCESS_DENIED)) {
-            return false;
-        }
-        throw new IllegalStateException("Exception occurred while trying to determine permissions on file", e);
-    }
-
-    private void close(File file) {
-        try {
-            getShare().close(file.getFileId());
-        } catch (TransportException e) {
-            throw new IllegalStateException("Exception occured while trying to determine permissions on file", e);
-        }
     }
 
     private String getSharePath() {
