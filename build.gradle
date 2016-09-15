@@ -124,8 +124,7 @@ test {
 task itest(type: Test) {
   useTestNG()
 
-  //includes = ['**/*Itest.*', '**/LocalConnectionTest.*']
-  includes = ['**/SmbTelnetConnectionWithAdministrativeUserTempItest.*']
+  includes = ['**/*Itest.*', '**/LocalConnectionTest.*']
   reports.junitXml.destination = file("${buildDir}/itest-results")
   reports.html.destination = file("${buildDir}/reports/itests")
 
