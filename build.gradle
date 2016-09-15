@@ -124,7 +124,7 @@ test {
 task itest(type: Test) {
   useTestNG()
 
-  includes = ['**/*Itest.shouldCreateWriteReadAndRemoveTemporaryFile']
+  includes = ['**/*Itest*.shouldCreateWriteReadAndRemoveTemporaryFile']
   reports.junitXml.destination = file("${buildDir}/itest-results")
   reports.html.destination = file("${buildDir}/reports/itests")
 
