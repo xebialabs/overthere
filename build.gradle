@@ -124,7 +124,7 @@ test {
 task itest(type: Test) {
   useTestNG()
 
-  includes = ['**/SmbTelnetConnectionWithAdministrativeUserItest.*']
+  includes = ['**/SmbTelnetConnectionWithAdministrativeUserItest.*shouldCreateWriteReadAndRemoveTemporaryFile*']
   reports.junitXml.destination = file("${buildDir}/itest-results")
   reports.html.destination = file("${buildDir}/reports/itests")
 
