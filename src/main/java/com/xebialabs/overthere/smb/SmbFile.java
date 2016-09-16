@@ -216,11 +216,6 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
                 }
 
                 @Override
-                public void flush() throws IOException {
-                    wrapped.flush();
-                }
-
-                @Override
                 public void close() throws IOException {
                     logger.debug("Closing SMB output stream for {}", getSharePath());
                     wrapped.close();
