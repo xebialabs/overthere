@@ -50,6 +50,7 @@ public class SmbWinRmConnection extends SmbConnection {
 
     @Override
     public void connect() {
+        super.connect();
         connected();
     }
 
