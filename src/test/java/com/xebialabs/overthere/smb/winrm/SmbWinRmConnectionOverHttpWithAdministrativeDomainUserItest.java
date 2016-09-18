@@ -22,11 +22,18 @@
  */
 package com.xebialabs.overthere.smb.winrm;
 
+import com.google.common.io.Resources;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostWithDomainListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
@@ -40,6 +47,10 @@ import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 public class SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest extends OverthereConnectionItestBase {
 
     public static final String DOMAIN_WINDOWS_USERNAME = "itest@W2K8R2.XEBIALABS.COM";
+
+    public SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest() {
+        System.setProperty("java.security.krb5.conf", getConfigFilePath());
+    }
 
     @Override
     protected String getProtocol() {
@@ -55,6 +66,19 @@ public class SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest extends
         options.set(USERNAME, DOMAIN_WINDOWS_USERNAME);
         options.set(PASSWORD, DOMAIN_WINDOWS_USER_PASSWORD);
         return options;
+    }
+
+    private String getConfigFilePath() {
+        URL url = Resources.getResource("winrm/conf/krb5.conf");
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("krb5", ".conf");
+            Files.copy(url.openStream(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to create krb5.conf file");
+        }
+        tempFile.deleteOnExit();
+        return tempFile.getAbsolutePath();
     }
 
     @Override
