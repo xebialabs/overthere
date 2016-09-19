@@ -614,7 +614,7 @@ __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `
 ### Host setup
 
 <a name="smb_cifs_host_setup_smb"></a>
-#### SMB and CIFS
+#### SMB 2.x and CIFS
 To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
 
 If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
@@ -764,7 +764,7 @@ Alternatively, place the file somewhere else and add the following Java system p
 
 See [the Kerberos V5 System Administrator's Guide at MIT](http://web.mit.edu/kerberos/krb5-1.10/krb5-1.10.6/doc/krb5-admin.html#krb5_002econf) for more information on the `krb5.conf` format.
 
-<a name="smb_host_setup_spn"></a>
+<a name="smb_cifs_host_setup_spn"></a>
 #### Kerberos - remote host
 
 __N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host with the __WINRM_INTERNAL__ connection type.
