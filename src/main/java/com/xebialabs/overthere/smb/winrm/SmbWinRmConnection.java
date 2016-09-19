@@ -20,50 +20,44 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.telnet;
+package com.xebialabs.overthere.smb.winrm;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsConnection;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.cifs.ConnectionValidator;
+import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
+import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 /**
- * A connection to a Windows host using CIFS and Telnet.
- * <p/>
- * Limitations:
- * <ul>
- * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
- * access is needed.</li>
- * <li>Windows Telnet Service must be configured to use stream mode:<br/>
- * <tt>&gt; tlntadmn config mode=stream</tt></li>
- * <li>Not tested with domain accounts.</li>
- * </ul>
+ * A connection to a Windows host using SMB and a Java implementation of WinRM.
  */
-public class CifsTelnetConnection extends CifsConnection {
+public class SmbWinRmConnection extends SmbConnection {
 
     /**
-     * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use
+     * Creates a {@link SmbWinRmConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
-    public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SmbWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotNewStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
-        // Make sure that we're properly cleaned up by setting the connected state.
-        connected();
+        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotOldStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
     }
 
     @Override
     public void connect() {
+        super.connect();
         connected();
     }
 
     @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
-        TelnetConnection connection = new TelnetConnection(options, mapper, workingDirectory);
+        WinRmConnection connection = new WinRmConnection(options, mapper, workingDirectory);
         return connection.startProcess(cmd);
     }
+
 }

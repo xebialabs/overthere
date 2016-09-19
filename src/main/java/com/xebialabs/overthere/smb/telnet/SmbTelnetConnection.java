@@ -20,44 +20,43 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.telnet;
+package com.xebialabs.overthere.smb.telnet;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsConnection;
 import com.xebialabs.overthere.cifs.ConnectionValidator;
+import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
+import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 
 /**
- * A connection to a Windows host using CIFS and Telnet.
+ * A connection to a Windows host using SMB and Telnet.
  * <p/>
  * Limitations:
  * <ul>
- * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
- * access is needed.</li>
  * <li>Windows Telnet Service must be configured to use stream mode:<br/>
  * <tt>&gt; tlntadmn config mode=stream</tt></li>
  * <li>Not tested with domain accounts.</li>
  * </ul>
  */
-public class CifsTelnetConnection extends CifsConnection {
+public class SmbTelnetConnection extends SmbConnection {
 
     /**
-     * Creates a {@link CifsTelnetConnection}. Don't invoke directly. Use
+     * Creates a {@link SmbTelnetConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
-    public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SmbTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotNewStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
-        // Make sure that we're properly cleaned up by setting the connected state.
+        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        ConnectionValidator.assertNotNewStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
         connected();
     }
 
     @Override
     public void connect() {
+        super.connect();
         connected();
     }
 

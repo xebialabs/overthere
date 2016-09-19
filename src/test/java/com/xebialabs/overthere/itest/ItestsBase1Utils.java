@@ -48,6 +48,7 @@ import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
@@ -201,6 +202,16 @@ public abstract class ItestsBase1Utils {
     public boolean onlyCifsTelnet() {
         checkConnected("onlyCifsTelnet");
         return protocol.equals(CIFS_PROTOCOL) && options.get(CONNECTION_TYPE).equals(TELNET);
+    }
+
+    public boolean onlySmbWinrm() {
+        checkConnected("onlySmbWinrm");
+        return protocol.equals(SMB_PROTOCOL) && options.get(CONNECTION_TYPE).equals(WINRM_INTERNAL);
+    }
+
+    public boolean onlySmbTelnet() {
+        checkConnected("onlySmbTelnet");
+        return protocol.equals(SMB_PROTOCOL) && options.get(CONNECTION_TYPE).equals(TELNET);
     }
 
     public boolean notSftpCygwin() {

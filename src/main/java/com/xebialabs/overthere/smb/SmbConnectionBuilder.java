@@ -20,57 +20,47 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs;
-
-import java.util.Collections;
-import java.util.Map;
+package com.xebialabs.overthere.smb;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
-import com.xebialabs.overthere.cifs.winrs.CifsWinrsConnection;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.cifs.ConnectionBuilder;
+import com.xebialabs.overthere.smb.telnet.SmbTelnetConnection;
+import com.xebialabs.overthere.smb.winrm.SmbWinRmConnection;
+import com.xebialabs.overthere.smb.winrs.SmbWinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
-/**
- * Builds CIFS connections.
- */
-@Protocol(name = CIFS_PROTOCOL)
-public class CifsConnectionBuilder extends ConnectionBuilder implements OverthereConnectionBuilder {
+@Protocol(name = SMB_PROTOCOL)
+public class SmbConnectionBuilder extends ConnectionBuilder implements OverthereConnectionBuilder {
 
-    /**
-     * Name of the protocol handled by this connection builder, i.e. "cifs".
-     */
-    public static final String CIFS_PROTOCOL = "cifs";
+    public static final String SMB_PROTOCOL = "smb";
 
     /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_cifsPort">the online documentation</a>
+     * The default port for SMB connections over TCP/IP
      */
-    public static final String CIFS_PORT = "cifsPort";
+    public static final int PORT_DEFAULT_SMB = 445;
 
-    /**
-     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#cifs_cifsPort">the online documentation</a>
-     */
-    public static final int CIFS_PORT_DEFAULT = 445;
+    public static final String SMB_PORT = "smbPort";
 
-    private CifsConnection connection;
+    private final SmbConnection connection;
 
-    public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SmbConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
 
         switch (cifsConnectionType) {
             case TELNET:
-                connection = new CifsTelnetConnection(type, options, mapper);
+                connection = new SmbTelnetConnection(type, options, mapper);
                 break;
             case WINRM_INTERNAL:
-                connection = new CifsWinRmConnection(type, options, mapper);
+                connection = new SmbWinRmConnection(type, options, mapper);
                 break;
             case WINRM_NATIVE:
-                connection = new CifsWinrsConnection(type, options, mapper);
+                connection = new SmbWinrsConnection(type, options, mapper);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
@@ -87,5 +77,4 @@ public class CifsConnectionBuilder extends ConnectionBuilder implements Overther
     public String toString() {
         return connection.toString();
     }
-
 }
