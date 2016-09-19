@@ -15,10 +15,12 @@
 	    * [Host setup](#ssh_host_setup)
 	    * [Troubleshooting](#ssh_troubleshooting)
 	    * [Connection options](#ssh_connection_options)
-	* [CIFS, WinRM and Telnet](#cifs)
-	    * [Host setup](#cifs_host_setup)
-	    * [Troubleshooting](#cifs_troubleshooting)
-	    * [Connection options](#cifs_connection_options)
+	* [SMB 2.x/CIFS, WinRM and Telnet](#smb_cifs)
+	    * [SMB 2.x](#smb)
+	    * [CIFS](#cifs)
+	    * [Host setup](#smb_cifs_host_setup)
+	    * [Troubleshooting](#smb_cifs_troubleshooting)
+	    * [Connection options](#smb_cifs_connection_options)
 	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations)
 * [Release History](#release_history)
 
@@ -91,7 +93,8 @@ Overthere supports a number of protocols to connect to remote hosts:
 
 * [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
 * [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
-* [__cifs__](#cifs) - a connection using the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
+* [__smb__](#smb) -  a connection using the prevalent [SMB protocol](http://en.wikipedia.org/wiki/Server_Message_Block) for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
+* [__cifs__](#cifs) - a connection using public variant of the original Server Message Block (SMB) protocol developed by Microsoft known as [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts, CIFS is widely regarded as an obsolete protocol and users are encouraged to prefer a SMB protocol over a CIFS. Support for CIFS is deprecated and will be removed from subsequent releases. 
 * [__ssh-jumpstation__](#jumpstations) - a special protocol type that can only be used as a jumpstation protocol, which allows a connection to be created over an [SSH jumpstation](https://en.wikipedia.org/wiki/Port_forwarding#Local_port_forwarding).
 * [__proxy__](#jumpstations) - a special protocol type that can only be used as a jumpstation protocol, which allows a connection to be created over an [HTTP proxy](https://en.wikipedia.org/wiki/HTTP_tunnel).
 
@@ -430,10 +433,6 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>SU</strong> connection type.</td>
 </tr>
-
-
-
-
 <tr>
 	<th align="left" valign="top"><a name="ssh_sudoCommandPrefix"></a>sudoCommandPrefix</th>
 	<td>The command to prefix to the command to be executed to execute it as <strong>sudoUsername</strong>. The string <code>{0}</code> is replaced with the
@@ -572,13 +571,24 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 </tr>
 </table>
 
+<a name="smb_cifs"></a>
+## SMB 2.x/CIFS, WinRM and Telnet
+
+<a name="smb"></a>
+### SMB 2.x
+
+The SMB 2.x protocol implementation of Overthere uses the prevalent [SMB protocol](http://en.wikipedia.org/wiki/Server_Message_Block) for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. 
+
 <a name="cifs"></a>
-## CIFS, WinRM and Telnet
+### CIFS
 
-The CIFS protocol implementation of Overthere uses the [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), also known as SMB, for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. You will most likely not need to install new software although you might need to enable and configure some services:
+The CIFS protocol implementation of Overthere uses public variant of the original Server Message Block (SMB) protocol developed by Microsoft known as [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. CIFS is widely regarded as an obsolete protocol and users are encouraged to prefer a SMB protocol over a CIFS. Support for CIFS is deprecated and will be removed from subsequent releases.
 
-* The built-in file sharing capabilities of Windows are based on CIFS and are therefore available and enabled by default.
-* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#cifs_connectionType) connection option to __WINRM_NATIVE__.
+### SMB 2.x and CIFS
+These protocols are only supported for Windows hosts, you will most likely not need to install new software although you might need to enable and configure some services:
+
+* The built-in file sharing capabilities of Windows are based on CIFS/SMB and are therefore available and enabled by default.
+* WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
 ### Password limitations
@@ -593,23 +603,23 @@ Windows domain accounts are supported by the __WINRM_INTERNAL__, __WINRM_NATIVE_
 * For the __WINRM_NATIVE__ connection type, domain accounts may be specified using either the new-style (`USER@FULL.DOMAIN`) or old-style (`DOMAIN\USER`) domain syntax.
 * For all three connection types, local accounts must be specified without an at-sign (`@`) or a backslash (`\`).
 
-__N.B.:__ When using domain accounts with the __WINRM_INTERNAL__ connection type, the Kerberos subsystem of the Java Virtual Machine must be configured correctly. Please read the section on how to set up Kerberos [for the source host](#cifs_host_setup_krb5) and [the remote hosts](#cifs_host_setup_spn).
+__N.B.:__ When using domain accounts with the __WINRM_INTERNAL__ connection type, the Kerberos subsystem of the Java Virtual Machine must be configured correctly. Please read the section on how to set up Kerberos [for the source host](#smb_cifs_host_setup_krb5) and [the remote hosts](#smb_cifs_host_setup_spn).
 
 ### Administrative shares
-By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection option should have access to those shares and the underlying directories and files.
+By default Overthere will access the [administrative shares](http://en.wikipedia.org/wiki/Administrative_share) on the remote host. These shares are only accessible for users that are part of the __Administrators__ on the remote host. If you want to access the remote host using a regular account, use the [__pathShareMapping__](#smb_cifs_pathShareMappings) connection option to configure the shares to use for the paths Overthere will be connecting to. Of course, the user configured with the __username__ connection option should have access to those shares and the underlying directories and files.
 
 __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to SMB URLs that use the administrative shares, e.g. `smb://username:password@hostname/C$/Program%20Files/IBM/WebSphere/AppServer` (which corresponds to the UNC path `\\hostname\C$\Program Files\IBM\WebSphere\AppServer`), so that your code can use Windows style paths.
 
-<a name="cifs_host_setup"></a>
+<a name="smb_cifs_host_setup"></a>
 ### Host setup
 
-<a name="cifs_host_setup_cifs"></a>
-#### CIFS
-To connect to a remote host using the __CIFS__ protocol, ensure the host is reachable on port 445.
+<a name="smb_cifs_host_setup_smb"></a>
+#### SMB and CIFS
+To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
 
-If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#cifs_pathShareMappings) connection option is configured accordingly.
+If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
 
-<a name="cifs_host_setup_telnet"></a>
+<a name="smb_cifs_host_setup_telnet"></a>
 #### TELNET
 
 To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
@@ -625,9 +635,9 @@ To use the __TELNET__ connection type, you'll need to enable and configure the T
 
 When the Telnet server is enabled any user that is in the __Administrators__ group or that is in the __TelnetClients__ group and that has the __Allow logon locally__ privilege can log in using Telnet. See the Microsoft Technet to learn <a href="http://technet.microsoft.com/en-us/library/ee957044(WS.10).aspx">how to grant a user or group the right to logon locally</a> on Windows Server 2008 R2.
 
-<a name="cifs_host_setup_winrm"></a>
-<a name="cifs_host_setup_winrm_internal"></a>
-<a name="cifs_host_setup_winrm_native"></a>
+<a name="smb_cifs_host_setup_winrm"></a>
+<a name="smb_cifs_host_setup_winrm_internal"></a>
+<a name="smb_cifs_host_setup_winrm_native"></a>
 #### WINRM (WINRM_INTERNAL and WINRM_NATIVE)
 
 _For a PowerShell script to do what is described below in one go, check [Richard Downer's blog](http://www.frontiertown.co.uk/2011/12/overthere-control-windows-from-java/)_
@@ -673,7 +683,7 @@ To use the __WINRM_INTERNAL__ or the __WINRM_NATIVE__ connection type, you'll ne
 
 	__N.B.:__ Do not disable Negotiate authentication as the `winrm` command itself uses that to configure the WinRM subsystem!
 
-1. (Only required for __WINRM_INTERNAL__ or when the connection option [**winrsUnencrypted**](#cifs_winrsUnencrypted) is set to `true`) Configure WinRM to allow unencrypted SOAP messages:
+1. (Only required for __WINRM_INTERNAL__ or when the connection option [**winrsUnencrypted**](#smb_cifs_winrsUnencrypted) is set to `true`) Configure WinRM to allow unencrypted SOAP messages:
 
 		winrm set winrm/config/service @{AllowUnencrypted="true"}
 
@@ -683,7 +693,7 @@ To use the __WINRM_INTERNAL__ or the __WINRM_NATIVE__ connection type, you'll ne
 
 	__N.B.:__ This is not supported by WinRM 3.0, included with the Windows Management Framework 3.0. This update [has been temporarily removed from Windows Update](http://blogs.msdn.com/b/powershell/archive/2012/12/20/windows-management-framework-3-0-compatibility-update.aspx) because of numerous incompatiblity issues with other Microsoft products. However, if you have already installed WMF 3.0 and cannot downgrade, [Microsoft Knowledge Base article #2842230](http://support.microsoft.com/kb/2842230) describes a hotfix that can be installed to re-enable the `MaxMemoryPerShellMB` setting.
 
-1. To use the __WINRM_INTERNAL__ or __WINRM_NATIVE__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#cifs_winrmEnableHttps) set to `true`, follow the steps below:
+1. To use the __WINRM_INTERNAL__ or __WINRM_NATIVE__ connection type with HTTPS, i.e. [__winrmEnableHttps__](#smb_cifs_winrmEnableHttps) set to `true`, follow the steps below:
 
 	1. (Optional) Create a self signed certificate for the remote host by installing `selfssl.exe` from [the IIS 6 resource kit](http://www.microsoft.com/download/en/details.aspx?displaylang=en&id=17275) and running the command below or by following the instructions [in this blog by Hans Olav](http://www.hansolav.net/blog/SelfsignedSSLCertificatesOnIIS7AndCommonNames.aspx):
 
@@ -730,12 +740,12 @@ For more information on WinRM, please refer to <a href="http://msdn.microsoft.co
 * Allow all hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="*"}`
 * Allow a fixed set of hosts to connect to the WinRM listener: `winrm set winrm/config/client @{TrustedHosts="host1,host2..."}`
 
-<a name="cifs_host_setup_krb5"></a>
+<a name="smb_cifs_host_setup_krb5"></a>
 #### Kerberos - source host
 
 __N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host with the __WINRM_INTERNAL__ connection type.
 
-In addition to the setup described in [the WINRM section](#cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
+In addition to the setup described in [the WINRM section](#smb_cifs_host_setup_winrm), using Kerberos authentication requires that you follow the [Kerberos Requirements for Java](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/KerberosReq.html) on the host from which the Overthere connections are initiated, i.e. the source host.
 
 Create a file called `krb5.conf` (Unix) or `krb5.ini` (Windows) with at least the following content:
 
@@ -754,14 +764,14 @@ Alternatively, place the file somewhere else and add the following Java system p
 
 See [the Kerberos V5 System Administrator's Guide at MIT](http://web.mit.edu/kerberos/krb5-1.10/krb5-1.10.6/doc/krb5-admin.html#krb5_002econf) for more information on the `krb5.conf` format.
 
-<a name="cifs_host_setup_spn"></a>
+<a name="smb_host_setup_spn"></a>
 #### Kerberos - remote host
 
 __N.B.:__ You will only need to configure Kerberos if you are going to use Windows domain accounts to access the remote host with the __WINRM_INTERNAL__ connection type.
 
-By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#cifs_host_setup_winrm).
+By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#smb_cifs_host_setup_winrm).
 
-If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
+If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#smb_cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#smb_cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
 
 This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any host in the domain, as follows:
 <pre>
@@ -769,9 +779,9 @@ setspn -A <em>PROTOCOL</em>/<em>ADDRESS</em>:<em>PORT</em> <em>WINDOWS-HOST</em>
 </pre>
 where:
 
-* `PROTOCOL` is either `WSMAN` (default) or `HTTP` (if [__winrmKerberosUseHttpSpn__](#cifs_winrmKerberosUseHttpSpn) has been set to `true`).
+* `PROTOCOL` is either `WSMAN` (default) or `HTTP` (if [__winrmKerberosUseHttpSpn__](#smb_cifs_winrmKerberosUseHttpSpn) has been set to `true`).
 * `ADDRESS` is the [__address__](#address) used to connect to the remote host,
-* `PORT` (optional) is the [__port__](#port) used to connect to the remote host (usually 5985 or 5986, only necessary if [__winrmKerberosAddPortToSpn__](#cifs_winrmKerberosAddPortToSpn) has been set to `true`), and
+* `PORT` (optional) is the [__port__](#port) used to connect to the remote host (usually 5985 or 5986, only necessary if [__winrmKerberosAddPortToSpn__](#smb_cifs_winrmKerberosAddPortToSpn) has been set to `true`), and
 * `WINDOWS-HOST` is the short Windows hostname of the remote host.
 
 Some other useful commands:
@@ -779,35 +789,20 @@ Some other useful commands:
 * List all service principal names configured for the domain: `setspn -Q */*`
 * List all service principal names configured for a specific host in the domain: `setspn -L _WINDOWS-HOST_`
 
-<a name="cifs_troubleshooting"></a>
-### Troubleshooting CIFS, WinrRM and Telnet
+<a name="smb_cifs_troubleshooting"></a>
+### Troubleshooting SMB 2.x/CIFS, WinrRM and Telnet
 
-This section lists a number of common configuration errors that can occur when using Overthere with CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, please let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
+This section lists a number of common configuration errors that can occur when using Overthere with SMB/CIFS, WinRM and/or Telnet. If you run into other connectivity issues when using Overthere, please let us know by [creating a ticket](https://github.com/xebialabs/overthere/issues) or by [sending us a pull request](https://github.com/xebialabs/overthere/pulls).
 
 For more troubleshooting tips for Kerberos, please refer to the [Kerberos troubleshooting guide in the Java SE documentation](http://docs.oracle.com/javase/6/docs/technotes/guides/security/jgss/tutorials/Troubleshooting.html).
 
-#### CIFS connections are very slow to set up.
-
-The [JCIFS library](http://jcifs.samba.org), which Overthere uses to connect to CIFS shares, will try and query the Windows domain controller to resolve the hostname in SMB URLs. JCIFS will send packets over port 139 (one of the [NetBIOS over TCP/IP] ports) to query the <a href="http://en.wikipedia.org/wiki/Distributed_File_System_(Microsoft)">DFS</a>. If that port is blocked by a firewall, JCIFS will only fall back to using regular hostname resolution after a timeout has occurred.
-
-Set the following Java system property to prevent JCIFS from sending DFS query packets:
-`-Djcifs.smb.client.dfs.disabled=true`.
-
-See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
-
-#### CIFS connections time out
-
-If the problem cannot be solved by changing the network topology, try increasing the JCIFS timeout values documented in the [JCIFS documentation](http://jcifs.samba.org/src/docs/api/overview-summary.html#scp). Another system property not mentioned there but only on the [JCIFS homepage](http://jcifs.samba.org/) is `jcifs.smb.client.connTimeout`.
-
-To get more debug information from JCIFS, set the system property `jcifs.util.loglevel` to 3.
-
 #### Kerberos authentication fails with the message `Unable to load realm info from SCDynamicStore`
 
-The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5)?
+The Kerberos subsystem of Java cannot start up. Did you configure it as described in [the section on Kerberos setup for the source host](#smb_cifs_host_setup_krb5)?
 
 #### Kerberos authentication fails with the message `Cannot get kdc for realm …`
 
-The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) is case sensitive and must be entered in upper case in the `krb5.conf` file.
+The Kerberos subsystem of Java cannot find the information for the realm in the `krb5.conf` file. The realm name specified in [the Kerberos configuration on the source host](#smb_cifs_host_setup_krb5) is case sensitive and must be entered in upper case in the `krb5.conf` file.
 
 Alternatively, you can use the `dns_lookup_kdc` and `dns_lookup_realm` options in the `libdefaults` section to automatically find the right realm and KDC from the DNS server if it has been configured to include the necessary `SRV` and `TXT` records:
 
@@ -817,7 +812,7 @@ Alternatively, you can use the `dns_lookup_kdc` and `dns_lookup_realm` options i
 
 #### Kerberos authentication fails with the message `Server not found in Kerberos database (7)`
 
-The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)?
+The service principal name for the remote host has not been added to Active Directory. Did you add the SPN as described in [the section on Kerberos setup for remote hosts](#smb_cifs_host_setup_spn)?
 
 #### Kerberos authentication fails with the message `Pre-authentication information was invalid (24)` or `Identifier doesn't match expected value (906)`
 
@@ -833,15 +828,15 @@ Is the target machine part of a Windows 2000 domain? In that case, you'll have t
 
 #### Kerberos authentication fails with the message `Message stream modified (41)`
 
-The realm name specified in [the Kerberos configuration on the source host](#cifs_host_setup_krb5) does not match the case of the Windows domain name. The realm name is case sensitive and must be entered in upper case in the `krb5.conf` file.
+The realm name specified in [the Kerberos configuration on the source host](#smb_cifs_host_setup_krb5) does not match the case of the Windows domain name. The realm name is case sensitive and must be entered in upper case in the `krb5.conf` file.
 
 #### I am not using Kerberos authentication and I still see messages saying `Unable to load realm info from SCDynamicStore`
 
-The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source host](#cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#cifs_host_setup_winrm).
+The Kerberos subsystem of Java cannot start up and the remote WinRM server is sending a Kerberos authentication challenge. If you are using local accounts, the authentication will proceed succesfully despite this message. To remove these messages either configure Kerberos as described in [the section on Kerberos setup for the source host](#smb_cifs_host_setup_krb5) or disallow Kerberos on the WinRM server as described in step 4 of [the section on WinRM setup](#smb_cifs_host_setup_winrm).
 
 #### Telnet connection fails with the message `VT100/ANSI escape sequence found in output stream. Please configure the Windows Telnet server to use stream mode (tlntadmn config mode=stream).`
 
-The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#cifs_host_setup_telnet)?
+The Telnet service has been configured to be in "Console" mode. Did you configure it as described in [the section on Telnet setup](#smb_cifs_host_setup_telnet)?
 
 #### The `winrm` configuration command fails with the message `There are no more endpoints available from the endpoint mapper`
 
@@ -863,11 +858,11 @@ Multiple causes can lead to this error message:
 
 1. The Kerberos ticket is not accepted by the remote host:
 
-    1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used in the **address** connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
+    1. Did you set up the correct service principal names (SPNs) as described in [the section on Kerberos setup for remote hosts](#smb_cifs_host_setup_spn)? The hostname is case insenstive, but it has to be the same as the one used in the **address** connection options, i.e. a simple hostname or a fully qualified domain name. Domain policies may prevent the Windows Management Service from creating the required SPNs. See [this blog by LazyJeff](http://fix.lazyjeff.com/2011/02/how-to-fix-winrm-service-failed-to.html) for more information.
 
     1. Has the reverse DNS of the remote host been set up correctly? See [Principal names and DNS](http://web.mit.edu/Kerberos/krb5-devel/doc/admin/princ_dns.html) for more information. Please note that the `rdns` option is not available in Java's Kerberos implementation.
 
-1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the [host setup for WinRM](#cifs_host_setup_winrm)?
+1. The WinRM service is not set up to accept unencrypted traffic. Did you execute step #8 of the [host setup for WinRM](#smb_cifs_host_setup_winrm)?
 
 1. The user is not allowed to log in. Did you uncheck the "User must change password at next logon" checkbox when you created the user in Windows?
 
@@ -877,7 +872,7 @@ Multiple causes can lead to this error message:
 
 Multiple causes can lead to this error message:
 
-1. If the command was executing for a long time, this might have been caused by a timeout. You can increase the WinRM timeout specified by the [**winrmTimeout**](#cifs_winrmTimeout) connection option to increase the request timeout. Don't forget to increase the `MaxTimeoutms` setting on the remote host as well. For example, to set the maximum timeout on the server to five minutes, enter the following command:
+1. If the command was executing for a long time, this might have been caused by a timeout. You can increase the WinRM timeout specified by the [**winrmTimeout**](#smb_cifs_winrmTimeout) connection option to increase the request timeout. Don't forget to increase the `MaxTimeoutms` setting on the remote host as well. For example, to set the maximum timeout on the server to five minutes, enter the following command:
 
     winrm set winrm/config @{MaxTimeoutms="300000"}
 
@@ -896,14 +891,31 @@ If you see an unknown WinRM error code in the logging, you can use the `winrm he
 
 _Courtesy of [this PowerShell Magazine blog by Shay Levy](http://www.powershellmagazine.com/2013/03/06/pstip-decoding-winrm-error-messages/)_
 
-<a name="cifs_connection_options"></a>
-### CIFS connection options
+### Troubleshooting CIFS
 
-The CIFS protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
+#### CIFS connections are very slow to set up.
+
+The [JCIFS library](http://jcifs.samba.org), which Overthere uses to connect to CIFS shares, will try and query the Windows domain controller to resolve the hostname in SMB URLs. JCIFS will send packets over port 139 (one of the [NetBIOS over TCP/IP] ports) to query the <a href="http://en.wikipedia.org/wiki/Distributed_File_System_(Microsoft)">DFS</a>. If that port is blocked by a firewall, JCIFS will only fall back to using regular hostname resolution after a timeout has occurred.
+
+Set the following Java system property to prevent JCIFS from sending DFS query packets:
+`-Djcifs.smb.client.dfs.disabled=true`.
+
+See [this article on the JCIFS mailing list](http://lists.samba.org/archive/jcifs/2009-December/009029.html) for a more detailed explanation.
+
+#### CIFS connections time out
+
+If the problem cannot be solved by changing the network topology, try increasing the JCIFS timeout values documented in the [JCIFS documentation](http://jcifs.samba.org/src/docs/api/overview-summary.html#scp). Another system property not mentioned there but only on the [JCIFS homepage](http://jcifs.samba.org/) is `jcifs.smb.client.connTimeout`.
+
+To get more debug information from JCIFS, set the system property `jcifs.util.loglevel` to 3.
+
+<a name="smb_cifs_common_connection_options"></a>
+### Common SMB 2.x and CIFS connection options
+
+The SMB 2.x and CIFS protocol implementation of Overthere defines a number of additional connection options, in addition to the [common connection options](#common_connection_options).
 
 <table>
 <tr>
-	<th align="left" valign="top"><a name="cifs_connectionType"></a>connectionType</th>
+	<th align="left" valign="top"><a name="smb_cifs_connectionType"></a>connectionType</th>
 	<td>Specifies what protocol is used to execute commands on the remote hsots. One of the following values must be set:<ul>
 		<li><strong><a href="#cifs_host_setup_winrm">WINRM_INTERNAL</a></strong> - uses WinRM over HTTP(S) to execute remote commands. The
 		    <strong>port</strong> connection option specifies the Telnet port to connect to. The default value is <code>5985</code> for HTTP and
@@ -916,34 +928,30 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	</ul></td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_cifsPort"></a>cifsPort</th>
-	<td>The CIFS port to connect to. The default value is <code>445</code>.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="cifs_pathShareMappings"></a>pathShareMappings</a></th>
+	<th align="left" valign="top"><a name="smb_cifs_pathShareMappings"></a>pathShareMappings</a></th>
 	<td>The path to share mappings to use for CIFS specified as a <code>Map&lt;String, String&gt;</code>, e.g. <code>C:\IBM\WebSphere</code> -&gt;
 	<code>WebSphere</code>. If a path is not explicitly mapped to a share, an administrative share will be used. The default value is to use no
 	path/share mappings, i.e. to use only administrative shares.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmEnableHttps"></a>winrmEnableHttps</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmEnableHttps"></a>winrmEnableHttps</th>
 	<td>If set to <code>true</code>, HTTPS is used to connect to the WinRM server. Otherwise HTTP is used. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> and <strong>WINRM_NATIVE</strong> connection types.</td>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmContext"></a>winrmContext</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmContext"></a>winrmContext</th>
 	<td>The context used by the WinRM server. The default value is <code>/wsman</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmEnvelopSize"></a>winrmEnvelopSize</th>
 	<td>The WinRM envelop size in bytes to use. The default value is <code>153600</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmHttpsCertificateTrustStrategy"></a>winrmHttpsCertificateTrustStrategy</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmHttpsCertificateTrustStrategy"></a>winrmHttpsCertificateTrustStrategy</th>
 	<td>The certificate trust strategy for WinRM HTTPS connections. One of the following values can be set:<ul>
 		<li><strong>STRICT</strong> (default) - use Java's trusted certificate chains.</li>
 		<li><strong>SELF_SIGNED</strong> - self-signed certificates are allowed (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/TrustSelfSignedStrategy.html">TrustSelfSignedStrategy</a>)</li>
@@ -952,7 +960,7 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmHttpsHostnameVerificationStrategy"></a>winrmHttpsHostnameVerificationStrategy</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmHttpsHostnameVerificationStrategy"></a>winrmHttpsHostnameVerificationStrategy</th>
 	<td>The hostname verification strategy for WinRM HTTPS connections. One of the following values can be set:<ul>
 		<li><strong>STRICT</strong> - strict verification (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/StrictHostnameVerifier.html">StrictHostnameVerifier</a>)</li>
 		<li><strong>BROWSER_COMPATIBLE</strong> (default) - wilcards in certifactes are matched (see <a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/conn/ssl/BrowserCompatHostnameVerifier.html">BrowserCompatHostnameVerifier.html</a>)</li>
@@ -963,85 +971,105 @@ The CIFS protocol implementation of Overthere defines a number of additional con
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when <a href="#cifs_winrmEnableHttps"><strong>winrmEnableHttps</strong></a> is set to <code>true</code>.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmKerberosAddPortToSpn"></a>winrmKerberosAddPortToSpn</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmKerberosAddPortToSpn"></a>winrmKerberosAddPortToSpn</th>
 	<td>If set to <code>true</code>, the port number (e.g. 5985) will be added to the service principal name (SPN) for which a Kerberos ticket is requested. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td></td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmKerberosDebug"></a>winrmKerberosDebug</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmKerberosDebug"></a>winrmKerberosDebug</th>
 	<td>If set to <code>true</code>, enables debug output for the <a href="http://en.wikipedia.org/wiki/Java_Authentication_and_Authorization_Service">JAAS</a>-based Kerberos authentication within the OverThere connector. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td>
 </tr>
 <tr>
-<th align="left" valign="top"><a name="cifs_winrmKerberosTicketCache"></a>winrmKerberosTicketCache</th>
+<th align="left" valign="top"><a name="smb_cifs_winrmKerberosTicketCache"></a>winrmKerberosTicketCache</th>
 <td>If set to <code>true</code>, enables the use of the Kerberos ticket cache for use in authentication.  When enabled, if a password is not specfified the system ticket cache will be used as a  The default value is <code>false</code>.
 <br/>
 <strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmKerberosUseHttpSpn"></a>winrmKerberosUseHttpSpn</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmKerberosUseHttpSpn"></a>winrmKerberosUseHttpSpn</th>
 	<td>If set to <code>true</code>, the protocol <code>HTTP</code> will be used in the service principal name (SPN) for which a Kerberos ticket is requested. Otherwise the protocol <code>WSMAN</code> is used. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type, when a Windows domain acount is used.</td></td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmLocale"></a>winrmLocale</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmLocale"></a>winrmLocale</th>
 	<td>The WinRM locale to use. The default value is <code>en-US</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrmTimeout"></a>winrmTimeout</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrmTimeout"></a>winrmTimeout</th>
 	<td>The WinRM timeout to use in <a href="http://www.w3.org/TR/xmlschema-2/#isoformats">XML schema duration format</a>. The default value is <code>PT60.000S</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_INTERNAL</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsAllowDelegate"></a>winrsAllowDelegate</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsAllowDelegate"></a>winrsAllowDelegate</th>
 	<td>If set to <code>false</code>, the user's credentials may be passed to the remote host. This option corresponds to the <code>winrs</code> command option <code>-allowdelegate</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsCompression"></a>winrsCompression</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsCompression"></a>winrsCompression</th>
 	<td>If set to <code>true</code>, compression is enabled. This option corresponds to the <code>winrs</code> command option <code>-compression</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsNoecho"></a>winrsNoecho</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsNoecho"></a>winrsNoecho</th>
 	<td>If set to <code>true</code>, echo is disabled. This option corresponds to the <code>winrs</code> command option <code>-noecho</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsNoprofile"></a>winrsNoprofile</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsNoprofile"></a>winrsNoprofile</th>
 	<td>If set to <code>true</code>, loading the user profile before executing the command is disabled. This option corresponds to the <code>winrs</code> command option <code>-noprofile</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsUnencrypted"></a>winrsUnencrypted</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsUnencrypted"></a>winrsUnencrypted</th>
 	<td>If set to <code>true</code>, encryption is disabled. This option corresponds to the <code>winrs</code> command option <code>-unencrypted</code>. The default value is <code>false</code>.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsProxyProtocol"></a>winrsProxyProtocol</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsProxyProtocol"></a>winrsProxyProtocol</th>
 	<td>The protocol to use when connecting to the "winrs proxy host", i.e. the host that is used to run the <code>winrs</code> command. The "winrs proxy host" must run Windows. The default value is <code>local</code>, which means the commands will be executed on the local host, which means the local host must run Windows.
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="cifs_winrsProxyConnectionOptions"></a>winrsProxyConnectionOptions</th>
+	<th align="left" valign="top"><a name="smb_cifs_winrsProxyConnectionOptions"></a>winrsProxyConnectionOptions</th>
 	<td>The connection options to use when connecting to the "winrs proxy host".
 	<br/>
 	<strong>N.B.:</strong> This connection option is only applicable for the <strong>WINRM_NATIVE</strong> connection type.</td>
 </tr>
-
 </table>
+
+<a name="smb_connection_options"></a>
+### SMB 2.x connection options
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="smbPort"></a>smbPort</th>
+	<td>The SMB port to connect to. The default value is <code>445</code>.</td>
+</tr>
+</table>
+
+<a name="cifs_connection_options"></a>
+### CIFS connection options
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="cifsPort"></a>cifsPort</th>
+	<td>The CIFS port to connect to. The default value is <code>445</code>.</td>
+</tr>
+</table>
+
 
 <a name="jumpstations"></a>
 ## Jumpstations: SSH tunnels and HTTP proxies
