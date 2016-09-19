@@ -45,6 +45,9 @@ public class SmbConnectionBuilder extends ConnectionBuilder implements Overthere
      */
     public static final int PORT_DEFAULT_SMB = 445;
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_smbPort">the online documentation</a>
+     */
     public static final String SMB_PORT = "smbPort";
 
     private final SmbConnection connection;
