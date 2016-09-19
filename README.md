@@ -1055,7 +1055,7 @@ The SMB 2.x and CIFS protocol implementation of Overthere defines a number of ad
 
 <table>
 <tr>
-	<th align="left" valign="top"><a name="smbPort"></a>smbPort</th>
+	<th align="left" valign="top"><a name="smb_smbPort"></a>smbPort</th>
 	<td>The SMB port to connect to. The default value is <code>445</code>.</td>
 </tr>
 </table>
