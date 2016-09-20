@@ -31,24 +31,24 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 
 public abstract class ConnectionValidator {
 
-    public static void assertIsWindowsHost(OperatingSystemFamily os, String protocol, CifsConnectionType connectionType) {
+    public static void checkIsWindowsHost(OperatingSystemFamily os, String protocol, CifsConnectionType connectionType) {
         checkArgument(os == WINDOWS, "Cannot create a " + protocol + ":%s connection to a host that is not running Windows", connectionType.toString().toLowerCase());
     }
 
-    public static void assertNotNewStyleWindowsDomain(String username, String protocol, CifsConnectionType connectionType) {
+    public static void checkNotNewStyleWindowsDomain(String username, String protocol, CifsConnectionType connectionType) {
         checkArgument(!username.contains("@"), "Cannot create a " + protocol + ":%s connection with a new-style Windows domain account [%s], use DOMAIN\\USER instead.", connectionType.toString().toLowerCase(), username);
     }
 
-    public static void assertNotOldStyleWindowsDomain(String username, String protocol, CifsConnectionType connectionType) {
+    public static void checkNotOldStyleWindowsDomain(String username, String protocol, CifsConnectionType connectionType) {
         checkArgument(!username.contains("\\"), "Cannot create a " + protocol + ":%s connection with an old-style Windows domain account [%s], use USER@DOMAIN instead.", connectionType.toString().toLowerCase(), username);
     }
 
-    public static void assetNotThroughJumpstation(AddressPortMapper mapper, String protocol, CifsConnectionType connectionType) {
+    public static void checkNotThroughJumpstation(AddressPortMapper mapper, String protocol, CifsConnectionType connectionType) {
         checkArgument(mapper instanceof DefaultAddressPortMapper, "Cannot create a " + protocol + ":%s connection when connecting through a SSH jumpstation", connectionType.toString().toLowerCase());
 
     }
 
-    public static void assertNoSingleQuoteInPassword(String password, String protocol, CifsConnectionType connectionType) {
+    public static void checkNoSingleQuoteInPassword(String password, String protocol, CifsConnectionType connectionType) {
         checkArgument(password.indexOf('\'') == -1 && password.indexOf('\"') == -1, "Cannot create a " + protocol + ":%s connection with a password that contains a single quote (\') or a double quote (\")", connectionType.toString().toLowerCase());
     }
 }

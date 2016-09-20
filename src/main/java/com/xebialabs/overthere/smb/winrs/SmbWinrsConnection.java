@@ -31,6 +31,9 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static java.lang.String.format;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotThroughJumpstation;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNoSingleQuoteInPassword;
 
 /**
  * A connection to a Windows host using SMB and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
@@ -43,9 +46,9 @@ public class SmbWinrsConnection extends SmbConnection {
 
     public SmbWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assetNotThroughJumpstation(mapper, SMB_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNoSingleQuoteInPassword(password, SMB_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        checkNotThroughJumpstation(mapper, SMB_PROTOCOL, cifsConnectionType);
+        checkNoSingleQuoteInPassword(password, SMB_PROTOCOL, cifsConnectionType);
         this.options = options;
     }
 

@@ -27,15 +27,17 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
+import com.xebialabs.overthere.cifs.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotOldStyleWindowsDomain;
 
 /**
  * A connection to a Windows host using CIFS and a Java implementation of WinRM.
  */
-public class CifsWinRmConnection extends CifsConnection {
+public class CifsWinRmConnection extends CifsConnection implements ProcessConnection {
 
     public static final int STDIN_BUF_SIZE = 4096;
 
@@ -45,8 +47,8 @@ public class CifsWinRmConnection extends CifsConnection {
      */
     public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotOldStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
+        checkNotOldStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
     }
 
     @Override

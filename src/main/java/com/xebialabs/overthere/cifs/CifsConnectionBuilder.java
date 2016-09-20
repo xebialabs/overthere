@@ -22,9 +22,6 @@
  */
 package com.xebialabs.overthere.cifs;
 
-import java.util.Collections;
-import java.util.Map;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
@@ -40,7 +37,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
  * Builds CIFS connections.
  */
 @Protocol(name = CIFS_PROTOCOL)
-public class CifsConnectionBuilder extends ConnectionBuilder implements OverthereConnectionBuilder {
+public class CifsConnectionBuilder extends BaseCifsConnectionBuilder implements OverthereConnectionBuilder {
 
     /**
      * Name of the protocol handled by this connection builder, i.e. "cifs".

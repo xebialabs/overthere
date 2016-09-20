@@ -24,11 +24,11 @@ package com.xebialabs.overthere.cifs.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotNewStyleWindowsDomain;
 
 /**
  * A connection to a Windows host using CIFS and Telnet.
@@ -50,8 +50,8 @@ public class CifsTelnetConnection extends CifsConnection {
      */
     public CifsTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotNewStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
+        checkNotNewStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
         // Make sure that we're properly cleaned up by setting the connected state.
         connected();
     }

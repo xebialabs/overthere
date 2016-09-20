@@ -1,21 +1,21 @@
 /**
  * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
- * <p>
- * <p>
+ *
+ *
  * Overthere is licensed under the terms of the GPLv2
  * <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most XebiaLabs Libraries.
  * There are special exceptions to the terms and conditions of the GPLv2 as it is applied to
  * this software, see the FLOSS License Exception
  * <http://github.com/xebialabs/overthere/blob/master/LICENSE>.
- * <p>
+ *
  * This program is free software; you can redistribute it and/or modify it under the terms
  * of the GNU General Public License as published by the Free Software Foundation; version 2
  * of the License.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU General Public License along with this
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
@@ -59,7 +59,6 @@ public class SmbConnection extends BaseOverthereConnection {
     private Connection connection;
     private Session session;
     private int port;
-    private Map<String, DiskShare> shareCache = new ConcurrentHashMap<>();
 
     protected final String password;
     protected CifsConnectionType cifsConnectionType;
@@ -128,28 +127,18 @@ public class SmbConnection extends BaseOverthereConnection {
     @Override
     protected void doClose() {
         try {
-            for (DiskShare s : shareCache.values())
-                try {
-                    s.close();
-                } catch (IOException e) {
-                    logger.warn("Exception while trying to close smb share", e);
-                }
+            if (session != null) {
+                session.close();
+            }
+        } catch (IOException e) {
+            logger.warn("Exception while trying to close smb session", e);
         } finally {
-            shareCache.clear();
             try {
-                if (session != null) {
-                    session.close();
+                if (connection != null) {
+                    connection.close();
                 }
-            } catch (IOException e) {
-                logger.warn("Exception while trying to close smb session", e);
-            } finally {
-                try {
-                    if (connection != null) {
-                        connection.close();
-                    }
-                } catch (Exception e) {
-                    logger.warn("Exception while trying to close smb connection", e);
-                }
+            } catch (Exception e) {
+                logger.warn("Exception while trying to close smb connection", e);
             }
         }
     }
@@ -165,14 +154,10 @@ public class SmbConnection extends BaseOverthereConnection {
     }
 
     protected DiskShare getShare(String shareName) {
-        DiskShare share = shareCache.get(shareName);
-        if (share == null) {
-            share = (DiskShare) session.connectShare(shareName);
-            if (!(share instanceof DiskShare)) {
-                close();
-                throw new RuntimeIOException("The share " + shareName + " is not a disk share");
-            }
-            shareCache.put(shareName, share);
+        DiskShare share = (DiskShare) session.connectShare(shareName);
+        if (!(share instanceof DiskShare)) {
+            close();
+            throw new RuntimeIOException("The share " + shareName + " is not a disk share");
         }
         return share;
     }

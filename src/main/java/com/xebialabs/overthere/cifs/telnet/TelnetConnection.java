@@ -24,6 +24,7 @@ package com.xebialabs.overthere.cifs.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.cifs.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
@@ -41,7 +42,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
-public class TelnetConnection {
+public class TelnetConnection implements ProcessConnection {
 
     private static final String DETECTABLE_WINDOWS_PROMPT = "TELNET4OVERTHERE ";
 
@@ -78,6 +79,7 @@ public class TelnetConnection {
         this.workingDirectory = workingDirectory;
     }
 
+    @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");

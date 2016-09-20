@@ -29,7 +29,7 @@ import static com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy.ST
 import static com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy.BROWSER_COMPATIBLE;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 
-public abstract class ConnectionBuilder {
+public abstract class BaseCifsConnectionBuilder {
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_cifs_connectionType">the online documentation</a>

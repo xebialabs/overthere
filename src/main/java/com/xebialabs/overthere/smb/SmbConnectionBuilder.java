@@ -25,7 +25,7 @@ package com.xebialabs.overthere.smb;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.cifs.ConnectionBuilder;
+import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
 import com.xebialabs.overthere.smb.telnet.SmbTelnetConnection;
 import com.xebialabs.overthere.smb.winrm.SmbWinRmConnection;
 import com.xebialabs.overthere.smb.winrs.SmbWinrsConnection;
@@ -36,7 +36,7 @@ import com.xebialabs.overthere.spi.Protocol;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 @Protocol(name = SMB_PROTOCOL)
-public class SmbConnectionBuilder extends ConnectionBuilder implements OverthereConnectionBuilder {
+public class SmbConnectionBuilder extends BaseCifsConnectionBuilder implements OverthereConnectionBuilder {
 
     public static final String SMB_PROTOCOL = "smb";
 

@@ -33,8 +33,8 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.WindowsCloudHostWithDomainListener.DOMAIN_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
-import static com.xebialabs.overthere.cifs.ConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.ConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 @Test

@@ -24,12 +24,14 @@ package com.xebialabs.overthere.cifs.winrs;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static java.lang.String.format;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotThroughJumpstation;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNoSingleQuoteInPassword;
 
 /**
  * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
@@ -42,9 +44,9 @@ public class CifsWinrsConnection extends CifsConnection {
 
     public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assetNotThroughJumpstation(mapper, CIFS_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNoSingleQuoteInPassword(password, CIFS_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
+        checkNotThroughJumpstation(mapper, CIFS_PROTOCOL, cifsConnectionType);
+        checkNoSingleQuoteInPassword(password, CIFS_PROTOCOL, cifsConnectionType);
         this.options = options;
     }
 

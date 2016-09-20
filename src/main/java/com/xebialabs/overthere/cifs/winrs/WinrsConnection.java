@@ -24,6 +24,7 @@ package com.xebialabs.overthere.cifs.winrs;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.cifs.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.net.InetSocketAddress.createUnresolved;
 
-public class WinrsConnection {
+public class WinrsConnection implements ProcessConnection {
 
     private OperatingSystemFamily os;
     private OverthereFile workingDirectory;
@@ -84,6 +85,7 @@ public class WinrsConnection {
         closeQuietly(winrsProxyConnection);
     }
 
+    @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");

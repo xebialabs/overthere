@@ -26,12 +26,13 @@ import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
 import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotOldStyleWindowsDomain;
 
 /**
  * A connection to a Windows host using SMB and a Java implementation of WinRM.
@@ -44,8 +45,8 @@ public class SmbWinRmConnection extends SmbConnection {
      */
     public SmbWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotOldStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        checkNotOldStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
     }
 
     @Override

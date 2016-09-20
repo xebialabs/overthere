@@ -23,12 +23,13 @@
 package com.xebialabs.overthere.smb.telnet;
 
 import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.ConnectionValidator;
 import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
 import com.xebialabs.overthere.smb.SmbConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotNewStyleWindowsDomain;
 
 
 /**
@@ -49,8 +50,8 @@ public class SmbTelnetConnection extends SmbConnection {
      */
     public SmbTelnetConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        ConnectionValidator.assertIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
-        ConnectionValidator.assertNotNewStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
+        checkIsWindowsHost(os, SMB_PROTOCOL, cifsConnectionType);
+        checkNotNewStyleWindowsDomain(username, SMB_PROTOCOL, cifsConnectionType);
         connected();
     }
 
