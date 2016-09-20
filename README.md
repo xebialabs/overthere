@@ -582,7 +582,7 @@ The SMB 2.x protocol implementation of Overthere uses the prevalent [SMB protoco
 <a name="cifs"></a>
 ### CIFS
 
-The CIFS protocol implementation of Overthere uses public variant of the original Server Message Block (SMB) protocol developed by Microsoft known as [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. CIFS is widely regarded as an obsolete protocol and users are encouraged to prefer a SMB protocol over a CIFS. Support for CIFS is deprecated and will be removed from subsequent releases.
+The CIFS protocol implementation of Overthere uses public variant of the original Server Message Block (SMB) protocol developed by Microsoft known as [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), for file manipulation and, depending on the settings, uses either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. CIFS is widely regarded as an obsolete protocol and users are encouraged to prefer SMB protocol over CIFS. Support for CIFS is deprecated and will be removed from subsequent releases.
 
 ### SMB 2.x and CIFS
 These protocols are only supported for Windows hosts, you will most likely not need to install new software although you might need to enable and configure some services:
@@ -1063,7 +1063,7 @@ The SMB 2.x and CIFS protocol implementation of Overthere defines a number of ad
 <a name="cifs_connection_options"></a>
 ### CIFS connection options
 
-<table>
+<table width="100%">
 <tr>
 	<th align="left" valign="top"><a name="cifs_cifsPort"></a>cifsPort</th>
 	<td>The CIFS port to connect to. The default value is <code>445</code>.</td>
