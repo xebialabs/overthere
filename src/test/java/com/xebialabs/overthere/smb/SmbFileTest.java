@@ -22,7 +22,6 @@
  */
 package com.xebialabs.overthere.smb;
 
-import com.xebialabs.overthere.smb.winrm.SmbWinRmConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -58,7 +57,7 @@ public class SmbFileTest {
     @Test
     public void shouldReturnNullForParentFileOfRoot() {
         options.set(USERNAME, "user@domain.com");
-        SmbWinRmConnection smbWinRmConnection = new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        SmbProcessConnection smbWinRmConnection = new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
         OverthereFile file = smbWinRmConnection.getFile("C:\\");
         assertThat(file.getParentFile(), nullValue());
     }
@@ -66,7 +65,7 @@ public class SmbFileTest {
     @Test
     public void shouldSucceedForNonRoot() {
         options.set(USERNAME, "user@domain.com");
-        SmbWinRmConnection smbWinRmConnection = new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        SmbProcessConnection smbWinRmConnection = new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
         OverthereFile file = smbWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
         assertThat(file.getParentFile(), not(nullValue()));
     }

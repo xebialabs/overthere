@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.smb.winrs;
 
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -63,7 +64,7 @@ public class SmbWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class SmbWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
@@ -79,6 +80,6 @@ public class SmbWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new SmbWinrsConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 }

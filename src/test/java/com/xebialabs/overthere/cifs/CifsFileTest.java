@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
 
 import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
@@ -65,7 +64,7 @@ public class CifsFileTest {
     @Test
     public void shouldReturnNullForParentFileOfRoot() {
         options.set(USERNAME, "user@domain.com");
-        CifsWinRmConnection cifsWinRmConnection = new CifsWinRmConnection(CIFS_PROTOCOL, options, INSTANCE);
+        CifsProcessConnection cifsWinRmConnection = new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
         OverthereFile file = cifsWinRmConnection.getFile("C:\\");
         assertThat(file.getParentFile(), nullValue());
     }
@@ -73,7 +72,7 @@ public class CifsFileTest {
     @Test
     public void shouldSucceedForNonRoot() {
         options.set(USERNAME, "user@domain.com");
-        CifsWinRmConnection cifsWinRmConnection = new CifsWinRmConnection(CIFS_PROTOCOL, options, INSTANCE);
+        CifsProcessConnection cifsWinRmConnection = new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
         OverthereFile file = cifsWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
         assertThat(file.getParentFile(), not(nullValue()));
     }

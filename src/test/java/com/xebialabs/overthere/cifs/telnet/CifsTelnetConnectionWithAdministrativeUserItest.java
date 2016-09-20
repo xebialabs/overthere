@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
+import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -62,7 +63,7 @@ public class CifsTelnetConnectionWithAdministrativeUserItest extends OverthereCo
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return CifsTelnetConnection.class.getName();
+        return CifsProcessConnection.class.getName();
     }
 
 }

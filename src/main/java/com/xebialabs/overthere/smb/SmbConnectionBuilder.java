@@ -24,11 +24,7 @@ package com.xebialabs.overthere.smb;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
-import com.xebialabs.overthere.smb.telnet.SmbTelnetConnection;
-import com.xebialabs.overthere.smb.winrm.SmbWinRmConnection;
-import com.xebialabs.overthere.smb.winrs.SmbWinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
@@ -53,21 +49,7 @@ public class SmbConnectionBuilder extends BaseCifsConnectionBuilder implements O
     private final SmbConnection connection;
 
     public SmbConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
-
-        switch (cifsConnectionType) {
-            case TELNET:
-                connection = new SmbTelnetConnection(type, options, mapper);
-                break;
-            case WINRM_INTERNAL:
-                connection = new SmbWinRmConnection(type, options, mapper);
-                break;
-            case WINRM_NATIVE:
-                connection = new SmbWinrsConnection(type, options, mapper);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
-        }
+        connection = new SmbProcessConnection(type, options, mapper);
     }
 
     @Override

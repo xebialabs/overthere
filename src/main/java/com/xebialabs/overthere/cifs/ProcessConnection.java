@@ -28,4 +28,8 @@ import com.xebialabs.overthere.OverthereProcess;
 public interface ProcessConnection {
 
     OverthereProcess startProcess(final CmdLine cmd);
+
+    void connect();
+
+    void close();
 }

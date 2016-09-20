@@ -32,14 +32,23 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNoSingleQuoteInPassword;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotThroughJumpstation;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
+/**
+ * A connection to a Windows host using Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
+ */
 public class WinrsConnection implements ProcessConnection {
 
     private OperatingSystemFamily os;
@@ -48,7 +57,8 @@ public class WinrsConnection implements ProcessConnection {
     private int port;
     private String password;
     private String username;
-    private CifsConnectionType connectionType = CifsConnectionType.WINRM_INTERNAL;
+    private String protocol;
+    private CifsConnectionType connectionType = CifsConnectionType.WINRM_NATIVE;
     private ConnectionOptions options;
 
     private OverthereConnection winrsProxyConnection;
@@ -64,25 +74,20 @@ public class WinrsConnection implements ProcessConnection {
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
         this.password = options.get(PASSWORD);
+        this.protocol = options.get(PROTOCOL);
+
+        checkIsWindowsHost(os, protocol, connectionType);
+        checkNotThroughJumpstation(mapper, protocol, connectionType);
+        checkNoSingleQuoteInPassword(password, protocol, connectionType);
     }
 
-    public OverthereConnection getWinrsProxyConnection() {
-        return this.winrsProxyConnection;
-    }
-
-    public OverthereConnection connectToWinrsProxy(ConnectionOptions options) {
-        logger.debug("Connecting to winrs proxy");
-
-        String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, WINRS_PROXY_PROTOCOL_DEFAULT);
-        ConnectionOptions winrsProxyConnectionOptions = options.get(WINRS_PROXY_CONNECTION_OPTIONS, new ConnectionOptions());
-        winrsProxyConnection = Overthere.getConnection(winrsProxyProtocol, winrsProxyConnectionOptions);
-        return winrsProxyConnection;
-    }
-
-    public void disconnectFromWinrsProxy() {
-        logger.debug("Disconnecting from winrs proxy");
-
-        closeQuietly(winrsProxyConnection);
+    @Override
+    public void connect() {
+        connectToWinrsProxy(options);
+        if (winrsProxyConnection.getHostOperatingSystem() != WINDOWS) {
+            disconnectFromWinrsProxy();
+            throw new IllegalArgumentException(format("Cannot create a " + SMB_PROTOCOL + ":%s connection with a winrs proxy that is not running Windows", connectionType.toString().toLowerCase()));
+        }
     }
 
     @Override
@@ -122,6 +127,25 @@ public class WinrsConnection implements ProcessConnection {
         winrsCmd.add(cmd.getArguments());
 
         return winrsProxyConnection.startProcess(winrsCmd);
+    }
+
+    @Override
+    public void close() {
+        disconnectFromWinrsProxy();
+    }
+
+    OverthereConnection connectToWinrsProxy(ConnectionOptions options) {
+        logger.debug("Connecting to winrs proxy");
+
+        String winrsProxyProtocol = options.get(WINRS_PROXY_PROTOCOL, WINRS_PROXY_PROTOCOL_DEFAULT);
+        ConnectionOptions winrsProxyConnectionOptions = options.get(WINRS_PROXY_CONNECTION_OPTIONS, new ConnectionOptions());
+        winrsProxyConnection = Overthere.getConnection(winrsProxyProtocol, winrsProxyConnectionOptions);
+        return winrsProxyConnection;
+    }
+
+    void disconnectFromWinrsProxy() {
+        logger.debug("Disconnecting from winrs proxy");
+        closeQuietly(winrsProxyConnection);
     }
 
     private static final Logger logger = LoggerFactory.getLogger(WinrsConnection.class);

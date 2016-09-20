@@ -26,6 +26,7 @@ import com.google.common.io.Resources;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.WindowsCloudHostWithDomainListener;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -83,6 +84,6 @@ public class SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest extends
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SmbWinRmConnection.class.getName();
+        return SmbProcessConnection.class.getName();
     }
 }

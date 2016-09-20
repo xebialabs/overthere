@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.smb.winrm;
 
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,21 +57,21 @@ public class SmbWinRmConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     @SuppressWarnings("resource")
     public void shouldNotSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new SmbWinRmConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
 }

@@ -24,6 +24,7 @@ package com.xebialabs.overthere.cifs.winrm;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.cifs.ProcessConnection;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.spi.AddressPortMapper;
@@ -37,13 +38,19 @@ import java.net.URL;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotOldStyleWindowsDomain;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
-public class WinRmConnection {
+/**
+ * A connection to a Windows host using a Java implementation of WinRM.
+ */
+public class WinRmConnection implements ProcessConnection {
 
     private int connectionTimeoutMillis;
     private int socketTimeoutMillis;
@@ -54,10 +61,12 @@ public class WinRmConnection {
     private int port;
     private String password;
     private String username;
+    private String protocol;
     private CifsConnectionType connectionType = CifsConnectionType.WINRM_INTERNAL;
     private ConnectionOptions options;
     private final String unmappedAddress;
     private final int unmappedPort;
+    public static final int STDIN_BUF_SIZE = 4096;
 
     public WinRmConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
         this.workingDirectory = workingDirectory;
@@ -75,9 +84,13 @@ public class WinRmConnection {
         this.port = addressPort.getPort();
         this.username = options.get(USERNAME);
         this.password = options.get(PASSWORD);
+        this.protocol = options.get(PROTOCOL);
 
+        checkIsWindowsHost(os, protocol, connectionType);
+        checkNotOldStyleWindowsDomain(username, protocol, connectionType);
     }
 
+    @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
@@ -107,7 +120,7 @@ public class WinRmConnection {
                 @Override
                 public void run() {
                     try {
-                        byte[] buf = new byte[CifsWinRmConnection.STDIN_BUF_SIZE];
+                        byte[] buf = new byte[STDIN_BUF_SIZE];
                         for (; ; ) {
                             int n = fromCallersStdin.read(buf);
                             if (n == -1)
@@ -224,6 +237,16 @@ public class WinRmConnection {
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot execute command " + cmd + " on " + this, exc);
         }
+    }
+
+    @Override
+    public void connect() {
+        // noop
+    }
+
+    @Override
+    public void close() {
+        // noop
     }
 
     private WinRmClient createWinrmClient() {

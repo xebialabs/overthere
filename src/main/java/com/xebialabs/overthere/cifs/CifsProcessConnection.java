@@ -1,3 +1,5 @@
+package com.xebialabs.overthere.cifs;
+
 /**
  * Copyright (c) 2008-2016, XebiaLabs B.V., All rights reserved.
  *
@@ -20,46 +22,40 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.cifs.CifsConnection;
-import com.xebialabs.overthere.cifs.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
-import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotOldStyleWindowsDomain;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
 
-/**
- * A connection to a Windows host using CIFS and a Java implementation of WinRM.
- */
-public class CifsWinRmConnection extends CifsConnection implements ProcessConnection {
+public class CifsProcessConnection extends CifsConnection {
 
-    public static final int STDIN_BUF_SIZE = 4096;
+    private ProcessConnection processConnection;
 
-    /**
-     * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use
-     * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
-     */
-    public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public CifsProcessConnection(String type, ConnectionOptions options,
+                                AddressPortMapper mapper) {
         super(type, options, mapper, true);
-        checkIsWindowsHost(os, CIFS_PROTOCOL, cifsConnectionType);
-        checkNotOldStyleWindowsDomain(username, CIFS_PROTOCOL, cifsConnectionType);
-    }
-
-    @Override
-    public void connect() {
+        options.set(ConnectionOptions.PROTOCOL, type);
+        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        processConnection = cifsConnectionType.getProcessConnection(options, mapper, workingDirectory);
         connected();
     }
 
     @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        WinRmConnection connection = new WinRmConnection(options, mapper, workingDirectory);
-        return connection.startProcess(cmd);
+    public void connect() {
+        processConnection.connect();
+        connected();
     }
 
+    @Override
+    public void doClose() {
+        processConnection.close();
+    }
+
+    @Override
+    public OverthereProcess startProcess(final CmdLine cmd) {
+        return processConnection.startProcess(cmd);
+    }
 }

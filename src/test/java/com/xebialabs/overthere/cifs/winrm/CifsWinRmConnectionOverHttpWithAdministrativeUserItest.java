@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
+import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -62,7 +63,7 @@ public class CifsWinRmConnectionOverHttpWithAdministrativeUserItest extends Over
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return CifsWinRmConnection.class.getName();
+        return CifsProcessConnection.class.getName();
     }
 
 }

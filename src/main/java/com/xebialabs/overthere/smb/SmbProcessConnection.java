@@ -22,5 +22,40 @@
  */
 package com.xebialabs.overthere.smb;
 
-public class SmbProcessConnection {
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.cifs.ProcessConnection;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+
+public class SmbProcessConnection extends SmbConnection {
+
+    private ProcessConnection processConnection;
+
+    public SmbProcessConnection(String type, ConnectionOptions options,
+                                AddressPortMapper mapper) {
+        super(type, options, mapper, true);
+        options.set(ConnectionOptions.PROTOCOL, type);
+        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        processConnection = cifsConnectionType.getProcessConnection(options, mapper, workingDirectory);
+        connected();
+    }
+
+    @Override
+    public void connect() {
+        super.connect();
+        connected();
+    }
+
+    @Override
+    public void doClose() {
+        processConnection.close();
+    }
+
+    @Override
+    public OverthereProcess startProcess(final CmdLine cmd) {
+        return processConnection.startProcess(cmd);
+    }
 }

@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
+import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,20 +61,20 @@ public class CifsTelnetConnectionTest {
     @SuppressWarnings("resource")
     public void shouldNotSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new CifsTelnetConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new CifsTelnetConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new CifsTelnetConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 }

@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.smb.telnet;
 
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,20 +57,20 @@ public class SmbTelnetConnectionTest {
     @SuppressWarnings("resource")
     public void shouldNotSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new SmbTelnetConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new SmbTelnetConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
     @Test
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new SmbTelnetConnection(SMB_PROTOCOL, options, INSTANCE);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 }

@@ -23,6 +23,11 @@
 package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
+import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
+import com.xebialabs.overthere.cifs.winrs.WinrsConnection;
+import com.xebialabs.overthere.spi.AddressPortMapper;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;
@@ -62,6 +67,25 @@ public enum CifsConnectionType {
             default:
                 throw new IllegalArgumentException("Unknown CIFS connection type " + this);
         }
+    }
+
+    public ProcessConnection getProcessConnection(ConnectionOptions options,
+                                                  AddressPortMapper mapper, OverthereFile workingDirectory) {
+        ProcessConnection connection;
+        switch (this) {
+            case TELNET:
+                connection = new TelnetConnection(options, mapper, workingDirectory);
+                break;
+            case WINRM_INTERNAL:
+                connection = new WinRmConnection(options, mapper, workingDirectory);
+                break;
+            case WINRM_NATIVE:
+                connection = new WinrsConnection(options, mapper, workingDirectory);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown CIFS connection type " + this);
+        }
+        return connection;
     }
 
 }

@@ -36,12 +36,25 @@ import java.io.*;
 import java.net.InetSocketAddress;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
+import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotNewStyleWindowsDomain;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
-
+/**
+ * A connection to a Windows host using Telnet.
+ * <p/>
+ * Limitations:
+ * <ul>
+ * <li>Shares with names like C$ need to available for all drives accessed. In practice, this means that Administrator
+ * access is needed.</li>
+ * <li>Windows Telnet Service must be configured to use stream mode:<br/>
+ * <tt>&gt; tlntadmn config mode=stream</tt></li>
+ * </ul>
+ */
 public class TelnetConnection implements ProcessConnection {
 
     private static final String DETECTABLE_WINDOWS_PROMPT = "TELNET4OVERTHERE ";
@@ -59,6 +72,7 @@ public class TelnetConnection implements ProcessConnection {
     private OperatingSystemFamily os;
     private OverthereFile workingDirectory;
     private String username;
+    private String protocol;
     private CifsConnectionType connectionType = CifsConnectionType.TELNET;
 
     public TelnetConnection(ConnectionOptions options, AddressPortMapper mapper, OverthereFile workingDirectory) {
@@ -75,8 +89,12 @@ public class TelnetConnection implements ProcessConnection {
         this.username = options.get(USERNAME);
         this.password = options.get(PASSWORD);
         this.mapper = mapper;
-
         this.workingDirectory = workingDirectory;
+        this.protocol = options.get(PROTOCOL);
+
+        checkIsWindowsHost(os, protocol, connectionType);
+        checkNotNewStyleWindowsDomain(username, protocol, connectionType);
+
     }
 
     @Override
@@ -229,6 +247,16 @@ public class TelnetConnection implements ProcessConnection {
         } catch (IOException exc) {
             throw new RuntimeIOException("Cannot execute command " + cmd + " at telnet://" + username + "@" + address, exc);
         }
+    }
+
+    @Override
+    public void connect() {
+        // noop
+    }
+
+    @Override
+    public void close() {
+        // noop
     }
 
     private static void receive(final InputStream stdout, final ByteArrayOutputStream outputBuf, final PipedOutputStream toCallersStdout,

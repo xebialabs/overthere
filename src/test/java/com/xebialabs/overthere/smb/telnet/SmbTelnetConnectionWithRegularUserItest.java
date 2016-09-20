@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.smb.telnet;
 
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
@@ -67,7 +68,7 @@ public class SmbTelnetConnectionWithRegularUserItest extends OverthereConnection
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SmbTelnetConnection.class.getName();
+        return SmbProcessConnection.class.getName();
     }
 
 }

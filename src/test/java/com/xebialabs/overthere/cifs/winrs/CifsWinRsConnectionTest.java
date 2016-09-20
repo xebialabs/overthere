@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.cifs.winrs;
 
+import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -67,7 +68,7 @@ public class CifsWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportNewStyleDomainAccount() {
         options.set(USERNAME, "user@domain.com");
-        new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
     @Test
@@ -75,7 +76,7 @@ public class CifsWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportOldStyleDomainAccount() {
         options.set(USERNAME, "domain\\user");
-        new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 
     @Test
@@ -83,6 +84,6 @@ public class CifsWinRsConnectionTest {
     @SuppressWarnings("resource")
     public void shouldSupportDomainlessAccount() {
         options.set(USERNAME, "user");
-        new CifsWinrsConnection(CIFS_PROTOCOL, options, INSTANCE);
+        new CifsProcessConnection(CIFS_PROTOCOL, options, INSTANCE);
     }
 }

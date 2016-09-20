@@ -24,6 +24,7 @@ package com.xebialabs.overthere.smb.winrm;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import com.xebialabs.overthere.smb.SmbProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -59,6 +60,6 @@ public class SmbWinRmConnectionOverHttpWithAdministrativeUserItest extends Overt
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SmbWinRmConnection.class.getName();
+        return SmbProcessConnection.class.getName();
     }
 }
