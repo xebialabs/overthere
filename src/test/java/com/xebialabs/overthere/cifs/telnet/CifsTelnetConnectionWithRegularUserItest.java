@@ -22,7 +22,6 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
@@ -68,7 +67,7 @@ public class CifsTelnetConnectionWithRegularUserItest extends OverthereConnectio
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return CifsProcessConnection.class.getName();
+        return CifsTelnetConnection.class.getName();
     }
 
 }

@@ -25,6 +25,7 @@ package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
@@ -47,6 +48,12 @@ public class CifsProcessConnection extends CifsConnection {
     public void connect() {
         processConnection.connect();
         connected();
+    }
+
+    @Override
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+        super.setWorkingDirectory(workingDirectory);
+        processConnection.setWorkingDirectory(workingDirectory);
     }
 
     @Override

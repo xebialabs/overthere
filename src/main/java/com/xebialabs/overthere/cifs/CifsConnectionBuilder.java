@@ -24,6 +24,9 @@ package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.cifs.telnet.CifsTelnetConnection;
+import com.xebialabs.overthere.cifs.winrm.CifsWinRmConnection;
+import com.xebialabs.overthere.cifs.winrs.CifsWinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
@@ -54,7 +57,21 @@ public class CifsConnectionBuilder extends BaseCifsConnectionBuilder implements 
     private CifsConnection connection;
 
     public CifsConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        connection = new CifsProcessConnection(type, options, mapper);
+        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+
+        switch (cifsConnectionType) {
+            case TELNET:
+                connection = new CifsTelnetConnection(type, options, mapper);
+                break;
+            case WINRM_INTERNAL:
+                connection = new CifsWinRmConnection(type, options, mapper);
+                break;
+            case WINRM_NATIVE:
+                connection = new CifsWinrsConnection(type, options, mapper);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
+        }
     }
 
     @Override

@@ -239,34 +239,12 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     @Override
     public void delete() {
-        String sharePath = getPathOnShare();
-        try {
-            if (isFile()) {
-                logger.debug("deleting file {}", sharePath);
-                getShare().rm(sharePath);
-            } else {
-                logger.debug("deleting directory {}", sharePath);
-                getShare().rmdir(sharePath, false);
-            }
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
-        } catch (SMBApiException e) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
-        }
+        delete(false);
     }
 
     @Override
     public void deleteRecursively() {
-        String sharePath = getPathOnShare();
-        logger.debug("deleting directory recursively {}", sharePath);
-        try {
-            if (isFile())
-                delete();
-            else
-                getShare().rmdir(sharePath, true);
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot delete recursively %s: %s", sharePath, e.toString()), e);
-        }
+        delete(true);
     }
 
     @Override
@@ -335,6 +313,23 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     @Override
     public String toString() {
         return getConnection() + "/" + getPath();
+    }
+
+    private void delete(boolean recursive) {
+        String sharePath = getPathOnShare();
+        try {
+            if (isFile()) {
+                logger.debug("deleting file {}", sharePath);
+                getShare().rm(sharePath);
+            } else {
+                logger.debug("deleting directory {}", sharePath);
+                getShare().rmdir(sharePath, recursive);
+            }
+        } catch (TransportException e) {
+            throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
+        } catch (SMBApiException e) {
+            throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
+        }
     }
 
     private String getSharePath() {
