@@ -241,12 +241,17 @@ public class WinRmConnection implements ProcessConnection {
 
     @Override
     public void connect() {
-        // noop
+        // no-op
     }
 
     @Override
     public void close() {
-        // noop
+        // no-op
+    }
+
+    @Override
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+        this.workingDirectory = workingDirectory;
     }
 
     private WinRmClient createWinrmClient() {

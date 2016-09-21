@@ -23,6 +23,7 @@
 package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 
 public interface ProcessConnection {
@@ -32,4 +33,6 @@ public interface ProcessConnection {
     void connect();
 
     void close();
+
+    void setWorkingDirectory(OverthereFile workingDirectory);
 }

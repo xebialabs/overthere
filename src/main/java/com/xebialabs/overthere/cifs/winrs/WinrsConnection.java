@@ -134,6 +134,11 @@ public class WinrsConnection implements ProcessConnection {
         disconnectFromWinrsProxy();
     }
 
+    @Override
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+        this.workingDirectory = workingDirectory;
+    }
+
     OverthereConnection connectToWinrsProxy(ConnectionOptions options) {
         logger.debug("Connecting to winrs proxy");
 
