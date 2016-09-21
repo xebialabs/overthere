@@ -89,7 +89,7 @@ import static org.apache.http.util.EntityUtils.consume;
 /**
  * See http://msdn.microsoft.com/en-us/library/cc251731(v=prot.10).aspx for some examples of how the WS-MAN protocol works on Windows
  */
-public class WinRmClient {
+class WinRmClient {
     private final SocketFactory socketFactory;
     private final String username;
     private final boolean enableKerberos;

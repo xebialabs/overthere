@@ -27,7 +27,7 @@ import org.dom4j.Namespace;
 import org.dom4j.XPath;
 import org.jaxen.SimpleNamespaceContext;
 
-public enum ResponseExtractor {
+enum ResponseExtractor {
 
     COMMAND_ID("CommandId"),
     EXIT_CODE("CommandState[@State='http://schemas.microsoft.com/wbem/wsman/1/windows/shell/CommandState/Done']/rsp:ExitCode", Namespaces.NS_WIN_SHELL),
