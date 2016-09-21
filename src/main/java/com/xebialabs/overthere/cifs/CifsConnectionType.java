@@ -24,10 +24,11 @@ package com.xebialabs.overthere.cifs;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.cifs.telnet.TelnetConnection;
-import com.xebialabs.overthere.cifs.winrm.WinRmConnection;
-import com.xebialabs.overthere.cifs.winrs.WinrsConnection;
+import com.xebialabs.overthere.telnet.TelnetConnection;
+import com.xebialabs.overthere.winrm.WinRmConnection;
+import com.xebialabs.overthere.winrs.WinrsConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.ProcessConnection;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;

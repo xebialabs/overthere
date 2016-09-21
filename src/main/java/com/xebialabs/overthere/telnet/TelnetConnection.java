@@ -20,11 +20,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.telnet;
+package com.xebialabs.overthere.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.cifs.ProcessConnection;
+import com.xebialabs.overthere.spi.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
@@ -38,7 +38,6 @@ import java.net.InetSocketAddress;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotNewStyleWindowsDomain;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;

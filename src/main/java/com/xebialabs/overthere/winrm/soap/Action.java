@@ -20,19 +20,27 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm.soap;
 
-public enum SoapAction {
+import java.net.URI;
 
-    SHELL("Shell"), COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SEND("Send"), SIGNAL("Signal");
+public enum Action {
 
-    private final String value;
+    WS_ACTION("http://schemas.xmlsoap.org/ws/2004/09/transfer/Create"),
+    WS_COMMAND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Command"),
+    WS_RECEIVE("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Receive"),
+    WS_SEND("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Send"),
+    WS_SIGNAL("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/Signal"),
+    WS_DELETE("http://schemas.xmlsoap.org/ws/2004/09/transfer/Delete");
 
-    SoapAction(String value) {
-        this.value = value;
+    private String uri;
+
+    Action(String uri) {
+        this.uri = uri;
     }
 
-    public String getValue() {
-        return value;
+    public URI getUri() {
+        return Soapy.getUri(uri);
     }
+
 }

@@ -20,18 +20,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm;
 
-import org.dom4j.Element;
+import org.ietf.jgss.GSSContext;
 
-public class BodyBuilder {
-    private Element body;
+class JavaVendor {
 
-    public BodyBuilder(Element body) {
-        this.body = body;
+    private static final boolean IBM_JAVA =  System.getProperty("java.vendor").toUpperCase().contains("IBM");
+
+    public static boolean isIBM() {
+        return IBM_JAVA;
     }
 
-    public void setContent(Element content) {
-        body.add(content);
+    public static String getKrb5LoginModuleName() {
+        return isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
+            : "com.sun.security.auth.module.Krb5LoginModule";
+    }
+
+    public static int getSpnegoLifetime() {
+        // With IBM JDK we need to use GSSContext.INDEFINITE_LIFETIME for SPNEGO
+        // ref http://www-01.ibm.com/support/docview.wss?uid=swg1IZ54545
+        return isIBM() ? GSSContext.INDEFINITE_LIFETIME : GSSContext.DEFAULT_LIFETIME;
     }
 }

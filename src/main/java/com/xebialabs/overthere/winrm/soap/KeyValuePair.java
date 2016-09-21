@@ -20,28 +20,23 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm.soap;
 
-import java.util.ArrayList;
-import java.util.List;
+public class KeyValuePair {
 
-/**
- */
-public enum OptionSet {
+    final String key;
+    final String value;
 
-    OPEN_SHELL(new KeyValuePair("WINRS_NOPROFILE", "FALSE"), new KeyValuePair("WINRS_CODEPAGE", "437")),
-    RUN_COMMAND(new KeyValuePair("WINRS_CONSOLEMODE_STDIN", "TRUE"));
-
-    private final List<KeyValuePair> keyValuePairs;
-
-    OptionSet(KeyValuePair... keyValuePairs) {
-        this.keyValuePairs = new ArrayList<KeyValuePair>();
-        for (KeyValuePair keyValuePair : keyValuePairs) {
-            this.keyValuePairs.add(keyValuePair);
-        }
+    public KeyValuePair(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 
-    public List<KeyValuePair> getKeyValuePairs() {
-        return keyValuePairs;
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

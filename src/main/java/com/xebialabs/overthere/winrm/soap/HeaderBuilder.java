@@ -20,18 +20,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm.soap;
 
 import java.net.URI;
 import java.util.List;
 import org.dom4j.Element;
 import org.dom4j.QName;
 
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_ADDRESSING;
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WSMAN_DMTF;
-import static com.xebialabs.overthere.cifs.winrm.Namespaces.NS_WSMAN_MSFT;
-import static com.xebialabs.overthere.cifs.winrm.soap.Soapy.mustUnderstand;
-import static com.xebialabs.overthere.cifs.winrm.soap.Soapy.needNotUnderstand;
+import static com.xebialabs.overthere.winrm.Namespaces.NS_ADDRESSING;
+import static com.xebialabs.overthere.winrm.Namespaces.NS_WSMAN_DMTF;
+import static com.xebialabs.overthere.winrm.Namespaces.NS_WSMAN_MSFT;
+import static com.xebialabs.overthere.winrm.soap.Soapy.mustUnderstand;
+import static com.xebialabs.overthere.winrm.soap.Soapy.needNotUnderstand;
 
 public class HeaderBuilder {
     private Element header;

@@ -20,19 +20,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs;
+package com.xebialabs.overthere.winrm.soap;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-public interface ProcessConnection {
+public enum ResourceURI {
 
-    OverthereProcess startProcess(final CmdLine cmd);
+    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
 
-    void connect();
+    private final String uri;
 
-    void close();
+    ResourceURI(String uri) {
+        this.uri = uri;
+    }
 
-    void setWorkingDirectory(OverthereFile workingDirectory);
+    public URI getUri() throws URISyntaxException {
+        return Soapy.getUri(uri);
+    }
 }

@@ -20,29 +20,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.spi;
 
-import java.util.HashMap;
-import javax.security.auth.login.AppConfigurationEntry;
-import javax.security.auth.login.Configuration;
-import org.ietf.jgss.GSSContext;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
 
-class JavaVendor {
+public interface ProcessConnection {
 
-    private static final boolean IBM_JAVA =  System.getProperty("java.vendor").toUpperCase().contains("IBM");
+    OverthereProcess startProcess(final CmdLine cmd);
 
-    public static boolean isIBM() {
-        return IBM_JAVA;
-    }
+    void connect();
 
-    public static String getKrb5LoginModuleName() {
-        return isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
-            : "com.sun.security.auth.module.Krb5LoginModule";
-    }
+    void close();
 
-    public static int getSpnegoLifetime() {
-        // With IBM JDK we need to use GSSContext.INDEFINITE_LIFETIME for SPNEGO
-        // ref http://www-01.ibm.com/support/docview.wss?uid=swg1IZ54545
-        return isIBM() ? GSSContext.INDEFINITE_LIFETIME : GSSContext.DEFAULT_LIFETIME;
-    }
+    void setWorkingDirectory(OverthereFile workingDirectory);
 }

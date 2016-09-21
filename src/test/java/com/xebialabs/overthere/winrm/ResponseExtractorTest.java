@@ -20,12 +20,13 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.winrm;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;

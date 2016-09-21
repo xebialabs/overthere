@@ -20,22 +20,18 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm.soap;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import org.dom4j.Element;
 
-public enum ResourceURI {
+public class BodyBuilder {
+    private Element body;
 
-    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
-
-    private final String uri;
-
-    ResourceURI(String uri) {
-        this.uri = uri;
+    public BodyBuilder(Element body) {
+        this.body = body;
     }
 
-    public URI getUri() throws URISyntaxException {
-        return Soapy.getUri(uri);
+    public void setContent(Element content) {
+        body.add(content);
     }
 }

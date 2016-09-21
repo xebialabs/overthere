@@ -27,7 +27,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.cifs.ProcessConnection;
+import com.xebialabs.overthere.spi.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
 

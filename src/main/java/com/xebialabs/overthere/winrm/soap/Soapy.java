@@ -20,7 +20,7 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm.soap;
+package com.xebialabs.overthere.winrm.soap;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,7 +31,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.xebialabs.overthere.cifs.winrm.WinRmRuntimeIOException;
+import com.xebialabs.overthere.winrm.WinRmRuntimeIOException;
 
 public class Soapy {
     private Soapy() {

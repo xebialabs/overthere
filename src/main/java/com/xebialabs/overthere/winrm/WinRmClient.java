@@ -20,11 +20,11 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.winrm;
 
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.cifs.winrm.soap.*;
+import com.xebialabs.overthere.winrm.soap.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
