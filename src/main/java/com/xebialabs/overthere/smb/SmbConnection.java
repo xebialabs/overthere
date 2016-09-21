@@ -29,6 +29,7 @@ import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
+import com.hierynomus.smbj.share.Share;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -154,12 +155,12 @@ public class SmbConnection extends BaseOverthereConnection {
     }
 
     protected DiskShare getShare(String shareName) {
-        DiskShare share = (DiskShare) session.connectShare(shareName);
+        Share share = session.connectShare(shareName);
         if (!(share instanceof DiskShare)) {
             close();
             throw new RuntimeIOException("The share " + shareName + " is not a disk share");
         }
-        return share;
+        return (DiskShare) share;
     }
 
     private UserAndDomain getUserNameAndDomain(String user) {
