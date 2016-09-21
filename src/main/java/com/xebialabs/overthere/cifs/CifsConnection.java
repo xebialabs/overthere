@@ -46,13 +46,8 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_TELNET;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTPS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
 import static java.net.InetSocketAddress.createUnresolved;
 
 /**
@@ -98,7 +93,7 @@ public abstract class CifsConnection extends BaseOverthereConnection {
             throw new IllegalArgumentException("Cannot open a cifs:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
         }
         this.unmappedAddress = options.get(ADDRESS);
-        this.unmappedPort = options.get(PORT, getDefaultPort(options));
+        this.unmappedPort = options.get(PORT, this.cifsConnectionType.getDefaultPort(options));
         InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
         this.address = addressPort.getHostName();
         this.port = addressPort.getPort();
@@ -109,22 +104,6 @@ public abstract class CifsConnection extends BaseOverthereConnection {
         this.cifsPort = addressCifsPort.getPort();
         this.encoder = new PathEncoder(null, null, this.address, cifsPort, options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT));
         this.authentication = new NtlmPasswordAuthentication(null, username, password);
-    }
-
-    private int getDefaultPort(ConnectionOptions options) {
-        switch (cifsConnectionType) {
-            case TELNET:
-                return PORT_DEFAULT_TELNET;
-            case WINRM_INTERNAL:
-            case WINRM_NATIVE:
-                if (!options.getBoolean(WINRM_ENABLE_HTTPS, WINRM_ENABLE_HTTPS_DEFAULT)) {
-                    return PORT_DEFAULT_WINRM_HTTP;
-                } else {
-                    return PORT_DEFAULT_WINRM_HTTPS;
-                }
-            default:
-                throw new IllegalArgumentException("Unknown CIFS connection type " + cifsConnectionType);
-        }
     }
 
     protected abstract void connect();

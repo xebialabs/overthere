@@ -20,33 +20,19 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.winrm.soap;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+public enum SoapAction {
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+    SHELL("Shell"), COMMAND_LINE("CommandLine"), RECEIVE("Receive"), SEND("Send"), SIGNAL("Signal");
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+    private final String value;
+
+    SoapAction(String value) {
+        this.value = value;
     }
 
-    @Override
-    public void connect() {
-        super.connect();
-    }
-
-    @Override
-    public void doClose() {
-        super.doClose();
-    }
-
-    @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+    public String getValue() {
+        return value;
     }
 }

@@ -20,33 +20,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overcast.host.CloudHost;
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+import java.util.concurrent.atomic.AtomicReference;
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
+
+public class WindowsCloudHostWithDomainListener extends CloudHostListener {
+
+    public static final String DOMAIN_WINDOWS_USER_PASSWORD = "Xebia@123";
+
+    private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
+
+    public WindowsCloudHostWithDomainListener() {
+        super("overthere-windows-domain-accounts", windowsHost);
     }
 
-    @Override
-    public void connect() {
-        super.connect();
+    public static CloudHost getHost() {
+        return checkNotNull(windowsHost.get(), "Cloud host overthere-windows-domain-accounts has not been started. Did you wire up the right CloudHostListener?");
     }
 
-    @Override
-    public void doClose() {
-        super.doClose();
-    }
-
-    @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
-    }
 }

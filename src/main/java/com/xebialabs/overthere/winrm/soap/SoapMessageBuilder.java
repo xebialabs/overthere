@@ -20,33 +20,43 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.winrm.soap;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.QName;
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+import static com.xebialabs.overthere.winrm.Namespaces.NS_SOAP_ENV;
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+public class SoapMessageBuilder {
+
+    private Document doc = DocumentHelper.createDocument();
+
+    public EnvelopeBuilder envelope() {
+        Element envelope = doc.addElement(QName.get("Envelope", NS_SOAP_ENV));
+        return new EnvelopeBuilder(envelope);
     }
 
-    @Override
-    public void connect() {
-        super.connect();
+    public class EnvelopeBuilder {
+        private Element envelope;
+
+        public EnvelopeBuilder(Element envelope) {
+            this.envelope = envelope;
+        }
+
+        public HeaderBuilder header() {
+            Element header = envelope.addElement(QName.get("Header", NS_SOAP_ENV));
+            return new HeaderBuilder(header);
+        }
+
+        public BodyBuilder body() {
+            Element body = envelope.addElement(QName.get("Body", NS_SOAP_ENV));
+            return new BodyBuilder(body);
+        }
     }
 
-    @Override
-    public void doClose() {
-        super.doClose();
-    }
-
-    @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+    public Document getDocument() {
+        return doc;
     }
 }

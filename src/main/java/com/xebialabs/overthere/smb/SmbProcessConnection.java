@@ -20,33 +20,49 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.smb;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
+import com.xebialabs.overthere.CmdLine;
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.OverthereProcess;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
+import com.xebialabs.overthere.spi.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+public class SmbProcessConnection extends SmbConnection {
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+    private ProcessConnection processConnection;
+
+    public SmbProcessConnection(String type, ConnectionOptions options,
+                                AddressPortMapper mapper) {
+        super(type, options, mapper, true);
+        options.set(ConnectionOptions.PROTOCOL, type);
+        CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        processConnection = cifsConnectionType.getProcessConnection(options, mapper, workingDirectory);
+        connected();
     }
 
     @Override
     public void connect() {
         super.connect();
+        connected();
+    }
+
+    @Override
+    public void setWorkingDirectory(OverthereFile workingDirectory) {
+        super.setWorkingDirectory(workingDirectory);
+        processConnection.setWorkingDirectory(workingDirectory);
     }
 
     @Override
     public void doClose() {
-        super.doClose();
+        processConnection.close();
     }
 
     @Override
     public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+        return processConnection.startProcess(cmd);
     }
 }

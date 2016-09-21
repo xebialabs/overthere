@@ -20,33 +20,22 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.winrm.soap;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+public enum ResourceURI {
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+    RESOURCE_URI_CMD("http://schemas.microsoft.com/wbem/wsman/1/windows/shell/cmd");
+
+    private final String uri;
+
+    ResourceURI(String uri) {
+        this.uri = uri;
     }
 
-    @Override
-    public void connect() {
-        super.connect();
-    }
-
-    @Override
-    public void doClose() {
-        super.doClose();
-    }
-
-    @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+    public URI getUri() throws URISyntaxException {
+        return Soapy.getUri(uri);
     }
 }

@@ -20,33 +20,26 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrs;
+package com.xebialabs.overthere.winrm;
 
-import com.xebialabs.overthere.*;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
-import com.xebialabs.overthere.spi.AddressPortMapper;
+import org.ietf.jgss.GSSContext;
 
-/**
- * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
- */
-public class CifsWinrsConnection  extends CifsProcessConnection {
+class JavaVendor {
 
-    public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+    private static final boolean IBM_JAVA =  System.getProperty("java.vendor").toUpperCase().contains("IBM");
+
+    public static boolean isIBM() {
+        return IBM_JAVA;
     }
 
-    @Override
-    public void connect() {
-        super.connect();
+    public static String getKrb5LoginModuleName() {
+        return isIBM() ? "com.ibm.security.auth.module.Krb5LoginModule"
+            : "com.sun.security.auth.module.Krb5LoginModule";
     }
 
-    @Override
-    public void doClose() {
-        super.doClose();
-    }
-
-    @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+    public static int getSpnegoLifetime() {
+        // With IBM JDK we need to use GSSContext.INDEFINITE_LIFETIME for SPNEGO
+        // ref http://www-01.ibm.com/support/docview.wss?uid=swg1IZ54545
+        return isIBM() ? GSSContext.INDEFINITE_LIFETIME : GSSContext.DEFAULT_LIFETIME;
     }
 }

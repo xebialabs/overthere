@@ -20,35 +20,46 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.cifs.winrm;
+package com.xebialabs.overthere.smb;
 
-import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.cifs.CifsProcessConnection;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
+import com.xebialabs.overthere.spi.Protocol;
 
-/**
- * A connection to a Windows host using CIFS and a Java implementation of WinRM.
- */
-public class CifsWinRmConnection extends CifsProcessConnection {
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+
+@Protocol(name = SMB_PROTOCOL)
+public class SmbConnectionBuilder extends BaseCifsConnectionBuilder implements OverthereConnectionBuilder {
+
+    public static final String SMB_PROTOCOL = "smb";
 
     /**
-     * Creates a {@link CifsWinRmConnection}. Don't invoke directly. Use
-     * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
+     * The default port for SMB connections over TCP/IP
      */
-    public CifsWinRmConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+    public static final int PORT_DEFAULT_SMB = 445;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_smbPort">the online documentation</a>
+     */
+    public static final String SMB_PORT = "smbPort";
+
+    private final SmbConnection connection;
+
+    public SmbConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
+        connection = new SmbProcessConnection(type, options, mapper);
     }
 
     @Override
-    public void connect() {
-        super.connect();
+    public OverthereConnection connect() {
+        connection.connect();
+        return connection;
     }
 
     @Override
-    public OverthereProcess startProcess(final CmdLine cmd) {
-        return super.startProcess(cmd);
+    public String toString() {
+        return connection.toString();
     }
 }
