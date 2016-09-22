@@ -21,10 +21,10 @@ buildscript {
 // build.gradle for Overthere
 plugins {
     id "com.github.hierynomus.license" version "0.11.0"
+    id "org.ajoberstar.release-opinion" version "1.5.1"
 }
 defaultTasks 'build'
 
-version = '4.3.4-SNAPSHOT'
 group = 'com.xebialabs.overthere'
 
 apply plugin: 'idea'
@@ -63,6 +63,25 @@ if (JavaVersion.current().isJava8Compatible()) {
   allprojects {
     tasks.withType(Javadoc) {
       options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+
+release {
+  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+  tagStrategy {
+    toTagString = { vs -> "${project.name}-$vs" }
+    parseTag = { org.ajoberstar.grgit.Tag tag ->
+      if (tag.name.startsWith(project.name)) {
+        print("Found tag: ${tag.name}")
+        try {
+          com.github.zafarkhaja.semver.Version.valueOf(tag.name[project.name.size() + 1..-1])
+        } catch (Exception e) {
+          null
+        }
+      } else {
+        null
+      }
     }
   }
 }
