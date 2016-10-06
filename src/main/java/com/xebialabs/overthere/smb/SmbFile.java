@@ -55,7 +55,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     public SmbFile(SmbConnection connection, String hostPath, Map<String, String> pathMappings) {
         super(connection);
-        this.hostPath = hostPath;
+        this.hostPath = SmbPaths.escapeForwardSlashes(hostPath);
         this.pathMappings = pathMappings;
     }
 
@@ -77,9 +77,9 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     @Override
     public OverthereFile getParentFile() {
         OverthereFile f = null;
-        String parentPath = SmbPaths.getParentPath(getPathOnShare());
+        String parentPath = SmbPaths.getParentPath(hostPath);
         if (parentPath != null)
-            f = getFile(parentPath);
+            f = getFileForAbsolutePath(parentPath);
         return f;
     }
 
@@ -348,6 +348,10 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     private boolean checkAttributes(FileAttributes mask) {
         long attrMask = getShare().getFileInformation(getPathOnShare()).getFileAttributes();
         return FileAttributes.EnumUtils.isSet(attrMask, mask);
+    }
+
+    private SmbFile getFileForAbsolutePath(String path) {
+        return new SmbFile(getConnection(), path, pathMappings);
     }
 
     private static Logger logger = LoggerFactory.getLogger(SmbFile.class);

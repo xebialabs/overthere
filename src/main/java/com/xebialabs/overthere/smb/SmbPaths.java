@@ -65,6 +65,10 @@ public abstract class SmbPaths {
     }
 
     static String getParentPath(String sharePath) {
+
+        if (sharePath.endsWith(String.valueOf(SLASH)))
+            sharePath = sharePath.substring(0, sharePath.length() - 1);
+
         int i = sharePath.lastIndexOf(SLASH);
         if (i != -1) {
             return sharePath.substring(0, i);

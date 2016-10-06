@@ -115,7 +115,6 @@ public class SmbConnection extends BaseOverthereConnection {
 
     @Override
     public OverthereFile getFile(String hostPath) {
-        hostPath = SmbPaths.escapeForwardSlashes(hostPath);
         Map<String, String> pathMappings = options.get(PATH_SHARE_MAPPINGS, PATH_SHARE_MAPPINGS_DEFAULT);
         return new SmbFile(this, hostPath, pathMappings);
     }

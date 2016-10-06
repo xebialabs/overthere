@@ -46,6 +46,7 @@ public class SmbProcessConnection extends SmbConnection {
 
     @Override
     public void connect() {
+        processConnection.connect();
         super.connect();
         connected();
     }

@@ -35,6 +35,7 @@ import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_NATIVE;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -63,10 +64,29 @@ public class SmbFileTest {
     }
 
     @Test
+    public void shouldReturnParentFileForFile() {
+        options.set(USERNAME, "user@domain.com");
+        SmbProcessConnection smbWinRmConnection = new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smbWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
+        assertThat((file = file.getParentFile()).getPath(), equalTo("C:\\windows\\temp"));
+        assertThat((file = file.getParentFile()).getPath(), equalTo("C:\\windows"));
+        assertThat((file = file.getParentFile()).getPath(), equalTo("C:"));
+        assertThat(file.getParentFile(), nullValue());
+    }
+
+    @Test
     public void shouldSucceedForNonRoot() {
         options.set(USERNAME, "user@domain.com");
         SmbProcessConnection smbWinRmConnection = new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
         OverthereFile file = smbWinRmConnection.getFile("C:\\windows\\temp\\ot-2015060");
         assertThat(file.getParentFile(), not(nullValue()));
+    }
+
+    @Test
+    public void shouldConvertForwardSlashInFilePathToBackSlash() {
+        options.set(USERNAME, "user@domain.com");
+        SmbProcessConnection smbWinRmConnection = new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+        OverthereFile file = smbWinRmConnection.getFile("C:\\windows/temp/ot-2015060");
+        assertThat(file.getPath(), equalTo("C:\\windows\\temp\\ot-2015060"));
     }
 }
