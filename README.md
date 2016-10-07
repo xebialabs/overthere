@@ -1129,6 +1129,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.4.1 (07-Oct-2016)
+    * Fixed bug causing incorrect parent path resolution for SmbFile.
 * Overthere 4.4.0 (22-Sep-2016)
     * Added SMB protocol support [#186](https://github.com/xebialabs/overthere/pull/186).
 * Overthere 4.2.2 (12-Jul-2016)
