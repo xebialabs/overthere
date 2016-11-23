@@ -415,15 +415,21 @@ class WinRmClient {
 
                 logResponseHeaders(response);
 
+                Document responseDocument = null;
+                try {
+                    final String responseBody = handleResponse(response, context);
+                    responseDocument = DocumentHelper.parseText(responseBody);
+                    logDocument("Response body:", responseDocument);
+                } catch(WinRmRuntimeIOException e) {
+                    if (response.getStatusLine().getStatusCode() == 200) {
+                    	throw e;
+                    }
+                }
+                
                 if (response.getStatusLine().getStatusCode() != 200) {
                     throw new WinRmRuntimeIOException(String.format("Unexpected HTTP response on %s:  %s (%s)",
                             targetURL, response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode()));
                 }
-
-                final String responseBody = handleResponse(response, context);
-                Document responseDocument = DocumentHelper.parseText(responseBody);
-
-                logDocument("Response body:", responseDocument);
 
                 return responseDocument;
             } finally {
