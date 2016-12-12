@@ -1129,6 +1129,11 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.4.2 (12-Dec-2016)
+    * Avoided creation of SecureRandom for every connection, reducing the amount of entropy needed.
+    * Upgraded to SSH/J 0.19.0.
+    * Upgraded to Scannit v1.4.1 (includes fix for [#179](https://github.com/xebialabs/overthere/pull/179) and [#183](https://github.com/xebialabs/overthere/pull/183)).
+    * Fixed [#192](https://github.com/xebialabs/overthere/pull/192).
 * Overthere 4.4.1 (07-Oct-2016)
     * Fixed bug causing incorrect parent path resolution for SmbFile.
 * Overthere 4.4.0 (22-Sep-2016)
