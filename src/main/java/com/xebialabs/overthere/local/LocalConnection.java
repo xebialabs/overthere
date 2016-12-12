@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
@@ -110,6 +111,10 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
 
     @Override
     public OverthereProcess startProcess(CmdLine cmd) {
+        return startProcess(cmd, null);
+    }
+
+    public OverthereProcess startProcess(CmdLine cmd, Map<String,String> env) {
         checkNotNull(cmd, "Cannot execute null command line");
         checkArgument(cmd.getArguments().size() > 0, "Cannot execute empty command line");
 
@@ -132,12 +137,19 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
                 logger.debug("Not setting working directory");
             }
 
+            if (env != null) {
+                logger.debug("Add additional environment variables to process [{}]", env);
+                pb.environment().putAll(env);
+            }
+
             logger.debug("Starting process");
             final Process p = pb.start();
+
             return new LocalProcess(p);
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot start command [%s] on [%s]", obfuscatedCmd, this), exc);
         }
+
     }
 
     @Override

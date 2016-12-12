@@ -270,6 +270,10 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     @Override
     public int execute(final OverthereExecutionOutputHandler stdoutHandler, final OverthereExecutionOutputHandler stderrHandler, final CmdLine commandLine) {
         final OverthereProcess process = startProcess(commandLine);
+        return attachToProcess(stdoutHandler, stderrHandler, commandLine, process);
+    }
+
+    protected int attachToProcess(final OverthereExecutionOutputHandler stdoutHandler, final OverthereExecutionOutputHandler stderrHandler, final CmdLine commandLine, final OverthereProcess process) {
         Thread stdoutReaderThread = null;
         Thread stderrReaderThread = null;
         final CountDownLatch latch = new CountDownLatch(2);

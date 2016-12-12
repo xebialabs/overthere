@@ -20,33 +20,8 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere.docker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharSink;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Files;
-import com.google.common.io.OutputSupplier;
-
-import com.xebialabs.overthere.RuntimeIOException;
-
-class SshTestUtils {
-
-    static File createPrivateKeyFile(String privateKey) {
-        try {
-            final File privateKeyFile = File.createTempFile("private", ".key");
-            privateKeyFile.deleteOnExit();
-            CharSink charSink = Files.asCharSink(privateKeyFile, Charsets.UTF_8);
-            charSink.write(privateKey);
-            return privateKeyFile;
-        } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot create private key file", exc);
-        }
-    }
-
-
+public enum DockerConnectionType {
+    LOCAL_CLIENT
 }

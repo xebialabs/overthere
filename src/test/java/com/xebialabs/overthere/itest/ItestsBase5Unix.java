@@ -29,7 +29,6 @@ import java.io.OutputStream;
 import java.util.List;
 import org.testng.annotations.Test;
 import com.google.common.io.CharStreams;
-import com.google.common.io.OutputSupplier;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
@@ -40,7 +39,6 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 import nl.javadude.assumeng.Assumption;
 
-import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -78,7 +76,7 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
     }
 
     @Test
-    @Assumption(methods = {"onUnix", "notLocal"})
+    @Assumption(methods = {"onUnix", "notLocal", "notDocker"})
     public void shouldWriteFileToAndReadFileFromSudoUserHomeDirectoryOnUnix() throws IOException {
         // get handle to file in home dir
         final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());
@@ -87,12 +85,15 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
 
         // write data to file in home dir
         final byte[] contentsWritten = generateRandomBytes(1024);
-        write(contentsWritten, new OutputSupplier<OutputStream>() {
-            @Override
-            public OutputStream getOutput() throws IOException {
-                return fileInHomeDir.getOutputStream();
+        OutputStream out = null;
+        try {
+            out = fileInHomeDir.getOutputStream();
+            out.write(contentsWritten);
+        } finally {
+            if (out != null) {
+                out.close();
             }
-        });
+        }
 
         assertThat(fileInHomeDir.exists(), equalTo(true));
 
@@ -109,7 +110,7 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
     }
 
     @Test
-    @Assumption(methods = {"onUnix", "notLocal"})
+    @Assumption(methods = {"onUnix", "notLocal", "notDocker"})
     public void shouldCopyFileToAndFromSudoUserHomeDirectoryOnUnix() throws IOException {
         // get handle to file in home dir
         final OverthereFile homeDir = connection.getFile(getUnixHomeDirPath());

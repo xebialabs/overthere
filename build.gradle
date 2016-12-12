@@ -123,6 +123,7 @@ dependencies {
   }
   compile 'org.apache.httpcomponents:httpcore:4.4.1'
   compile 'commons-codec:commons-codec:1.10'
+  compile 'com.github.docker-java:docker-java:3.0.6'
 
   // Test dependencies
   testCompile('com.xebialabs.cloud:overcast:1.2.1') {

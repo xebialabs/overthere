@@ -57,7 +57,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
     }
 
     @Test
-    @Assumption(methods = {"notLocal", "notCifs"})
+    @Assumption(methods = {"notLocal", "notCifs", "notDocker"})
     public void shouldNotConnectWithIncorrectUsername() {
         ConnectionOptions incorrectUserNameOptions = new ConnectionOptions(options);
         incorrectUserNameOptions.set(USERNAME, "an-incorrect-username");
@@ -95,6 +95,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
         OutputStream out = tempFile.getOutputStream();
         try {
             out.write(contents);
+            out.flush();
         } finally {
             closeQuietly(out);
         }

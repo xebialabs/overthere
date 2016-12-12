@@ -31,6 +31,8 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.local.LocalFile;
 import com.xebialabs.overthere.util.OverthereUtils;
 
+import nl.javadude.assumeng.Assumption;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -67,6 +69,7 @@ public abstract class ItestsBase4Size extends ItestsBase3Copy {
 
 
     @Test
+    @Assumption(methods = {"notDocker"})
     public void shouldCopyDirectoryWithManyFiles() throws IOException {
         File largeFolder = temp.newFolder("small.folder");
         for (int i = 0; i < NR_OF_SMALL_FILES; i++) {

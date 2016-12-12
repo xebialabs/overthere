@@ -20,33 +20,43 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere.docker;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharSink;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Files;
-import com.google.common.io.OutputSupplier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
 
-class SshTestUtils {
+import static com.xebialabs.overthere.util.OverthereUtils.mkString;
 
-    static File createPrivateKeyFile(String privateKey) {
-        try {
-            final File privateKeyFile = File.createTempFile("private", ".key");
-            privateKeyFile.deleteOnExit();
-            CharSink charSink = Files.asCharSink(privateKeyFile, Charsets.UTF_8);
-            charSink.write(privateKey);
-            return privateKeyFile;
-        } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot create private key file", exc);
-        }
+public abstract class DockerFile<T extends DockerConnection> extends BaseOverthereFile<T> {
+
+    protected DockerFile(T connection) {
+        super(connection);
     }
 
+    static List<String> splitPath(String path) {
+        Pattern s = UNIX_PATH_SPLITTER;
+        List<String> l = new ArrayList<String>();
+        for (String p : s.split(path)) {
+            if (p.isEmpty()) continue;
+            l.add(p);
+        }
+        return l;
+    }
+
+    static String joinPath(List<String> pathComponents) {
+        String fileSep = OperatingSystemFamily.UNIX.getFileSeparator();
+
+        if (pathComponents.isEmpty()) {
+            return fileSep;
+        }
+
+        return fileSep + mkString(pathComponents, fileSep);
+    }
+
+    private static final Pattern UNIX_PATH_SPLITTER = Pattern.compile("/");
 
 }

@@ -41,16 +41,17 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.TemporaryFolder;
+import com.xebialabs.overthere.docker.DockerConnectionBuilder;
 import com.xebialabs.overthere.ssh.SshConnectionType;
 
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.docker.DockerConnectionBuilder.DOCKER_PROTOCOL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static java.lang.String.format;
@@ -107,12 +108,7 @@ public abstract class ItestsBase1Utils {
 
     protected static byte[] readFile(final OverthereFile f) {
         try {
-            return toByteArray(new InputSupplier<InputStream>() {
-                @Override
-                public InputStream getInput() throws IOException {
-                    return f.getInputStream();
-                }
-            });
+            return toByteArray(f.getInputStream());
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot read file [%s]", f), exc);
         }
@@ -121,12 +117,10 @@ public abstract class ItestsBase1Utils {
 
     protected static void writeData(final OverthereFile f, byte[] data) {
         try {
-            write(data, new OutputSupplier<OutputStream>() {
-                @Override
-                public OutputStream getOutput() throws IOException {
-                    return f.getOutputStream();
-                }
-            });
+            final OutputStream out = f.getOutputStream();
+            out.write(data);
+            out.flush();
+            out.close();
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot write data to file [%s]", f), exc);
         }
@@ -134,12 +128,9 @@ public abstract class ItestsBase1Utils {
 
     protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
         byte[] randomBytes = generateRandomBytes(size);
-        write(randomBytes, new OutputSupplier<OutputStream>() {
-            @Override
-            public OutputStream getOutput() throws IOException {
-                return new FileOutputStream(f);
-            }
-        });
+        FileOutputStream fileOutputStream = new FileOutputStream(f);
+        fileOutputStream.write(randomBytes);
+        fileOutputStream.close();
         return randomBytes;
     }
 
@@ -212,6 +203,10 @@ public abstract class ItestsBase1Utils {
     public boolean onlySmbTelnet() {
         checkConnected("onlySmbTelnet");
         return protocol.equals(SMB_PROTOCOL) && options.get(CONNECTION_TYPE).equals(TELNET);
+    }
+
+    public boolean notDocker() {
+        return !protocol.equals(DOCKER_PROTOCOL);
     }
 
     public boolean notSftpCygwin() {
