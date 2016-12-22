@@ -84,7 +84,7 @@ public class ProxyConfigurationItest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void shouldNotConnectThroughProxyBehindJumpstation() {
         try {
             ConnectionOptions jumpstationOptions = new ConnectionOptions();
