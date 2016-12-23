@@ -36,6 +36,7 @@ import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
@@ -48,7 +49,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,8 +106,11 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     private static final Config config = new DefaultConfig();
     {
-        // This is missing from 0.19.0 SSHJ
-        config.getFileKeyProviderFactories().add(new PKCS5KeyFile.Factory());
+        // PKCS5 is missing from 0.19.0 SSHJ config.
+        List<Factory.Named<FileKeyProvider>> current = config.getFileKeyProviderFactories();
+        current = new ArrayList<>(current);
+        current.add(new PKCS5KeyFile.Factory());
+        config.setFileKeyProviderFactories(current);
     }
 
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
