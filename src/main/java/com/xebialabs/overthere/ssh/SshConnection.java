@@ -37,6 +37,7 @@ import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
@@ -101,6 +102,10 @@ abstract class SshConnection extends BaseOverthereConnection {
     private static final Pattern ptyPattern = Pattern.compile(PTY_PATTERN);
 
     private static final Config config = new DefaultConfig();
+    {
+        // This is missing from 0.19.0 SSHJ
+        config.getFileKeyProviderFactories().add(new PKCS5KeyFile.Factory());
+    }
 
     protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
         @Override
