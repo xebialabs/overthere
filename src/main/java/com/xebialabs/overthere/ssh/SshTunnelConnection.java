@@ -175,6 +175,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         private final InetSocketAddress remoteAddress;
         private final ServerSocket localSocket;
         private CountDownLatch latch = new CountDownLatch(1);
+        private LocalPortForwarder forwarder;
 
         public PortForwarder(SSHClient sshClient, InetSocketAddress remoteAddress, ServerSocket localSocket) {
             super(buildName(remoteAddress, localSocket.getLocalPort()));
@@ -191,7 +192,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         public void run() {
             LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(),
                     remoteAddress.getHostName(), remoteAddress.getPort());
-            LocalPortForwarder forwarder = sshClient.newLocalPortForwarder(params, localSocket);
+            forwarder = sshClient.newLocalPortForwarder(params, localSocket);
             try {
                 latch.countDown();
                 forwarder.listen();
@@ -203,6 +204,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
         @Override
         public void close() throws IOException {
             localSocket.close();
+            forwarder.close();
             try {
                 this.join();
             } catch (InterruptedException e) {
