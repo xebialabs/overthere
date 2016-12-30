@@ -22,14 +22,23 @@
  */
 package com.xebialabs.overthere.smb;
 
-import com.hierynomus.ntlm.NtlmException;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.Security;
+import java.util.Map;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.smbj.DefaultConfig;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.common.SMBApiException;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.Share;
+
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -37,19 +46,16 @@ import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.proxy.ProxyConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.Security;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static com.xebialabs.overthere.ConnectionOptions.*;
+import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
+import static com.xebialabs.overthere.ConnectionOptions.PORT;
+import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PORT_DEFAULT_SMB;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PORT;
 import static java.net.InetSocketAddress.createUnresolved;
 
 public class SmbConnection extends BaseOverthereConnection {
@@ -106,9 +112,12 @@ public class SmbConnection extends BaseOverthereConnection {
             connection = client.connect(hostname);
             AuthenticationContext authContext = new AuthenticationContext(user, password.toCharArray(), domain);
             session = connection.authenticate(authContext);
+        } catch (SMBApiException smbApi) {
+            if (smbApi.getStatus() == NtStatus.STATUS_LOGON_FAILURE) {
+                throw new RuntimeIOException(smbApi);
+            }
+            throw smbApi;
         } catch (IOException e) {
-            throw new RuntimeIOException(e);
-        } catch (NtlmException e) {
             throw new RuntimeIOException(e);
         }
     }

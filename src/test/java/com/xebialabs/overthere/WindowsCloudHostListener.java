@@ -30,7 +30,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class WindowsCloudHostListener extends CloudHostListener {
 
-    public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere";
+    public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere-user";
     public static final String REGULAR_WINDOWS_USER_PASSWORD = "wLitdMy@:;<>KY9";
     // The password for the regular user includes special characters to test that they get encoded correctly
 
