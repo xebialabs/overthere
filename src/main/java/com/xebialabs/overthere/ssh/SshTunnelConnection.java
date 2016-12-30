@@ -203,8 +203,9 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
         @Override
         public void close() throws IOException {
-            localSocket.close();
             forwarder.close();
+            localSocket.close();
+
             try {
                 this.join();
             } catch (InterruptedException e) {
