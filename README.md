@@ -173,7 +173,7 @@ Apart from selecting a protocol to use, you will also need to supply a number of
 <tr>
     <th align="left" valign="top"><a name="directoryCopyCommandForUnix"></a>directoryCopyCommandForUnix</th>
     <td>The command to use when copying a directory on a Unix host. The string <code>{0}</code> is replaced with the path of the source directory, the string
-        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>cd {1} ; tar -cf - -C {0} . | tar xpf -</code>. If the
+        <code>{1}</code> is replaced with the path of the destination directory. The default value is <code>tar -cf - -C {0} . | tar xpf - -C {1}</code>. If the
         <code>tar</code> command is not available but the <code>find</code> command recognizes the <code>-depth</code> parameter with a value, the alternative
         command <code>find {0} -depth 1 -exec cp -pr {} {1} ;</code> may be configured.</td>
 </tr>
