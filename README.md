@@ -1129,6 +1129,9 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.4.4 (??-???-2017)
+    * Upgraded to SSH/J 0.20.0.
+    * Added `suPassword` to hidden fields of `ConnectionOptions` to prevent printing it.
 * Overthere 4.4.3 (18-Jan-2017)
     * Added missing PKCS5 KeyFileProvider.
     * Fixed hanging Tunnel connection issue.
