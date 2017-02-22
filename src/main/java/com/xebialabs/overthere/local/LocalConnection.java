@@ -89,6 +89,11 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     }
 
     @Override
+    protected void logDisconnect() {
+        logger.debug("Disconnected from: {}", this);
+    }
+
+    @Override
     public OverthereFile getFile(String path) throws RuntimeIOException {
         return new LocalFile(this, new File(path));
     }

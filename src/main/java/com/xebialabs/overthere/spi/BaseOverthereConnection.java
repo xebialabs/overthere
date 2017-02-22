@@ -42,7 +42,6 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.local.LocalConnection;
 
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.*;
@@ -129,14 +128,14 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
 
             closeQuietly(mapper);
 
-            if (this instanceof LocalConnection) {
-                logger.debug("Disconnected from {}", this);
-            } else {
-                logger.info("Disconnected from {}", this);
-            }
         } finally {
+            logDisconnect();
             isConnected = false;
         }
+    }
+
+    protected void logDisconnect() {
+        logger.info("Disconnected from {}", this);
     }
 
     /**
