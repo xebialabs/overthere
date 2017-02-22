@@ -22,15 +22,22 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.*;
-
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PASSPHRASE;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PRIVATE_KEY;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents options to use when creating a {@link OverthereConnection connection}.
  */
 public class ConnectionOptions {
+
+    private static final Set<String> filteredKeys = new HashSet<>();
+
+    public static String registerFilteredKey(String key) {
+        filteredKeys.add(key);
+        return key;
+    }
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#protocol">the online documentation</a>
@@ -105,7 +112,7 @@ public class ConnectionOptions {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#password">the online documentation</a>
      */
-    public static final String PASSWORD = "password";
+    public static final String PASSWORD = registerFilteredKey("password");
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#jumpstation">the online documentation</a>
@@ -183,16 +190,6 @@ public class ConnectionOptions {
     public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 64 * 1024; // 64 KB
 
     private final Map<String, Object> options;
-
-    private static final Set<String> filteredKeys = getFilteredKeys();
-
-    private static Set<String> getFilteredKeys() {
-        HashSet<String> strings = new HashSet<String>();
-        strings.add(PASSWORD);
-        strings.add(PASSPHRASE);
-        strings.add(PRIVATE_KEY);
-        return Collections.unmodifiableSet(strings);
-    }
 
     /**
      * Creates an empty options object.

@@ -28,6 +28,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
+import static com.xebialabs.overthere.ConnectionOptions.registerFilteredKey;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
@@ -171,12 +172,12 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
      */
-    public static final String PASSPHRASE = "passphrase";
+    public static final String PASSPHRASE = registerFilteredKey("passphrase");
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
      */
-    public static final String PRIVATE_KEY = "privateKey";
+    public static final String PRIVATE_KEY = registerFilteredKey("privateKey");
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_passphrase">the online documentation</a>
@@ -286,7 +287,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPassword">the online documentation</a>
      */
-    public static final String SU_PASSWORD = "suPassword";
+    public static final String SU_PASSWORD = registerFilteredKey("suPassword");
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#ssh_suPasswordPromptRegex">the online documentation</a>
