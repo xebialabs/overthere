@@ -44,7 +44,7 @@ To get Overthere, you have two options:
 
 And, if you want, you can also run the Overthere examples used in the Overthere presentation mentioned above.
 
-Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.4.4%7Cjar) if you want to.
+Binary releases of Overthere are not provided here, but you can download it [straight from the Maven Central repository](http://search.maven.org/#artifactdetails%7Ccom.xebialabs.overthere%7Coverthere%7C4.4.5%7Cjar) if you want to.
 
 <a name="depending_on_overthere"></a>
 ## Depending on Overthere
@@ -54,7 +54,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.4.4</version>
+			<version>4.4.5</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -1129,7 +1129,7 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
-* Overthere 4.4.5 (??-Mar-2017)
+* Overthere 4.4.5 (17-Mar-2017)
     * Upgraded to SMBJ 0.0.8
 * Overthere 4.4.4 (01-Mar-2017)
     * Upgraded to SSH/J 0.20.0.
