@@ -1129,6 +1129,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.4.5 (??-Mar-2017)
+    * Upgraded to SMBJ 0.0.8
 * Overthere 4.4.4 (01-Mar-2017)
     * Upgraded to SSH/J 0.20.0.
     * Added `suPassword` to hidden fields of `ConnectionOptions` to prevent printing it.
