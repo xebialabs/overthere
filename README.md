@@ -1129,6 +1129,15 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 4.4.7 (21-Mar-2017)
+    * Upgraded to SSHJ 0.21.1
+        * SSHJ 0.21.1 (2017-04-25)
+        * Fix regression from 40f956b (invalid length parameter on outputstream)
+        * SSHJ 0.21.0 (2017-04-14)
+        * Added support for ssh-rsa-cert-v01@openssh.com and ssh-dsa-cert-v01@openssh.com certificate key files
+        * Upgraded Gradle to 3.4.1
+        * Added support for custom string encoding
+        * Fixed #312: Upgraded BouncyCastle to 1.56       
 * Overthere 4.4.6 (21-Mar-2017)
     * Upgraded to SMBJ 0.0.9
 * Overthere 4.4.5 (17-Mar-2017)
