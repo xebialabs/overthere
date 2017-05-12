@@ -57,6 +57,7 @@ import static java.lang.String.format;
 
 public abstract class ItestsBase1Utils {
 
+    private static final int MAX_RETRY_COUNT = 20;
     protected TemporaryFolder temp;
     protected String protocol;
     protected ConnectionOptions options;
@@ -66,19 +67,24 @@ public abstract class ItestsBase1Utils {
 
     @BeforeMethod
     public void setupHost() throws Exception {
-        try {
             temp = new TemporaryFolder();
             temp.create();
 
             protocol = getProtocol();
             options = getOptions();
             expectedConnectionClassName = getExpectedConnectionClassName();
-
-            connection = Overthere.getConnection(protocol, options);
-        } catch(Exception exc) {
-            setupException = exc;
-            throw exc;
-        }
+            int retryCount = 0;
+            while (connection == null) {
+                try {
+                    connection = Overthere.getConnection(protocol, options);
+                    ++retryCount;
+                } catch (Exception exc) {
+                    if (retryCount > MAX_RETRY_COUNT) {
+                        setupException = exc;
+                        throw exc;
+                    }
+                }
+            }
     }
 
     protected abstract String getProtocol();
