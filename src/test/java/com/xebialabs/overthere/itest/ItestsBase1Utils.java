@@ -22,36 +22,27 @@
  */
 package com.xebialabs.overthere.itest;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Random;
+import com.google.common.io.InputSupplier;
+import com.google.common.io.OutputSupplier;
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.ssh.SshConnectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.OutputSupplier;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.TemporaryFolder;
-import com.xebialabs.overthere.ssh.SshConnectionType;
+import java.io.*;
+import java.util.Random;
 
 import static com.google.common.io.ByteStreams.toByteArray;
 import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static java.lang.String.format;
 
@@ -83,6 +74,7 @@ public abstract class ItestsBase1Utils {
                         setupException = exc;
                         throw exc;
                     }
+                    System.out.println("Connection Failed, attempting " + retryCount + " try ");
                 }
             }
     }
