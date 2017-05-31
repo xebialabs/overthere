@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +42,7 @@ import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.OverthereProcessOutputHandler;
 import com.xebialabs.overthere.RuntimeIOException;
+import org.slf4j.MDC;
 
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.*;
@@ -273,10 +274,11 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         Thread stderrReaderThread = null;
         final CountDownLatch latch = new CountDownLatch(2);
         try {
-            stdoutReaderThread = getThread("stdout", commandLine.toString(), stdoutHandler, process.getStdout(), latch);
+            Map<String, String> mdcContext =  MDC.getCopyOfContextMap();
+            stdoutReaderThread = getThread("stdout", commandLine.toString(), stdoutHandler, process.getStdout(), latch, mdcContext);
             stdoutReaderThread.start();
 
-            stderrReaderThread = getThread("stderr", commandLine.toString(), stderrHandler, process.getStderr(), latch);
+            stderrReaderThread = getThread("stderr", commandLine.toString(), stderrHandler, process.getStderr(), latch, mdcContext);
             stderrReaderThread.start();
 
             try {
@@ -308,10 +310,12 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         }
     }
 
-    private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch) {
+    private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch, final Map<String, String> mdcContext) {
         Thread t = new Thread(format("%s reader", streamName)) {
             @Override
             public void run() {
+                Map<String, String> previous = MDC.getCopyOfContextMap();
+                mdcFromParentContext();
                 StringBuilder lineBuffer = new StringBuilder();
                 InputStreamReader stdoutReader = new InputStreamReader(stream);
                 latch.countDown();
@@ -336,6 +340,23 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                     if (lineBuffer.length() > 0) {
                         outputHandler.handleLine(lineBuffer.toString());
                     }
+                    restoreMDCContext(previous);
+                }
+            }
+
+            private void restoreMDCContext(Map<String, String> previous) {
+                if (previous == null) {
+                    MDC.clear();
+                } else {
+                    MDC.setContextMap(previous);
+                }
+            }
+
+            private void mdcFromParentContext() {
+                if (mdcContext == null) {
+                    MDC.clear();
+                } else {
+                    MDC.setContextMap(mdcContext);
                 }
             }
         };
