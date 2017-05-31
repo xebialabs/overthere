@@ -315,7 +315,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
             @Override
             public void run() {
                 Map<String, String> previous = MDC.getCopyOfContextMap();
-                mdcFromParentContext();
+                mdcFromParentContext(mdcContext);
                 StringBuilder lineBuffer = new StringBuilder();
                 InputStreamReader stdoutReader = new InputStreamReader(stream);
                 latch.countDown();
@@ -352,11 +352,11 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 }
             }
 
-            private void mdcFromParentContext() {
-                if (mdcContext == null) {
+            private void mdcFromParentContext(Map<String, String> mdcParent) {
+                if (mdcParent == null) {
                     MDC.clear();
                 } else {
-                    MDC.setContextMap(mdcContext);
+                    MDC.setContextMap(mdcParent);
                 }
             }
         };
