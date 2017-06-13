@@ -111,7 +111,7 @@ public class UnixCloudHostListener extends CloudHostListener {
     private static AtomicReference<CloudHost> unixHost = new AtomicReference<CloudHost>();
 
     public UnixCloudHostListener() {
-        super("overthere-unix", unixHost);
+        super("overthere-unix-salt", unixHost);
     }
 
     public static CloudHost getHost() {
