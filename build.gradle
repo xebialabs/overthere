@@ -125,7 +125,7 @@ dependencies {
   compile 'commons-codec:commons-codec:1.10'
 
   // Test dependencies
-  testCompile('com.xebialabs.cloud:overcast:1.2.1') {
+  testCompile('com.xebialabs.cloud:overcast:2.5.1') {
     exclude group: 'com.xebialabs.overthere', module: 'overthere'
     exclude group: 'net.schmizz', module: 'sshj'
   }
