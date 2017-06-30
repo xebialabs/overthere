@@ -40,7 +40,8 @@ public class WindowsCloudHostListener extends CloudHostListener {
     private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
 
     public WindowsCloudHostListener() {
-        super("overthere-windows-local-accounts", windowsHost);
+        //super("overthere-windows-local-accounts", windowsHost);
+        super("overthere-winla-salt", windowsHost);
     }
 
     public static CloudHost getHost() {
