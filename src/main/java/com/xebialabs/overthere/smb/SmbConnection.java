@@ -24,13 +24,13 @@ package com.xebialabs.overthere.smb;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.security.Security;
 import java.util.Map;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.smbj.SmbConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hierynomus.mserref.NtStatus;
-import com.hierynomus.smbj.DefaultConfig;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.common.SMBApiException;
@@ -52,10 +52,7 @@ import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.PORT;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PORT_DEFAULT_SMB;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PORT;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static java.net.InetSocketAddress.createUnresolved;
 
 public class SmbConnection extends BaseOverthereConnection {
@@ -70,12 +67,6 @@ public class SmbConnection extends BaseOverthereConnection {
     protected final String password;
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
-
-    static {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
 
     protected SmbConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
         super(protocol, options, mapper, canStartProcess);
@@ -94,9 +85,14 @@ public class SmbConnection extends BaseOverthereConnection {
         int unmappedSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
         smbPort = smbAddressPort.getPort();
+        boolean requireSigning = options.getBoolean(SMB_REQUIRE_SIGNING, SMB_REQUIRE_SIGNING_DEFAULT);
         username = options.get(USERNAME);
         password = options.get(PASSWORD);
-        client = new SMBClient(new DefaultConfig());
+        SmbConfig config = SmbConfig.builder()
+                .withSigningRequired(requireSigning)
+                .withSecurityProvider(new BCSecurityProvider())
+                .build();
+        client = new SMBClient(config);
     }
 
     public void connect() {

@@ -45,8 +45,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.testng.Assert.fail;
 
 public abstract class ItestsBase2Basics extends ItestsBase1Utils {
@@ -161,9 +160,8 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
         OverthereUtils.write(contents, regularFile);
 
         List<OverthereFile> dirContents = tempDir.listFiles();
-        assertThat("Expected directory to contain two entries", dirContents.size(), equalTo(2));
-        assertThat("Expected directory to contain parent of deeply nested directory", dirContents.contains(nested1), equalTo(true));
-        assertThat("Expected directory to contain regular file that was just created", dirContents.contains(regularFile), equalTo(true));
+        assertThat(dirContents, contains(nested1, regularFile));
+        assertThat(dirContents, hasSize(2));
 
         try {
             nested1.delete();

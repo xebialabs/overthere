@@ -1058,6 +1058,10 @@ The SMB 2.x and CIFS protocol implementation of Overthere defines a number of ad
 	<th align="left" valign="top"><a name="smb_smbPort"></a>smbPort</th>
 	<td>The SMB port to connect to. The default value is <code>445</code>.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="smb_smbRequireSigning"></a>smbRequireSigning</th>
+	<td>Whether to require the server to sign the responses. The default value is <code>false</code>.</td>
+</tr>
 </table>
 
 <a name="cifs_connection_options"></a>
@@ -1129,6 +1133,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.2 (??-Jul-2017)
+    * Upgraded to SMBJ 0.1.0
 * Overthere 5.0.1 (08-Jun-2017)
     * Mapped diagnostic context of the parent thread to its child.
 * Overthere 5.0.0 (21-Mar-2017)

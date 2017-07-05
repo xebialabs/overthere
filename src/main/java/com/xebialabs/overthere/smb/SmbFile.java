@@ -25,9 +25,12 @@ package com.xebialabs.overthere.smb;
 import com.hierynomus.msdtyp.AccessMask;
 import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.msfscc.FileAttributes;
-import com.hierynomus.msfscc.fileinformation.FileInfo;
+import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
+import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.smbj.common.SMBApiException;
+import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import com.hierynomus.smbj.transport.TransportException;
@@ -91,19 +94,27 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     @Override
     public boolean canRead() {
         logger.debug("Checking whether {} can be read", this.getPath());
-        return getShare().checkAccessMask(AccessMask.FILE_READ_DATA, getPathOnShare());
+        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_READ_DATA);
     }
 
     @Override
     public boolean canWrite() {
         logger.debug("Checking whether {} can be write", this.getPath());
-        return getShare().checkAccessMask(AccessMask.FILE_WRITE_DATA, getPathOnShare());
+        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_WRITE_DATA);
     }
 
     @Override
     public boolean canExecute() {
         logger.debug("Checking whether {} can execute", this.getPath());
-        return getShare().checkAccessMask(AccessMask.FILE_READ_DATA, getPathOnShare());
+        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_EXECUTE);
+    }
+
+    private int getAccessMask() {
+        try (DiskEntry entry = getShare().open(getPathOnShare(), EnumSet.of(AccessMask.MAXIMUM_ALLOWED), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
+            return entry.getFileInformation().getAccessInformation().getAccessFlags();
+        } catch (TransportException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     @Override
@@ -142,94 +153,86 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     @Override
     public long length() {
-        return getShare().getFileInformation(getPathOnShare()).getFileSize();
+        return getShare().getFileInformation(getPathOnShare()).getStandardInformation().getEndOfFile();
     }
 
     @Override
     public InputStream getInputStream() throws RuntimeIOException {
         logger.debug("Opening SMB input stream for {}", getSharePath());
-        try {
-            final File file = getShare().openFile(getPathOnShare(),
-                    EnumSet.of(AccessMask.GENERIC_READ), SMB2CreateDisposition.FILE_OPEN);
+        final File file = getShare().openFile(getPathOnShare(),
+                EnumSet.of(AccessMask.GENERIC_READ), null, EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ), SMB2CreateDisposition.FILE_OPEN, null);
 
-            final InputStream wrapped = file.getInputStream();
-            return asBuffered(new InputStream() {
+        final InputStream wrapped = file.getInputStream();
+        return asBuffered(new InputStream() {
 
-                @Override
-                public int read() throws IOException {
-                    return wrapped.read();
-                }
+            @Override
+            public int read() throws IOException {
+                return wrapped.read();
+            }
 
-                @Override
-                public int read(byte[] b) throws IOException {
-                    return wrapped.read(b);
-                }
+            @Override
+            public int read(byte[] b) throws IOException {
+                return wrapped.read(b);
+            }
 
-                @Override
-                public int read(byte[] b, int off, int len) throws IOException {
-                    return wrapped.read(b, off, len);
-                }
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return wrapped.read(b, off, len);
+            }
 
-                @Override
-                public long skip(long n) throws IOException {
-                    return wrapped.skip(n);
-                }
+            @Override
+            public long skip(long n) throws IOException {
+                return wrapped.skip(n);
+            }
 
-                @Override
-                public void close() throws IOException {
-                    logger.debug("Closing SMB input stream for {}", getSharePath());
-                    wrapped.close();
-                    getShare().close(file.getFileId());
-                }
-            });
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot open %s for reading: %s", getSharePath(), e.toString()), e);
-        }
+            @Override
+            public void close() throws IOException {
+                logger.debug("Closing SMB input stream for {}", getSharePath());
+                wrapped.close();
+                file.close();
+            }
+        });
     }
 
     @Override
     public OutputStream getOutputStream() {
         logger.debug("Opening SMB output stream for {}", getSharePath());
-        try {
-            SMB2CreateDisposition createDisposition = SMB2CreateDisposition.FILE_OVERWRITE_IF;
-            if (!overwrite) createDisposition = SMB2CreateDisposition.FILE_CREATE;
-            final File file = getShare().openFile(getPathOnShare(),
-                    EnumSet.of(AccessMask.GENERIC_WRITE), createDisposition);
+        SMB2CreateDisposition createDisposition = SMB2CreateDisposition.FILE_OVERWRITE_IF;
+        if (!overwrite) createDisposition = SMB2CreateDisposition.FILE_CREATE;
+        final File file = getShare().openFile(getPathOnShare(), EnumSet.of(AccessMask.GENERIC_WRITE),
+                null, EnumSet.of(SMB2ShareAccess.FILE_SHARE_WRITE), createDisposition, null);
 
-            final OutputStream wrapped = file.getOutputStream();
+        final OutputStream wrapped = file.getOutputStream();
 
-            return asBuffered(new OutputStream() {
+        return asBuffered(new OutputStream() {
 
-                @Override
-                public void write(int b) throws IOException {
-                    wrapped.write(b);
-                }
+            @Override
+            public void write(int b) throws IOException {
+                wrapped.write(b);
+            }
 
-                @Override
-                public void write(byte[] b, int off, int len) throws IOException {
-                    wrapped.write(b, off, len);
-                }
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                wrapped.write(b, off, len);
+            }
 
-                @Override
-                public void write(byte[] b) throws IOException {
-                    wrapped.write(b);
-                }
+            @Override
+            public void write(byte[] b) throws IOException {
+                wrapped.write(b);
+            }
 
-                @Override
-                public void flush() throws IOException {
-                    wrapped.flush();
-                }
+            @Override
+            public void flush() throws IOException {
+                wrapped.flush();
+            }
 
-                @Override
-                public void close() throws IOException {
-                    logger.debug("Closing SMB output stream for {}", getSharePath());
-                    wrapped.close();
-                    getShare().close(file.getFileId());
-                }
-            });
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot open %s for writing: %s", getSharePath(), e.toString()), e);
-        }
+            @Override
+            public void close() throws IOException {
+                logger.debug("Closing SMB output stream for {}", getSharePath());
+                wrapped.close();
+                file.close();
+            }
+        });
     }
 
     @Override
@@ -253,12 +256,12 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
         logger.debug("Listing directory {}", sharePath);
         try {
             List<OverthereFile> files = new ArrayList<OverthereFile>();
-            for (FileInfo info : getShare().list(sharePath)) {
-                files.add(getFile(info.getFileName()));
+            for (FileIdBothDirectoryInformation info : getShare().list(sharePath)) {
+                if (!info.getFileName().equals(".") && !info.getFileName().equals("..")) {
+                    files.add(getFile(info.getFileName()));
+                }
             }
             return files;
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot list directory %s: %s", sharePath, e.toString()), e);
         } catch (SMBApiException e) {
             throw new RuntimeIOException(format("Cannot list directory %s: %s", sharePath, e.toString()), e);
         }
@@ -274,8 +277,6 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
         logger.debug("Creating directory {}", sharePath);
         try {
             getShare().mkdir(path);
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot create directory %s: %s", sharePath, e.toString()), e);
         } catch (SMBApiException e) {
             throw new RuntimeIOException(format("Cannot create directory %s: %s", sharePath, e.toString()), e);
         }
@@ -325,8 +326,6 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
                 logger.debug("deleting directory {}", sharePath);
                 getShare().rmdir(sharePath, recursive);
             }
-        } catch (TransportException e) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
         } catch (SMBApiException e) {
             throw new RuntimeIOException(format("Cannot delete %s: %s", sharePath, e.toString()), e);
         }
@@ -346,7 +345,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     }
 
     private boolean checkAttributes(FileAttributes mask) {
-        long attrMask = getShare().getFileInformation(getPathOnShare()).getFileAttributes();
+        long attrMask = getShare().getFileInformation(getPathOnShare()).getBasicInformation().getFileAttributes();
         return FileAttributes.EnumUtils.isSet(attrMask, mask);
     }
 

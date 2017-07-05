@@ -46,6 +46,16 @@ public class SmbConnectionBuilder extends BaseCifsConnectionBuilder implements O
      */
     public static final String SMB_PORT = "smbPort";
 
+    /**
+     * Whether SMB Connections require the server to sign the responses.
+     */
+    public static final boolean SMB_REQUIRE_SIGNING_DEFAULT = false;
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_smbRequireSigning">the online documentation</a>
+     */
+    public static final String SMB_REQUIRE_SIGNING = "smbRequireSigning";
+
     private final SmbConnection connection;
 
     public SmbConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
