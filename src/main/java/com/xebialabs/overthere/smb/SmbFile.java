@@ -30,8 +30,10 @@ import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.protocol.commons.EnumWithValue;
 import com.hierynomus.smbj.common.SMBApiException;
+import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
+import com.hierynomus.smbj.transport.TransportException;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
@@ -108,7 +110,11 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     }
 
     private int getAccessMask() {
-        return getShare().getFileInformation(getPathOnShare()).getAccessInformation().getAccessFlags();
+        try (DiskEntry entry = getShare().open(getPathOnShare(), EnumSet.of(AccessMask.MAXIMUM_ALLOWED), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
+            return entry.getFileInformation().getAccessInformation().getAccessFlags();
+        } catch (TransportException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     @Override
@@ -251,7 +257,9 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
         try {
             List<OverthereFile> files = new ArrayList<OverthereFile>();
             for (FileIdBothDirectoryInformation info : getShare().list(sharePath)) {
-                files.add(getFile(info.getFileName()));
+                if (!info.getFileName().equals(".") && !info.getFileName().equals("..")) {
+                    files.add(getFile(info.getFileName()));
+                }
             }
             return files;
         } catch (SMBApiException e) {
