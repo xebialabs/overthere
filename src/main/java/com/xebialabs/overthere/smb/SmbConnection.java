@@ -26,11 +26,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.Security;
 import java.util.Map;
+
+import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.smbj.SmbConfig;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hierynomus.mserref.NtStatus;
-import com.hierynomus.smbj.DefaultConfig;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.common.SMBApiException;
@@ -96,7 +98,7 @@ public class SmbConnection extends BaseOverthereConnection {
         smbPort = smbAddressPort.getPort();
         username = options.get(USERNAME);
         password = options.get(PASSWORD);
-        client = new SMBClient(new DefaultConfig());
+        client = new SMBClient(SmbConfig.builder().withSecurityProvider(new BCSecurityProvider()).build());
     }
 
     public void connect() {
