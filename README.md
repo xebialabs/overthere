@@ -1129,6 +1129,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.2 (??-Jul-2017)
+    * Upgraded to SMBJ 0.1.0
 * Overthere 5.0.1 (08-Jun-2017)
     * Mapped diagnostic context of the parent thread to its child.
 * Overthere 5.0.0 (21-Mar-2017)
