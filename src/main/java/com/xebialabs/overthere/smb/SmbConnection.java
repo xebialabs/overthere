@@ -105,7 +105,7 @@ public class SmbConnection extends BaseOverthereConnection {
             UserAndDomain ud = getUserNameAndDomain(username);
             String user = ud.getUsername();
             String domain = ud.getDomain();
-            connection = client.connect(hostname);
+            connection = client.connect(hostname, smbPort);
             AuthenticationContext authContext = new AuthenticationContext(user, password.toCharArray(), domain);
             session = connection.authenticate(authContext);
         } catch (SMBApiException smbApi) {
