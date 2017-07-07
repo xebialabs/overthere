@@ -189,6 +189,26 @@ public class ConnectionOptions {
      */
     public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 64 * 1024; // 64 KB
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCharacterEncoding">the online documentation</a>
+     */
+    public static final String REMOTE_CHARACTER_ENCODING = "remoteCharacterEncoding";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCharacterEncoding">the online documentation</a>
+     */
+    public static final String REMOTE_CHARACTER_ENCODING_ZOS_DEFAULT = "Cp1047";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCharacterEncoding">the online documentation</a>
+     */
+    public static final String REMOTE_CHARACTER_ENCODING_UNIX_DEFAULT = "UTF-8";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCharacterEncoding">the online documentation</a>
+     */
+    public static final String REMOTE_CHARACTER_ENCODING_WINDOWS_DEFAULT = "UTF-8";
+
     private final Map<String, Object> options;
 
     /**
