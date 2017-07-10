@@ -26,8 +26,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
 
+import com.hierynomus.mssmb2.SMB2Packet;
 import com.hierynomus.security.bc.BCSecurityProvider;
 import com.hierynomus.smbj.SmbConfig;
+import com.hierynomus.smbj.transport.TransportLayerFactory;
+import com.hierynomus.smbj.transport.tcp.direct.DirectTcpTransportFactory;
+import com.hierynomus.smbj.transport.tcp.tunnel.TunnelTransportFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hierynomus.mserref.NtStatus;
@@ -59,6 +63,8 @@ public class SmbConnection extends BaseOverthereConnection {
 
     private final SMBClient client;
     private final String hostname;
+    private final String realSmbHost;
+    private final int realSmbPort;
     private final int smbPort;
     private Connection connection;
     private Session session;
@@ -75,21 +81,26 @@ public class SmbConnection extends BaseOverthereConnection {
             throw new IllegalArgumentException("Cannot open a smb:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
         }
 
-        String unmappedAddress = options.get(ADDRESS);
+        realSmbHost = options.get(ADDRESS);
 
         int unmappedPort = options.get(PORT, this.cifsConnectionType.getDefaultPort(options));
-        InetSocketAddress addressPort = mapper.map(createUnresolved(unmappedAddress, unmappedPort));
+        InetSocketAddress addressPort = mapper.map(createUnresolved(realSmbHost, unmappedPort));
         hostname = addressPort.getHostName();
         port = addressPort.getPort();
 
-        int unmappedSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
-        InetSocketAddress smbAddressPort = mapper.map(createUnresolved(unmappedAddress, unmappedSmbPort));
+        realSmbPort = options.getInteger(SMB_PORT, PORT_DEFAULT_SMB);
+        InetSocketAddress smbAddressPort = mapper.map(createUnresolved(realSmbHost, realSmbPort));
         smbPort = smbAddressPort.getPort();
         boolean requireSigning = options.getBoolean(SMB_REQUIRE_SIGNING, SMB_REQUIRE_SIGNING_DEFAULT);
+        TransportLayerFactory<SMB2Packet> transportLayerFactory = new DirectTcpTransportFactory<>();
+        if (!realSmbHost.equals(hostname)) {
+            transportLayerFactory = new TunnelTransportFactory<>(transportLayerFactory, hostname, smbPort);
+        }
         username = options.get(USERNAME);
         password = options.get(PASSWORD);
         SmbConfig config = SmbConfig.builder()
                 .withSigningRequired(requireSigning)
+                .withTransportLayerFactory(transportLayerFactory)
                 .withSecurityProvider(new BCSecurityProvider())
                 .build();
         client = new SMBClient(config);
@@ -105,7 +116,7 @@ public class SmbConnection extends BaseOverthereConnection {
             UserAndDomain ud = getUserNameAndDomain(username);
             String user = ud.getUsername();
             String domain = ud.getDomain();
-            connection = client.connect(hostname, smbPort);
+            connection = client.connect(realSmbHost, realSmbPort);
             AuthenticationContext authContext = new AuthenticationContext(user, password.toCharArray(), domain);
             session = connection.authenticate(authContext);
         } catch (SMBApiException smbApi) {
