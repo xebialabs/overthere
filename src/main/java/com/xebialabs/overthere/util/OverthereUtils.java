@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -131,6 +132,18 @@ public class OverthereUtils {
             int nRead;
             while ((nRead = from.read(bytes, 0, bytes.length)) != -1) {
                 to.write(bytes, 0, nRead);
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeIOException(ioe);
+        }
+    }
+
+    public static void write(Reader from, Writer to) {
+        try {
+            char[] chars = new char[1024];
+            int nRead;
+            while ((nRead = from.read(chars, 0, chars.length)) != -1) {
+                to.write(chars, 0, nRead);
             }
         } catch (IOException ioe) {
             throw new RuntimeIOException(ioe);

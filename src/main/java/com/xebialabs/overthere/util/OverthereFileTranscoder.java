@@ -1,10 +1,8 @@
 package com.xebialabs.overthere.util;
 
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.Charset;
 
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
@@ -36,12 +34,15 @@ public class OverthereFileTranscoder extends OverthereFileTransmitter {
      * @throws RuntimeIOException if an I/O error occurred
      */
     public static void transcode(OverthereFile src, OverthereFile dst) {
-        src.getConnection().getOptions().get()
-        if (src.isDirectory()) {
-            transcodeDirectory(src, dst);
-        } else {
-            transcodeFile(src, dst);
-        }
+        Charset srcCharset = getConfiguredCharacterSet(src.getConnection());
+        Charset dstCharset = getConfiguredCharacterSet(dst.getConnection());
+        transcode(src, srcCharset, dst, dstCharset);
+    }
+
+    private static Charset getConfiguredCharacterSet(OverthereConnection connection) {
+        OperatingSystemFamily hostOperatingSystem = connection.getHostOperatingSystem();
+        String charsetName = connection.getOptions().get(ConnectionOptions.REMOTE_CHARACTER_ENCODING, hostOperatingSystem.getDefaultCharacterSet());
+        return Charset.forName(charsetName);
     }
 
     /**
@@ -55,11 +56,9 @@ public class OverthereFileTranscoder extends OverthereFileTransmitter {
      * @throws RuntimeIOException if an I/O error occurred
      */
     public static void transcode(OverthereFile src, String srcCharsetName, OverthereFile dst, String dstCharsetName) {
-        if (src.isDirectory()) {
-            transcodeDirectory(src, dst);
-        } else {
-            transcodeFile(src, dst);
-        }
+        Charset srcCharset = Charset.forName(srcCharsetName);
+        Charset dstCharset = Charset.forName(dstCharsetName);
+        transcode(src, srcCharset, dst, dstCharset);
     }
 
     /**
@@ -74,9 +73,9 @@ public class OverthereFileTranscoder extends OverthereFileTransmitter {
      */
     public static void transcode(OverthereFile src, Charset srcCharset, OverthereFile dst, Charset dstCharset) {
         if (src.isDirectory()) {
-            transcodeDirectory(src, dst);
+            transcodeDirectory(src, srcCharset, dst, dstCharset);
         } else {
-            transcodeFile(src, dst);
+            new OverthereFileTranscoder(srcCharset, dstCharset).transmitFile(src, dst);
         }
     }
 
@@ -89,43 +88,33 @@ public class OverthereFileTranscoder extends OverthereFileTransmitter {
      */
     private static void transcodeDirectory(OverthereFile srcDir, Charset srcCharset, OverthereFile dstDir, Charset dstCharset) throws RuntimeIOException {
         OverthereFileTranscoder dirCopier = new OverthereFileTranscoder(srcDir, srcCharset, dstDir, dstCharset);
-        dirCopier.startCopy();
-    }
-
-    /**
-     * Copies a regular file.
-     *
-     * @param srcFile the source file. Must exists and must not be a directory.
-     * @param dstFile the destination file. May exists but must not be a directory. Its parent directory must exist.
-     * @throws RuntimeIOException if an I/O error occurred
-     */
-    private static void transcodeFile(final OverthereFile srcFile, final OverthereFile dstFile) throws RuntimeIOException {
-        checkFileExists(srcFile, SOURCE);
-        checkReallyIsAFile(dstFile, DESTINATION);
-
-        logger.debug("Copying file {} to {}", srcFile, dstFile);
-        if (dstFile.exists())
-            logger.trace("About to overwrite existing file {}", dstFile);
-
-        try {
-            InputStream is = srcFile.getInputStream();
-            try {
-                OutputStream os = dstFile.getOutputStream();
-                try {
-                    write(is, os);
-                } finally {
-                    closeQuietly(os);
-                }
-            } finally {
-                closeQuietly(is);
-            }
-        } catch (RuntimeIOException exc) {
-            throw new RuntimeIOException("Cannot copy " + srcFile + " to " + dstFile, exc.getCause());
-        }
+        dirCopier.startTransmission();
     }
 
     @Override
     protected void transmitFile(OverthereFile srcFile, OverthereFile dstFile) {
+        checkFileExists(srcFile, SOURCE);
+        checkReallyIsAFile(dstFile, DESTINATION);
 
+        logger.debug("Transcoding file {} ({}) to {} ({})", srcFile, srcCharset, dstFile, dstCharset);
+        if (dstFile.exists()) {
+            logger.trace("About to overwrite existing file {}", dstFile);
+        }
+
+        try {
+            Reader in = new BufferedReader(new InputStreamReader(srcFile.getInputStream(), srcCharset));
+            try {
+                Writer out = new BufferedWriter(new OutputStreamWriter(dstFile.getOutputStream(), dstCharset));
+                try {
+                    write(in, out);
+                } finally {
+                    closeQuietly(out);
+                }
+            } finally {
+                closeQuietly(in);
+            }
+        } catch (RuntimeIOException exc) {
+            throw new RuntimeIOException("Cannot transcode " + srcFile + " (" + srcCharset + ") to " + dstFile + " (" + dstCharset + ")", exc.getCause());
+        }
     }
 }

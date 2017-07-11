@@ -34,17 +34,17 @@ public enum OperatingSystemFamily {
     /**
      * An operating system from the Windows family: NT, XP, Server 2003, Vista, etc.
      */
-    WINDOWS('\\', ';', "\r\n", "&&", ".bat", "C:\\windows\\temp"),
+    WINDOWS('\\', ';', "\r\n", "&&", ".bat", "C:\\windows\\temp", "UTF-8"),
 
     /**
      * An operating system from the Unix family: Linux, AIX, MacOS, etc.
      */
-    UNIX('/', ':', "\n", ";", ".sh", "/tmp"),
+    UNIX('/', ':', "\n", ";", ".sh", "/tmp", "UTF-8"),
 
     /**
      * The Z/OS operating system.
      */
-    ZOS('/', ':', "\n", ";", ".sh", "/tmp");
+    ZOS('/', ':', "\n", ";", ".sh", "/tmp", "Cp1047");
 
     private final String fileSeparator;
 
@@ -62,8 +62,10 @@ public enum OperatingSystemFamily {
 
     private final String defaultTemporaryDirectoryPath;
 
+    private final String defaultCharacterSet;
+
     private OperatingSystemFamily(char fileSeparatorChar, char pathSeparatorChar, String lineSeparator, String commandSepator, String scriptExtension,
-                                  String defaultTemporaryDirectoryPath) {
+                                  String defaultTemporaryDirectoryPath, String defaultCharacterSet) {
         this.scriptExtension = scriptExtension;
         this.lineSeparator = lineSeparator;
         this.defaultTemporaryDirectoryPath = defaultTemporaryDirectoryPath;
@@ -72,6 +74,7 @@ public enum OperatingSystemFamily {
         this.pathSeparator = String.valueOf(pathSeparatorChar);
         this.pathSeparatorChar = pathSeparatorChar;
         this.commandSeparator = commandSepator;
+        this.defaultCharacterSet = defaultCharacterSet;
     }
 
     /**
@@ -185,4 +188,13 @@ public enum OperatingSystemFamily {
         return defaultTemporaryDirectoryPath;
     }
 
+    /**
+     * Returns the default character set encoding for this operating system family, i.e. <tt>UTF-8</tt> for Windows and Unix, or
+     * <tt>Cp1047</tt> for Z/OS.
+     *
+     * @return the character set name
+     */
+    public String getDefaultCharacterSet() {
+        return defaultCharacterSet;
+    }
 }
