@@ -27,7 +27,7 @@ pipeline {
                 "Build Windows": {
                     node('windows') {
                         checkout scm
-                        bat './gradle.bat clean test'
+                        bat './gradlew.bat clean test'
                     }
                 })
             }
