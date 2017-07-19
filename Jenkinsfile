@@ -60,7 +60,7 @@ pipeline {
                         checkout scm
                         unstash name: 'overcast-instances'
                         echo 'test windows'
-                        throw new Exception("Build failed lala")
+                        error("Build failed lala")
                     }
                 })
             }
