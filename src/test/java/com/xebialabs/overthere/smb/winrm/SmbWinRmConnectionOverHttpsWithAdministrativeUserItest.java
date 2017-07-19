@@ -23,25 +23,22 @@
 package com.xebialabs.overthere.smb.winrm;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.smb.SmbProcessConnection;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
-import com.xebialabs.overthere.WindowsCloudHostListener;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.*;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class SmbWinRmConnectionOverHttpsWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -54,7 +51,7 @@ public class SmbWinRmConnectionOverHttpsWithAdministrativeUserItest extends Over
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         options.set(WINRM_ENABLE_HTTPS, true);

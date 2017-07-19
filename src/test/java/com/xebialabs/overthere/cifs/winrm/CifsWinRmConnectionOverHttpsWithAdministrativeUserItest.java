@@ -22,31 +22,21 @@
  */
 package com.xebialabs.overthere.cifs.winrm;
 
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
-
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_ENABLE_HTTPS;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_CERTIFICATE_TRUST_STRATEGY;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.WINRM_HTTPS_HOSTNAME_VERIFICATION_STRATEGY;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class CifsWinRmConnectionOverHttpsWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -59,7 +49,7 @@ public class CifsWinRmConnectionOverHttpsWithAdministrativeUserItest extends Ove
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         options.set(WINRM_ENABLE_HTTPS, true);

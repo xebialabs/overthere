@@ -22,29 +22,20 @@
  */
 package com.xebialabs.overthere.cifs.telnet;
 
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
-
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.WindowsCloudHost.REGULAR_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.REGULAR_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class CifsTelnetConnectionWithRegularUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -57,7 +48,7 @@ public class CifsTelnetConnectionWithRegularUserItest extends OverthereConnectio
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
         options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\temp");

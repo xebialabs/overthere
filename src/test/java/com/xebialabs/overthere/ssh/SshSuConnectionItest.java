@@ -23,19 +23,17 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.UnixCloudHostListener;
+import com.xebialabs.overthere.UnixCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.UnixCloudHostListener.*;
+import static com.xebialabs.overthere.UnixCloudHost.*;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SU;
 
 @Test
-@Listeners({UnixCloudHostListener.class})
 public class SshSuConnectionItest extends OverthereConnectionItestBase {
 
     @Override
@@ -48,7 +46,7 @@ public class SshSuConnectionItest extends OverthereConnectionItestBase {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SU);
-        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, UnixCloudHost.getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
         options.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);

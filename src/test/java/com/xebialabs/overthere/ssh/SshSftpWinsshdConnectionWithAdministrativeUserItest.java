@@ -23,21 +23,19 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_WINSSHD;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class SshSftpWinsshdConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -50,7 +48,7 @@ public class SshSftpWinsshdConnectionWithAdministrativeUserItest extends Overthe
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_WINSSHD);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(PORT, 2222);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);

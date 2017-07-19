@@ -22,30 +22,21 @@
  */
 package com.xebialabs.overthere.smb.telnet;
 
-import com.xebialabs.overthere.smb.SmbProcessConnection;
-import org.testng.annotations.Listeners;
-import org.testng.annotations.Test;
 import com.google.common.collect.ImmutableMap;
-
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import com.xebialabs.overthere.smb.SmbProcessConnection;
+import org.testng.annotations.Test;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.REGULAR_WINDOWS_USER_USERNAME;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.CONNECTION_TYPE;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.PATH_SHARE_MAPPINGS;
-import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
+import static com.xebialabs.overthere.WindowsCloudHost.REGULAR_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.REGULAR_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
+import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class SmbTelnetConnectionWithRegularUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -58,7 +49,7 @@ public class SmbTelnetConnectionWithRegularUserItest extends OverthereConnection
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, TELNET);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(USERNAME, REGULAR_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, REGULAR_WINDOWS_USER_PASSWORD);
         options.set(TEMPORARY_DIRECTORY_PATH, "C:\\overthere\\temp");

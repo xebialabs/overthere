@@ -24,17 +24,16 @@ package com.xebialabs.overthere.proxy;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.UnixCloudHostListener;
+import com.xebialabs.overthere.UnixCloudHost;
 import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
 import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
-import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
+import static com.xebialabs.overthere.UnixCloudHost.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHost.REGULAR_UNIX_USER_USERNAME;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
@@ -49,7 +48,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.testng.Assert.fail;
 
 @Test
-@Listeners({UnixCloudHostListener.class})
 public class ProxyConfigurationItest {
 
     @Test
@@ -89,7 +87,7 @@ public class ProxyConfigurationItest {
         try {
             ConnectionOptions jumpstationOptions = new ConnectionOptions();
             jumpstationOptions.set(PROTOCOL, SSH_JUMPSTATION_PROTOCOL);
-            jumpstationOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+            jumpstationOptions.set(ADDRESS, UnixCloudHost.getHostName());
             jumpstationOptions.set(OPERATING_SYSTEM, UNIX);
             jumpstationOptions.set(PORT, 22);
             jumpstationOptions.set(USERNAME, REGULAR_UNIX_USER_USERNAME);

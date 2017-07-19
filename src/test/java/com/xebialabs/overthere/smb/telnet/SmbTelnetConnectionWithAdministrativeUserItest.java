@@ -22,27 +22,21 @@
  */
 package com.xebialabs.overthere.smb.telnet;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.WindowsCloudHost;
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.smb.SmbProcessConnection;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostListener;
-import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.TELNET;
 
 @Test
-@Listeners({WindowsCloudHostListener.class})
 public class SmbTelnetConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
 
     @Override
@@ -53,7 +47,7 @@ public class SmbTelnetConnectionWithAdministrativeUserItest extends OverthereCon
     @Override
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(CONNECTION_TYPE, TELNET);
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);

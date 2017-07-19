@@ -22,13 +22,7 @@
  */
 package com.xebialabs.overthere;
 
-import com.xebialabs.overcast.host.CloudHost;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-
-public class UnixCloudHostListener extends CloudHostListener {
+public class UnixCloudHost {
 
     public static final String REGULAR_UNIX_USER_USERNAME = "overthere";
     public static final String REGULAR_UNIX_USER_PASSWORD = "}Kp39hdb}LzM";
@@ -108,14 +102,8 @@ public class UnixCloudHostListener extends CloudHostListener {
     // AAAAB3NzaC1yc2EAAAADAQABAAABAQDrkl/X1IK/ytn+QvJ87D46Me3l9CfEdVBHYHpRbQHSrpGFJKBgDaA5QQ8mmHv47nrTmOOsyVuVJyxc7tWcUm0FMxEWhCMGU4/xUW4SDQyho3lE9BRlVigUo/1XrJwQqmZ95KZWGkSKlR2Av59SNvWezD4KnHxY0td/cK+quTh3XFnR/SK7cPj8H4ubJm5Wq+WZF9UM57Q6u+j+F+SIz6EyoqcV8qdSV29Rvp96rgevGl5igSaw76iqQ19Wn9F9eK5LMEdCXqxhjBYNIeCzIij/ujYBNwPDcXMSvFHekyMfSuqHf0BMm0VPO9X3RU1NF37XvbuHNLohAt/4z9jo6/Nr
     // overthere@overthere-unix
 
-    private static AtomicReference<CloudHost> unixHost = new AtomicReference<CloudHost>();
-
-    public UnixCloudHostListener() {
-        super("overthere-unix-salt", unixHost);
-    }
-
-    public static CloudHost getHost() {
-        return checkNotNull(unixHost.get(), "Cloud host overthere-unix has not been started. Did you wire up the right CloudHostListener?");
+    public static String getHostName() {
+        return System.getProperty("overthere-unix-host");
     }
 
 }

@@ -22,24 +22,12 @@
  */
 package com.xebialabs.overthere;
 
-import com.xebialabs.overcast.host.CloudHost;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-
-public class WindowsCloudHostWithDomainListener extends CloudHostListener {
+public class WindowsCloudHostWithDomain {
 
     public static final String DOMAIN_WINDOWS_USER_PASSWORD = "Xebia@123";
 
-    private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
-
-    public WindowsCloudHostWithDomainListener() {
-        super("overthere-windows-domain-accounts", windowsHost);
-    }
-
-    public static CloudHost getHost() {
-        return checkNotNull(windowsHost.get(), "Cloud host overthere-windows-domain-accounts has not been started. Did you wire up the right CloudHostListener?");
+    public static String getHostName() {
+        return System.getProperty("overthere-windows-domain-host");
     }
 
 }

@@ -24,10 +24,9 @@ package com.xebialabs.overthere.smb.winrm;
 
 import com.google.common.io.Resources;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.WindowsCloudHostWithDomainListener;
+import com.xebialabs.overthere.WindowsCloudHostWithDomain;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
 import com.xebialabs.overthere.smb.SmbProcessConnection;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -38,13 +37,12 @@ import java.nio.file.StandardCopyOption;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostWithDomainListener.DOMAIN_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
+import static com.xebialabs.overthere.WindowsCloudHostWithDomain.DOMAIN_WINDOWS_USER_PASSWORD;
 import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.SMB_PROTOCOL;
 
 @Test
-@Listeners({WindowsCloudHostWithDomainListener.class})
 public class SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest extends OverthereConnectionItestBase {
 
     public static final String DOMAIN_WINDOWS_USERNAME = "itest@W2K8R2.XEBIALABS.COM";
@@ -63,7 +61,7 @@ public class SmbWinRmConnectionOverHttpWithAdministrativeDomainUserItest extends
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, WINRM_INTERNAL);
-        options.set(ADDRESS, WindowsCloudHostWithDomainListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHostWithDomain.getHostName());
         options.set(USERNAME, DOMAIN_WINDOWS_USERNAME);
         options.set(PASSWORD, DOMAIN_WINDOWS_USER_PASSWORD);
         return options;

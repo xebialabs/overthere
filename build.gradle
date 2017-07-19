@@ -1,3 +1,7 @@
+import com.xebialabs.overcast.gradle.tasks.OvercastSetup
+import com.xebialabs.overcast.gradle.tasks.OvercastTeardown
+import groovy.json.JsonSlurper
+
 /*
  * Release and publish instructions:
  *
@@ -12,9 +16,13 @@
 buildscript {
   repositories {
     mavenCentral()
+    mavenLocal()
   }
   dependencies {
     classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    classpath "com.xebialabs.cloud:overcast-gradle-plugin:2.6.0-SNAPSHOT"
+    classpath "org.slf4j:slf4j-simple:1.7.25"
+
   }
 }
 
@@ -34,6 +42,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'license'
 apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'com.xebialabs.overcast'
 
 repositories {
   mavenCentral()
@@ -125,10 +134,11 @@ dependencies {
   compile 'commons-codec:commons-codec:1.10'
 
   // Test dependencies
-  testCompile('com.xebialabs.cloud:overcast:2.5.1') {
-    exclude group: 'com.xebialabs.overthere', module: 'overthere'
-    exclude group: 'net.schmizz', module: 'sshj'
-  }
+//  testCompile('com.xebialabs.cloud:overcast:2.5.1') {
+//    exclude group: 'com.xebialabs.overthere', module: 'overthere'
+//    exclude group: 'net.schmizz', module: 'sshj'
+//  }
+
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'
   testCompile 'org.mockito:mockito-core:1.8.5'
@@ -160,6 +170,17 @@ test {
   maxHeapSize = "512m"
 }
 
+task overcastSetup(type: OvercastSetup) {
+  labels = ["overthere-unix-salt", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
+}
+
+task overcastTeardown(type: OvercastTeardown) {
+  outputs.upToDateWhen { false }
+}
+
+test.mustRunAfter overcastSetup
+overcastTeardown.mustRunAfter test
+
 task itest(type: Test) {
   useTestNG()
 
@@ -169,10 +190,25 @@ task itest(type: Test) {
 
   maxHeapSize = "512m"
   copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
 }
+
+itest.doFirst {
+  def instances = readInstances()
+
+  systemProperties["overthere-unix -host"] = instances["overthere-unix-salt"]["hostname"]
+  systemProperties["overthere-windows-host"] = instances["overthere-windows-local-accounts"]["hostname"]
+  systemProperties["overthere-windows-domain-host"] = instances["overthere-windows-domain-accounts"]["hostname"]
+}
+
+Map<String, Map<String, String>> readInstances() {
+  def instanceFile = new File(getProject().getBuildDir(), "overcast/instances.json")
+  if(instanceFile.exists()) {
+    return new JsonSlurper().parseText(instanceFile.text)
+  } else {
+    return [:]
+  }
+}
+
 
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource

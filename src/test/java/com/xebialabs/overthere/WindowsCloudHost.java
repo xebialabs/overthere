@@ -22,13 +22,7 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.concurrent.atomic.AtomicReference;
-
-import com.xebialabs.overcast.host.CloudHost;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-
-public class WindowsCloudHostListener extends CloudHostListener {
+public class WindowsCloudHost {
 
     public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere-user";
     public static final String REGULAR_WINDOWS_USER_PASSWORD = "wLitdMy@:;<>KY9";
@@ -37,14 +31,8 @@ public class WindowsCloudHostListener extends CloudHostListener {
     public static final String ADMINISTRATIVE_WINDOWS_USER_USERNAME = "Administrator";
     public static final String ADMINISTRATIVE_WINDOWS_USER_PASSWORD = "iW8tcaM0d";
 
-    private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
-
-    public WindowsCloudHostListener() {
-        super("overthere-windows-local-accounts", windowsHost);
-    }
-
-    public static CloudHost getHost() {
-        return checkNotNull(windowsHost.get(), "Cloud host overthere-windows-local has not been started. Did you wire up the right CloudHostListener?");
+    public static String getHostName() {
+        return System.getProperty("overthere-windows-host");
     }
 
 }

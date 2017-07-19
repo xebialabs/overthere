@@ -23,16 +23,15 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.UnixCloudHostListener;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.UnixCloudHost;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
@@ -41,7 +40,6 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_CYGWIN;
 import static java.net.Proxy.Type.HTTP;
 
 @Test
-@Listeners({UnixCloudHostListener.class, WindowsCloudHostListener.class})
 public class SshSftpCygwinConnectionWithAdministrativeUserOverHttpProxyItest extends OverthereConnectionItestBase {
 
     @Override
@@ -54,13 +52,13 @@ public class SshSftpCygwinConnectionWithAdministrativeUserOverHttpProxyItest ext
         ConnectionOptions proxyOptions = new ConnectionOptions();
         proxyOptions.set(PROTOCOL, PROXY_PROTOCOL);
         proxyOptions.set(PROXY_TYPE, HTTP);
-        proxyOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        proxyOptions.set(ADDRESS, UnixCloudHost.getHostName());
         proxyOptions.set(PORT, 8888);
 
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_CYGWIN);
-        options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, WindowsCloudHost.getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);

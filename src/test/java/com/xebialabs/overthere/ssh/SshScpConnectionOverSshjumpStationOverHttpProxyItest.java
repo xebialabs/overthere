@@ -23,19 +23,18 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.UnixCloudHostListener;
-import com.xebialabs.overthere.WindowsCloudHostListener;
+import com.xebialabs.overthere.UnixCloudHost;
+import com.xebialabs.overthere.WindowsCloudHost;
 import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
-import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_PASSWORD;
-import static com.xebialabs.overthere.UnixCloudHostListener.REGULAR_UNIX_USER_USERNAME;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
-import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
+import static com.xebialabs.overthere.UnixCloudHost.REGULAR_UNIX_USER_PASSWORD;
+import static com.xebialabs.overthere.UnixCloudHost.REGULAR_UNIX_USER_USERNAME;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_PASSWORD;
+import static com.xebialabs.overthere.WindowsCloudHost.ADMINISTRATIVE_WINDOWS_USER_USERNAME;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_PROTOCOL;
 import static com.xebialabs.overthere.proxy.ProxyConnection.PROXY_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
@@ -44,7 +43,6 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
 import static java.net.Proxy.Type.HTTP;
 
 @Test
-@Listeners({UnixCloudHostListener.class, WindowsCloudHostListener.class})
 public class SshScpConnectionOverSshjumpStationOverHttpProxyItest extends OverthereConnectionItestBase {
 
     @Override
@@ -57,12 +55,12 @@ public class SshScpConnectionOverSshjumpStationOverHttpProxyItest extends Overth
         ConnectionOptions proxyOptions = new ConnectionOptions();
         proxyOptions.set(PROTOCOL, PROXY_PROTOCOL);
         proxyOptions.set(PROXY_TYPE, HTTP);
-        proxyOptions.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        proxyOptions.set(ADDRESS, UnixCloudHost.getHostName());
         proxyOptions.set(PORT, 8888);
 
         ConnectionOptions jumpstationOptions = new ConnectionOptions();
         jumpstationOptions.set(OPERATING_SYSTEM, WINDOWS);
-        jumpstationOptions.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
+        jumpstationOptions.set(ADDRESS, WindowsCloudHost.getHostName());
         jumpstationOptions.set(PORT, 22);
         jumpstationOptions.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         jumpstationOptions.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
@@ -71,7 +69,7 @@ public class SshScpConnectionOverSshjumpStationOverHttpProxyItest extends Overth
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, UNIX);
         options.set(CONNECTION_TYPE, SCP);
-        options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
+        options.set(ADDRESS, UnixCloudHost.getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
         options.set(PASSWORD, REGULAR_UNIX_USER_PASSWORD);
