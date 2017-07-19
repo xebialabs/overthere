@@ -17,10 +17,19 @@ buildscript {
   repositories {
     mavenCentral()
     mavenLocal()
+
+    maven {
+        credentials {
+          username nexusUserName
+          password nexusPassword
+        }
+        url "${nexusBaseUrl}/repositories/thirdparty"
+      }
+
   }
   dependencies {
     classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-    classpath "com.xebialabs.cloud:overcast-gradle-plugin:2.6.0-SNAPSHOT"
+    classpath "com.xebialabs.cloud:overcast-gradle-plugin:2.6.0-alpha.2"
     classpath "org.slf4j:slf4j-simple:1.7.25"
 
   }
