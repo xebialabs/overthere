@@ -13,7 +13,25 @@ pipeline {
 
     stages {
 
-        // TODO do the normal build with unit tests
+        stage('Build') {
+            tools {
+                jdk 'JDK 8u60'
+            }
+            steps {
+                parallel("Build Linux": {
+                    node('linux') {
+                        checkout scm
+                        sh './gradlew clean test'
+                    }
+                },
+                "Build Windows": {
+                    node('windows') {
+                        checkout scm
+                        bat './gradle.bat clean test'
+                    }
+                })
+            }
+        }
 
         stage('Overcast Setup') {
             agent {
