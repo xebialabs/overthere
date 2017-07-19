@@ -52,14 +52,14 @@ pipeline {
                     node('linux') {
                         checkout scm
                         unstash name: 'overcast-instances'
-                        echo 'test'
+                        echo 'test linux'
                     }
                 },
                 "ITest Windows": {
                     node('windows') {
                         checkout scm
                         unstash name: 'overcast-instances'
-                        echo 'test'
+                        echo 'test windows'
                     }
                 })
             }
@@ -67,7 +67,7 @@ pipeline {
                 always {
                     checkout scm
                     unstash name: 'overcast-instances'
-                    echo 'test'
+                    echo 'post teardown'
                     // sh './gradlew overcastTeardown -i'
                 }
             }
