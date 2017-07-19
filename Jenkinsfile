@@ -60,6 +60,7 @@ pipeline {
                         checkout scm
                         unstash name: 'overcast-instances'
                         echo 'test windows'
+                        throw new Exception("Build failed lala")
                     }
                 })
             }
@@ -68,7 +69,7 @@ pipeline {
                     checkout scm
                     unstash name: 'overcast-instances'
                     echo 'post teardown'
-                    // sh './gradlew overcastTeardown -i'
+                    sh './gradlew overcastTeardown -i'
                 }
             }
 
