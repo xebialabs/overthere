@@ -146,12 +146,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
         OverthereFile nested2 = nested1.getFile("nested2");
         OverthereFile nested3 = nested2.getFile("nested3");
         assertThat("Expected deeply nested directory to not exist", nested3.exists(), equalTo(false));
-        try {
-            nested3.mkdir();
-            fail("Expected not to be able to create a deeply nested directory in one go");
-        } catch (RuntimeIOException expected1) {
-        }
-        assertThat("Expected deeply nested directory to still not exist", nested3.exists(), equalTo(false));
+
         nested3.mkdirs();
         assertThat("Expected deeply nested directory to exist after invoking mkdirs on it", nested3.exists(), equalTo(true));
 
@@ -172,6 +167,32 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
 
         regularFile.delete();
         tempDir.delete();
+        assertThat("Expected temporary directory to not exist after removing it when it was empty", tempDir.exists(), equalTo(false));
+    }
+
+    /*
+    * This test is ignored on WinSSHD because in new and supported versions of WinSSHD it is possible to create
+    * nested folders in one go (mkdir nest1/nest2/nest3 is possible). In all other implementations of sftp creating
+    * nested folders in one go is not possible.
+    */
+
+    @Test
+    @Assumption(methods = {"notSftpWinsshd"})
+    public void shouldNotCreateTemporaryDirectoriesRecursively() {
+        final String prefix = "prefix";
+        final String suffix = "suffix";
+
+        OverthereFile tempDir = connection.getTempFile(prefix, suffix);
+        OverthereFile nested1 = tempDir.getFile("nested1");
+        OverthereFile nested2 = nested1.getFile("nested2");
+        OverthereFile nested3 = nested2.getFile("nested3");
+        assertThat("Expected deeply nested directory to not exist", nested3.exists(), equalTo(false));
+        try {
+            nested3.mkdir();
+            fail("Expected not to be able to create a deeply nested directory in one go");
+        } catch (RuntimeIOException expected1) {
+        }
+        assertThat("Expected deeply nested directory to still not exist", nested3.exists(), equalTo(false));
         assertThat("Expected temporary directory to not exist after removing it when it was empty", tempDir.exists(), equalTo(false));
     }
 

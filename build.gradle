@@ -109,7 +109,7 @@ dependencies {
   compile 'jcifs:jcifs:1.3.17'
 
   // SMB2/3
-  compile 'com.hierynomus:smbj:0.1.0'
+  compile 'com.hierynomus:smbj:0.2.0'
   compile 'net.engio:mbassador:1.3.0'
   compile "org.bouncycastle:bcprov-jdk15on:1.57"
   compile "org.bouncycastle:bcpkix-jdk15on:1.57"
@@ -171,7 +171,7 @@ test {
 }
 
 task overcastSetup(type: OvercastSetup) {
-  labels = ["overthere-unix-salt", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
+  labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
 }
 
 task overcastTeardown(type: OvercastTeardown) {
@@ -195,7 +195,7 @@ task itest(type: Test) {
 itest.doFirst {
   def instances = readInstances()
 
-  systemProperties["overthere-unix -host"] = instances["overthere-unix-salt"]["hostname"]
+  systemProperties["overthere-unix-host"] = instances["overthere-unix"]["hostname"]
   systemProperties["overthere-windows-host"] = instances["overthere-windows-local-accounts"]["hostname"]
   systemProperties["overthere-windows-domain-host"] = instances["overthere-windows-domain-accounts"]["hostname"]
 }
