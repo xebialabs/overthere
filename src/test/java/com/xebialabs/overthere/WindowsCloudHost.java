@@ -22,6 +22,9 @@
  */
 package com.xebialabs.overthere;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class WindowsCloudHost {
 
     public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere-user";
@@ -32,7 +35,7 @@ public class WindowsCloudHost {
     public static final String ADMINISTRATIVE_WINDOWS_USER_PASSWORD = "iW8tcaM0d";
 
     public static String getHostName() {
-        return System.getProperty("overthere-windows-host");
+        return System.getProperty("overcast-overthere-windows-local-accounts");
     }
 
 }

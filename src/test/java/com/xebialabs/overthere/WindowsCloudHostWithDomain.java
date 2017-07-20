@@ -27,7 +27,7 @@ public class WindowsCloudHostWithDomain {
     public static final String DOMAIN_WINDOWS_USER_PASSWORD = "Xebia@123";
 
     public static String getHostName() {
-        return System.getProperty("overthere-windows-domain-host");
+        return System.getProperty("overcast-overthere-windows-domain-accounts");
     }
 
 }

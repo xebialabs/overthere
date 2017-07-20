@@ -1,7 +1,3 @@
-import com.xebialabs.overcast.gradle.tasks.OvercastSetup
-import com.xebialabs.overcast.gradle.tasks.OvercastTeardown
-import groovy.json.JsonSlurper
-
 /*
  * Release and publish instructions:
  *
@@ -179,16 +175,10 @@ test {
   maxHeapSize = "512m"
 }
 
-task overcastSetup(type: OvercastSetup) {
+
+overcast {
   labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
 }
-
-task overcastTeardown(type: OvercastTeardown) {
-  outputs.upToDateWhen { false }
-}
-
-test.mustRunAfter overcastSetup
-overcastTeardown.mustRunAfter test
 
 task itest(type: Test) {
   useTestNG()
@@ -200,24 +190,6 @@ task itest(type: Test) {
   maxHeapSize = "512m"
   copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
 }
-
-itest.doFirst {
-  def instances = readInstances()
-
-  systemProperties["overthere-unix-host"] = instances["overthere-unix"]["hostname"]
-  systemProperties["overthere-windows-host"] = instances["overthere-windows-local-accounts"]["hostname"]
-  systemProperties["overthere-windows-domain-host"] = instances["overthere-windows-domain-accounts"]["hostname"]
-}
-
-Map<String, Map<String, String>> readInstances() {
-  def instanceFile = new File(getProject().getBuildDir(), "overcast/instances.json")
-  if(instanceFile.exists()) {
-    return new JsonSlurper().parseText(instanceFile.text)
-  } else {
-    return [:]
-  }
-}
-
 
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource

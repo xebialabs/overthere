@@ -103,7 +103,7 @@ public class UnixCloudHost {
     // overthere@overthere-unix
 
     public static String getHostName() {
-        return System.getProperty("overthere-unix-host");
+        return System.getProperty("overcast-overthere-unix");
     }
 
 }
