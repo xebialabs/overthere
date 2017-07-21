@@ -70,34 +70,36 @@ pipeline {
             }
 
             steps {
-                parallel("ITest Linux": {
-                    node('linux') {
-                        checkout scm
-                        unstash name: 'overcast-instances'
-                        try {
-                            sh './gradlew itest'
-                        }catch (e) {
-                            echo 'Itests failed'
-                            throw e
-                        } finally {
-                            junit '**/build/itest-results/*.xml'
+                script {
+                    parallel("ITest Linux": {
+                        node('linux') {
+                            checkout scm
+                            unstash name: 'overcast-instances'
+                            try {
+                                sh './gradlew itest'
+                            }catch (e) {
+                                echo 'Itests failed'
+                                throw e
+                            } finally {
+                                junit '**/build/itest-results/*.xml'
+                            }
                         }
-                    }
-                },
-                "ITest Windows": {
-                    node('windows') {
-                        checkout scm
-                        unstash name: 'overcast-instances'
-                        try {
-                            bat './gradlew.bat itest'
-                        }catch (e) {
-                            echo 'Itests failed'
-                            throw e
-                        } finally {
-                            junit '**/build/itest-results/*.xml'
+                    },
+                    "ITest Windows": {
+                        node('windows') {
+                            checkout scm
+                            unstash name: 'overcast-instances'
+                            try {
+                                bat './gradlew.bat itest'
+                            }catch (e) {
+                                echo 'Itests failed'
+                                throw e
+                            } finally {
+                                junit '**/build/itest-results/*.xml'
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
             post {
                 always {
