@@ -74,6 +74,9 @@ pipeline {
                     parallel(
                     "ITest Windows": {
                         node('windows') {
+                            tools {
+                                jdk 'JDK 8u60'
+                            }
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
