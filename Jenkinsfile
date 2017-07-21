@@ -31,7 +31,7 @@ pipeline {
                 "Build Windows": {
                     node('windows') {
                         checkout scm
-                        bat './gradlew.bat clean test'
+                        bat 'gradlew clean test'
                     }
                 })
             }
@@ -90,7 +90,7 @@ pipeline {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                bat './gradlew.bat itest'
+                                bat 'gradlew itest'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
