@@ -1,11 +1,7 @@
 #!groovy
 
 pipeline {
-    agent {
-        node {
-            label 'linux'
-        }
-    }
+    agent none
 
     environment {
         GRADLE_OPTS = '-XX:MaxPermSize=256m -Xmx1024m  -Djsse.enableSNIExtension=false'
@@ -109,10 +105,13 @@ pipeline {
     }
     post {
         always {
-            checkout scm
-            unstash name: 'overcast-instances'
-            echo 'post teardown'
-            sh './gradlew overcastTeardown -i'
+            node('linux') {
+                checkout scm
+                unstash name: 'overcast-instances'
+                echo 'post teardown'
+                sh './gradlew overcastTeardown -i'
+            }
+
         }
     }
 
