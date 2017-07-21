@@ -3,6 +3,10 @@
 pipeline {
     agent none
 
+    environment {
+        GRADLE_OPTS = '-XX:MaxPermSize=256m -Xmx1024m  -Djsse.enableSNIExtension=false'
+    }
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '10', artifactDaysToKeepStr: '7', artifactNumToKeepStr: '5'))
         skipDefaultCheckout()
@@ -70,15 +74,28 @@ pipeline {
                     node('linux') {
                         checkout scm
                         unstash name: 'overcast-instances'
-                        echo 'test linux'
+                        try {
+                            sh './gradlew itest'
+                        }catch (e) {
+                            echo 'Itests failed'
+                            throw e
+                        } finally {
+                            junit '**/build/itest-results/*.xml'
+                        }
                     }
                 },
                 "ITest Windows": {
                     node('windows') {
                         checkout scm
                         unstash name: 'overcast-instances'
-                        echo 'test windows'
-                        error("Build failed lala")
+                        try {
+                            bat './gradlew.bat itest'
+                        }catch (e) {
+                            echo 'Itests failed'
+                            throw e
+                        } finally {
+                            junit '**/build/itest-results/*.xml'
+                        }
                     }
                 })
             }
