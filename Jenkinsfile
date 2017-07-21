@@ -60,6 +60,11 @@ pipeline {
         }
 
         stage('Integration Test') {
+            agent {
+                node {
+                    label 'linux'
+                }
+            }
             tools {
                 jdk 'JDK 8u60'
             }
@@ -71,7 +76,8 @@ pipeline {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                sh './gradlew itest'
+                                //sh './gradlew itest'
+                                echo 'itest linux'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
@@ -85,7 +91,8 @@ pipeline {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                bat './gradlew.bat itest'
+                                //bat './gradlew.bat itest'
+                                echo 'itest windows'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
@@ -96,28 +103,18 @@ pipeline {
                     })
                 }
             }
-
-
         }
 
-        stage('Teardown Overcast Setup') {
-            agent {
-                node {
-                    label 'linux'
-                }
-            }
-            tools {
-                jdk 'JDK 8u60'
-            }
-            post {
-                always {
-                    checkout scm
-                    unstash name: 'overcast-instances'
-                    echo 'post teardown'
-                    sh './gradlew overcastTeardown -i'
-                }
-            }
 
+
+    }
+    post {
+        always {
+            checkout scm
+            unstash name: 'overcast-instances'
+            echo 'post teardown'
+            sh './gradlew overcastTeardown -i'
+        }
     }
 
 }
