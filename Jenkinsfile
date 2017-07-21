@@ -60,11 +60,6 @@ pipeline {
         }
 
         stage('Integration Test') {
-            agent {
-                node {
-                    label 'linux'
-                }
-            }
             tools {
                 jdk 'JDK 8u60'
             }
@@ -110,6 +105,11 @@ pipeline {
     }
     post {
         always {
+            agent {
+                node {
+                    label 'linux'
+                }
+            }
             checkout scm
             unstash name: 'overcast-instances'
             echo 'post teardown'
