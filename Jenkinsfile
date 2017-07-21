@@ -31,7 +31,7 @@ pipeline {
                 "Build Windows": {
                     node('windows') {
                         checkout scm
-                        bat 'gradlew clean test'
+                        bat './gradlew.bat clean test'
                     }
                 })
             }
@@ -71,7 +71,7 @@ pipeline {
 
             steps {
                 script {
-                    parallel("ITest Linux": {
+                    parallel(/*"ITest Linux": {
                         node('linux') {
                             checkout scm
                             unstash name: 'overcast-instances'
@@ -84,13 +84,13 @@ pipeline {
                                 junit '**/build/itest-results/*.xml'
                             }
                         }
-                    },
+                    },*/
                     "ITest Windows": {
                         node('windows') {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                bat 'gradlew itest'
+                                bat './gradlew.bat itest'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
