@@ -60,23 +60,28 @@ pipeline {
         }
 
         stage('Integration Test') {
-            agent {
-                node {
-                    label 'linux'
-                }
-            }
             tools {
                 jdk 'JDK 8u60'
             }
 
             steps {
                 script {
-                    parallel(
+                    parallel("ITest Linux": {
+                        node('linux') {
+                            checkout scm
+                            unstash name: 'overcast-instances'
+                            try {
+                                sh './gradlew itest'
+                            }catch (e) {
+                                echo 'Itests failed'
+                                throw e
+                            } finally {
+                                junit '**/build/itest-results/*.xml'
+                            }
+                        }
+                    },
                     "ITest Windows": {
                         node('windows') {
-                            tools {
-                                jdk 'JDK 8u60'
-                            }
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
@@ -91,6 +96,19 @@ pipeline {
                     })
                 }
             }
+
+
+        }
+
+        stage('Teardown Overcast Setup') {
+            agent {
+                node {
+                    label 'linux'
+                }
+            }
+            tools {
+                jdk 'JDK 8u60'
+            }
             post {
                 always {
                     checkout scm
@@ -99,8 +117,6 @@ pipeline {
                     sh './gradlew overcastTeardown -i'
                 }
             }
-
-        }
 
     }
 
