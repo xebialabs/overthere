@@ -71,20 +71,7 @@ pipeline {
 
             steps {
                 script {
-                    parallel(/*"ITest Linux": {
-                        node('linux') {
-                            checkout scm
-                            unstash name: 'overcast-instances'
-                            try {
-                                sh './gradlew itest'
-                            }catch (e) {
-                                echo 'Itests failed'
-                                throw e
-                            } finally {
-                                junit '**/build/itest-results/*.xml'
-                            }
-                        }
-                    },*/
+                    parallel(
                     "ITest Windows": {
                         node('windows') {
                             checkout scm
