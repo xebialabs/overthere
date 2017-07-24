@@ -63,7 +63,6 @@ pipeline {
             tools {
                 jdk 'JDK 8u60'
             }
-
             steps {
                 script {
                     parallel("ITest Linux": {
@@ -97,9 +96,6 @@ pipeline {
                 }
             }
         }
-
-
-
     }
     post {
         always {
