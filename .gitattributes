@@ -1,0 +1,11 @@
+*.bat.ftl text eol=crlf
+*.cmd.ftl text eol=crlf
+*.sh.ftl  text eol=lf
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+*.ps1     text eol=crlf
+*.sh      text eol=lf
+*.svg	  binary
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+*.java text
