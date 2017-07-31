@@ -67,6 +67,10 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 configurations {
+  overcast {
+    labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
+  }
+
   compile {
     transitive = false
     exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
@@ -138,12 +142,6 @@ dependencies {
   compile 'org.apache.httpcomponents:httpcore:4.4.1'
   compile 'commons-codec:commons-codec:1.10'
 
-  // Test dependencies
-//  testCompile('com.xebialabs.cloud:overcast:2.5.1') {
-//    exclude group: 'com.xebialabs.overthere', module: 'overthere'
-//    exclude group: 'net.schmizz', module: 'sshj'
-//  }
-
   testCompile 'org.hamcrest:hamcrest-core:1.2.1'
   testCompile 'org.hamcrest:hamcrest-library:1.2.1'
   testCompile 'org.mockito:mockito-core:1.8.5'
@@ -175,10 +173,6 @@ test {
   maxHeapSize = "512m"
 }
 
-
-overcast {
-  labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
-}
 
 task itest(type: Test) {
   useTestNG()
