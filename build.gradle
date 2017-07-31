@@ -67,10 +67,6 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 configurations {
-  overcast {
-    labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
-  }
-
   compile {
     transitive = false
     exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
@@ -102,6 +98,10 @@ release {
       }
     }
   }
+}
+
+overcast {
+  labels = ["overthere-unix", "overthere-windows-local-accounts", "overthere-windows-domain-accounts"]
 }
 
 dependencies {
