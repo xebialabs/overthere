@@ -70,7 +70,7 @@ pipeline {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                sh './gradlew -s itest'
+                                sh './gradlew itest'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
@@ -84,7 +84,7 @@ pipeline {
                             checkout scm
                             unstash name: 'overcast-instances'
                             try {
-                                bat './gradlew.bat -s itest'
+                                bat './gradlew.bat itest'
                             }catch (e) {
                                 echo 'Itests failed'
                                 throw e
@@ -103,7 +103,7 @@ pipeline {
                 checkout scm
                 unstash name: 'overcast-instances'
                 echo 'post teardown'
-                sh './gradlew overcastTeardown -s'
+                sh './gradlew overcastTeardown'
             }
 
         }
