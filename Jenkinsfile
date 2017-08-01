@@ -48,8 +48,6 @@ pipeline {
             }
             steps {
                 checkout scm
-                echo 'test'
-
                 sh './gradlew overcastSetup -i'
             }
             post {
@@ -102,8 +100,7 @@ pipeline {
             node('linux') {
                 checkout scm
                 unstash name: 'overcast-instances'
-                echo 'post teardown'
-                sh './gradlew overcastTeardown'
+                sh './gradlew overcastTeardown -i'
             }
 
         }
