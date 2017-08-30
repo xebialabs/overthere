@@ -28,12 +28,12 @@ import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
+import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.protocol.commons.EnumWithValue;
-import com.hierynomus.smbj.common.SMBApiException;
+import com.hierynomus.protocol.transport.TransportException;
 import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
-import com.hierynomus.smbj.transport.TransportException;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.BaseOverthereFile;
@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
+
 
 public class SmbFile extends BaseOverthereFile<SmbConnection> {
 

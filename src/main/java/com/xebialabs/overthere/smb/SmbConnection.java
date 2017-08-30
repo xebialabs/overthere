@@ -22,27 +22,20 @@
  */
 package com.xebialabs.overthere.smb;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.Map;
-
-import com.hierynomus.mssmb2.SMB2Packet;
-import com.hierynomus.security.bc.BCSecurityProvider;
-import com.hierynomus.smbj.SmbConfig;
-import com.hierynomus.smbj.transport.TransportLayerFactory;
-import com.hierynomus.smbj.transport.tcp.direct.DirectTcpTransportFactory;
-import com.hierynomus.smbj.transport.tcp.tunnel.TunnelTransportFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.hierynomus.mserref.NtStatus;
+import com.hierynomus.mssmb2.SMBApiException;
+import com.hierynomus.security.bc.BCSecurityProvider;
+import com.hierynomus.smb.SMBPacket;
 import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
-import com.hierynomus.smbj.common.SMBApiException;
 import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.Share;
-
+import com.hierynomus.smbj.transport.TransportLayerFactory;
+import com.hierynomus.smbj.transport.tcp.direct.DirectTcpTransportFactory;
+import com.hierynomus.smbj.transport.tcp.tunnel.TunnelTransportFactory;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -50,11 +43,14 @@ import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.proxy.ProxyConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.xebialabs.overthere.ConnectionOptions.ADDRESS;
-import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
-import static com.xebialabs.overthere.ConnectionOptions.PORT;
-import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Map;
+
+import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static java.net.InetSocketAddress.createUnresolved;
@@ -92,7 +88,7 @@ public class SmbConnection extends BaseOverthereConnection {
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(realSmbHost, realSmbPort));
         smbPort = smbAddressPort.getPort();
         boolean requireSigning = options.getBoolean(SMB_REQUIRE_SIGNING, SMB_REQUIRE_SIGNING_DEFAULT);
-        TransportLayerFactory<SMB2Packet> transportLayerFactory = new DirectTcpTransportFactory<>();
+        TransportLayerFactory<SMBPacket<?>> transportLayerFactory = new DirectTcpTransportFactory<>();
         if (!realSmbHost.equals(hostname)) {
             transportLayerFactory = new TunnelTransportFactory<>(transportLayerFactory, hostname, smbPort);
         }
