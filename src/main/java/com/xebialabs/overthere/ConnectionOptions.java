@@ -189,6 +189,11 @@ public class ConnectionOptions {
      */
     public static final int REMOTE_COPY_BUFFER_SIZE_DEFAULT = 64 * 1024; // 64 KB
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#remoteCharacterEncoding">the online documentation</a>
+     */
+    public static final String REMOTE_CHARACTER_ENCODING = "remoteCharacterEncoding";
+
     private final Map<String, Object> options;
 
     /**

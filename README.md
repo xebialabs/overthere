@@ -203,6 +203,10 @@ Apart from selecting a protocol to use, you will also need to supply a number of
     <th align="left" valign="top"><a name="remoteCopyBufferSize"></a>remoteCopyBufferSize</th>
     <td>The buffer size to use when copying files from one connection to the other. The buffer size is taken from the _source_ file's connection. The default value is <code>64 KB (64*1024 bytes)</code>. Larger values potentially break copy operations.</td>
 </tr>
+<tr>
+    <th align="left" valign="top"><a name="remoteCharacterEncoding"></a>remoteCharacterEncoding</th>
+    <td>The character encoding used to transcode files from one connection to the other. The default value is Operating System dependent and is set to <code>'UTF-8'</code> for Windows and Unix, and to <code>'Cp1047'</code> (EBCDIC) for Z/OS.</td>
+</tr>
 
 </table>
 
