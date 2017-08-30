@@ -26,6 +26,16 @@ public class OverthereFileTranscoder extends OverthereFileTransmitter {
     }
 
     /**
+     * Transcode a String with teh given encoding to the configured character encoding of the target {@link OverthereFile}.
+     */
+    public static void transcode(String contents, String srcCharsetName, OverthereFile dst) {
+        Charset srcCharset = Charset.forName(srcCharsetName);
+        Charset dstCharset = getConfiguredCharacterSet(dst.getConnection());
+        OverthereFile baf = new ByteArrayFile("byte_array", contents.getBytes(srcCharset));
+        transcode(baf, srcCharset, dst, dstCharset);
+    }
+
+    /**
      * Transcode a file or directory using the default configured character encodings for the respective {@link OverthereFile}s.
      *
      * @param src the source file or directory.
