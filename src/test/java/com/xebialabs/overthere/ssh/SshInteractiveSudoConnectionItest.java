@@ -55,7 +55,7 @@ public class SshInteractiveSudoConnectionItest extends OverthereConnectionItestB
         options.set(PASSWORD, UNTRUSTED_UNIX_USER_PASSWORD);
         options.set(SUDO_USERNAME, REGULAR_UNIX_USER_USERNAME);
         options.set(SUDO_PASSWORD_PROMPT_REGEX, ".*[P|p]assword.*:");
-        options.set(ALLOCATE_DEFAULT_PTY, true);
+        options.set(ALLOCATE_PTY, "xterm:80:24:0:0");
         options.set(SUDO_OVERRIDE_UMASK, true);
         return options;
     }
