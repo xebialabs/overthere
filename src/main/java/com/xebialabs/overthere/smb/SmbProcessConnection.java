@@ -59,6 +59,7 @@ public class SmbProcessConnection extends SmbConnection {
 
     @Override
     public void doClose() {
+        super.doClose();
         processConnection.close();
     }
 
