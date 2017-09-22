@@ -31,7 +31,7 @@ import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 public class UnixCloudHostListener extends CloudHostListener {
 
     public static final String REGULAR_UNIX_USER_USERNAME = "overthere";
-    public static final String REGULAR_UNIX_USER_PASSWORD = "}Kp39hdb}LzM";
+    public static final String REGULAR_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.regular.password");
     public static final String REGULAR_UNIX_USER_PRIVATE_KEY =
             "-----BEGIN RSA PRIVATE KEY-----\r\n"
             + "Proc-Type: 4,ENCRYPTED\r\n"
@@ -69,10 +69,10 @@ public class UnixCloudHostListener extends CloudHostListener {
     public static final String REGULAR_UNIX_USER_PASSPHRASE = "letmein";
 
     public static final String ROOT_UNIX_USER_USERNAME = "root";
-    public static final String ROOT_UNIX_USER_PASSWORD = "87bC=vu@DTHx";
+    public static final String ROOT_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.root.password");
 
     public static final String UNTRUSTED_UNIX_USER_USERNAME = "untrusted";
-    public static final String UNTRUSTED_UNIX_USER_PASSWORD = "zePVB,%EU84i";
+    public static final String UNTRUSTED_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.untrusted.password");
 
     public static final String TRUSTED_UNIX_USER_USERNAME = "trusted";
     public static final String TRUSTED_UNIX_USER_PRIVATE_KEY =

@@ -168,9 +168,11 @@ task itest(type: Test) {
 
   maxHeapSize = "512m"
   copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.endpoint')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.accessKey')
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'aws.secretKey')
+
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.root.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.untrusted.password')
+
 }
 
 task sourcesJar(type: Jar) {
