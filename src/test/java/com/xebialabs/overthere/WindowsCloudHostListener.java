@@ -26,16 +26,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.xebialabs.overcast.host.CloudHost;
 
+import static com.xebialabs.overthere.Utils.getPassword;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class WindowsCloudHostListener extends CloudHostListener {
 
     public static final String REGULAR_WINDOWS_USER_USERNAME = "overthere-user";
-    public static final String REGULAR_WINDOWS_USER_PASSWORD = "wLitdMy@:;<>KY9";
+    public static final String REGULAR_WINDOWS_USER_PASSWORD = getPassword("test.overthere.windows.regular.password");
     // The password for the regular user includes special characters to test that they get encoded correctly
 
     public static final String ADMINISTRATIVE_WINDOWS_USER_USERNAME = "Administrator";
-    public static final String ADMINISTRATIVE_WINDOWS_USER_PASSWORD = "iW8tcaM0d";
+    public static final String ADMINISTRATIVE_WINDOWS_USER_PASSWORD = getPassword("test.overthere.windows.administrative.password");;
 
     private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
 

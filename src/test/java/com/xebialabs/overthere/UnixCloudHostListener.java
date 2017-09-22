@@ -26,12 +26,13 @@ import com.xebialabs.overcast.host.CloudHost;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.xebialabs.overthere.Utils.getPassword;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class UnixCloudHostListener extends CloudHostListener {
 
     public static final String REGULAR_UNIX_USER_USERNAME = "overthere";
-    public static final String REGULAR_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.regular.password");
+    public static final String REGULAR_UNIX_USER_PASSWORD = getPassword("test.overthere.linux.regular.password");
     public static final String REGULAR_UNIX_USER_PRIVATE_KEY =
             "-----BEGIN RSA PRIVATE KEY-----\r\n"
             + "Proc-Type: 4,ENCRYPTED\r\n"
@@ -66,13 +67,13 @@ public class UnixCloudHostListener extends CloudHostListener {
     // ssh-rsa
     // AAAAB3NzaC1yc2EAAAADAQABAAABAQDSuXwO9Pvcde3onMWQ+ek3zYq38XOU/vcHgy0sr1yjeGqt8H2WQZOjW4wfpKs5TVhfjMoL4Znw6uSV7UHqsDw3K5lnI/3jV+SwiPry4DlMQ+wNoNCTZUBxhRWWK6AwFrkOGfH7JwTgzUvwxgoxi67jP+G5sCiAux2NHnkQCX4wq8O5bygHS5FgTVAPqKrkGBPZVDBGhi2VmEsFeUZQEFhe8Vb3ywk2O6hLWANmevpfTSdS/7tgcoxV13HJuC/KvdWnsCw+/CCV6QIY0+u23zcHL3uQi9Ytl4s5jQBfuO4L5L/TQm1U9X8a4Tx8WAtnUh7o2MwYFGgarw0mGN11M7sn
     // overthere@overthere-unix
-    public static final String REGULAR_UNIX_USER_PASSPHRASE = "letmein";
+    public static final String REGULAR_UNIX_USER_PASSPHRASE = getPassword("test.overthere.linux.regular.passphrase");
 
     public static final String ROOT_UNIX_USER_USERNAME = "root";
-    public static final String ROOT_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.root.password");
+    public static final String ROOT_UNIX_USER_PASSWORD = getPassword("test.overthere.linux.root.password");
 
     public static final String UNTRUSTED_UNIX_USER_USERNAME = "untrusted";
-    public static final String UNTRUSTED_UNIX_USER_PASSWORD = System.getProperty("test.overthere.linux.untrusted.password");
+    public static final String UNTRUSTED_UNIX_USER_PASSWORD = getPassword("test.overthere.linux.untrusted.password");
 
     public static final String TRUSTED_UNIX_USER_USERNAME = "trusted";
     public static final String TRUSTED_UNIX_USER_PRIVATE_KEY =

@@ -170,8 +170,12 @@ task itest(type: Test) {
   copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
 
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.passphrase')
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.root.password')
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.untrusted.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.regular.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.administrative.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.domain.password')
 
 }
 
@@ -265,6 +269,8 @@ uploadArchives {
 def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
   if(project.hasProperty(name)) {
     systemProperties[name] = project.getProperty(name)
+  } else {
+    throw new Exception("Property [$name] missing. Please define it in your gradle.properties or on the command line")
   }
 }
 

@@ -26,11 +26,12 @@ import com.xebialabs.overcast.host.CloudHost;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.xebialabs.overthere.Utils.getPassword;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 
 public class WindowsCloudHostWithDomainListener extends CloudHostListener {
 
-    public static final String DOMAIN_WINDOWS_USER_PASSWORD = "Xebia@123";
+    public static final String DOMAIN_WINDOWS_USER_PASSWORD = getPassword("test.overthere.windows.domain.password");
 
     private static AtomicReference<CloudHost> windowsHost = new AtomicReference<CloudHost>();
 
