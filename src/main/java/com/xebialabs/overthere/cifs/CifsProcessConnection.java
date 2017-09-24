@@ -42,7 +42,6 @@ public class CifsProcessConnection extends CifsConnection {
         options.set(ConnectionOptions.PROTOCOL, type);
         CifsConnectionType cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         processConnection = cifsConnectionType.getProcessConnection(options, mapper, workingDirectory);
-        connected();
     }
 
     @Override
