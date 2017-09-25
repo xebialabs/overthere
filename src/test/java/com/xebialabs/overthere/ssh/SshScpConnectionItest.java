@@ -31,9 +31,9 @@ import org.testng.annotations.Test;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.UnixCloudHostListener.*;
+import static com.xebialabs.overthere.Utils.getFilePath;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
-import static com.xebialabs.overthere.ssh.SshTestUtils.createPrivateKeyFile;
 
 @Test
 @Listeners({UnixCloudHostListener.class})
@@ -52,7 +52,7 @@ public class SshScpConnectionItest extends OverthereConnectionItestBase {
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, REGULAR_UNIX_USER_USERNAME);
-        options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(REGULAR_UNIX_USER_PRIVATE_KEY).getPath());
+        options.set(PRIVATE_KEY_FILE, getFilePath(REGULAR_UNIX_USER_PRIVATE_KEY));
         options.set(PASSPHRASE, REGULAR_UNIX_USER_PASSPHRASE);
         return options;
     }

@@ -171,8 +171,10 @@ task itest(type: Test) {
 
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.passphrase', true)
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.privatekey', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.root.password', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.untrusted.password', true)
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.trusted.privatekey', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.regular.password', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.administrative.password', true)
   copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.domain.password', true)
