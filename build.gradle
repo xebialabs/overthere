@@ -169,15 +169,15 @@ task itest(type: Test) {
   maxHeapSize = "512m"
   copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
 
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.passphrase', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.privatekey', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.root.password', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.untrusted.password', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.trusted.privatekey', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.regular.password', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.administrative.password', true)
-  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.domain.password', true)
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.passphrase')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.privatekey')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.root.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.untrusted.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.trusted.privatekey')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.regular.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.administrative.password')
+  copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.domain.password')
 
 }
 
@@ -268,11 +268,9 @@ uploadArchives {
   }
 }
 
-def copyProjectPropertyToSystemProperty(project, systemProperties, name, required=false) {
+def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
   if(project.hasProperty(name)) {
     systemProperties[name] = project.getProperty(name)
-  } else if (required) {
-    throw new Exception("Property [$name] missing. Please define it in your gradle.properties or on the command line")
   }
 }
 
