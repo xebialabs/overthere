@@ -31,9 +31,9 @@ import org.testng.annotations.Test;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.UnixCloudHostListener.*;
+import static com.xebialabs.overthere.Utils.getFilePath;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SUDO;
-import static com.xebialabs.overthere.ssh.SshTestUtils.createPrivateKeyFile;
 
 @Test
 @Listeners({UnixCloudHostListener.class})
@@ -52,7 +52,7 @@ public class SshSudoConnectionItest extends OverthereConnectionItestBase {
         options.set(ADDRESS, UnixCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, TRUSTED_UNIX_USER_USERNAME);
-        options.set(PRIVATE_KEY_FILE, createPrivateKeyFile(TRUSTED_UNIX_USER_PRIVATE_KEY).getPath());
+        options.set(PRIVATE_KEY_FILE, getFilePath(TRUSTED_UNIX_USER_PRIVATE_KEY));
         options.set(SUDO_USERNAME, REGULAR_UNIX_USER_USERNAME);
         return options;
     }

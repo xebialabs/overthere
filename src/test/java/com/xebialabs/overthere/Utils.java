@@ -20,34 +20,37 @@
  * program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth
  * Floor, Boston, MA 02110-1301  USA
  */
-package com.xebialabs.overthere.ssh;
+package com.xebialabs.overthere;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import com.google.common.io.CharStreams;
-import com.google.common.io.OutputSupplier;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
-import com.xebialabs.overthere.RuntimeIOException;
+public class Utils {
 
-class SshTestUtils {
-
-    static File createPrivateKeyFile(String privateKey) {
-        try {
-            final File privateKeyFile = File.createTempFile("private", ".key");
-            privateKeyFile.deleteOnExit();
-            CharStreams.write(privateKey, new OutputSupplier<Writer>() {
-                @Override
-                public Writer getOutput() throws IOException {
-                    return new FileWriter(privateKeyFile);
-                }
-            });
-            return privateKeyFile;
-        } catch (IOException exc) {
-            throw new RuntimeIOException("Cannot create private key file", exc);
+    public static String getProperty(String propertyName) throws RuntimeException {
+        if(System.getProperty(propertyName) == null) {
+            throw new RuntimeException(String.format("Property [%s] missing. Please define it in your gradle.properties or on the command line", propertyName));
+        } else {
+            return System.getProperty(propertyName);
         }
     }
 
+    public static String getFilePath(String urlLoc) {
+        URL url;
+        File file;
+        try {
+            url = new URL(urlLoc);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            file = new File(url.toURI());
+        } catch(URISyntaxException e) {
+            file = new File(url.getPath());
+        }
+        return file.getPath();
+    }
 
 }
