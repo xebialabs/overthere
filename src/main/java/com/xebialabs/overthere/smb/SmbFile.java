@@ -296,7 +296,34 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     @Override
     public void renameTo(OverthereFile dest) {
-        throw new RuntimeException("Operation not supported");
+        final String srcPathOnShare = getPathOnShare();
+        logger.debug("Renaming {} to {}", srcPathOnShare, dest);
+        if (!(dest instanceof SmbFile)) {
+            throw new RuntimeIOException(
+                    format("Cannot move/rename smb:%s: file/directory %s  to non-smb:%s: file/directory %s",
+                            connection.cifsConnectionType.toString().toLowerCase(), getSharePath(),
+                            connection.cifsConnectionType.toString().toLowerCase(), dest));
+        }
+        SmbFile destSmbFile = (SmbFile) dest;
+        DiskShare destShare = destSmbFile.getShare();
+        DiskShare srcShare = getShare();
+        if (!srcShare.getSmbPath().toUncPath().equalsIgnoreCase(destShare.getSmbPath().toUncPath())) {
+            throw new RuntimeIOException(
+                    format("Cannot move smb:%s: file/directory %s on the other share smb:%s: file/directory %s",
+                            connection.cifsConnectionType.toString().toLowerCase(), getSharePath(),
+                            connection.cifsConnectionType.toString().toLowerCase(), dest));
+        }
+        try ( DiskEntry srcEntry = isFile()
+                ? srcShare.openFile(srcPathOnShare, EnumSet.of(AccessMask.DELETE), null,
+                                SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)
+                : srcShare.openDirectory(srcPathOnShare, EnumSet.of(AccessMask.DELETE), null,
+                                SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)
+        ) {
+            srcEntry.rename(destSmbFile.getPathOnShare());
+        } catch (SMBApiException exc) {
+            throw new RuntimeIOException(
+                    format("Cannot move/rename %s to %s: %s", srcPathOnShare, dest, exc.toString()), exc);
+        }
     }
 
     @Override
