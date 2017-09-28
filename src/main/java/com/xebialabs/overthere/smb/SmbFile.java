@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -95,23 +96,37 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     @Override
     public boolean canRead() {
         logger.debug("Checking whether {} can be read", this.getPath());
-        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_READ_DATA);
+        return checkAccess(EnumSet.of(AccessMask.GENERIC_READ), AccessMask.FILE_READ_DATA);
     }
 
     @Override
     public boolean canWrite() {
         logger.debug("Checking whether {} can be write", this.getPath());
-        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_WRITE_DATA);
+        return checkAccess(EnumSet.of(AccessMask.GENERIC_READ, AccessMask.GENERIC_WRITE), AccessMask.FILE_WRITE_DATA);
     }
 
     @Override
     public boolean canExecute() {
         logger.debug("Checking whether {} can execute", this.getPath());
-        return EnumWithValue.EnumUtils.isSet(getAccessMask(), AccessMask.FILE_EXECUTE);
+        return checkAccess(EnumSet.of(AccessMask.GENERIC_EXECUTE), AccessMask.FILE_EXECUTE);
     }
 
-    private int getAccessMask() {
-        try (DiskEntry entry = getShare().open(getPathOnShare(), EnumSet.of(AccessMask.MAXIMUM_ALLOWED), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
+    private boolean checkAccess(Set<AccessMask> requestAccesSet, AccessMask searchAccessMask) {
+        try {
+            int accessFlags = getAccessMask(requestAccesSet);
+            return EnumWithValue.EnumUtils.isSet(accessFlags, searchAccessMask);
+        } catch(SMBApiException e) {
+            logger.warn("Acces denied to {} : {}", getPath(), e.getMessage());
+            if (e.getStatus() == NtStatus.STATUS_ACCESS_DENIED) {
+                return false;
+            }
+            throw e;
+        }
+    }
+    
+    private int getAccessMask(Set<AccessMask> requestAccesSet) {
+    	String pathOnShare = getPathOnShare();
+    	try (DiskEntry entry = getShare().open(pathOnShare, requestAccesSet, null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
             return entry.getFileInformation().getAccessInformation().getAccessFlags();
         } catch (TransportException e) {
             throw new RuntimeIOException(e);
@@ -161,7 +176,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     public InputStream getInputStream() throws RuntimeIOException {
         logger.debug("Opening SMB input stream for {}", getSharePath());
         final File file = getShare().openFile(getPathOnShare(),
-                EnumSet.of(AccessMask.GENERIC_READ), null, EnumSet.of(SMB2ShareAccess.FILE_SHARE_READ), SMB2CreateDisposition.FILE_OPEN, null);
+                EnumSet.of(AccessMask.GENERIC_READ), null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null);
 
         final InputStream wrapped = file.getInputStream();
         return asBuffered(new InputStream() {
@@ -201,7 +216,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
         SMB2CreateDisposition createDisposition = SMB2CreateDisposition.FILE_OVERWRITE_IF;
         if (!overwrite) createDisposition = SMB2CreateDisposition.FILE_CREATE;
         final File file = getShare().openFile(getPathOnShare(), EnumSet.of(AccessMask.GENERIC_WRITE),
-                null, EnumSet.of(SMB2ShareAccess.FILE_SHARE_WRITE), createDisposition, null);
+                null, SMB2ShareAccess.ALL, createDisposition, null);
 
         final OutputStream wrapped = file.getOutputStream();
 
