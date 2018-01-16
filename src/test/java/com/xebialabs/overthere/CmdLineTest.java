@@ -22,13 +22,12 @@
  */
 package com.xebialabs.overthere;
 
-import java.util.List;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
 import static com.google.common.base.Joiner.on;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.OperatingSystemFamily.ZOS;
+import static com.xebialabs.overthere.OperatingSystemFamily.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -70,7 +69,8 @@ public class CmdLineTest {
     public void shouldHidePasswordWhenEncodingForLogging() {
         CmdLine commandLine = new CmdLine().addArgument("wsadmin.sh").addArgument("-user").addArgument("admin").addArgument("-password").addPassword("secret");
         String actualEncodedCommandLine = commandLine.toCommandLine(WINDOWS, true);
-        assertThat(actualEncodedCommandLine, equalTo("wsadmin.sh -user admin -password ********"));
+        String operand = quote("wsadmin.sh") + " " + quote("-user") + " " +  quote("admin") + " " + quote("-password") + " " + "********";
+        assertThat(actualEncodedCommandLine, equalTo(operand));
     }
 
     @Test
@@ -79,10 +79,11 @@ public class CmdLineTest {
         String actualEncodedCommandLine = commandLine.toCommandLine(WINDOWS, false);
 
         String encodedCommand = "\"" + command + "\"";
+        String encodedRegularArgument = "\"" + regularArgument + "\"";
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = "\"" + argumentWithSpaces + "\"";
-        String encodedArgumentWithSpecialChars = "heretheycome'\"\\;()${}*?andthatwasem";
-        String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
+        String encodedArgumentWithSpecialChars = "\"" + "heretheycome'\"\\;()${}*?andthatwasem" + "\"";
+        String[] encodedCmdArray = {encodedCommand, encodedRegularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
         assertThat(actualEncodedCommandLine, equalTo(expectedEncodedCommandLine));
@@ -147,7 +148,7 @@ public class CmdLineTest {
         CmdLine cmdLine = new CmdLine();
         cmdLine.addArgument("-password:" + "P@ssword+-&");
         assertThat(cmdLine.getArguments().get(0).toString(WINDOWS, false), equalTo("-password:P@ssword+-&"));
-        assertThat(cmdLine.toCommandLine(WINDOWS,false), equalTo("-password:P@ssword+-^&"));
+        assertThat(cmdLine.toCommandLine(WINDOWS, false), equalTo("\"" + "-password:P@ssword+-^&" + "\""));
     }
 
     @Test
@@ -159,4 +160,7 @@ public class CmdLineTest {
         assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo rm\\ \\*"));
     }
 
+    private static String quote(String str) {
+        return "\"" + str + "\"";
+    }
 }

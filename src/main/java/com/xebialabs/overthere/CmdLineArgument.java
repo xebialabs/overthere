@@ -110,11 +110,7 @@ public abstract class CmdLineArgument implements Serializable {
 
         switch (os) {
             case WINDOWS:
-                if (!WindowsCommandLineArgsSanitizer.containsAnySpecialChars(str)) {
-                    builder.append(str);
-                } else {
-                    builder.append(WindowsCommandLineArgsSanitizer.sanitize(str));
-                }
+                builder.append(WindowsCommandLineArgsSanitizer.sanitize(str));
                 break;
             case UNIX:
             case ZOS:
