@@ -318,7 +318,7 @@ abstract class SshConnection extends BaseOverthereConnection {
                             + ALLOCATE_DEFAULT_PTY + " and using " + ALLOCATE_PTY + ".", this);
                 }
                 Matcher matcher = ptyPattern.matcher(allocatePty);
-                checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocateDefaultPty);
+                checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocatePty);
 
                 String term = matcher.group(1);
                 int cols = Integer.valueOf(matcher.group(2));
