@@ -22,35 +22,34 @@
  */
 package com.xebialabs.overthere.winrm;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.List;
-
+import com.google.common.io.Resources;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.XPath;
-import org.junit.Test;
-import com.google.common.base.Joiner;
-import com.google.common.io.Resources;
+import org.dom4j.io.SAXReader;
+import org.jdom2.JDOMException;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ResponseExtractorTest {
 
 
     @Test
-    public void checkReturnExitCodeWinRmV1() throws IOException, DocumentException {
+    public void checkReturnExitCodeWinRmV1() throws DocumentException {
         Document doc = getRequestDocument("winrm/winrm-exitcode-test_10.xml");
         String exitCode = getFirstElement(doc, ResponseExtractor.EXIT_CODE.getXPath());
         assertThat(exitCode, equalTo("12"));
     }
 
     @Test
-    public void checkReturnExitCodeWinRmV2() throws IOException, DocumentException {
+    public void checkReturnExitCodeWinRmV2() throws DocumentException {
         Document doc = getRequestDocument("winrm/winrm-exitcode-test_20.xml");
         String exitCode = getFirstElement(doc, ResponseExtractor.EXIT_CODE.getXPath());
         assertThat(exitCode, equalTo("16"));
@@ -65,10 +64,10 @@ public class ResponseExtractorTest {
         return next.getText();
     }
 
-    private Document getRequestDocument(String path) throws DocumentException, IOException {
+    private Document getRequestDocument(String path) throws DocumentException {
         URL resource = Resources.getResource(path);
-        List<String> list = Resources.readLines(resource, Charset.defaultCharset());
-        Document responseDocument = DocumentHelper.parseText(Joiner.on("\n|").join(list));
+        SAXReader reader = new SAXReader();
+        Document responseDocument = reader.read(resource);
         return responseDocument;
     }
 }

@@ -27,9 +27,9 @@ import com.xebialabs.overthere.ssh.SshConnectionBuilder;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
 
 public class ConnectionOptionsTest {
 

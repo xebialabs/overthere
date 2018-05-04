@@ -40,7 +40,6 @@ import nl.javadude.assumeng.Assumption;
 import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
-import static junit.framework.Assert.assertFalse;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -106,7 +105,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
 
         // Windows systems don't support the concept of checking for executability
         if (connection.getHostOperatingSystem() == OperatingSystemFamily.UNIX) {
-            assertFalse("Expected temporary file to not be executable", tempFile.canExecute());
+            assertThat("Expected temporary file to not be executable", !tempFile.canExecute());
         }
 
         DataInputStream in = new DataInputStream(tempFile.getInputStream());
@@ -155,7 +154,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
         OverthereUtils.write(contents, regularFile);
 
         List<OverthereFile> dirContents = tempDir.listFiles();
-        assertThat(dirContents, contains(nested1, regularFile));
+        assertThat(dirContents, containsInAnyOrder(nested1, regularFile));
         assertThat(dirContents, hasSize(2));
 
         try {

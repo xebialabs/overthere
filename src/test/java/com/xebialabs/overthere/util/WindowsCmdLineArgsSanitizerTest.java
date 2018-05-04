@@ -22,9 +22,10 @@
  */
 package com.xebialabs.overthere.util;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class WindowsCmdLineArgsSanitizerTest {
 
@@ -33,50 +34,50 @@ public class WindowsCmdLineArgsSanitizerTest {
     @Test
     public void shouldEscapeAmpersandsInACommandLineArgument() {
         String arg = "Password+-&";
-        assertEquals("Password+-^&", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("Password+-^&", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldQuoteArgumentIfItContainsWhiteSpaces(){
         String arg = "hello+-& world";
-        assertEquals("\"hello+-& world\"", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("\"hello+-& world\"", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldEscapeAllInstancesOfAmpersandFromCommandLineArg() {
         String arg = "Password&&+-&";
-        assertEquals("Password^&^&+-^&", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("Password^&^&+-^&", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldReplaceAllCaratEscapeCharsWithCaratInACommandLineArg() {
         String arg = "Password";
         for (char c : CARET_ESCAPE.toCharArray()) {
-            assertEquals("Password^" + c, WindowsCommandLineArgsSanitizer.sanitize(arg + c));
+            assertThat("Password^" + c, equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg + c)));
         }
     }
 
     @Test
     public void shouldEscapeAllCharactersIfPasswordContainsOnlySpecialChars(){
         String arg = "^&+-&";
-        assertEquals("^^^&+-^&", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("^^^&+-^&", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldNotEscapeSingleQuote(){
         String arg = "a'b";
-        assertEquals("a'b", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("a'b", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldReturnBlankStringAsIs(){
         String arg = "";
-        assertEquals("", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 
     @Test
     public void shouldEscapeCarriageReturnWithCaret(){
         String arg = "Pass\rword";
-        assertEquals("Pass^\rword", WindowsCommandLineArgsSanitizer.sanitize(arg));
+        assertThat("Pass^\rword", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
 }

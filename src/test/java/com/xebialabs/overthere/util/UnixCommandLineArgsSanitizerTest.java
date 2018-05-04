@@ -22,32 +22,34 @@
  */
 package com.xebialabs.overthere.util;
 
-import org.junit.Test;
+
+import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.util.UnixCommandLineArgsSanitizer.sanitize;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class UnixCommandLineArgsSanitizerTest {
 
     @Test
     public void shouldSanitizeCorrectly() {
-        assertEquals("a\\&b", sanitize("a&b"));
-        assertEquals("a\\\"b", sanitize("a\"b"));
-        assertEquals("a\\'b", sanitize("a'b"));
-        assertEquals("a\\;b", sanitize("a;b"));
-        assertEquals("a\\{b", sanitize("a{b"));
-        assertEquals("a\\}b", sanitize("a}b"));
-        assertEquals("a\\)b", sanitize("a)b"));
-        assertEquals("a\\(b", sanitize("a(b"));
-        assertEquals("a\\ b", sanitize("a b"));
-        assertEquals("a\\$b", sanitize("a$b"));
-        assertEquals("a\\\\b", sanitize("a\\b"));
-        assertEquals("a\\|b", sanitize("a|b"));
-        assertEquals("a\\?b", sanitize("a?b"));
-        assertEquals("a\\>b", sanitize("a>b"));
-        assertEquals("a\\<b", sanitize("a<b"));
-        assertEquals("a\\}b", sanitize("a}b"));
-        assertEquals("a\\\nb", sanitize("a\nb"));
-        assertEquals("a\\\rb", sanitize("a\rb"));
+        assertThat("a\\&b", equalTo(sanitize("a&b")));
+        assertThat("a\\\"b", equalTo(sanitize("a\"b")));
+        assertThat("a\\'b", equalTo(sanitize("a'b")));
+        assertThat("a\\;b", equalTo(sanitize("a;b")));
+        assertThat("a\\{b", equalTo(sanitize("a{b")));
+        assertThat("a\\}b", equalTo(sanitize("a}b")));
+        assertThat("a\\)b", equalTo(sanitize("a)b")));
+        assertThat("a\\(b", equalTo(sanitize("a(b")));
+        assertThat("a\\ b", equalTo(sanitize("a b")));
+        assertThat("a\\$b", equalTo(sanitize("a$b")));
+        assertThat("a\\\\b", equalTo(sanitize("a\\b")));
+        assertThat("a\\|b", equalTo(sanitize("a|b")));
+        assertThat("a\\?b", equalTo(sanitize("a?b")));
+        assertThat("a\\>b", equalTo(sanitize("a>b")));
+        assertThat("a\\<b", equalTo(sanitize("a<b")));
+        assertThat("a\\}b", equalTo(sanitize("a}b")));
+        assertThat("a\\\nb", equalTo(sanitize("a\nb")));
+        assertThat("a\\\rb", equalTo(sanitize("a\rb")));
     }
 }
