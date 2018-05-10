@@ -31,6 +31,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'license'
 apply plugin: 'io.codearte.nexus-staging'
@@ -213,13 +214,25 @@ nexusStaging {
   packageGroup = "com.xebialabs"
 }
 
-uploadArchives {
+publishing {
   repositories {
-    mavenDeployer {
-      repository(url: "file://E:/maven")
+    maven {
+      // change to point to your repo, e.g. http://my.org/repo
+      url "file://C:/tmp"
     }
   }
+  publications {
+    maven(MavenPublication) {
+      groupId 'com.xebialabs.overthere'
+      artifactId 'overthere'
+      version '5.0.2-jenkins'
 
+      from components.java
+    }
+  }
+}
+
+uploadArchives {
   if(project.hasProperty('sonatypeUsername')) {
     repositories.mavenDeployer {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
