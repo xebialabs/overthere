@@ -31,7 +31,6 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'license'
 apply plugin: 'io.codearte.nexus-staging'
@@ -212,24 +211,6 @@ signing {
 
 nexusStaging {
   packageGroup = "com.xebialabs"
-}
-
-publishing {
-  repositories {
-    maven {
-      // change to point to your repo, e.g. http://my.org/repo
-      url "file://C:/tmp"
-    }
-  }
-  publications {
-    maven(MavenPublication) {
-      groupId 'com.xebialabs.overthere'
-      artifactId 'overthere'
-      version '5.0.2-jenkins'
-
-      from components.java
-    }
-  }
 }
 
 uploadArchives {
