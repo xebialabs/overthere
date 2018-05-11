@@ -22,14 +22,21 @@
  */
 package com.xebialabs.overthere;
 
+import com.xebialabs.overthere.cifs.CifsConnectionBuilder;
+import com.xebialabs.overthere.local.LocalConnection;
+import com.xebialabs.overthere.proxy.ProxyConnection;
+import com.xebialabs.overthere.smb.SmbConnectionBuilder;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
+import com.xebialabs.overthere.ssh.SshConnectionBuilder;
+import com.xebialabs.overthere.ssh.SshJumpstationConnectionBuilder;
 import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.Scannit;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -56,18 +63,30 @@ public class Overthere {
     }
 
     private static void boot() {
-        boot(new Scannit(Configuration.config().scan("com.xebialabs").with(new TypeAnnotationScanner())));
-    }
+        final Set<Class<?>> protocolClasses = getProtocolClassess();
 
-    private static void boot(Scannit scannit) {
-        final Set<Class<?>> protocolClasses = scannit.getTypesAnnotatedWith(Protocol.class);
-        for (Class<?> protocol : protocolClasses) {
+        for (Class protocol : protocolClasses) {
             if (OverthereConnectionBuilder.class.isAssignableFrom(protocol)) {
                 connector.registerProtocol((Class<? extends OverthereConnectionBuilder>) protocol);
             } else {
                 logger.warn("Skipping class {} because it is not a HostConnectionBuilder.", protocol);
             }
         }
+    }
+
+    private static void boot(Scannit scannit) {
+
+    }
+
+    private static Set<Class<?>> getProtocolClassess() {
+        Set<Class<?>>  set  = new HashSet<Class<?>>();
+        set.add(SshConnectionBuilder.class);
+        set.add(CifsConnectionBuilder.class);
+        set.add(LocalConnection.class);
+        set.add(SmbConnectionBuilder.class);
+        set.add(ProxyConnection.class);
+        set.add(SshJumpstationConnectionBuilder.class);
+        return set;
     }
 
     private Overthere() {
