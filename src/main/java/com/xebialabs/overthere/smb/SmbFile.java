@@ -123,13 +123,11 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
             throw e;
         }
     }
-    
+
     private int getAccessMask(Set<AccessMask> requestAccesSet) {
     	String pathOnShare = getPathOnShare();
     	try (DiskEntry entry = getShare().open(pathOnShare, requestAccesSet, null, SMB2ShareAccess.ALL, SMB2CreateDisposition.FILE_OPEN, null)) {
             return entry.getFileInformation().getAccessInformation().getAccessFlags();
-        } catch (TransportException e) {
-            throw new RuntimeIOException(e);
         }
     }
 
