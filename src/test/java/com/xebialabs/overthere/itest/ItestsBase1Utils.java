@@ -68,8 +68,8 @@ public abstract class ItestsBase1Utils {
             while (connection == null) {
                 try {
                     connection = Overthere.getConnection(protocol, options);
-                    ++retryCount;
                 } catch (Exception exc) {
+                    ++retryCount;
                     if (retryCount > MAX_RETRY_COUNT) {
                         setupException = exc;
                         throw exc;
