@@ -776,6 +776,7 @@ __N.B.:__ You will only need to configure Kerberos if you are going to use Windo
 By default, Overthere 2.1.0 and up will request access to a Kerberos <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms677949(v=vs.85).aspx">service principal name</a> of the form <code>WSMAN/<em>HOST</em></code>, for which an SPN should be configured automatically when you [configure WinRM for a remote host](#smb_cifs_host_setup_winrm).
 
 If that was not configured correctly, if you have overridden the default SPN for which a ticket is requested through the [__winrmKerberosAddPortToSpn__](#smb_cifs_winrmKerberosAddPortToSpn) or the [__winrmKerberosUseHttpSpn__](#smb_cifs_winrmKerberosUseHttpSpn) connection properties, or if you are running an older version of Overthere, you will have configure the service principal names manually.
+The parameter [__winrmUseCanonicalHostname__](#smb_cifs_winrmUseCanonicalHostname) can be used to use the remote host FQDN provided by the DNS.  
 
 This can be achieved by invoking the <a href="http://technet.microsoft.com/en-us/library/cc731241(v=ws.10).aspx">setspn</a> command, as an Administrator, on any host in the domain, as follows:
 <pre>

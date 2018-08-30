@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
+import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.impl.auth.KerberosSchemeFactory;
 import org.apache.http.params.HttpParams;
@@ -37,11 +38,18 @@ class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
 
     private final int spnPort;
 
+    private final boolean useCanonicalHostname;
+
     public WsmanKerberosSchemeFactory(final boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
-        super(stripPort);
+        this(stripPort, spnServiceClass, spnHost, spnPort, BaseCifsConnectionBuilder.WINRM_USE_CANONICAL_HOSTNAME_DEFAULT);
+    }
+
+    public WsmanKerberosSchemeFactory(final boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort, final boolean useCanonicalHostname) {
+        super(stripPort, useCanonicalHostname);
         this.spnServiceClass = spnServiceClass;
         this.spnHost = spnHost;
         this.spnPort = spnPort;
+        this.useCanonicalHostname = useCanonicalHostname;
     }
 
     @Override

@@ -236,4 +236,13 @@ public abstract class BaseCifsConnectionBuilder {
      */
     public static final Map<String, String> PATH_SHARE_MAPPINGS_DEFAULT = Collections.emptyMap();
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_cifs_winrmUseCanonicalHostname">the online documentation</a>
+     */
+    public static final String WINRM_USE_CANONICAL_HOSTNAME = "winrmUseCanonicalHostname";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#smb_cifs_winrmUseCanonicalHostname">the online documentation</a>
+     */
+    public static final boolean WINRM_USE_CANONICAL_HOSTNAME_DEFAULT = false;
 }

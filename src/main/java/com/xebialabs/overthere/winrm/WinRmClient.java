@@ -109,6 +109,7 @@ class WinRmClient {
     private boolean kerberosTicketCache;
     private int soTimeout;
     private int connectionTimeout;
+    private boolean useCanonicalHostname;
 
     private String shellId;
     private String commandId;
@@ -467,8 +468,8 @@ class WinRmClient {
         if (enableKerberos) {
             String spnServiceClass = kerberosUseHttpSpn ? "HTTP" : "WSMAN";
             RegistryBuilder<AuthSchemeProvider> authSchemeRegistryBuilder = RegistryBuilder.create();
-            authSchemeRegistryBuilder.register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
-            authSchemeRegistryBuilder.register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort));
+            authSchemeRegistryBuilder.register(KERBEROS, new WsmanKerberosSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort, useCanonicalHostname));
+            authSchemeRegistryBuilder.register(SPNEGO, new WsmanSPNegoSchemeFactory(!kerberosAddPortToSpn, spnServiceClass, unmappedAddress, unmappedPort, useCanonicalHostname));
             httpclient.setDefaultAuthSchemeRegistry(authSchemeRegistryBuilder.build());
             configureAuthentication(credentialsProvider, KERBEROS, new KerberosPrincipal(username));
             configureAuthentication(credentialsProvider, SPNEGO, new KerberosPrincipal(username));
@@ -635,6 +636,15 @@ class WinRmClient {
     public void setSoTimeout ( int soTimeout )
     {
         this.soTimeout = soTimeout;
+    }
+
+
+    public boolean isUseCanonicalHostname() {
+        return useCanonicalHostname;
+    }
+
+    public void setUseCanonicalHostname(boolean useCanonicalHostname) {
+        this.useCanonicalHostname = useCanonicalHostname;
     }
 
     private static Logger logger = LoggerFactory.getLogger(WinRmClient.class);
