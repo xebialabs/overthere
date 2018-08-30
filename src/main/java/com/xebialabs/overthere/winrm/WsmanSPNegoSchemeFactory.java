@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
+import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
 import org.apache.http.auth.AuthScheme;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.http.params.HttpParams;
@@ -37,23 +38,30 @@ class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
 
     private final int spnPort;
 
+    private final boolean useCanonicalHostname;
+
     public WsmanSPNegoSchemeFactory(boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort) {
-        super(stripPort);
+        this(stripPort, spnServiceClass, spnHost, spnPort, BaseCifsConnectionBuilder.WINRM_USE_CANONICAL_HOSTNAME_DEFAULT);
+    }
+
+    public WsmanSPNegoSchemeFactory(boolean stripPort, final String spnServiceClass, final String spnHost, final int spnPort, final boolean useCanonicalHostname) {
+        super(stripPort, useCanonicalHostname);
         this.spnServiceClass = spnServiceClass;
         this.spnHost = spnHost;
         this.spnPort = spnPort;
+        this.useCanonicalHostname = useCanonicalHostname;
     }
 
     @Override
     public AuthScheme newInstance(final HttpParams params) {
         logger.trace("WsmanSPNegoSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
-        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
+        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort, useCanonicalHostname);
     }
 
     @Override
     public AuthScheme create(final HttpContext context) {
         logger.trace("WsmanSPNegoSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
-        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
+        return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort, useCanonicalHostname);
     }
 
     private Logger logger = LoggerFactory.getLogger(WsmanSPNegoSchemeFactory.class);

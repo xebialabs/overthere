@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
+import com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.KerberosCredentials;
 import org.apache.http.impl.auth.SPNegoScheme;
@@ -43,7 +44,11 @@ class WsmanSPNegoScheme extends SPNegoScheme {
     private final int spnPort;
 
     public WsmanSPNegoScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort) {
-        super(stripPort);
+        this(stripPort, spnServiceClass, spnAddress, spnPort, BaseCifsConnectionBuilder.WINRM_USE_CANONICAL_HOSTNAME_DEFAULT);
+    }
+
+    public WsmanSPNegoScheme(final boolean stripPort, final String spnServiceClass, final String spnAddress, final int spnPort, final boolean useCanonicalHostname) {
+        super(stripPort, useCanonicalHostname);
         this.spnServiceClass = spnServiceClass;
         this.spnAddress = spnAddress;
         this.spnPort = spnPort;

@@ -266,6 +266,7 @@ public class WinRmConnection implements ProcessConnection {
         client.setKerberosTicketCache(options.getBoolean(WINRM_KERBEROS_TICKET_CACHE, WINRM_KERBEROS_TICKET_CACHE_DEFAULT));
         client.setConnectionTimeout(connectionTimeoutMillis);
         client.setSoTimeout(socketTimeoutMillis);
+        client.setUseCanonicalHostname(options.getBoolean(WINRM_USE_CANONICAL_HOSTNAME, WINRM_USE_CANONICAL_HOSTNAME_DEFAULT));
         return client;
     }
 
