@@ -151,6 +151,14 @@ public class SmbConnection extends BaseOverthereConnection {
                 }
             } catch (Exception e) {
                 logger.warn("Exception while trying to close smb connection", e);
+            } finally {
+                try {
+                    if (client != null) {
+                        client.close();
+                    }
+                } catch (Exception e) {
+                    logger.warn("Exception closing the SMB Client", e);
+                }
             }
         }
     }
