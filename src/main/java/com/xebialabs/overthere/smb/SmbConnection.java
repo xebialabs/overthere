@@ -26,6 +26,7 @@ import com.hierynomus.mserref.NtStatus;
 import com.hierynomus.mssmb2.SMBApiException;
 import com.hierynomus.security.bc.BCSecurityProvider;
 import com.hierynomus.smb.SMBPacket;
+import com.hierynomus.smb.SMBPacketData;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.SmbConfig;
 import com.hierynomus.smbj.auth.AuthenticationContext;
@@ -88,7 +89,7 @@ public class SmbConnection extends BaseOverthereConnection {
         InetSocketAddress smbAddressPort = mapper.map(createUnresolved(realSmbHost, realSmbPort));
         smbPort = smbAddressPort.getPort();
         boolean requireSigning = options.getBoolean(SMB_REQUIRE_SIGNING, SMB_REQUIRE_SIGNING_DEFAULT);
-        TransportLayerFactory<SMBPacket<?>> transportLayerFactory = new DirectTcpTransportFactory<>();
+        TransportLayerFactory<SMBPacketData<?>, SMBPacket<?, ?>> transportLayerFactory = new DirectTcpTransportFactory<>();
         if (!realSmbHost.equals(hostname)) {
             transportLayerFactory = new TunnelTransportFactory<>(transportLayerFactory, hostname, smbPort);
         }
