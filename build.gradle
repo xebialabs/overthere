@@ -92,14 +92,14 @@ dependencies {
   compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 
   // SSH
-  compile 'com.hierynomus:sshj:0.26.0'
+  compile 'com.hierynomus:sshj:0.27.0'
   runtime 'com.jcraft:jzlib:1.0.7'
 
   // CIFS
   compile 'jcifs:jcifs:1.3.17'
 
   // SMB2/3
-  compile 'com.hierynomus:smbj:0.8.0'
+  compile 'com.hierynomus:smbj:0.9.1'
   compile 'net.engio:mbassador:1.3.0'
   compile "org.bouncycastle:bcprov-jdk15on:1.60"
   compile "org.bouncycastle:bcpkix-jdk15on:1.60"
