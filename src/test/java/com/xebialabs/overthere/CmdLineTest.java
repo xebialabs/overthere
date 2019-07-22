@@ -42,7 +42,7 @@ public class CmdLineTest {
 
     private String argumentWithSpaces = "the argument with spaces";
 
-    private String argumentWithSpecialChars = "heretheycome'\"\\;()${}*?andthatwasem";
+    private String argumentWithSpecialChars = "heretheycome'\"\\;()%${}*?andthatwasem";
 
     @Test(expectedExceptions = NullPointerException.class)
     public void shouldThrowNullPointerExceptionWhenAddingNullArgument() {
@@ -81,7 +81,7 @@ public class CmdLineTest {
         String encodedCommand = "\"" + command + "\"";
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = "\"" + argumentWithSpaces + "\"";
-        String encodedArgumentWithSpecialChars = "heretheycome'\"\\;()${}*?andthatwasem";
+        String encodedArgumentWithSpecialChars = "heretheycome'\"\\;()%${}*?andthatwasem";
         String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
@@ -96,7 +96,7 @@ public class CmdLineTest {
         String encodedCommand = command.replace("\\", "\\\\").replace(" ", "\\ ");
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
-        String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}\\*\\?andthatwasem";
+        String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)%\\$\\{\\}\\*\\?andthatwasem";
         String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
@@ -111,7 +111,7 @@ public class CmdLineTest {
         String encodedCommand = command.replace("\\", "\\\\").replace(" ", "\\ ");
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = argumentWithSpaces.replace(" ", "\\ ");
-        String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)\\$\\{\\}\\*\\?andthatwasem";
+        String encodedArgumentWithSpecialChars = "heretheycome\\'\\\"\\\\\\;\\(\\)%\\$\\{\\}\\*\\?andthatwasem";
         String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
