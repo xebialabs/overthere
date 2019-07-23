@@ -28,6 +28,14 @@ public class WindowsCommandLineArgsSanitizer {
 
     private static final String WHITE_SPACE = " ";
 
+    private static final Character ESCAPE_CHAR = '^';
+
+    /**
+     * Percent is treated in another way, so it cannot be escaped by ^ char, but with `%` instead.
+     * {@link <a href="https://www.robvanderwoude.com/escapechars.php">More information.</a>}
+     */
+    private static final Character PERCENT_CHAR = '%';
+
     public static String sanitize(String str) {
         if (str.contains(WHITE_SPACE)) {
             return "\"" + str + "\"";
@@ -39,11 +47,11 @@ public class WindowsCommandLineArgsSanitizer {
         StringBuilder builder = new StringBuilder();
         for (int j = 0; j < str.length(); j++) {
             char c = str.charAt(j);
-            if (c == '%') {
-                builder.append('%');
+            if (c == PERCENT_CHAR) {
+                builder.append(PERCENT_CHAR);
             }
             if (contains(c, SPECIAL_CHARS)) {
-                builder.append('^');
+                builder.append(ESCAPE_CHAR);
             }
             builder.append(c);
         }
@@ -60,10 +68,10 @@ public class WindowsCommandLineArgsSanitizer {
     }
 
     public static boolean containsAnySpecialChars(String str) {
+        if (str.indexOf(PERCENT_CHAR) >= 0) {
+            return true;
+        }
         for (char c : SPECIAL_CHARS) {
-            if (c == '%') {
-                return true;
-            }
             if (str.indexOf(c) >= 0) {
                 return true;
             }

@@ -81,7 +81,7 @@ public class CmdLineTest {
         String encodedCommand = "\"" + command + "\"";
         String encodedEmptyArgument = "\"\"";
         String encodedArgumentWithSpaces = "\"" + argumentWithSpaces + "\"";
-        String encodedArgumentWithSpecialChars = "heretheycome'\"\\;()%${}*?andthatwasem";
+        String encodedArgumentWithSpecialChars = "heretheycome'\"\\;()%%${}*?andthatwasem";
         String[] encodedCmdArray = {encodedCommand, regularArgument, encodedEmptyArgument, encodedArgumentWithSpaces, encodedArgumentWithSpecialChars};
         String expectedEncodedCommandLine = on(' ').join(encodedCmdArray);
 
