@@ -32,7 +32,7 @@ public class WindowsCommandLineArgsSanitizer {
 
     /**
      * Percent is treated in another way, so it cannot be escaped by ^ char, but with `%` instead.
-     * {@link <a href="https://www.robvanderwoude.com/escapechars.php">More information.</a>}
+     * @see <a href="https://www.robvanderwoude.com/escapechars.php">Escape Characters.</a>
      */
     private static final Character PERCENT_CHAR = '%';
 
