@@ -61,6 +61,9 @@ public class WindowsCommandLineArgsSanitizer {
 
     public static boolean containsAnySpecialChars(String str) {
         for (char c : SPECIAL_CHARS) {
+            if (c == '%') {
+                return true;
+            }
             if (str.indexOf(c) >= 0) {
                 return true;
             }
