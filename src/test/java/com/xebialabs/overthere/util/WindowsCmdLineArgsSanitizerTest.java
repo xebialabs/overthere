@@ -80,4 +80,10 @@ public class WindowsCmdLineArgsSanitizerTest {
         String arg = "Pass\rword";
         assertThat("Pass^\rword", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
     }
+
+    @Test
+    public void shouldEscapePercentageWithPercentage(){
+        String arg = "Password%";
+        assertThat("Password%%", equalTo(WindowsCommandLineArgsSanitizer.sanitize(arg)));
+    }
 }
