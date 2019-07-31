@@ -108,7 +108,7 @@ dependencies {
   compile 'commons-net:commons-net:3.3'
 
   // WinRM
-  compile('dom4j:dom4j:1.6.1') {
+  compile('org.dom4j:dom4j:2.1.1') {
     exclude group: 'xml-apis', module: 'xml-apis'
   }
   compile('jaxen:jaxen:1.1.6') {

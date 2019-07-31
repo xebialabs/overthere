@@ -54,10 +54,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
@@ -278,14 +275,14 @@ class WinRmClient {
     }
 
     private static void handleStream(Document responseDocument, ResponseExtractor stream, OutputStream out) throws IOException {
-        @SuppressWarnings("unchecked") final List<Element> streams = stream.getXPath().selectNodes(responseDocument);
+        @SuppressWarnings("unchecked") final List<Node> streams = stream.getXPath().selectNodes(responseDocument);
         if (!streams.isEmpty()) {
             final Base64 base64 = new Base64();
-            Iterator<Element> itStreams = streams.iterator();
+            Iterator<Node> itStreams = streams.iterator();
             while (itStreams.hasNext()) {
-                Element e = itStreams.next();
+                Node node = itStreams.next();
                 // TODO check performance with http://www.iharder.net/current/java/base64/
-                final byte[] decode = base64.decode(e.getText());
+                final byte[] decode = base64.decode(node.getText());
                 out.write(decode);
             }
         }
@@ -293,11 +290,11 @@ class WinRmClient {
     }
 
     private static String getFirstElement(Document doc, ResponseExtractor extractor) {
-        @SuppressWarnings("unchecked") final List<Element> nodes = extractor.getXPath().selectNodes(doc);
+        @SuppressWarnings("unchecked") final List<Node> nodes = extractor.getXPath().selectNodes(doc);
         if (nodes.isEmpty())
             throw new RuntimeException("Cannot find " + extractor.getXPath() + " in " + toString(doc));
 
-        final Element next = nodes.iterator().next();
+        final Node next = nodes.iterator().next();
         return next.getText();
     }
 
