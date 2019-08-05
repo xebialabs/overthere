@@ -23,10 +23,7 @@
 package com.xebialabs.overthere.winrm;
 
 import com.google.common.io.Resources;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.XPath;
+import org.dom4j.*;
 import org.dom4j.io.SAXReader;
 import org.jdom2.JDOMException;
 import org.testng.annotations.Test;
@@ -57,10 +54,10 @@ public class ResponseExtractorTest {
 
     @SuppressWarnings("unchecked")
     private static String getFirstElement(Document doc, XPath xpath) {
-        final List<Element> nodes = xpath.selectNodes(doc);
+        final List<Node> nodes = xpath.selectNodes(doc);
         assertThat(nodes.isEmpty(), equalTo(false));
         assertThat(nodes.size(), equalTo(1));
-        final Element next = nodes.iterator().next();
+        final Node next = nodes.iterator().next();
         return next.getText();
     }
 
