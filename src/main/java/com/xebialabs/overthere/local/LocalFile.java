@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,8 +142,10 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     public void delete() {
         logger.debug("Deleting {}", this);
 
-        if (!file.delete()) {
-            throw new RuntimeIOException("Cannot delete " + this);
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException io) {
+            throw new RuntimeIOException("Cannot delete " + this, io);
         }
     }
 
