@@ -95,7 +95,7 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
             if (allSucces) {
                 delete();
             } else {
-                logger.debug("Not deleting " + this + ", not all children are deleted.");
+                throw new RuntimeIOException("Cannot delete " + this + ", not all children are deleted.");
             }
         } else {
             delete();
