@@ -205,7 +205,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
                 @Override
                 public void close() throws IOException {
                     super.close();
-                    logger.debug("Closing file input stream for {}", this);
+                    logger.debug("Closed file input stream for {}", LocalFile.this);
                 }
             });
         } catch (FileNotFoundException exc) {
@@ -222,7 +222,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
                 @Override
                 public void close() throws IOException {
                     super.close();
-                    logger.debug("Closing file output stream for {}", this);
+                    logger.debug("Closed file output stream for {}", LocalFile.this);
                 }
             });
         } catch (FileNotFoundException exc) {
