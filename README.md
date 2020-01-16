@@ -1138,6 +1138,20 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.7 (16-Jan-2020)
+    * Improved error handling on file delete failure
+    * Improved logging on closing of streams
+* Overthere 5.0.6 (5-Aug-2019)
+    * Upgrade to dom4j 2.1.1
+* Overthere 5.0.5 (23-Jul-2019)
+    * Improved Windows command line sanitization
+* Overthere 5.0.4 (1-Mar-2019)
+    * Fixes for #231, #232
+    * Upgrade to SSHJ 0.27.0, SMBJ 0.9.1
+* Overthere 5.0.3 (22-Aug-2018)
+    * Fixes for #207, #211, #212, #213, #218
+    * Upgrade to SSHJ 0.26.0, SMBJ 0.8.0
+    * Support programmatic protocol registration
 * Overthere 5.0.2 (30-Aug-2017)
     * Upgraded to SMBJ 0.3.0
     * Added support for transcode OvertherFile to another encoding
