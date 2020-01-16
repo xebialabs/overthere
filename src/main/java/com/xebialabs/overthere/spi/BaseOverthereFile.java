@@ -83,19 +83,20 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
     @Override
     public void deleteRecursively() throws RuntimeIOException {
         if (isDirectory()) {
-            boolean allSucces = true;
+            RuntimeIOException accumulator = new RuntimeIOException("Cannot delete " + this + ", not all children are deleted.");
             for (OverthereFile each : listFiles()) {
                 try {
                     each.deleteRecursively();
                 } catch (RuntimeIOException rio) {
-                    logger.warn("Unable to delete child "+ each + ". Continue...", rio);
-                    allSucces = false;
+                    logger.warn("Unable to delete child {}. Continue...", each);
+                    accumulator.addSuppressed(rio);
                 }
             }
-            if (allSucces) {
+            Throwable[] suppressed = accumulator.getSuppressed();
+            if (suppressed == null || suppressed.length == 0) {
                 delete();
             } else {
-                throw new RuntimeIOException("Cannot delete " + this + ", not all children are deleted.");
+                throw accumulator;
             }
         } else {
             delete();
