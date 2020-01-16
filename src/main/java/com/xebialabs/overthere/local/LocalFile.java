@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,8 +142,10 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     public void delete() {
         logger.debug("Deleting {}", this);
 
-        if (!file.delete()) {
-            throw new RuntimeIOException("Cannot delete " + this);
+        try {
+            Files.delete(file.toPath());
+        } catch (IOException io) {
+            throw new RuntimeIOException("Cannot delete " + this, io);
         }
     }
 
@@ -202,7 +205,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
                 @Override
                 public void close() throws IOException {
                     super.close();
-                    logger.debug("Closing file input stream for {}", this);
+                    logger.debug("Closed file input stream for {}", LocalFile.this);
                 }
             });
         } catch (FileNotFoundException exc) {
@@ -219,7 +222,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
                 @Override
                 public void close() throws IOException {
                     super.close();
-                    logger.debug("Closing file output stream for {}", this);
+                    logger.debug("Closed file output stream for {}", LocalFile.this);
                 }
             });
         } catch (FileNotFoundException exc) {
