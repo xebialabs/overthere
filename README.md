@@ -260,6 +260,11 @@ To use the __SFTP_CYGWIN__ connection type, install [COPSSH](http://www.itefix.n
 
 To use the __SFTP_WINSSHD__ connection type, install [WinSSHD](http://www.bitvise.com/winsshd) on your Windows host. In the Easy WinSSHD Settings control panel, add the users as which you want to connect, check the _Login allowed_ checkbox and select _Allow full access_ in the _Virtual filesystem layout_ dropdown box. Alternatively you can check the _Allow login to any Windows account_ to allow access to all Windows accounts.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to WinSSHD-style paths, e.g. `/C/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
 
+<a name="ssh_host_setup_sftp_opensshd"></a>
+#### SFTP_OpenSSHD
+
+To use the __SFTP_OpenSSHD__ connection type, install [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.<br/>__N.B.:__ Overthere will take care of the translation from Windows style paths, e.g. `C:\Program Files\IBM\WebSphere\AppServer`, to OpenSSHD-style paths, e.g. `/C:/Program Files/IBM/WebSphere/AppServer`, so that your code can use Windows style paths.
+
 <a name="ssh_host_setup_sudo"></a>
 <a name="ssh_host_setup_interactive_sudo"></a>
 #### SUDO and INTERACTIVE_SUDO
