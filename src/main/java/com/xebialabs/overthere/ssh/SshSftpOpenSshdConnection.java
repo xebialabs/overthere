@@ -63,8 +63,7 @@ class SshSftpOpenSshdConnection extends SshSftpConnection {
         } else {
             throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a OpenSSHD path because it is not a Windows path", path));
         }
-        // logger.trace("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
-        logger.info("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
+        logger.trace("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
         return translatedPath;
     }
 
