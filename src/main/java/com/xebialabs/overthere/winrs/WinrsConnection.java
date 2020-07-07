@@ -102,7 +102,7 @@ public class WinrsConnection implements ProcessConnection {
         winrsCmd.addArgument("winrs");
         winrsCmd.addArgument("-remote:" + address + ":" + port);
         winrsCmd.addArgument("-username:" + username);
-        winrsCmd.addPassword("-password:" + password);
+        winrsCmd.addRaw("-password:" + password);
         if (workingDirectory != null) {
             winrsCmd.addArgument("-directory:" + workingDirectory.getPath());
         }
