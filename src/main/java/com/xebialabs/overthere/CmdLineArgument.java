@@ -23,6 +23,7 @@
 package com.xebialabs.overthere;
 
 import com.xebialabs.overthere.util.UnixCommandLineArgsSanitizer;
+import com.xebialabs.overthere.util.WinRSCommandLinePasswordSanitizer;
 import com.xebialabs.overthere.util.WindowsCommandLineArgsSanitizer;
 
 import java.io.Serializable;
@@ -207,6 +208,29 @@ public abstract class CmdLineArgument implements Serializable {
             }
         }
 
+        @Override
+        protected void encodeString(String str, OperatingSystemFamily os, StringBuilder builder) {
+            if (str.length() == 0) {
+                builder.append(EMPTY_ARGUMENT);
+                return;
+            }
+
+            switch (os) {
+                case WINDOWS:
+                    if (!WinRSCommandLinePasswordSanitizer.containsAnySpecialChars(str)) {
+                        builder.append(str);
+                    } else {
+                        builder.append(WinRSCommandLinePasswordSanitizer.sanitize(str));
+                    }
+                    break;
+                case UNIX:
+                case ZOS:
+                    super.encodeString(str, os, builder);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown os " + os);
+            }
+        }
     }
 
     private static class Nested extends CmdLineArgument {
