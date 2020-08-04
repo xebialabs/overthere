@@ -1138,6 +1138,10 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.10 (29-Jul-2020)
+    * Fix for #245 (Execution of cmd.command that contains percentage symbol(%) on windows)
+* Overthere 5.0.9 (16-Jul-2020)
+    * Fix for #244 (Escaping % character in passwords breaks winrm_native authentication)
 * Overthere 5.0.8 (30-Jun-2020)
     * Upgrade to dom4j 2.1.3
 * Overthere 5.0.7 (16-Jan-2020)
