@@ -26,6 +26,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,6 +115,9 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
             ((BaseOverthereFile<?>) dest).copyFrom(this);
         }
     }
+
+    @Override
+    public final void copyToWithConfig(final OverthereFile dest, final Map<String, String> config) {}
 
     protected void copyFrom(OverthereFile source) {
         OverthereFileCopier.copy(source, this);

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An abstract representation of a file that can be access through an {@link OverthereConnection}. It could be a local
@@ -211,5 +212,16 @@ public interface OverthereFile {
      * @param dest the file to copy to.
      */
     void copyTo(final OverthereFile dest);
+
+    /**
+     * Copies this file or directory (recursively) to the destination. Contrary to the semantics of
+     * {@link #renameTo(OverthereFile)}, a file <em>can</em> be copied accross {@link OverthereConnection connections}
+     * and across file systems withtin a {@link OverthereConnection connection}.
+     *
+     * @param dest the file to copy to.
+     * @param config configurations to copy if needed
+     */
+
+    void copyToWithConfig(final OverthereFile dest, Map<String, String> config);
 
 }
