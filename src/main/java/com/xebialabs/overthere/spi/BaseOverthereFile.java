@@ -107,13 +107,17 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
 
     @Override
     public final void copyTo(final OverthereFile dest) {
-        copyToDestination(dest);
+        checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
+
+        if (getConnection().equals(dest.getConnection())) {
+            ((BaseOverthereFile<?>) dest).shortCircuitCopyFrom(this);
+        } else {
+            ((BaseOverthereFile<?>) dest).copyFrom(this);
+        }
     }
 
     @Override
-    public final void copyToWithConfig(final OverthereFile dest, final Map<String, String> config) {
-        copyToDestination(dest);
-    }
+    public final void copyToWithConfig(final OverthereFile dest, final Map<String, String> config) {}
 
     protected void copyFrom(OverthereFile source) {
         OverthereFileCopier.copy(source, this);
@@ -190,16 +194,6 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
         int streamBufferSize = getConnection().streamBufferSize;
         logger.debug("Using buffer of size [{}] for streaming to [{}]", streamBufferSize, this);
         return new BufferedOutputStream(os, getConnection().streamBufferSize);
-    }
-
-    private void copyToDestination(final OverthereFile dest) {
-        checkArgument(dest instanceof BaseOverthereFile<?>, "dest is not a subclass of BaseOverthereFile");
-
-        if (getConnection().equals(dest.getConnection())) {
-            ((BaseOverthereFile<?>) dest).shortCircuitCopyFrom(this);
-        } else {
-            ((BaseOverthereFile<?>) dest).copyFrom(this);
-        }
     }
 
     /**
