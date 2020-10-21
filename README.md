@@ -1138,6 +1138,10 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.21 (07-Oct-2020)
+    * Make artifact-copy-strategy work on satellite
+* Overthere 5.0.20 (18-Sep-2020)
+    * Fix for #247 (Make artifact-copy-strategy work on satellite)
 * Overthere 5.0.10 (29-Jul-2020)
     * Fix for #245 (Execution of cmd.command that contains percentage symbol(%) on windows)
 * Overthere 5.0.9 (16-Jul-2020)
