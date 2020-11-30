@@ -506,6 +506,9 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
             case SFTP_WINSSHD:
                 connection = new SshSftpWinSshdConnection(type, options, mapper);
                 break;
+            case SFTP_OPENSSHD:
+                connection = new SshSftpOpenSshdConnection(type, options, mapper);
+                break;
             case SCP:
                 connection = new SshScpConnection(type, options, mapper);
                 break;

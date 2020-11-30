@@ -43,6 +43,11 @@ public enum SshConnectionType {
     SFTP_WINSSHD,
 
     /**
+     * An SSH connection that uses SFTP to transfer files, to a Windows host running OpenSSHD.
+     */
+    SFTP_OPENSSHD,
+
+    /**
      * An SSH connection that uses SCP to transfer files, to a Unix host.
      */
     SCP,
