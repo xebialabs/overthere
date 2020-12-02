@@ -23,12 +23,15 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
+import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.registerFilteredKey;
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
@@ -495,19 +498,21 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
+        OperatingSystemFamily os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
 
         switch (sshConnectionType) {
             case SFTP:
-                connection = new SshSftpUnixConnection(type, options, mapper);
+                if(os == WINDOWS){
+                    connection = new SshSftpWindowsConnection(type, options, mapper);
+                }else{
+                    connection = new SshSftpUnixConnection(type, options, mapper);
+                }
                 break;
             case SFTP_CYGWIN:
                 connection = new SshSftpCygwinConnection(type, options, mapper);
                 break;
             case SFTP_WINSSHD:
                 connection = new SshSftpWinSshdConnection(type, options, mapper);
-                break;
-            case SFTP_OPENSSHD:
-                connection = new SshSftpOpenSshdConnection(type, options, mapper);
                 break;
             case SCP:
                 connection = new SshScpConnection(type, options, mapper);
