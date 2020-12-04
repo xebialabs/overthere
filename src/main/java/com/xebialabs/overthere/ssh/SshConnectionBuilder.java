@@ -23,13 +23,11 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.OverthereConnectionBuilder;
 import com.xebialabs.overthere.spi.Protocol;
 
-import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.registerFilteredKey;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
@@ -497,7 +495,6 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
         SshConnectionType sshConnectionType = options.getEnum(CONNECTION_TYPE, SshConnectionType.class);
-        OperatingSystemFamily os = options.getEnum(OPERATING_SYSTEM, OperatingSystemFamily.class);
 
         switch (sshConnectionType) {
             case SFTP:
