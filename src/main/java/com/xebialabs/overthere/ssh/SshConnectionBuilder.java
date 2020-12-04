@@ -31,7 +31,6 @@ import com.xebialabs.overthere.spi.Protocol;
 
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.registerFilteredKey;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 
 /**
@@ -502,11 +501,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
         switch (sshConnectionType) {
             case SFTP:
-                if(os == WINDOWS){
-                    connection = new SshSftpWindowsConnection(type, options, mapper);
-                }else{
-                    connection = new SshSftpUnixConnection(type, options, mapper);
-                }
+                connection = new SshSftpUnixAndWindConnection(type, options, mapper);
                 break;
             case SFTP_CYGWIN:
                 connection = new SshSftpCygwinConnection(type, options, mapper);

@@ -59,7 +59,7 @@ public class SshSftpConnectionItest extends OverthereConnectionItestBase {
 
     @Override
     protected String getExpectedConnectionClassName() {
-        return SshSftpUnixConnection.class.getName();
+        return SshSftpUnixAndWindConnection.class.getName();
     }
 
 }

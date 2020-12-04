@@ -13,7 +13,6 @@ public class SshSftpWindowsConnection extends SshSftpConnection{
 
     public SshSftpWindowsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
-        checkArgument(os == WINDOWS, "Cannot create a %s connection to a host that is running Windows", protocolAndConnectionType);
     }
 
     @Override
