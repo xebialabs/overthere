@@ -498,7 +498,7 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
 
         switch (sshConnectionType) {
             case SFTP:
-                connection = new SshSftpUnixConnection(type, options, mapper);
+                connection = new SshSftpUnixAndWindConnection(type, options, mapper);
                 break;
             case SFTP_CYGWIN:
                 connection = new SshSftpCygwinConnection(type, options, mapper);
