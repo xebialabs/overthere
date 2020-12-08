@@ -32,9 +32,9 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 /**
  * A connection to a Unix host using SSH w/ SFTP.
  */
-class SshSftpUnixAndWindConnection extends SshSftpConnection {
+class SshSftpConnectionClient extends SshSftpConnection {
 
-    public SshSftpUnixAndWindConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SshSftpConnectionClient(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
     }
 
