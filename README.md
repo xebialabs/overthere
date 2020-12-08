@@ -238,12 +238,13 @@ Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH an
 
 <a name="ssh_host_setup_ssh"></a>
 #### SSH
-To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms two SSH servers are supported:
+To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix and Windows platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms three SSH servers are supported:
 
 * OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
 * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
+* Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
 
-__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP__ or __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
 
 <a name="ssh_host_setup_sftp"></a>
 #### SFTP
@@ -1138,6 +1139,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.0.23 (08-Dec-2020)
+    * Supporting Opensshd service for windows host by SFTP connection type.
 * Overthere 5.0.21 (07-Oct-2020)
     * Upgrade to SMBJ 0.10.0
 * Overthere 5.0.20 (18-Sep-2020)
