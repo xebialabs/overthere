@@ -32,10 +32,11 @@ import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 /**
  * A connection to a Unix host using SSH w/ SFTP.
  */
-class SshSftpConnectionClient extends SshSftpConnection {
+class SshSftpUnixConnection extends SshSftpConnection {
 
-    public SshSftpConnectionClient(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SshSftpUnixConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
         super(type, options, mapper);
+        checkArgument(os != WINDOWS, "Cannot create a %s connection to a host that is running Windows", protocolAndConnectionType);
     }
 
     @Override
