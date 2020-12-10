@@ -23,7 +23,14 @@
 package com.xebialabs.overthere.ssh;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static java.lang.Character.toUpperCase;
+import static java.lang.String.format;
 
 /**
  * A connection to a Unix/Windows host using SSH w/ SFTP.
@@ -35,6 +42,23 @@ class SshSftpConnectionClient extends SshSftpConnection {
     }
 
     @Override
-    protected String pathToSftpPath(String path) { return path;   }
+    protected String pathToSftpPath(String path) {
+        if(os == WINDOWS){
+            String translatedPath;
+            if (path.length() >= 2 && path.charAt(1) == ':') {
+                char driveLetter = toUpperCase(path.charAt(0));
+                String pathInDrive = path.substring(2).replace('\\', '/');
+                translatedPath = "/" + driveLetter + ":" + pathInDrive;
+            } else {
+                throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a OpenSSHD path because it is not a Windows path", path));
+            }
+            logger.trace("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
+            return translatedPath;
+        }else {
+            return path;
+        }
+    }
+
+    private static Logger logger = LoggerFactory.getLogger(SshSftpConnectionClient.class);
 
 }
