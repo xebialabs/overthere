@@ -22,43 +22,51 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
+import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static java.lang.Character.toUpperCase;
 import static java.lang.String.format;
 
 /**
- * A connection to a Unix/Windows host using SSH w/ SFTP.
+ * A connection to a Windows host running OpenSSHD.
  */
-class SshSftpConnectionClient extends SshSftpConnection {
+class SshSftpOpenSshdConnection extends SshSftpConnection {
 
-    public SshSftpConnectionClient(String type, ConnectionOptions options, AddressPortMapper mapper) {
+    public SshSftpOpenSshdConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
+           
         super(type, options, mapper);
+        checkArgument(os == WINDOWS, "Cannot create a %s connection to a host that is not running Windows", protocolAndConnectionType);
+    }
+
+    @Override
+    protected void connect() {
+        // In OpenSSHD we have to wait for the server ident before sending our ident.
+        // config.setWaitForServerIdentBeforeSendingClientIdent(true);
+        super.connect();
     }
 
     @Override
     protected String pathToSftpPath(String path) {
-        if(os == WINDOWS){
-            String translatedPath;
-            if (path.length() >= 2 && path.charAt(1) == ':') {
-                char driveLetter = toUpperCase(path.charAt(0));
-                String pathInDrive = path.substring(2).replace('\\', '/');
-                translatedPath = "/" + driveLetter + ":" + pathInDrive;
-            } else {
-                throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a OpenSSHD path because it is not a Windows path", path));
-            }
-            logger.trace("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
-            return translatedPath;
-        }else {
-            return path;
+        String translatedPath;
+        if (path.length() >= 2 && path.charAt(1) == ':') {
+            char driveLetter = toUpperCase(path.charAt(0));
+            String pathInDrive = path.substring(2).replace('\\', '/');
+            translatedPath = "/" + driveLetter + ":" + pathInDrive;
+        } else {
+            throw new RuntimeIOException(format("Cannot translate Windows path [%s] to a OpenSSHD path because it is not a Windows path", path));
         }
+        logger.trace("Translated Windows path [{}] to OpenSSHD path [{}]", path, translatedPath);
+        return translatedPath;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(SshSftpConnectionClient.class);
+    private static Logger logger = LoggerFactory.getLogger(SshSftpOpenSshdConnection.class);
 
 }
