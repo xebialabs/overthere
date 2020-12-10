@@ -1144,8 +1144,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="release_history"></a>
 # Release History
-* Overthere 5.0.23 (08-Dec-2020)
-    * Supporting Opensshd service for windows host by SFTP connection type.
+* Overthere 5.2.1 (10-Dec-2020)
+    * Supported Opensshd service for windows host by SFTP_Opensshd connection type.
 * Overthere 5.0.21 (07-Oct-2020)
     * Upgrade to SMBJ 0.10.0
 * Overthere 5.0.20 (18-Sep-2020)
