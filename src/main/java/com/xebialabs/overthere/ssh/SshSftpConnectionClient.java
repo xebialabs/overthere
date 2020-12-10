@@ -25,12 +25,8 @@ package com.xebialabs.overthere.ssh;
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
-import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
-
 /**
- * A connection to a Unix host using SSH w/ SFTP.
+ * A connection to a Unix/Windows host using SSH w/ SFTP.
  */
 class SshSftpConnectionClient extends SshSftpConnection {
 
@@ -39,8 +35,6 @@ class SshSftpConnectionClient extends SshSftpConnection {
     }
 
     @Override
-    protected String pathToSftpPath(String path) {
-        return path;
-    }
+    protected String pathToSftpPath(String path) { return path;   }
 
 }
