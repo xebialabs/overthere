@@ -35,10 +35,11 @@ import static com.xebialabs.overthere.WindowsCloudHostListener.ADMINISTRATIVE_WI
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.CONNECTION_TYPE;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SSH_PROTOCOL;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
+import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP_OpenSSHD;
 
 @Test
 @Listeners({WindowsCloudHostListener.class})
-public class SshSftpWindowsConnectionItest extends OverthereConnectionItestBase {
+public class SshSftpOpensshdConnectionWithAdministrativeUserItest extends OverthereConnectionItestBase {
     @Override
     protected String getProtocol() {
         return SSH_PROTOCOL;
@@ -48,7 +49,7 @@ public class SshSftpWindowsConnectionItest extends OverthereConnectionItestBase 
     protected ConnectionOptions getOptions() {
         ConnectionOptions options = new ConnectionOptions();
         options.set(OPERATING_SYSTEM, WINDOWS);
-        options.set(CONNECTION_TYPE, SFTP);
+        options.set(CONNECTION_TYPE, SFTP_OpenSSHD);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
         options.set(PORT, 22);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
