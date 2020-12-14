@@ -232,6 +232,16 @@ public abstract class ItestsBase1Utils {
         return SshConnectionType.SFTP_WINSSHD.equals(options.get(CONNECTION_TYPE, null));
     }
 
+    public boolean notSftpOpensshd() {
+        checkConnected("notSftpOpensshd");
+        return !onlySftpOpensshd();
+    }
+
+    public boolean onlySftpOpensshd() {
+        checkConnected("onlySftpOpensshd");
+        return SshConnectionType.SFTP_OpenSSHD.equals(options.get(CONNECTION_TYPE, null));
+    }
+
     public boolean supportsProcess() {
         checkConnected("supportsProcess");
         return connection.canStartProcess();

@@ -176,7 +176,7 @@ public abstract class ItestsBase2Basics extends ItestsBase1Utils {
     */
 
     @Test
-    @Assumption(methods = {"notSftpWinsshd"})
+    @Assumption(methods = {"notSftpWinsshd","notSftpOpensshd"})
     public void shouldNotCreateTemporaryDirectoriesRecursively() {
         final String prefix = "prefix";
         final String suffix = "suffix";
