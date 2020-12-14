@@ -92,7 +92,7 @@ The protocols that Overthere uses to connect to remote hosts, such as SSH, CIFS,
 Overthere supports a number of protocols to connect to remote hosts:
 
 * [__local__](#local) - a connection to the local host. This is a wrapper around <a href="http://download.oracle.com/javase/6/docs/api/java/io/File.html"></code>java.io.File</code></a> and <a href="http://docs.oracle.com/javase/6/docs/api/java/lang/Process.html"></code>java.lang.Process</code></a>.
-* [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD.
+* [__ssh__](#ssh) - a connection using the [SSH protocol](http://en.wikipedia.org/wiki/Secure_Shell), to a Unix host, to a z/OS host, or to a Windows host running either OpenSSH on Cygwin (i.e. COPSSH) or WinSSHD or microsoft OpenSSH.
 * [__smb__](#smb) -  a connection using the prevalent [SMB protocol](http://en.wikipedia.org/wiki/Server_Message_Block) for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts.
 * [__cifs__](#cifs) - a connection using public variant of the original Server Message Block (SMB) protocol developed by Microsoft known as [CIFS protocol](http://en.wikipedia.org/wiki/Server_Message_Block), for file manipulation and, depending on the settings, using either [WinRM](http://en.wikipedia.org/wiki/WS-Management) or [Telnet](http://en.wikipedia.org/wiki/Telnet) for process execution. This protocol is only supported for Windows hosts, CIFS is widely regarded as an obsolete protocol and users are encouraged to prefer a SMB protocol over a CIFS. Support for CIFS is deprecated and will be removed from subsequent releases. 
 * [__ssh-jumpstation__](#jumpstations) - a special protocol type that can only be used as a jumpstation protocol, which allows a connection to be created over an [SSH jumpstation](https://en.wikipedia.org/wiki/Port_forwarding#Local_port_forwarding).
@@ -244,7 +244,7 @@ To connect to a remote host using the SSH protocol, you will need to install an 
 * [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
 * Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
 
-__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP__ or __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ connection type.
+__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ or the __SFTP_OPENSSHD__ connection type.
 
 <a name="ssh_host_setup_sftp"></a>
 #### SFTP
@@ -342,6 +342,7 @@ The SSH protocol implementation of Overthere defines a number of additional conn
             <li><strong><a href="#ssh_host_setup_sftp_cygwin">SFTP_CYGWIN</a></strong> - uses SFTP to transfer files, to a Windows host running OpenSSH on
                 Cygwin.</li>
             <li><strong><a href="#ssh_host_setup_sftp_winsshd">SFTP_WINSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running WinSSHD.</li>
+            <li><strong><a href="#ssh_host_setup_sftp_opensshd">SFTP_OPENSSHD</a></strong> - uses SFTP to transfer files, to a Windows host running OPENSSHD.</li>
 	    </ul>
 	    The connection property <code>port</code> specifies the port on which the SSH server listens. The default value for is <code>22</code> for all
 	    connection types.</td>
