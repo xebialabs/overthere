@@ -51,7 +51,7 @@ public class SshSftpOpensshdConnectionWithAdministrativeUserItest extends Overth
         options.set(OPERATING_SYSTEM, WINDOWS);
         options.set(CONNECTION_TYPE, SFTP_OpenSSHD);
         options.set(ADDRESS, WindowsCloudHostListener.getHost().getHostName());
-        options.set(PORT, 22);
+        options.set(PORT, 2222);
         options.set(USERNAME, ADMINISTRATIVE_WINDOWS_USER_USERNAME);
         options.set(PASSWORD, ADMINISTRATIVE_WINDOWS_USER_PASSWORD);
         return options;
