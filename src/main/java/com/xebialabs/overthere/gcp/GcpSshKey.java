@@ -1,6 +1,6 @@
 package com.xebialabs.overthere.gcp;
 
-public class GcpSshKey {
+public final class GcpSshKey {
 
     private final SshKeyPair sshKeyPair;
     private final String username;

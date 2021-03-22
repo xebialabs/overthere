@@ -64,12 +64,6 @@ class JavaSecurityGenerateSshKey implements GenerateSshKey {
             PrivateKey priv = key.getPrivate();
             PublicKey pub = key.getPublic();
 
-//            Signature privateSignature = Signature.getInstance("SHA256withRSA");
-//            privateSignature.initSign(privateKey);
-//            privateSignature.update(plainText.getBytes(UTF_8));
-//
-//            byte[] signature = privateSignature.sign();
-
             String privateKeyString = encodePrivateKey(priv);
             String publicKeyString = encodePublicKey((RSAPublicKey) pub, username);
             return new SshKeyPair(username, privateKeyString, publicKeyString, "");
