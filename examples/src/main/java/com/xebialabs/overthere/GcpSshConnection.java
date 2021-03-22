@@ -44,7 +44,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
  *  --project $PROJECT_ID --zone $ZONE_ID \
  *  --member serviceAccount:$SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com \
  *  --role roles/compute.osAdminLogin
- *  # or add osAdminLogin or osLogin on instance level
+ *  # or add osAdminLogin or osLogin on project level
  *  gcloud projects add-iam-policy-binding $PROJECT_ID \
  *  --member serviceAccount:$SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com \
  *  --role roles/compute.osAdminLogin
