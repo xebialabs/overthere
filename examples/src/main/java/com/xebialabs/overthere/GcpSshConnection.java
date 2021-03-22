@@ -1,5 +1,8 @@
 package com.xebialabs.overthere;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import com.xebialabs.overthere.gcp.GcpSshConnectionBuilder;
 import com.xebialabs.overthere.util.DefaultAddressPortMapper;
 
@@ -62,7 +65,7 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SCP;
  */
 public class GcpSshConnection {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         assert args.length == 2;
 
@@ -76,13 +79,26 @@ public class GcpSshConnection {
                 .connect();
 
         try {
-            assert connection.execute(CmdLine.build("cat", "/etc/motd")) == 0;
+            OverthereProcess process = connection.startProcess(CmdLine.build("cat", "/etc/motd"));
+            BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getStdout()));
+            try {
+                String line;
+                while((line = stdout.readLine()) != null) {
+                    System.err.println(line);
+                }
+            } finally {
+                stdout.close();
+            }
+            int exitCode = process.waitFor();
+            System.err.println("Exit code from process: " + exitCode);
+
             OverthereFile motd = connection.getFile("/etc/motd");
-            System.out.println("Length        : " + motd.length());
-            System.out.println("Exists        : " + motd.exists());
-            System.out.println("Can read      : " + motd.canRead());
-            System.out.println("Can write     : " + motd.canWrite());
-            System.out.println("Can execute   : " + motd.canExecute());
+            System.err.println("Length        : " + motd.length());
+            System.err.println("Exists        : " + motd.exists());
+            System.err.println("Can read      : " + motd.canRead());
+            System.err.println("Can write     : " + motd.canWrite());
+            System.err.println("Can execute   : " + motd.canExecute());
+            Thread.sleep(100000L);
         } finally {
             connection.close();
         }
