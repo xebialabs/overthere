@@ -22,8 +22,6 @@
  */
 package com.xebialabs.overthere.itest;
 
-import com.google.common.io.InputSupplier;
-import com.google.common.io.OutputSupplier;
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.ssh.SshConnectionType;
 import org.slf4j.Logger;
@@ -34,8 +32,10 @@ import org.testng.annotations.BeforeMethod;
 import java.io.*;
 import java.util.Random;
 
+import com.google.common.io.ByteSink;
+import com.google.common.io.ByteSource;
+
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PROTOCOL;
@@ -105,26 +105,25 @@ public abstract class ItestsBase1Utils {
 
     protected static byte[] readFile(final OverthereFile f) {
         try {
-            return toByteArray(new InputSupplier<InputStream>() {
+            return new ByteSource() {
                 @Override
-                public InputStream getInput() throws IOException {
+                public InputStream openStream() throws IOException {
                     return f.getInputStream();
                 }
-            });
+            }.read();
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot read file [%s]", f), exc);
         }
-
     }
 
     protected static void writeData(final OverthereFile f, byte[] data) {
         try {
-            write(data, new OutputSupplier<OutputStream>() {
+            new ByteSink() {
                 @Override
-                public OutputStream getOutput() throws IOException {
+                public OutputStream openStream() throws IOException {
                     return f.getOutputStream();
                 }
-            });
+            }.write(data);
         } catch (IOException exc) {
             throw new RuntimeIOException(format("Cannot write data to file [%s]", f), exc);
         }
@@ -132,12 +131,12 @@ public abstract class ItestsBase1Utils {
 
     protected static byte[] writeRandomBytes(final File f, final int size) throws IOException {
         byte[] randomBytes = generateRandomBytes(size);
-        write(randomBytes, new OutputSupplier<OutputStream>() {
+        new ByteSink() {
             @Override
-            public OutputStream getOutput() throws IOException {
+            public OutputStream openStream() throws IOException {
                 return new FileOutputStream(f);
             }
-        });
+        }.write(randomBytes);
         return randomBytes;
     }
 

@@ -28,7 +28,8 @@ import java.util.Random;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import com.google.common.io.OutputSupplier;
+
+import com.google.common.io.ByteSink;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
@@ -36,7 +37,6 @@ import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.TemporaryFolder;
 
-import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
 import static com.xebialabs.overthere.OperatingSystemFamily.getLocalHostOperatingSystemFamily;
@@ -78,12 +78,12 @@ public class OverthereFileLocalCopyTest {
     @Test
     public void shouldDoLocalCopyIfOverSameConnection() throws IOException {
         final OverthereFile tempFile = connection.getTempFile("Foo.txt");
-        write(generateRandomBytes(1000), new OutputSupplier<OutputStream>() {
+        new ByteSink() {
             @Override
-            public OutputStream getOutput() throws IOException {
+            public OutputStream openStream() throws IOException {
                 return tempFile.getOutputStream();
             }
-        });
+        }.write(generateRandomBytes(1000));
         BaseOverthereFile spy = mock(BaseOverthereFile.class);
         when(spy.getConnection()).thenReturn((BaseOverthereConnection) connection);
         tempFile.copyTo(spy);
@@ -93,12 +93,12 @@ public class OverthereFileLocalCopyTest {
     @Test
     public void shouldNotDoLocalCopyIfDifferentConnection() throws IOException {
         final OverthereFile tempFile = connection.getTempFile("Foo.txt");
-        write(generateRandomBytes(1000), new OutputSupplier<OutputStream>() {
+        new ByteSink() {
             @Override
-            public OutputStream getOutput() throws IOException {
+            public OutputStream openStream() throws IOException {
                 return tempFile.getOutputStream();
             }
-        });
+        }.write(generateRandomBytes(1000));
         BaseOverthereFile spy = mock(BaseOverthereFile.class);
         when(spy.getConnection()).thenReturn((BaseOverthereConnection) otherConnection);
         tempFile.copyTo(spy);
