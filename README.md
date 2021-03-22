@@ -1154,6 +1154,7 @@ Prerequisites:
 2. Enable OS Login [step 3](https://cloud.google.com/compute/docs/instances/managing-instance-access#enable_oslogin)
 3. Target instance with a role (roles/compute.osAdminLogin or roles/compute.osLogin) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
 
+OS Login connections options:
 <table>
 <tr>
 	<th align="left" valign="top"><a name="connectionType"></a>connectionType</th>
@@ -1167,6 +1168,14 @@ Prerequisites:
         <pre>gcloud iam service-accounts keys create path_to_credentials_json \
 --iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
 	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="keySize"></a>keySize</th>
+	<td>Key size, default is 1024.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
+	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
 </tr>
 </table>
 
