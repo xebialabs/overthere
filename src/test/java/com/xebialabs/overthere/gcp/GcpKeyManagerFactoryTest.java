@@ -3,7 +3,7 @@ package com.xebialabs.overthere.gcp;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.google.common.io.Resources;
+import com.xebialabs.overthere.Utils;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -17,8 +17,8 @@ public class GcpKeyManagerFactoryTest {
 
     @BeforeClass
     public void init() throws Exception {
-        credFile1 = Resources.getResource("gcp/sa-key-ssh-account.json").getFile();
-        credFile2 = Resources.getResource("gcp/sa-key-ssh-account2.json").getFile();
+        credFile1 = Utils.getClasspathFile("gcp/sa-key-ssh-account.json");
+        credFile2 = Utils.getClasspathFile("gcp/sa-key-ssh-account2.json");
     }
 
     @Test
@@ -39,4 +39,5 @@ public class GcpKeyManagerFactoryTest {
         assertThat(gcpKeyManager2, notNullValue());
         assertThat(gcpKeyManager2, not(gcpKeyManager1));
     }
+
 }
