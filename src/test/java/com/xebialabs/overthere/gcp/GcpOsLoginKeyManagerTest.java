@@ -4,6 +4,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.google.cloud.oslogin.common.OsLoginProto;
 import com.google.cloud.oslogin.v1.LoginProfile;
+import com.google.common.io.Resources;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -17,7 +18,7 @@ public class GcpOsLoginKeyManagerTest {
 
     @BeforeClass
     public void init() throws Exception {
-        credFile = Thread.currentThread().getContextClassLoader().getResources("gcp/sa-key-ssh-account.json").nextElement().getFile();
+        credFile = Resources.getResource("gcp/sa-key-ssh-account.json").getFile();
     }
 
     @Test
