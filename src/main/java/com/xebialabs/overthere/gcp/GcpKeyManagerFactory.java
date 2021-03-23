@@ -1,12 +1,11 @@
 package com.xebialabs.overthere.gcp;
 
-
-import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 public class GcpKeyManagerFactory {
 
-    private static final Map<String, GcpKeyManager> managers = new HashMap<>();
+    private static final Map<String, GcpKeyManager> managers = new WeakHashMap<>();
 
     private static final GenerateSshKey GENERATE_SSH_KEY = new JCraftGenerateSshKey();
 

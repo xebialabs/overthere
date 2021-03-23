@@ -1,5 +1,6 @@
 package com.xebialabs.overthere.gcp;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
@@ -10,7 +11,7 @@ import com.google.cloud.oslogin.v1.*;
 
 public class GcpOsLoginKeyManager implements GcpKeyManager {
 
-    private final String credentialsFile;
+    private final File credentialsFile;
     private final GenerateSshKey generateSshKey;
     private ServiceAccountCredentials serviceAccountCredentials;
     private UserName userName;
@@ -19,7 +20,7 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
 
     public GcpOsLoginKeyManager(final GenerateSshKey generateSshKey, final String credentialsFile) {
         this.generateSshKey = generateSshKey;
-        this.credentialsFile = credentialsFile;
+        this.credentialsFile = new File(credentialsFile);
     }
 
     @Override
@@ -32,7 +33,7 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
                             .setCredentialsProvider(FixedCredentialsProvider.create(serviceAccountCredentials))
                             .build();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot load credentials file " + credentialsFile, e);
+            throw new IllegalArgumentException("Cannot load credentials file " + credentialsFile.getAbsolutePath(), e);
         }
         return this;
     }
@@ -47,7 +48,7 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
             LoginProfile loginProfile = importSssKeyProjectLevel(sshKeyPair, expiryInUsec);
             int posixAccountsCount = loginProfile.getPosixAccountsCount();
             if (posixAccountsCount < 1) {
-                throw new IllegalArgumentException("Service account from file " + credentialsFile + " has no posix account");
+                throw new IllegalArgumentException("Service account from file " + credentialsFile.getAbsolutePath() + " has no posix account");
             }
             OsLoginProto.PosixAccount posixAccount = loginProfile.getPosixAccounts(0);
 
@@ -68,7 +69,7 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
             return osLoginServiceClient.importSshPublicKey(userName, sshPublicKey, serviceAccountCredentials.getProjectId())
                     .getLoginProfile();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot use credentials from file " + credentialsFile, e);
+            throw new IllegalArgumentException("Cannot use credentials from file " + credentialsFile.getAbsolutePath(), e);
         }
     }
 
