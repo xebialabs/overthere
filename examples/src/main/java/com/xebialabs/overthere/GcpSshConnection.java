@@ -98,7 +98,6 @@ public class GcpSshConnection {
             System.err.println("Can read      : " + motd.canRead());
             System.err.println("Can write     : " + motd.canWrite());
             System.err.println("Can execute   : " + motd.canExecute());
-            Thread.sleep(100000L);
         } finally {
             connection.close();
         }
