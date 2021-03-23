@@ -67,7 +67,9 @@ public class GcpSshConnection {
 
     public static void main(String[] args) throws Exception {
 
-        assert args.length == 2;
+        if (args.length != 2) {
+            throw new IllegalArgumentException("Use input arguments: external_ip_address path_to_credentials_json");
+        }
 
         ConnectionOptions connectionOptions = new ConnectionOptions();
         connectionOptions.set(CONNECTION_TYPE, SCP);
