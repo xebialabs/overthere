@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>4.3.3</version>
+			<version>5.2.2-dev.14.uncommitted+4602785</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

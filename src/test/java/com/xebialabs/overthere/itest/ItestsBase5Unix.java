@@ -28,8 +28,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 import org.testng.annotations.Test;
+import com.google.common.io.ByteSink;
 import com.google.common.io.CharStreams;
-import com.google.common.io.OutputSupplier;
 
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OverthereFile;
@@ -40,7 +40,6 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 import nl.javadude.assumeng.Assumption;
 
-import static com.google.common.io.ByteStreams.write;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -87,12 +86,12 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
 
         // write data to file in home dir
         final byte[] contentsWritten = generateRandomBytes(1024);
-        write(contentsWritten, new OutputSupplier<OutputStream>() {
+        new ByteSink() {
             @Override
-            public OutputStream getOutput() throws IOException {
+            public OutputStream openStream() throws IOException {
                 return fileInHomeDir.getOutputStream();
             }
-        });
+        }.write(contentsWritten);
 
         assertThat(fileInHomeDir.exists(), equalTo(true));
 

@@ -123,6 +123,10 @@ dependencies {
   compile 'org.apache.httpcomponents:httpcore:4.4.1'
   compile 'commons-codec:commons-codec:1.10'
 
+  // GCP
+  compile 'com.jcraft:jsch:0.1.55'
+  compile 'com.google.cloud:google-cloud-os-login:1.2.2'
+
   // Test dependencies
   testCompile('com.xebialabs.cloud:overcast:2.5.1') {
     exclude group: 'com.xebialabs.overthere', module: 'overthere'

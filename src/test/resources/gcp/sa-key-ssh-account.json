@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "test",
+  "private_key_id": "22222222222222222222222222",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCb6eD4XapOS3Fb\nM5v9xpI/D5aZptPTBh63M5faRc+1X0X10unvsvGR+uWSeXKPFsngNVfeDn4Malb/\nQp5CzO+oN6KeBQ6L9OFQtGSOuJFoI9eZxMnXV+K8bE22fO1nK4w49oQdMP+z77cx\n4HXhm3zF4CCuDA2wJ2LfsXUitwV8CH6hDG2dt2bNWDXf3BRGEf76/UuT50KU91TS\nLtVh40NwKPk9ErGVn8ZrhNCrkF1Nbc0bh87La7+3fK20rqPeUYa+dQAyEB3s0hmI\nIj6hLnklzhikNURdJiKv+FHEY3yWQAfLJCMrcChfJrBXxUYBps646Yt28hAgqdZI\nev0KcxFrAgMBAAECggEASeVUDLMsFDa6j7zKusFiMEQ9ny6MJ/C3HyJzXu8GjpKM\n0IF6AfMgfo1ZQI6SJtJotPzjW+ongM/n0szqwINsNSDFULrZ1ainH76YCHLe6+pM\n9eLovUk4vBBi1tKoHGVt7NOd8031a316qMeXZ2nv/cMICiXJWQuZ16a+e0kebtXD\nv9YSPAFtSxtYTMBN+pvfvhNVJim+rElAOOtK9FgNlhZE7FYSEDGz0xuzNI76qcut\nuBlqu3zi+/IIvkbzgDIY1S30HFX7MMM4liKtjdUHpKeM5U3cnr9i0pxcYAaPx8FF\nY+YzFlcQTAe124LavdcOBqrfyfmQbnVtxBCOyUO3JQKBgQDaCss+p8vY/DRjDLpB\noxfqDwiOfuq2rve4X/y7Yxrr7SzeJQ7g4uaTYKTxe6R702NPAz1odPRHmvROS1RP\nHKuFrQhqw9PEJ0PWvqgQS20ymXRDbIuw7meDUnnWqOt/uzgi2R78NEHtW0pBjRSQ\nO6Wn1DDFnVONJ3gWxZvpMTCj/wKBgQC3Dke6Di6yXmGUV/AwdgUA0x+D7xiaRY/Q\n+jRYJiUbZknQEILIpd5IZwZf4SIa9M+UpnFNUiFr+yU3D8jQJnGdkEYt1o8AorPF\nKfPdPZTS+BOmcEwenzOkVLPobSP3DQIXSMzudLaH5rjw1gASUWxKi5ak7xTyIRTN\nJJ/uRaRilQKBgE6DmoI6S9YbowWTvLIL932J4kvlecFEqeETd19GpZgU9JYdhAkI\ny3yATYTDQAxypwz5nrAxhREPxC85Quel7EGbeC9xypyUgwId70jG0FBrH4lz2a1h\ne5a3KTZZ50s8cE9kHZs1ehPtToTiN2hkghc3+kP+jeqDLuQMTkMfOmOjAoGBALab\nKDIRs8N7Ixw4HQI6uQL5mJakDIbYnX56GX1Vj+6lOzyzO8OssvDG1TUQAFWjoO9I\nmf3n0C9HePhUZp49u1jScy+GuWCI7YvhLcOlirBpiDCgFU72wS1M0asqNJZeA5f2\np3e4Nd2b6yFUWP3s+3nhhYVCekKPfZCm2GN4VWOBAoGBAIKdoC7XzGtmKsaH7Zwz\n/dDwiFQuUeGCx2X+s08YoPT+vQHAkpqu1hls0T+n68Wnb3nOi0DdaMOO5lDk+GOe\nxYYtpV70jph6DZyLKOHe7x/FrXRQE2PDsg6phwwsd6begGO+HFMXEgYVGBl0saI9\nEF0L4kfG9sxLOGpGIBZQHskC\n-----END PRIVATE KEY-----\n",
+  "client_email": "ssh-account@test.com",
+  "client_id": "11111111111111111",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ssh-account%40test.com"
+}

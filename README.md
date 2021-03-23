@@ -1143,6 +1143,56 @@ The `jumpstation` connection options support the same values (for as much as it 
 </tr>
 </table>
 
+<a name="jumpstations"></a>
+## GCP OsLogin: Using GCP's service account with OsLogin
+SSH connection to the GCP hosts can be implemented my managing ssh keys in with OsLogin API. 
+It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials JSON file.
+OsLogin management of SSH keys is recommended way to connect on instances, but it has some [limitations](https://cloud.google.com/compute/docs/instances/managing-instance-access#limitations).
+
+Prerequisites:
+1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud)) 
+2. Enable OS Login [step 3](https://cloud.google.com/compute/docs/instances/managing-instance-access#enable_oslogin)
+3. Target instance with a role (roles/compute.osAdminLogin or roles/compute.osLogin) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
+
+OS Login connections options:
+<table>
+<tr>
+	<th align="left" valign="top"><a name="connectionType"></a>connectionType</th>
+	<td>Specifies what protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
+</tr>
+<tr>
+	<th align="left" valign="credentialsFile"><a name="credentialsFile"></a>credentialsFile</th>
+	<td>
+		Path to the service account credentials file. Credentials are used to internally manage SSH keys via OsLogin GCP API.
+ 		The easiest way to get it is via gcloud command: 
+        <pre>gcloud iam service-accounts keys create path_to_credentials_json \
+--iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="keySize"></a>keySize</th>
+	<td>Key size, default is 1024.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
+	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+</tr>
+</table>
+
+Minimal properties to setup SSH connection:
+<table>
+<tr>
+	<th align="left" valign="top"><a name="os"></a>os</th>
+	<td>Same as with usual <a href="#os">SSH connection</a></td>
+</tr>
+<tr>
+	<th align="left" valign="address"><a name="address"></a>address</th>
+	<td>
+		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
+	</td>
+</tr>
+</table>
+
 <a name="release_history"></a>
 # Release History
 * Overthere 5.2.1 (10-Dec-2020)
