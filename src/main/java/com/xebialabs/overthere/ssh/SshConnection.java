@@ -96,6 +96,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected boolean openShellBeforeExecute;
 
+    protected int transportTimeoutMillis;
+
     protected String allocatePty;
 
     protected int heartbeatInterval;
@@ -148,6 +150,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         }
         allocatePty = options.getOptional(ALLOCATE_PTY);
         openShellBeforeExecute = options.getBoolean(OPEN_SHELL_BEFORE_EXECUTE, OPEN_SHELL_BEFORE_EXECUTE_DEFAULT);
+        transportTimeoutMillis = options.getInteger(TRANSPORT_TIMEOUT_MILLIS, TRANSPORT_TIMEOUT_MILLIS_DEFAULT);
     }
 
     protected void connect() {
@@ -159,6 +162,7 @@ abstract class SshConnection extends BaseOverthereConnection {
             client.addHostKeyVerifier(new PromiscuousVerifier());
             client.setTimeout(socketTimeoutMillis);
             client.getConnection().getKeepAlive().setKeepAliveInterval(heartbeatInterval);
+            client.getTransport().setTimeoutMs(transportTimeoutMillis);
 
             try {
                 if (localAddress == null) {

@@ -80,6 +80,8 @@ public class SshConnectionTest {
         keepAlive = mock(KeepAlive.class);
         when(client.getConnection()).thenReturn(conn);
         when(conn.getKeepAlive()).thenReturn(keepAlive);
+        Transport transport = mock(Transport.class);
+        when(client.getTransport()).thenReturn(transport);
     }
 
     @Test
