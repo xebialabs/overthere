@@ -4,16 +4,16 @@ public final class GcpSshKey {
 
     private final SshKeyPair sshKeyPair;
     private final String username;
-    private final long expirationTimeUsec;
+    private final long expirationTimeMs;
 
-    public GcpSshKey(final SshKeyPair sshKeyPair, final String username, final long expirationTimeUsec) {
+    public GcpSshKey(final SshKeyPair sshKeyPair, final String username, final long expirationTimeMs) {
         this.sshKeyPair = sshKeyPair;
         this.username = username;
-        this.expirationTimeUsec = expirationTimeUsec;
+        this.expirationTimeMs = expirationTimeMs;
     }
 
-    public long getExpirationTimeUsec() {
-        return expirationTimeUsec;
+    public long getExpirationTimeMs() {
+        return expirationTimeMs;
     }
 
     public String getPrivateKey() {

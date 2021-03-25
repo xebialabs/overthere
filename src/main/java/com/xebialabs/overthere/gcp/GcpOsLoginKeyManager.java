@@ -1,39 +1,45 @@
 package com.xebialabs.overthere.gcp;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.google.api.gax.core.FixedCredentialsProvider;
-import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.oslogin.common.OsLoginProto;
 import com.google.cloud.oslogin.v1.*;
 
-public class GcpOsLoginKeyManager implements GcpKeyManager {
+import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
+import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
-    private final File credentialsFile;
+/**
+ *
+ */
+public class GcpOsLoginKeyManager implements GcpKeyManager {
+    private static final Logger logger = LoggerFactory.getLogger(GcpOsLoginKeyManager.class);
+
+    private final GcpCredentialFactory gcpCredentialFactory;
     private final GenerateSshKey generateSshKey;
-    private ServiceAccountCredentials serviceAccountCredentials;
+    private ProjectCredentials projectCredentials;
     private UserName userName;
     private OsLoginServiceSettings osLoginServiceSettings;
     private GcpSshKey gcpSshKey;
 
-    public GcpOsLoginKeyManager(final GenerateSshKey generateSshKey, final String credentialsFile) {
+    public GcpOsLoginKeyManager(final GenerateSshKey generateSshKey, final GcpCredentialFactory gcpCredentialFactory) {
         this.generateSshKey = generateSshKey;
-        this.credentialsFile = new File(credentialsFile);
+        this.gcpCredentialFactory = gcpCredentialFactory;
     }
 
     @Override
     public GcpKeyManager init() {
         try {
-            serviceAccountCredentials = ServiceAccountCredentials.fromStream(new FileInputStream(credentialsFile));
-            userName = UserName.of(serviceAccountCredentials.getClientEmail());
+            projectCredentials = gcpCredentialFactory.create();
+            userName = UserName.of(projectCredentials.getClientEmail());
             osLoginServiceSettings =
                     OsLoginServiceSettings.newBuilder()
-                            .setCredentialsProvider(FixedCredentialsProvider.create(serviceAccountCredentials))
+                            .setCredentialsProvider(FixedCredentialsProvider.create(projectCredentials.getCredentials()))
                             .build();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot load credentials file " + credentialsFile.getAbsolutePath(), e);
+            throw new IllegalArgumentException("Cannot initialize for " + gcpCredentialFactory.info(), e);
         }
         return this;
     }
@@ -41,14 +47,14 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
     @Override
     public GcpSshKey refreshKey(long expiryInUsec, int keySize) {
         // check if key valid for next second
-        if (gcpSshKey == null || System.currentTimeMillis() + 1_000 > this.gcpSshKey.getExpirationTimeUsec() / 1_000) {
+        if (gcpSshKey == null || System.currentTimeMillis() + 1_000 > this.gcpSshKey.getExpirationTimeMs()) {
 
-            SshKeyPair sshKeyPair = generateSshKey.generate(this.serviceAccountCredentials.getClientEmail(), keySize);
+            SshKeyPair sshKeyPair = generateSshKey.generate(projectCredentials.getClientEmail(), keySize);
             long expirationTimeUsec = System.currentTimeMillis() * 1000 + expiryInUsec;
             LoginProfile loginProfile = importSssKeyProjectLevel(sshKeyPair, expiryInUsec);
             int posixAccountsCount = loginProfile.getPosixAccountsCount();
             if (posixAccountsCount < 1) {
-                throw new IllegalArgumentException("Service account from file " + credentialsFile.getAbsolutePath() + " has no posix account");
+                throw new IllegalArgumentException("Cannot get account for " + gcpCredentialFactory.info() + " has no posix account");
             }
             OsLoginProto.PosixAccount posixAccount = loginProfile.getPosixAccounts(0);
 
@@ -58,6 +64,8 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
                 expirationTimeUsec = sshPublicKey.getExpirationTimeUsec();
             }
 
+            logger.debug("Using new key pair for user {} it expires at {} usec", posixAccount.getUsername(), expirationTimeUsec);
+
             this.gcpSshKey = new GcpSshKey(sshKeyPair, posixAccount.getUsername(), expirationTimeUsec);
         }
         return this.gcpSshKey;
@@ -66,10 +74,11 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
     protected LoginProfile importSssKeyProjectLevel(SshKeyPair sshKeyPair, long expiryInUsec) {
         try (OsLoginServiceClient osLoginServiceClient = OsLoginServiceClient.create(osLoginServiceSettings)) {
             OsLoginProto.SshPublicKey sshPublicKey = createSshPublicKey(sshKeyPair, expiryInUsec);
-            return osLoginServiceClient.importSshPublicKey(userName, sshPublicKey, serviceAccountCredentials.getProjectId())
-                    .getLoginProfile();
+            ImportSshPublicKeyResponse importSshPublicKeyResponse =
+                    osLoginServiceClient.importSshPublicKey(userName, sshPublicKey, projectCredentials.getProjectId());
+            return importSshPublicKeyResponse.getLoginProfile();
         } catch (IOException e) {
-            throw new IllegalArgumentException("Cannot use credentials from file " + credentialsFile.getAbsolutePath(), e);
+            throw new IllegalArgumentException("Cannot use credentials from " + gcpCredentialFactory.info(), e);
         }
     }
 

@@ -20,7 +20,33 @@ public class GcpSshConnectionBuilder extends SshConnectionBuilder {
 
     public static final String KEY_MANAGEMENT_TYPE = "ketManagementType";
 
+    public static final String GCP_CREDENTIALS_TYPE = "gcpCredentialsType";
+
     public static final String CREDENTIALS_FILE = "credentialsFile";
+
+    public static final String CREDENTIALS_JSON = "credentialsJson";
+
+    public static final String TOKEN_VALUE = "tokenValue";
+
+    public static final String TOKEN_EXPIRATION_TIME_MILLIS = "tokenExpirationTimeMillis";
+
+    public static final String PROJECT_ID = "projectId";
+
+    public static final String INSTANCE_ID = "instanceId";
+
+    public static final String CLIENT_ID = "clientId";
+
+    public static final String CLIENT_EMAIL = "clientEmail";
+
+    public static final String PRIVATE_KEY_PKCS8 = "privateKeyPkcs8";
+
+    public static final String PRIVATE_KEY_ID = "privateKeyId";
+
+    public static final String SCOPES = "scopes";
+
+    public static final String TOKEN_SERVER_URI = "tokenServerUri";
+
+    public static final String SERVICE_ACCOUNT_USER = "serviceAccountUser";
 
     public static final String KEY_SIZE = "keySize";
 
