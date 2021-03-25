@@ -580,6 +580,11 @@ The SSH protocol implementation of Overthere defines a number of additional conn
 	<th align="left" valign="top"><a name="ssh_localPort"></a>localPort</th>
 	<td>The port to use on the local machine as the source port of the connection. This property is optional and to be used in combination with the <a href="#ssh_localAddress"><strong>localAddress</strong></a> property. The default behaviour is to let the OS pick a free port.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="transportTimeoutMillis"></a>transportTimeoutMillis</th>
+	<td>The number of milliseconds Overthere will wait for exchanging SSH keys and to authenticate user. The default value is <code>30000</code>, i.e.
+	    30s timeout.</td>
+</tr>
 </table>
 
 <a name="smb_cifs"></a>

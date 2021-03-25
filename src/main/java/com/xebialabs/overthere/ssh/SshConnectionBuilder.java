@@ -491,6 +491,16 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
      */
     public static final String LOCAL_PORT = "localPort";
 
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#transportTimeoutMillis">the online documentation</a>
+     */
+    public static final String TRANSPORT_TIMEOUT_MILLIS = "transportTimeoutMillis";
+
+    /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#transportTimeoutMillis">the online documentation</a>
+     */
+    public static final int TRANSPORT_TIMEOUT_MILLIS_DEFAULT = 30_000;
+
     protected SshConnection connection;
 
     public SshConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {
