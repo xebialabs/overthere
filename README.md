@@ -1153,8 +1153,8 @@ There are 2 options to manage internally SSH keys via GCP keys, that are selecte
 	<td>
 	    Currently folllowing 2 types are suppport for key management on GCP instances:
 		<ul>
-			<li><a href="#gcp_oslogin">OsLogin</a> - managing ssh keys in with OsLogin API;</li>
-			<li><a href="#gcp_metadata">Metadata</a> - managing ssh keys by changing value under a metadata key `ssh-keys`</li>
+			<li><a href="#gcp_oslogin">`OsLogin`</a> - managing ssh keys in with OsLogin API;</li>
+			<li><a href="#gcp_metadata">`Metadata`</a> - managing ssh keys by changing value under a metadata key `ssh-keys`</li>
 		</ul>
 	</td>
 </tr>
@@ -1219,7 +1219,7 @@ From following options first 3 are required. Other generic options have default 
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
-	<td>Specifies which protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
+	<td>Specifies which protocol is used to execute commands, it can be any SSH related protocol like: `SCP`, `SFTP`</td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="gcp_os"></a>os</th>
@@ -1267,7 +1267,7 @@ To be able to use GCP API's credentials needs to be supplied via Overthere optio
 	<td>
 		<ul>
 			<li>
- 				Default - The following are searched (in order) to find the Application Default Credentials:
+ 				`Default` - The following are searched (in order) to find the Application Default Credentials:
 				<ol>
 				  <li>Credentials file pointed to by the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
 				  <li>Credentials provided by the Google Cloud SDK `gcloud auth application-default login` command
@@ -1277,13 +1277,13 @@ To be able to use GCP API's credentials needs to be supplied via Overthere optio
 			   </ol>
 			</li>
 			<li>
- 				ServiceAccountJsonFile - defined by a Service Account key file in JSON format from the Google Developers Console.
+ 				`ServiceAccountJsonFile` - defined by a Service Account key file in JSON format from the Google Developers Console.
 			</li>
 			<li>
- 				ServiceAccountJson - defined by a Service Account key in JSON format from the Google Developers Console.
+ 				`ServiceAccountJson` - defined by a Service Account key in JSON format from the Google Developers Console.
 			</li>
 			<li>
- 				ServiceAccountPkcs8 - defined by a Service Account PKCS#8 private key and other required options.
+ 				`ServiceAccountPkcs8` - defined by a Service Account PKCS#8 private key and other required options.
 			</li>
 		</ul>
 	</td>
@@ -1313,7 +1313,7 @@ For `ServiceAccountJson` following option is required:
 </tr>
 </table>
 
-For `ServiceAccountPkcs8` following option is required:
+For `ServiceAccountPkcs8` following options are required:
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_projectId"></a>projectId</th>
