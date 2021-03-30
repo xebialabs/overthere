@@ -1182,20 +1182,20 @@ Prerequisites:
 2. Service account needs to have the following IAM roles on the project:
    - `iam.serviceAccountUser` on the instance or project level
    - `compute.instanceAdmin.v1` on the instance or project level
-3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
+3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level
 
 For using Metadata following options are required:
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_zoneName"></a>zoneName</th>
 	<td>
-		Name of deployment area <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a>. 
+		Name of deployment area. See <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a> for details. 
     </td>
 </tr>
 <tr>
 	<th align="left" valign="top"><a name="gcp_instanceId"></a>instanceId</th>
 	<td>
-		Instance id that needs management of the keys. If managing of the keys is done on project level, this options needs to be omitted.
+		Instance id of a instance that needs management of the keys. If managing of the keys is done on a project level, this option needs to be omitted.
 	</td>
 </tr>
 <tr>
@@ -1215,6 +1215,7 @@ For using Metadata following options are required:
 <a name="gcp_credentials"></a>
 ### GCP Generic SSH options
 
+From following options first 3 are required. Other generic options have default value that is used if custom not provided.
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
@@ -1258,15 +1259,39 @@ For using Metadata following options are required:
 ### GCP Credentials
 
 To be able to use GCP API's credentials needs to be supplied via Overthere options. There are different ways to supply credentials and that is defined with the
-<a href="gcp_gcpCredentialsType">gcpCredentialsType</a> option.
+<a href="#gcp_gcpCredentialsType">gcpCredentialsType</a> option.
 
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_gcpCredentialsType"></a>gcpCredentialsType</th>
 	<td>
-		Default, ServiceAccountJsonFile, ServiceAccountJson, ServiceAccountPkcs8
+		<ul>
+			<li>
+ 				Default - The following are searched (in order) to find the Application Default Credentials:
+				<ol>
+				  <li>Credentials file pointed to by the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
+				  <li>Credentials provided by the Google Cloud SDK `gcloud auth application-default login` command
+				  <li>Google App Engine built-in credentials
+				  <li>Google Cloud Shell built-in credentials
+				  <li>Google Compute Engine built-in credentials
+			   </ol>
+			</li>
+			<li>
+ 				ServiceAccountJsonFile - defined by a Service Account key file in JSON format from the Google Developers Console.
+			</li>
+			<li>
+ 				ServiceAccountJson - defined by a Service Account key in JSON format from the Google Developers Console.
+			</li>
+			<li>
+ 				ServiceAccountPkcs8 - defined by a Service Account PKCS#8 private key and other required options.
+			</li>
+		</ul>
 	</td>
 </tr>
+</table>
+
+For `ServiceAccountJsonFile` following option is required:
+<table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_credentialsFile"></a>credentialsFile</th>
 	<td>
@@ -1276,12 +1301,20 @@ To be able to use GCP API's credentials needs to be supplied via Overthere optio
 --iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
 	</td>
 </tr>
+</table>
+
+For `ServiceAccountJson` following option is required:
+<table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_credentialsJson"></a>credentialsJson</th>
 	<td>
 		Service account credentials JSON. Credentials are used to internally manage SSH keys.
 	</td>
 </tr>
+</table>
+
+For `ServiceAccountPkcs8` following option is required:
+<table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_projectId"></a>projectId</th>
 	<td>

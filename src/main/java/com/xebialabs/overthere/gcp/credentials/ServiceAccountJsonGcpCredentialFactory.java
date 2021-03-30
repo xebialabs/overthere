@@ -6,7 +6,7 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.io.CharSource;
 
 /**
- * Returns credentials defined by a Service Account key file in JSON format from the Google Developers Console.
+ * Returns credentials defined by a Service Account key in JSON format from the Google Developers Console.
  */
 class ServiceAccountJsonGcpCredentialFactory extends GcpCredentialFactory {
 
