@@ -1145,7 +1145,8 @@ The `jumpstation` connection options support the same values (for as much as it 
 
 <a name="gcp"></a>
 ## SSH connection to GCP instances
-
+SSH connection to GCP instances is possible without directly installing key pairs on instances. 
+There are 2 options to manage internally SSH keys via GCP keys, that are selected with <a href="#gcp_gcpKeyManagementType">gcpKeyManagementType</a>.
 <table>
 <tr>
 	<th align="left" valign="top"><a name="gcp_gcpKeyManagementType"></a>gcpKeyManagementType</th>
@@ -1159,8 +1160,105 @@ The `jumpstation` connection options support the same values (for as much as it 
 </tr>
 </table>
 
+<a name="gcp_oslogin"></a>
+### GCP OsLogin: Using GCP's service account with OsLogin
+SSH connection to the GCP hosts can be implemented by managing ssh keys with OsLogin API.
+It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials.
+OsLogin management of SSH keys is recommended way to connect on instances, but it has some [limitations](https://cloud.google.com/compute/docs/instances/managing-instance-access#limitations).
+
+Prerequisites:
+1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud))
+2. Enable OS Login [step 3](https://cloud.google.com/compute/docs/instances/managing-instance-access#enable_oslogin)
+3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
+
+<a name="gcp_metadata"></a>
+### GCP Metadata: Using GCP's service account with metadata
+
+Metadata gives the possibility to define temporary time-limited SSH keys project-wide or per instance. Overthere manages keypairs internally registering public key to the GCP metadata on project or instance level.
+More details is available in following guide: [Managing SSH keys in metadata](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys).
+
+Prerequisites:
+1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud))
+2. Service account needs to have the following IAM roles on the project:
+   - `iam.serviceAccountUser` on the instance or project level
+   - `compute.instanceAdmin.v1` on the instance or project level
+3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
+
+For using Metadata following options are required:
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_zoneName"></a>zoneName</th>
+	<td>
+		Name of deployment area <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a>. 
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_instanceId"></a>instanceId</th>
+	<td>
+		Instance id that needs management of the keys. If managing of the keys is done on project level, this options needs to be omitted.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_applicationName"></a>applicationName</th>
+	<td>
+		Optional application name that is using this overthere client.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_username"></a>username</th>
+	<td>
+		SSH connection username. It is same options as for <a href="#username">SSH connection</a>
+	</td>
+</tr>
+</table>
+
+<a name="gcp_credentials"></a>
+### GCP Generic SSH options
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
+	<td>Specifies which protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_os"></a>os</th>
+	<td>Same as with usual <a href="#os">SSH connection</a></td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_address"></a>address</th>
+	<td>
+		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_retryCount"></a>retryCount</th>
+	<td>
+    	Retry count of trying to connect to the instance. Connection openning retry will be done in case of auth failure.
+		Key management on GCP needs sometime more time to provision new keys on instance level and for that case failed auth needs retries.
+		Default value is 3.
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_retryPeriodMillis"></a>retryPeriodMillis</th>
+	<td>
+		Retry period between each retry to open the connection. Default value is 1000 ms.
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keySize"></a>keySize</th>
+	<td>Key size, default is 1024.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
+	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+</tr>
+</table>
+
 <a name="gcp_credentials"></a>
 ### GCP Credentials
+
+To be able to use GCP API's credentials needs to be supplied via Overthere options. There are different ways to supply credentials and that is defined with the
+<a href="gcp_gcpCredentialsType">gcpCredentialsType</a> option.
 
 <table>
 <tr>
@@ -1233,98 +1331,6 @@ The `jumpstation` connection options support the same values (for as much as it 
 	</td>
 </tr>
 </table>
-
-<a name="gcp_key_pair_generation"></a>
-### GCP Key Pair Generation
-
-<table>
-<tr>
-	<th align="left" valign="top"><a name="gcp_keySize"></a>keySize</th>
-	<td>Key size, default is 1024.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
-	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
-</tr>
-</table>
-
-
-<a name="gcp_oslogin"></a>
-### GCP OsLogin: Using GCP's service account with OsLogin
-SSH connection to the GCP hosts can be implemented by managing ssh keys in with OsLogin API. 
-It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials JSON file.
-OsLogin management of SSH keys is recommended way to connect on instances, but it has some [limitations](https://cloud.google.com/compute/docs/instances/managing-instance-access#limitations).
-
-Prerequisites:
-1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud)) 
-2. Enable OS Login [step 3](https://cloud.google.com/compute/docs/instances/managing-instance-access#enable_oslogin)
-3. Target instance with a role (roles/compute.osAdminLogin or roles/compute.osLogin) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
-
-OS Login connections options:
-<table>
-<tr>
-	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
-	<td>Specifies what protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_retryCount"></a>retryCount</th>
-	<td>
-    	Retry count of trying to connect to the instance. Connection openning retry will be done in case of auth failure.
-		Key management on GCP needs sometime more time to provision new keys on instance level and for that case failed auth needs retries.
-    </td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_retryPeriodMillis"></a>retryPeriodMillis</th>
-	<td>
-		Retry period between each retry to open the connection.
-    </td>
-</tr>
-</table>
-
-Minimal properties to setup SSH connection:
-<table>
-<tr>
-	<th align="left" valign="top"><a name="gcp_os"></a>os</th>
-	<td>Same as with usual <a href="#os">SSH connection</a></td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_address"></a>address</th>
-	<td>
-		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
-	</td>
-</tr>
-</table>
-
-<a name="gcp_metadata"></a>
-### GCP Metadata: Using GCP's service account with metadata
-
-<table>
-<tr>
-	<th align="left" valign="top"><a name="gcp_zoneName"></a>zoneName</th>
-	<td>
-		Name of deployment area <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a>. 
-    </td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_instanceId"></a>instanceId</th>
-	<td>
-		Instance id that needs management of the keys.
-	</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_applicationName"></a>applicationName</th>
-	<td>
-		Optional application name.
-	</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="gcp_username"></a>username</th>
-	<td>
-		SSH connection username.
-	</td>
-</tr>
-</table>
-
 
 <a name="release_history"></a>
 # Release History
