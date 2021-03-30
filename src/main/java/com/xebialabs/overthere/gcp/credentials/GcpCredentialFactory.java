@@ -4,12 +4,18 @@ import java.util.Collections;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 
-import com.xebialabs.overthere.ConnectionOptions;
-
-import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.*;
-
+/**
+ * Abstract factory that base for implementation of credential factory.
+ * Credential factory produces credentials that will be used by GCP API for secure management through GCP's APIs.
+ */
 public abstract class GcpCredentialFactory {
 
+    /**
+     * Adds additional scopes that are used with credentials
+     *
+     * @param projectCredentials current credentials
+     * @return credentials with additional scopes.
+     */
     public ProjectCredentials withScope(ProjectCredentials projectCredentials) {
         Credentials credentials = projectCredentials.getCredentials();
         if (credentials instanceof GoogleCredentials) {
@@ -24,6 +30,11 @@ public abstract class GcpCredentialFactory {
         return projectCredentials;
     }
 
+    /**
+     * Creates project credentials based on custom implementation and options defined for each instance.
+     *
+     * @return new project credentials.
+     */
     public ProjectCredentials create() {
         ProjectCredentials credentials = doCreate();
         return withScope(credentials);
@@ -31,17 +42,11 @@ public abstract class GcpCredentialFactory {
 
     protected abstract ProjectCredentials doCreate();
 
+    /**
+     * Returns string that will be used for logging to describe this factory.
+     *
+     * @return factory string
+     */
     public abstract String info();
-
-    public static GcpCredentialFactory getFactory(final ConnectionOptions options) {
-        String credentialsFile = options.get(CREDENTIALS_FILE);
-        String projectId = options.get(PROJECT_ID);
-        String clientEmail = options.get(CLIENT_EMAIL);
-        String instanceId = options.get(INSTANCE_ID);
-
-        return new DefaultCredentialsGcpCredentialFactory(
-               projectId, clientEmail
-        );
-    }
 
 }

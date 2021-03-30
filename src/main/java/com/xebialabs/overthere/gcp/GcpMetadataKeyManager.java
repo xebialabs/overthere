@@ -1,28 +1,32 @@
 package com.xebialabs.overthere.gcp;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Strings;
 import com.google.api.services.compute.Compute;
 import com.google.api.services.compute.model.Instance;
 import com.google.api.services.compute.model.Metadata;
 import com.google.api.services.compute.model.Operation;
 import com.google.api.services.compute.model.Project;
-import com.google.auth.Credentials;
 import com.google.auth.http.HttpCredentialsAdapter;
 
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
+import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
 /**
- * It is requering additional IAM permissions `compute.instances.setMetadata`
+ * Key Manager that is provisioning SSH keys on GCP with project or instance metadata. Implementation is based on following documentation
+ * <a href="https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys">Managing SSH keys in metadata</a>.
  */
 public class GcpMetadataKeyManager implements GcpKeyManager {
     private static final Logger logger = LoggerFactory.getLogger(GcpMetadataKeyManager.class);
@@ -43,87 +47,108 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
 
     private final GcpCredentialFactory gcpCredentialFactory;
     private final GenerateSshKey generateSshKey;
-    private Credentials credentials;
+    private ProjectCredentials projectCredentials;
     private GcpSshKey gcpSshKey;
     private Compute computeService;
 
-    private String projectId;
-    private String zoneName;
-    private String instanceName;
-    private String username;
+    private final String zoneName;
+    private final String instanceId;
+    private final String username;
+    private final String applicationName;
 
-    public GcpMetadataKeyManager(
+    GcpMetadataKeyManager(
             final GenerateSshKey generateSshKey,
             final GcpCredentialFactory gcpCredentialFactory,
-            final String projectId,
             final String zoneName,
-            final String instanceName,
-            final String username) {
+            final String instanceId,
+            final String username,
+            final String applicationName) {
         this.generateSshKey = generateSshKey;
         this.gcpCredentialFactory = gcpCredentialFactory;
-        this.projectId = projectId;
         this.zoneName = zoneName;
-        this.instanceName = instanceName;
+        this.instanceId = instanceId;
         this.username = username;
+        this.applicationName = applicationName;
     }
 
     @Override
     public GcpKeyManager init() {
-        credentials = gcpCredentialFactory.create();
+        projectCredentials = gcpCredentialFactory.create();
         computeService = createComputeService();
-
         return this;
     }
 
     @Override
-    public GcpSshKey refreshKey(final long expiryInUsec, final int keySize) {
+    public GcpSshKey refreshKey(final long expiryInMs, final int keySize) {
         if (gcpSshKey == null || System.currentTimeMillis() + 1_000 > this.gcpSshKey.getExpirationTimeMs()) {
 
             SshKeyPair sshKeyPair = generateSshKey.generate(SSH_KEYS_USERNAME, keySize);
-            long expirationTimeMs = System.currentTimeMillis() + expiryInUsec / 1_000;
+            long expirationTimeMs = System.currentTimeMillis() + expiryInMs;
 
-            if (this.instanceName == null) {
-                addKeyToProject(expirationTimeMs);
+            if (this.instanceId == null) {
+                addKeyToProject(sshKeyPair.getPublicKey(), expirationTimeMs);
             } else {
-                addKeyToInstance(expirationTimeMs);
+                addKeyToInstance(sshKeyPair.getPublicKey(), expirationTimeMs);
             }
 
             logger.debug("Using new key pair for user {} it expires at {} ms", username, expirationTimeMs);
-            this.gcpSshKey = new GcpSshKey(sshKeyPair, username, expirationTimeMs * 1000);
+            this.gcpSshKey = new GcpSshKey(sshKeyPair, username, expirationTimeMs);
         }
         return this.gcpSshKey;
     }
 
-    private void addKeyToInstance(final long expiryInMs) {
+    public String getZoneName() {
+        return zoneName;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    private void addKeyToInstance(final String publicKey, final long expiryInMs) {
         try {
             Compute.Instances instances = computeService.instances();
 
-            Instance instance = instances.get(projectId, zoneName, instanceName)
+            Instance instance = instances.get(projectCredentials.getProjectId(), zoneName, instanceId)
                     .execute();
             Metadata metadata = instance.getMetadata();
-            updateSshKey(metadata, , expiryInMs)
-            Operation operation = instances.setMetadata(projectId, zoneName, instanceName, metadata).execute();
-
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                    "Cannot install key pairs on project " + projectId + " and instance " + instanceName + " for username " + username, e);
-        }
-    }
-
-    private void addKeyToProject(final long expiryInMs) {
-        try {
-            Compute.Projects projects = computeService.projects();
-            Project project = projects.get(projectId)
-                    .execute();
-            Metadata metadata = project.getCommonInstanceMetadata();
-            updateSshKey(metadata, , expiryInMs)
-            Operation operation = projects.setCommonInstanceMetadata(projectId, metadata)
+            updateSshKey(metadata, publicKey, expiryInMs);
+            Operation operation = instances.setMetadata(projectCredentials.getProjectId(), zoneName, instanceId, metadata)
                     .execute();
 
             checkForOperationErrors(operation);
-
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot install key pairs on project " + projectId + " for username " + username, e);
+            throw new IllegalStateException(
+                    "Cannot install key pairs on project " + projectCredentials.getProjectId() + " and instance " + instanceId + " for username " + username,
+                    e
+            );
+        }
+    }
+
+    private void addKeyToProject(final String publicKey, final long expiryInMs) {
+        try {
+            Compute.Projects projects = computeService.projects();
+            Project project = projects.get(projectCredentials.getProjectId())
+                    .execute();
+            Metadata metadata = project.getCommonInstanceMetadata();
+            updateSshKey(metadata, publicKey, expiryInMs);
+            Operation operation = projects.setCommonInstanceMetadata(projectCredentials.getProjectId(), metadata)
+                    .execute();
+
+            checkForOperationErrors(operation);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Cannot install key pairs on project " + projectCredentials.getProjectId() + " for username " + username,
+                    e
+            );
         }
     }
 
@@ -146,7 +171,9 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
 
     protected Metadata.Items composeSshKeyItem(final String sshKeys, final String publicKey, final long expiryInMs) {
         if (Strings.isNullOrEmpty(sshKeys)) {
-            return new Metadata.Items().set(SSH_KEYS_KEYNAME, composeSshKeyLine(publicKey, expiryInMs));
+            return new Metadata.Items()
+                    .setKey(SSH_KEYS_KEYNAME)
+                    .setValue(composeSshKeyLine(publicKey, expiryInMs));
         }
         String[] sshKeysSplit = sshKeys.split("\n");
         StringBuilder resultSshKeys = new StringBuilder();
@@ -156,7 +183,9 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
             }
         }
         resultSshKeys.append(composeSshKeyLine(publicKey, expiryInMs));
-        return new Metadata.Items().set(SSH_KEYS_KEYNAME, resultSshKeys.toString());
+        return new Metadata.Items()
+                .setKey(SSH_KEYS_KEYNAME)
+                .setValue(resultSshKeys.toString());
     }
 
     protected boolean isUsernameInLine(final String line) {
@@ -165,23 +194,33 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
 
     protected String composeSshKeyLine(String publicKey, final long expiryInMs) {
         return new StringBuilder(username).append(":")
-                .append(publicKey)
+                .append(publicKey.replace('\n', ' '))
                 .append(" {\"userName\":\"").append(username)
-                .append("\",\"expireOn\":\"").append(new DateTime(expiryInMs).toStringRfc3339())
+                .append("\",\"expireOn\":\"").append(getISO8601StringForDate(expiryInMs))
                 .append("\"}")
                 .toString();
-    }
-
-    private Compute createComputeService() {
-        return new Compute.Builder(httpTransport, jsonFactory, new HttpCredentialsAdapter(credentials))
-                .build();
     }
 
     private void checkForOperationErrors(final Operation operation) {
         if (operation.getError() != null && operation.getError().getErrors() != null && !operation.getError().getErrors().isEmpty()) {
             Operation.Error.Errors errors = operation.getError().getErrors().get(0);
-            throw new IllegalStateException("Cannot install key pairs on project " + projectId + " for username " + username + ": " +
-                    errors.getMessage());
+            throw new IllegalStateException(
+                    "Cannot install key pairs on project " + projectCredentials.getProjectId() + " for username " + username + ": " + errors.getMessage()
+            );
         }
+    }
+
+    private Compute createComputeService() {
+        return new Compute.Builder(
+                httpTransport,
+                jsonFactory,
+                new HttpCredentialsAdapter(projectCredentials.getCredentials())
+        ).setApplicationName(applicationName).build();
+    }
+
+    private static String getISO8601StringForDate(long date) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+0000", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return dateFormat.format(date);
     }
 }

@@ -5,6 +5,9 @@ import java.nio.charset.StandardCharsets;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.io.CharSource;
 
+/**
+ * Returns credentials defined by a Service Account key file in JSON format from the Google Developers Console.
+ */
 class ServiceAccountJsonGcpCredentialFactory extends GcpCredentialFactory {
 
     private final String jsonContent;
@@ -14,7 +17,7 @@ class ServiceAccountJsonGcpCredentialFactory extends GcpCredentialFactory {
     }
 
     @Override
-    public ProjectCredentials doCreate() {
+    protected ProjectCredentials doCreate() {
         try {
             ServiceAccountCredentials serviceAccountCredentials = ServiceAccountCredentials.fromStream(
                     CharSource.wrap(jsonContent).asByteSource(StandardCharsets.UTF_8).openStream()

@@ -1143,9 +1143,115 @@ The `jumpstation` connection options support the same values (for as much as it 
 </tr>
 </table>
 
-<a name="jumpstations"></a>
-## GCP OsLogin: Using GCP's service account with OsLogin
-SSH connection to the GCP hosts can be implemented my managing ssh keys in with OsLogin API. 
+<a name="gcp"></a>
+## SSH connection to GCP instances
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_gcpKeyManagementType"></a>gcpKeyManagementType</th>
+	<td>
+	    Currently folllowing 2 types are suppport for key management on GCP instances:
+		<ul>
+			<li><a href="#gcp_oslogin">OsLogin</a> - managing ssh keys in with OsLogin API;</li>
+			<li><a href="#gcp_metadata">Metadata</a> - managing ssh keys by changing value under a metadata key `ssh-keys`</li>
+		</ul>
+	</td>
+</tr>
+</table>
+
+<a name="gcp_credentials"></a>
+### GCP Credentials
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_gcpCredentialsType"></a>gcpCredentialsType</th>
+	<td>
+		Default, ServiceAccountJsonFile, ServiceAccountJson, ServiceAccountPkcs8
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_credentialsFile"></a>credentialsFile</th>
+	<td>
+		Path to the service account credentials file. Credentials are used to internally manage SSH keys.
+ 		The easiest way to get it is via gcloud command: 
+        <pre>gcloud iam service-accounts keys create path_to_credentials_json \
+--iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_credentialsJson"></a>credentialsJson</th>
+	<td>
+		Service account credentials JSON. Credentials are used to internally manage SSH keys.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_projectId"></a>projectId</th>
+	<td>
+		Project ID
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_clientId"></a>clientId</th>
+	<td>
+        Client ID of the service account
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_clientEmail"></a>clientEmail</th>
+	<td>
+        Client email address of the service account
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_privateKeyPkcs8"></a>privateKeyPkcs8</th>
+	<td>
+ 		RSA private key object for the service account in PKCS#8 format.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_privateKeyId"></a>privateKeyId</th>
+	<td>
+		Private key identifier for the service account.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_scopes"></a>scopes</th>
+	<td>
+		Scopes, comma separated list, for the APIs to be called. May be empty, which results in a credential that must have createScoped called before use.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_tokenServerUri"></a>tokenServerUri</th>
+	<td>
+		URI of the end point that provides tokens.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_serviceAccountUser"></a>serviceAccountUser</th>
+	<td>
+		The email of the user account to impersonate, if delegating domain-wide authority to the service account.
+	</td>
+</tr>
+</table>
+
+<a name="gcp_key_pair_generation"></a>
+### GCP Key Pair Generation
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keySize"></a>keySize</th>
+	<td>Key size, default is 1024.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
+	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+</tr>
+</table>
+
+
+<a name="gcp_oslogin"></a>
+### GCP OsLogin: Using GCP's service account with OsLogin
+SSH connection to the GCP hosts can be implemented by managing ssh keys in with OsLogin API. 
 It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials JSON file.
 OsLogin management of SSH keys is recommended way to connect on instances, but it has some [limitations](https://cloud.google.com/compute/docs/instances/managing-instance-access#limitations).
 
@@ -1157,44 +1263,78 @@ Prerequisites:
 OS Login connections options:
 <table>
 <tr>
-	<th align="left" valign="top"><a name="connectionType"></a>connectionType</th>
+	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
 	<td>Specifies what protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
 </tr>
 <tr>
-	<th align="left" valign="credentialsFile"><a name="credentialsFile"></a>credentialsFile</th>
+	<th align="left" valign="top"><a name="gcp_retryCount"></a>retryCount</th>
 	<td>
-		Path to the service account credentials file. Credentials are used to internally manage SSH keys via OsLogin GCP API.
- 		The easiest way to get it is via gcloud command: 
-        <pre>gcloud iam service-accounts keys create path_to_credentials_json \
---iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
-	</td>
+    	Retry count of trying to connect to the instance. Connection openning retry will be done in case of auth failure.
+		Key management on GCP needs sometime more time to provision new keys on instance level and for that case failed auth needs retries.
+    </td>
 </tr>
 <tr>
-	<th align="left" valign="top"><a name="keySize"></a>keySize</th>
-	<td>Key size, default is 1024.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
-	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+	<th align="left" valign="top"><a name="gcp_retryPeriodMillis"></a>retryPeriodMillis</th>
+	<td>
+		Retry period between each retry to open the connection.
+    </td>
 </tr>
 </table>
 
 Minimal properties to setup SSH connection:
 <table>
 <tr>
-	<th align="left" valign="top"><a name="os"></a>os</th>
+	<th align="left" valign="top"><a name="gcp_os"></a>os</th>
 	<td>Same as with usual <a href="#os">SSH connection</a></td>
 </tr>
 <tr>
-	<th align="left" valign="address"><a name="address"></a>address</th>
+	<th align="left" valign="top"><a name="gcp_address"></a>address</th>
 	<td>
 		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
 	</td>
 </tr>
 </table>
 
+<a name="gcp_metadata"></a>
+### GCP Metadata: Using GCP's service account with metadata
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_zoneName"></a>zoneName</th>
+	<td>
+		Name of deployment area <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a>. 
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_instanceId"></a>instanceId</th>
+	<td>
+		Instance id that needs management of the keys.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_applicationName"></a>applicationName</th>
+	<td>
+		Optional application name.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_username"></a>username</th>
+	<td>
+		SSH connection username.
+	</td>
+</tr>
+</table>
+
+
 <a name="release_history"></a>
 # Release History
+* Overthere 5.3.2 (30-Mar-2021)
+	* SSH connection to GCP hosts by using project or instance metadata.
+    * Fix SSH connection resource leak on connection failure.
+* Overthere 5.3.1 (26-Mar-2021)
+	* Add transportTimeoutMillis option for ssh connection.
+* Overthere 5.3.0 (23-Mar-2021)
+	* SSH connection to GCP hosts by using OsLogin API.
 * Overthere 5.2.1 (10-Dec-2020)
     * Supported Opensshd service for windows host by SFTP_Opensshd connection type.
 * Overthere 5.0.21 (07-Oct-2020)

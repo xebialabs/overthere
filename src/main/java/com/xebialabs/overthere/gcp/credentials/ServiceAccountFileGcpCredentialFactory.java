@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 
+/**
+ * Creates credentials defined by a Service Account key file in JSON format from the Google Developers Console.
+ */
 class ServiceAccountFileGcpCredentialFactory extends GcpCredentialFactory {
 
     private final File credentialsFile;
@@ -14,7 +17,7 @@ class ServiceAccountFileGcpCredentialFactory extends GcpCredentialFactory {
     }
 
     @Override
-    public ProjectCredentials doCreate() {
+    protected ProjectCredentials doCreate() {
         try {
             ServiceAccountCredentials serviceAccountCredentials = ServiceAccountCredentials.fromStream(new FileInputStream(credentialsFile));
             return new ProjectCredentials(

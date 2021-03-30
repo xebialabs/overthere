@@ -2,7 +2,7 @@ package com.xebialabs.overthere.gcp.credentials;
 
 import com.google.auth.Credentials;
 
-public class ProjectCredentials {
+public final class ProjectCredentials {
     private final Credentials credentials;
     private final String projectId;
     private final String clientEmail;

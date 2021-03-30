@@ -12,7 +12,8 @@ import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
 /**
- *
+ * Key Manager that is provisioning SSH keys on GCP with OS Login API. Implementation is based on following documentation
+ * <a href="https://cloud.google.com/compute/docs/instances/managing-instance-access">Setting up OS Login</a>.
  */
 public class GcpOsLoginKeyManager implements GcpKeyManager {
     private static final Logger logger = LoggerFactory.getLogger(GcpOsLoginKeyManager.class);
@@ -24,7 +25,7 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
     private OsLoginServiceSettings osLoginServiceSettings;
     private GcpSshKey gcpSshKey;
 
-    public GcpOsLoginKeyManager(final GenerateSshKey generateSshKey, final GcpCredentialFactory gcpCredentialFactory) {
+    GcpOsLoginKeyManager(final GenerateSshKey generateSshKey, final GcpCredentialFactory gcpCredentialFactory) {
         this.generateSshKey = generateSshKey;
         this.gcpCredentialFactory = gcpCredentialFactory;
     }
@@ -45,13 +46,13 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
     }
 
     @Override
-    public GcpSshKey refreshKey(long expiryInUsec, int keySize) {
+    public GcpSshKey refreshKey(long expiryInMs, int keySize) {
         // check if key valid for next second
         if (gcpSshKey == null || System.currentTimeMillis() + 1_000 > this.gcpSshKey.getExpirationTimeMs()) {
 
             SshKeyPair sshKeyPair = generateSshKey.generate(projectCredentials.getClientEmail(), keySize);
-            long expirationTimeUsec = System.currentTimeMillis() * 1000 + expiryInUsec;
-            LoginProfile loginProfile = importSssKeyProjectLevel(sshKeyPair, expiryInUsec);
+            long expirationTimeMs = System.currentTimeMillis() + expiryInMs;
+            LoginProfile loginProfile = importSssKeyProjectLevel(sshKeyPair, expiryInMs * 1000);
             int posixAccountsCount = loginProfile.getPosixAccountsCount();
             if (posixAccountsCount < 1) {
                 throw new IllegalArgumentException("Cannot get account for " + gcpCredentialFactory.info() + " has no posix account");
@@ -61,12 +62,12 @@ public class GcpOsLoginKeyManager implements GcpKeyManager {
             Map<String, OsLoginProto.SshPublicKey> sshPublicKeysMap = loginProfile.getSshPublicKeysMap();
             OsLoginProto.SshPublicKey sshPublicKey = sshPublicKeysMap.get(sshKeyPair.getFingerPrint());
             if (sshPublicKey != null) {
-                expirationTimeUsec = sshPublicKey.getExpirationTimeUsec();
+                expirationTimeMs = sshPublicKey.getExpirationTimeUsec() / 1_000;
             }
 
-            logger.debug("Using new key pair for user {} it expires at {} usec", posixAccount.getUsername(), expirationTimeUsec);
+            logger.debug("Using new key pair for user {} it expires at {} ms", posixAccount.getUsername(), expirationTimeMs);
 
-            this.gcpSshKey = new GcpSshKey(sshKeyPair, posixAccount.getUsername(), expirationTimeUsec);
+            this.gcpSshKey = new GcpSshKey(sshKeyPair, posixAccount.getUsername(), expirationTimeMs);
         }
         return this.gcpSshKey;
     }
