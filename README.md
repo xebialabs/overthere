@@ -1368,7 +1368,7 @@ For `ServiceAccountPkcs8` following options are required:
 <a name="release_history"></a>
 # Release History
 * Overthere 5.3.2 (30-Mar-2021)
-	* SSH connection to GCP hosts by using project or instance metadata.
+    * SSH connection to GCP hosts by using project or instance metadata.
     * Fix SSH connection resource leak on connection failure.
 * Overthere 5.3.1 (26-Mar-2021)
 	* Add transportTimeoutMillis option for ssh connection.
