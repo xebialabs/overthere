@@ -2,27 +2,32 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Getting Overthere](#getting_overthere)
-	* [Depending on Overthere](#depending_on_overthere)
-	* [Building Overthere](#building_overthere)
-	* [Running the Examples](#running_the_examples)
-* [Programming Overthere](#programming_overthere)
-* [Configuring Overthere](#configuring_overthere)
+* [Getting Overthere](#getting-overthere)
+	* [Depending on Overthere](#depending-on-overthere)
+	* [Building Overthere](#building-overthere)
+	* [Running the Examples](#running-the-examples)
+* [Programming Overthere](#programming-overthere)
+* [Configuring Overthere](#configuring-overthere)
 	* [Protocols](#protocols)
-	* [Common connection options](#common_connection_options)
+	* [Common connection options](#common-connection-options)
 	* [Local](#local)
 	* [SSH](#ssh)
-	    * [Host setup](#ssh_host_setup)
-	    * [Troubleshooting](#ssh_troubleshooting)
-	    * [Connection options](#ssh_connection_options)
-	* [SMB 2.x/CIFS, WinRM and Telnet](#smb_cifs)
-	    * [SMB 2.x](#smb)
+	    * [Host setup](#ssh-host-setup)
+	    * [Troubleshooting](#troubleshooting-ssh-connections)
+	    * [Connection options](#ssh-connection-options)
+	* [SMB 2.x/CIFS, WinRM and Telnet](#smb-2x-and-cifs)
+	    * [SMB 2.x](#smb-2x)
 	    * [CIFS](#cifs)
 	    * [Host setup](#smb_cifs_host_setup)
 	    * [Troubleshooting](#smb_cifs_troubleshooting)
 	    * [Connection options](#smb_cifs_connection_options)
-	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations)
-* [Release History](#release_history)
+	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations-ssh-tunnels-and-http-proxies)
+	* [SSH connection to GCP instances](#ssh-connection-to-gcp-instances)
+		* [GCP OsLogin: Using GCP's service account with OsLogin](#gcp-oslogin-using-gcps-service-account-with-oslogin)
+		* [GCP Metadata: Using GCP's service account with metadata](#gcp-metadata-using-gcps-service-account-with-metadata)
+		* [GCP Generic SSH options](#gcp-generic-ssh-options)
+		* [GCP Credentials](#gcp-credentials)
+* [Release History](#release-history)
 
 
 <a name="introduction"></a>
@@ -54,7 +59,7 @@ Binary releases of Overthere are not provided here, but you can download it [str
 		<dependency>
 			<groupId>com.xebialabs.overthere</groupId>
 			<artifactId>overthere</artifactId>
-			<version>5.0.8</version>
+			<version>5.3.2</version>
 		</dependency>
 
 1. If your project is built using another build tool that uses the Maven Central repository, translate these dependencies into the format used by your build tool.
@@ -222,6 +227,16 @@ The local protocol implementation uses the local file manipulation and local pro
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
 
+To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix and Windows platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms three SSH servers are supported:
+
+* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
+* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
+* Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
+
+__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ or the __SFTP_OPENSSHD__ connection type.
+
+<a name="ssh_host_setup_sftp"></a>
+
 ### Compatibility
 
 Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH and supports all algorithms and formats supported by that library:
@@ -237,16 +252,6 @@ Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH an
 ### SSH host setup
 
 <a name="ssh_host_setup_ssh"></a>
-#### SSH
-To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix and Windows platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms three SSH servers are supported:
-
-* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
-* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
-* Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
-
-__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ or the __SFTP_OPENSSHD__ connection type.
-
-<a name="ssh_host_setup_sftp"></a>
 #### SFTP
 
 To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
@@ -607,6 +612,11 @@ These protocols are only supported for Windows hosts, you will most likely not n
 * WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
+To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
+
+If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
+
+<a name="smb_cifs_host_setup_telnet"></a>
 ### Password limitations
 
 Due to a limitation of the `winrs` command, passwords containing a single quote (`'`) or a double quote (`"`) cannot be used when using the __WINRM_NATIVE__ connection type.
@@ -630,12 +640,6 @@ __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `
 ### Host setup
 
 <a name="smb_cifs_host_setup_smb"></a>
-#### SMB 2.x and CIFS
-To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
-
-If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
-
-<a name="smb_cifs_host_setup_telnet"></a>
 #### TELNET
 
 To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
@@ -1148,58 +1152,237 @@ The `jumpstation` connection options support the same values (for as much as it 
 </tr>
 </table>
 
-<a name="jumpstations"></a>
-## GCP OsLogin: Using GCP's service account with OsLogin
-SSH connection to the GCP hosts can be implemented my managing ssh keys in with OsLogin API. 
-It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials JSON file.
+<a name="gcp"></a>
+## SSH connection to GCP instances
+SSH connection to GCP instances is possible without directly installing key pairs on instances. 
+There are 2 options to manage internally SSH keys via GCP keys, that are selected with <a href="#gcp_gcpKeyManagementType">gcpKeyManagementType</a>.
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_gcpKeyManagementType"></a>gcpKeyManagementType</th>
+	<td>
+	    Currently folllowing 2 types are suppport for key management on GCP instances:
+		<ul>
+			<li><a href="#gcp_oslogin">`OsLogin`</a> - managing ssh keys in with OsLogin API;</li>
+			<li><a href="#gcp_metadata">`Metadata`</a> - managing ssh keys by changing value under a metadata key `ssh-keys`</li>
+		</ul>
+	</td>
+</tr>
+</table>
+
+<a name="gcp_oslogin"></a>
+### GCP OsLogin: Using GCP's service account with OsLogin
+SSH connection to the GCP hosts can be implemented by managing ssh keys with OsLogin API.
+It gives the possibility to define temporary time-limited SSH keys project-wide or per an instance by using GCP's service account credentials.
 OsLogin management of SSH keys is recommended way to connect on instances, but it has some [limitations](https://cloud.google.com/compute/docs/instances/managing-instance-access#limitations).
 
 Prerequisites:
-1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud)) 
+1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud))
 2. Enable OS Login [step 3](https://cloud.google.com/compute/docs/instances/managing-instance-access#enable_oslogin)
-3. Target instance with a role (roles/compute.osAdminLogin or roles/compute.osLogin) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
+3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level [step 4](https://cloud.google.com/compute/docs/instances/managing-instance-access#grant-iam-roles)
 
-OS Login connections options:
+<a name="gcp_metadata"></a>
+### GCP Metadata: Using GCP's service account with metadata
+
+Metadata gives the possibility to define temporary time-limited SSH keys project-wide or per instance. Overthere manages keypairs internally registering public key to the GCP metadata on project or instance level.
+More details is available in following guide: [Managing SSH keys in metadata](https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys).
+
+Prerequisites:
+1. Get service account key to JSON file (for [ServiceAccountCredentials](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#iam-service-account-keys-create-gcloud))
+2. Service account needs to have the following IAM roles on the project:
+   - `iam.serviceAccountUser` on the instance or project level
+   - `compute.instanceAdmin.v1` on the instance or project level
+3. Target instance with a role (`roles/compute.osAdminLogin` or `roles/compute.osLogin`) on project or instance level
+
+For using Metadata following options are required:
 <table>
 <tr>
-	<th align="left" valign="top"><a name="connectionType"></a>connectionType</th>
-	<td>Specifies what protocol is used to execute commands, it can be any SSH related protocol like: SCP, SFTP</td>
+	<th align="left" valign="top"><a name="gcp_zoneName"></a>zoneName</th>
+	<td>
+		Name of deployment area. See <a href="https://cloud.google.com/compute/docs/regions-zones">Regions and zones</a> for details. 
+    </td>
 </tr>
 <tr>
-	<th align="left" valign="credentialsFile"><a name="credentialsFile"></a>credentialsFile</th>
+	<th align="left" valign="top"><a name="gcp_instanceId"></a>instanceId</th>
 	<td>
-		Path to the service account credentials file. Credentials are used to internally manage SSH keys via OsLogin GCP API.
+		Instance id of a instance that needs management of the keys. If managing of the keys is done on a project level, this option needs to be omitted.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_applicationName"></a>applicationName</th>
+	<td>
+		Optional application name that is using this overthere client.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_username"></a>username</th>
+	<td>
+		SSH connection username. It is same options as for <a href="#username">SSH connection</a>
+	</td>
+</tr>
+</table>
+
+<a name="gcp_credentials"></a>
+### GCP Generic SSH options
+
+From following options first 3 are required. Other generic options have default value that is used if custom not provided.
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_connectionType"></a>connectionType</th>
+	<td>Specifies which protocol is used to execute commands, it can be any SSH related protocol like: `SCP`, `SFTP`</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_os"></a>os</th>
+	<td>Same as with usual <a href="#os">SSH connection</a></td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_address"></a>address</th>
+	<td>
+		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_retryCount"></a>retryCount</th>
+	<td>
+    	Retry count of trying to connect to the instance. Connection openning retry will be done in case of auth failure.
+		Key management on GCP needs sometime more time to provision new keys on instance level and for that case failed auth needs retries.
+		Default value is 3.
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_retryPeriodMillis"></a>retryPeriodMillis</th>
+	<td>
+		Retry period between each retry to open the connection. Default value is 1000 ms.
+    </td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keySize"></a>keySize</th>
+	<td>Key size, default is 1024.</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
+	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+</tr>
+</table>
+
+<a name="gcp_credentials"></a>
+### GCP Credentials
+
+To be able to use GCP API's credentials needs to be supplied via Overthere options. There are different ways to supply credentials and that is defined with the
+<a href="#gcp_gcpCredentialsType">gcpCredentialsType</a> option.
+
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_gcpCredentialsType"></a>gcpCredentialsType</th>
+	<td>
+		<ul>
+			<li>
+ 				`Default` - The following are searched (in order) to find the Application Default Credentials:
+				<ol>
+				  <li>Credentials file pointed to by the `GOOGLE_APPLICATION_CREDENTIALS` environment variable
+				  <li>Credentials provided by the Google Cloud SDK `gcloud auth application-default login` command
+				  <li>Google App Engine built-in credentials
+				  <li>Google Cloud Shell built-in credentials
+				  <li>Google Compute Engine built-in credentials
+			   </ol>
+			</li>
+			<li>
+ 				`ServiceAccountJsonFile` - defined by a Service Account key file in JSON format from the Google Developers Console.
+			</li>
+			<li>
+ 				`ServiceAccountJson` - defined by a Service Account key in JSON format from the Google Developers Console.
+			</li>
+			<li>
+ 				`ServiceAccountPkcs8` - defined by a Service Account PKCS#8 private key and other required options.
+			</li>
+		</ul>
+	</td>
+</tr>
+</table>
+
+For `ServiceAccountJsonFile` following option is required:
+<table>
+<tr>
+	<th align="left" valign="top"><a name="gcp_credentialsFile"></a>credentialsFile</th>
+	<td>
+		Path to the service account credentials file. Credentials are used to internally manage SSH keys.
  		The easiest way to get it is via gcloud command: 
         <pre>gcloud iam service-accounts keys create path_to_credentials_json \
 --iam-account $SERVICE_ACCOUNT@$PROJECT_ID.iam.gserviceaccount.com</pre>
 	</td>
 </tr>
+</table>
+
+For `ServiceAccountJson` following option is required:
+<table>
 <tr>
-	<th align="left" valign="top"><a name="keySize"></a>keySize</th>
-	<td>Key size, default is 1024.</td>
-</tr>
-<tr>
-	<th align="left" valign="top"><a name="keyExpiryTimeMillis"></a>keyExpiryTimeMillis</th>
-	<td>Key expiry time defined in milliseconds, default value is 300,000ms (5 minutes). If generated key expires new one will be internally created and installed via OsLogin.</td>
+	<th align="left" valign="top"><a name="gcp_credentialsJson"></a>credentialsJson</th>
+	<td>
+		Service account credentials JSON. Credentials are used to internally manage SSH keys.
+	</td>
 </tr>
 </table>
 
-Minimal properties to setup SSH connection:
+For `ServiceAccountPkcs8` following options are required:
 <table>
 <tr>
-	<th align="left" valign="top"><a name="os"></a>os</th>
-	<td>Same as with usual <a href="#os">SSH connection</a></td>
+	<th align="left" valign="top"><a name="gcp_projectId"></a>projectId</th>
+	<td>
+		Project ID
+	</td>
 </tr>
 <tr>
-	<th align="left" valign="address"><a name="address"></a>address</th>
+	<th align="left" valign="top"><a name="gcp_clientId"></a>clientId</th>
 	<td>
-		On the GCP external instance address. Same as with usual <a href="#address">SSH connection</a>.
+        Client ID of the service account
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_clientEmail"></a>clientEmail</th>
+	<td>
+        Client email address of the service account
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_privateKeyPkcs8"></a>privateKeyPkcs8</th>
+	<td>
+ 		RSA private key object for the service account in PKCS#8 format.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_privateKeyId"></a>privateKeyId</th>
+	<td>
+		Private key identifier for the service account.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_scopes"></a>scopes</th>
+	<td>
+		Scopes, comma separated list, for the APIs to be called. May be empty, which results in a credential that must have createScoped called before use.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_tokenServerUri"></a>tokenServerUri</th>
+	<td>
+		URI of the end point that provides tokens.
+	</td>
+</tr>
+<tr>
+	<th align="left" valign="top"><a name="gcp_serviceAccountUser"></a>serviceAccountUser</th>
+	<td>
+		The email of the user account to impersonate, if delegating domain-wide authority to the service account.
 	</td>
 </tr>
 </table>
 
 <a name="release_history"></a>
 # Release History
+* Overthere 5.3.2 (30-Mar-2021)
+    * SSH connection to GCP hosts by using project or instance metadata.
+    * Fix SSH connection resource leak on connection failure.
+* Overthere 5.3.1 (26-Mar-2021)
+	* Add transportTimeoutMillis option for ssh connection.
+* Overthere 5.3.0 (23-Mar-2021)
+	* SSH connection to GCP hosts by using OsLogin API.
 * Overthere 5.2.1 (10-Dec-2020)
     * Supported Opensshd service for windows host by SFTP_Opensshd connection type.
 * Overthere 5.0.21 (07-Oct-2020)

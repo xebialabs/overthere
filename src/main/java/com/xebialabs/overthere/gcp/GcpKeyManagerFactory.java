@@ -3,18 +3,27 @@ package com.xebialabs.overthere.gcp;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
+import com.xebialabs.overthere.gcp.credentials.GcpCredentialsType;
+
 public class GcpKeyManagerFactory {
 
     private static final Map<String, GcpKeyManager> managers = new WeakHashMap<>();
 
-    private static final GenerateSshKey GENERATE_SSH_KEY = new JCraftGenerateSshKey();
+    static final GenerateSshKey GENERATE_SSH_KEY = new JCraftGenerateSshKey();
 
-    public static GcpKeyManager create(final String credentialsFile) {
+    public static GcpKeyManager create(final ConnectionOptions options) {
+
+        GcpCredentialsType gcpCredentialsType = GcpCredentialsType.resolve(options);
+        final String managersKey = gcpCredentialsType.createKey(options);
+
         synchronized (managers) {
-            GcpKeyManager gcpKeyManager = managers.get(credentialsFile);
+            GcpKeyManager gcpKeyManager = managers.get(managersKey);
             if (gcpKeyManager == null) {
-                gcpKeyManager = new GcpOsLoginKeyManager(GENERATE_SSH_KEY, credentialsFile).init();
-                managers.put(credentialsFile, gcpKeyManager);
+                GcpCredentialFactory gcpCredentialFactory = gcpCredentialsType.createGcpCredentialFactory(options);
+                gcpKeyManager = GcpKeyManagementType.resolveGcpKeyManager(options, gcpCredentialFactory);
+                managers.put(managersKey, gcpKeyManager);
             }
             return gcpKeyManager;
         }

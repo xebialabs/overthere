@@ -16,9 +16,9 @@ interface GcpKeyManager {
     /**
      * Refresh key after expiry period, if there is no current key it generates new one.
      *
-     * @param expiryInUsec Key expiry period in microseconds
+     * @param expiryInMs Key expiry period in milliseconds
      * @param keySize Key size
      * @return generated private key with username for current expiry period
      */
-    GcpSshKey refreshKey(long expiryInUsec, int keySize);
+    GcpSshKey refreshKey(long expiryInMs, int keySize);
 }

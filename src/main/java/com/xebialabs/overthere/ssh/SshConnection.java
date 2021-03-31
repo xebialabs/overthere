@@ -36,6 +36,7 @@ import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.userauth.UserAuthException;
 import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
@@ -154,9 +155,9 @@ abstract class SshConnection extends BaseOverthereConnection {
     }
 
     protected void connect() {
+        config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
+        SSHClient client = sshClientFactory.create();
         try {
-            config.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
-            SSHClient client = sshClientFactory.create();
             client.setSocketFactory(mapper.socketFactory());
             client.setConnectTimeout(connectionTimeoutMillis);
             client.addHostKeyVerifier(new PromiscuousVerifier());
@@ -210,6 +211,12 @@ abstract class SshConnection extends BaseOverthereConnection {
             sshClient = client;
             connected();
         } catch (SSHException e) {
+            try {
+                if (client.isConnected()) {
+                    client.close(); // close connection in case it was already opened before failure
+                }
+            } catch (IOException ignored) {
+            }
             throw new RuntimeIOException("Cannot connect to " + this, e);
         }
     }
