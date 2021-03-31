@@ -2,27 +2,32 @@
 # Table of Contents
 
 * [Introduction](#introduction)
-* [Getting Overthere](#getting_overthere)
-	* [Depending on Overthere](#depending_on_overthere)
-	* [Building Overthere](#building_overthere)
-	* [Running the Examples](#running_the_examples)
-* [Programming Overthere](#programming_overthere)
-* [Configuring Overthere](#configuring_overthere)
+* [Getting Overthere](#getting-overthere)
+	* [Depending on Overthere](#depending-on-overthere)
+	* [Building Overthere](#building-overthere)
+	* [Running the Examples](#running-the-examples)
+* [Programming Overthere](#programming-overthere)
+* [Configuring Overthere](#configuring-overthere)
 	* [Protocols](#protocols)
-	* [Common connection options](#common_connection_options)
+	* [Common connection options](#common-connection-options)
 	* [Local](#local)
 	* [SSH](#ssh)
-	    * [Host setup](#ssh_host_setup)
-	    * [Troubleshooting](#ssh_troubleshooting)
-	    * [Connection options](#ssh_connection_options)
-	* [SMB 2.x/CIFS, WinRM and Telnet](#smb_cifs)
-	    * [SMB 2.x](#smb)
+	    * [Host setup](#ssh-host-setup)
+	    * [Troubleshooting](#troubleshooting-ssh-connections)
+	    * [Connection options](#ssh-connection-options)
+	* [SMB 2.x/CIFS, WinRM and Telnet](#smb-2x-and-cifs)
+	    * [SMB 2.x](#smb-2x)
 	    * [CIFS](#cifs)
 	    * [Host setup](#smb_cifs_host_setup)
 	    * [Troubleshooting](#smb_cifs_troubleshooting)
 	    * [Connection options](#smb_cifs_connection_options)
-	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations)
-* [Release History](#release_history)
+	* [Jumpstations: SSH tunnels and HTTP proxies](#jumpstations-ssh-tunnels-and-http-proxies)
+	* [SSH connection to GCP instances](#ssh-connection-to-gcp-instances)
+		* [GCP OsLogin: Using GCP's service account with OsLogin](#gcp-oslogin-using-gcps-service-account-with-oslogin)
+		* [GCP Metadata: Using GCP's service account with metadata](#gcp-metadata-using-gcps-service-account-with-metadata)
+		* [GCP Generic SSH options](#gcp-generic-ssh-options)
+		* [GCP Credentials](#gcp-credentials)
+* [Release History](#release-history)
 
 
 <a name="introduction"></a>
@@ -222,6 +227,16 @@ The local protocol implementation uses the local file manipulation and local pro
 
 The SSH protocol implementation of Overthere uses the [SSH](http://en.wikipedia.org/wiki/Secure_Shell) protocol to connect to remote hosts to manipulate files and execute commands. Most Unix systems already have an SSH server installed and configured and a number of different SSH implementations are available for Windows although not all of them are supported by Overthere.
 
+To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix and Windows platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms three SSH servers are supported:
+
+* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
+* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
+* Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
+
+__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ or the __SFTP_OPENSSHD__ connection type.
+
+<a name="ssh_host_setup_sftp"></a>
+
 ### Compatibility
 
 Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH and supports all algorithms and formats supported by that library:
@@ -237,16 +252,6 @@ Overthere uses the [sshj](https://github.com/hierynomus/sshj) library for SSH an
 ### SSH host setup
 
 <a name="ssh_host_setup_ssh"></a>
-#### SSH
-To connect to a remote host using the SSH protocol, you will need to install an SSH server on that remote host. For Unix and Windows platforms, we recommend [OpenSSH](http://www.openssh.com/). It is included in all Linux distributions and most other Unix flavours. For Windows platforms three SSH servers are supported:
-
-* OpenSSH on [Cygwin](http://www.cygwin.com/). We recommend [COPSSH](http://www.itefix.no/i2/copssh) as a convenient packaging of OpenSSH and Cygwin. It is a free source download but since 22/11/2011 the binary installers are a paid solution.
-* [WinSSHD](http://www.bitvise.com/winsshd) is a commercial SSH server that has a lot of configuration options.
-* Install microsoft [OpenSSHD](https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse) on your Windows host and make sure the OpenSSH Server service is enabled.
-
-__N.B.:__ The __SFTP__, __SCP__, __SU__, __SUDO__ and __INTERACTIVE_SUDO__ connection types are only available for Unix hosts. To use SSH with z/OS hosts, use the __SFTP__ connection type. To use SSH with Windows hosts, choose either the __SFTP_CYGWIN__ or the __SFTP_WINSSHD__ or the __SFTP_OPENSSHD__ connection type.
-
-<a name="ssh_host_setup_sftp"></a>
 #### SFTP
 
 To use the __SFTP__ connection type, make sure SFTP is enabled in the SSH server. This is enabled by default in most SSH servers.
@@ -602,6 +607,11 @@ These protocols are only supported for Windows hosts, you will most likely not n
 * WinRM is available on Windows Server 2008 and up. Overthere supports basic authentication for local accounts and Kerberos authentication for domain accounts. Overthere has a built-in WinRM library that can be used from all operating systems by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_INTERNAL__. When connecting from a host that runs Windows, or when using a "winrs proxy host" that runs Windows, the native WinRM capabilities of Windows, i.e. the `winrs` command, can be used by setting the [**connectionType**](#smb_cifs_connectionType) connection option to __WINRM_NATIVE__.
 * A Telnet Server is available on all Windows Server versions although it might not be enabled.
 
+To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
+
+If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
+
+<a name="smb_cifs_host_setup_telnet"></a>
 ### Password limitations
 
 Due to a limitation of the `winrs` command, passwords containing a single quote (`'`) or a double quote (`"`) cannot be used when using the __WINRM_NATIVE__ connection type.
@@ -625,12 +635,6 @@ __N.B.:__ Overthere will take care of the translation from Windows paths, e.g. `
 ### Host setup
 
 <a name="smb_cifs_host_setup_smb"></a>
-#### SMB 2.x and CIFS
-To connect to a remote host using the __SMB__ or __CIFS__ protocol, ensure the host is reachable on port 445.
-
-If you will be connecting as an administrative user, ensure the administrative shares are configured. Otherwise, ensure that the user you will be using to connect has access to shares that correspond to the directory you want to access and that the [__pathShareMappings__](#smb_cifs_pathShareMappings) connection option is configured accordingly.
-
-<a name="smb_cifs_host_setup_telnet"></a>
 #### TELNET
 
 To use the __TELNET__ connection type, you'll need to enable and configure the Telnet Server according to these instructions:
