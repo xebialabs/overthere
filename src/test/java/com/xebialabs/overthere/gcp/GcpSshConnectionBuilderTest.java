@@ -63,7 +63,7 @@ public class GcpSshConnectionBuilderTest {
 
         assertThat(gcpSshConnectionBuilder.getKeyExpiryTimeMillis(), equalTo(300_000L));
         assertThat(gcpSshConnectionBuilder.getKeySize(), equalTo(1024));
-        assertThat(gcpSshConnectionBuilder.getRetryCount(), equalTo(3));
+        assertThat(gcpSshConnectionBuilder.getRetryCount(), equalTo(10));
         assertThat(gcpSshConnectionBuilder.getRetryPeriodMillis(), equalTo(1000));
     }
 

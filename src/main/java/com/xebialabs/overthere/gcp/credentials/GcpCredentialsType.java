@@ -38,7 +38,7 @@ public enum GcpCredentialsType {
 
         @Override
         public String createKey(final ConnectionOptions options) {
-            return name();
+            return composeKey(options.<String>get(CLIENT_EMAIL), options);
         }
     },
     ServiceAccountJsonFile(Sets.newHashSet(CREDENTIALS_FILE)) {
@@ -51,7 +51,7 @@ public enum GcpCredentialsType {
 
         @Override
         public String createKey(final ConnectionOptions options) {
-            return composeKey(options.<String>get(CREDENTIALS_FILE));
+            return composeKey(options.<String>get(CREDENTIALS_FILE), options);
         }
     },
     ServiceAccountJson(Sets.newHashSet(CREDENTIALS_JSON)) {
@@ -64,7 +64,7 @@ public enum GcpCredentialsType {
 
         @Override
         public String createKey(final ConnectionOptions options) {
-            return composeKey(options.<String>get(CREDENTIALS_JSON));
+            return composeKey(options.<String>get(CREDENTIALS_JSON), options);
         }
     },
     ServiceAccountPkcs8(Sets.newHashSet(PROJECT_ID, CLIENT_ID, CLIENT_EMAIL, PRIVATE_KEY_PKCS8, PRIVATE_KEY_ID)) {
@@ -89,7 +89,7 @@ public enum GcpCredentialsType {
 
         @Override
         public String createKey(final ConnectionOptions options) {
-            return composeKey(options.<String>get(PRIVATE_KEY_ID));
+            return composeKey(options.<String>get(PRIVATE_KEY_ID), options);
         }
     };
 
@@ -115,8 +115,8 @@ public enum GcpCredentialsType {
 
     protected abstract GcpCredentialFactory doCreate(final ConnectionOptions options);
 
-    protected String composeKey(String keySuffix) {
-        return name() + ":" + keySuffix;
+    protected String composeKey(final String keySuffix, final ConnectionOptions options) {
+        return name() + ":" + keySuffix + ":" + options.get(ConnectionOptions.USERNAME, "");
     }
 
     /**
