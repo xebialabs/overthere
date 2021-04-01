@@ -1245,7 +1245,7 @@ From following options first 3 are required. Other generic options have default 
 	<td>
     	Retry count of trying to connect to the instance. Connection openning retry will be done in case of auth failure.
 		Key management on GCP needs sometime more time to provision new keys on instance level and for that case failed auth needs retries.
-		Default value is 3.
+		Default value is 10.
     </td>
 </tr>
 <tr>

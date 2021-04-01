@@ -135,7 +135,7 @@ public class GcpSshConnectionBuilder extends SshConnectionBuilder {
         this.gcpKeyManager = GcpKeyManagerFactory.create(options);
         keyExpiryTimeMillis = options.getInteger(KEY_EXPIRY_TIME_MILLIS, 300_000);
         keySize = options.getInteger(KEY_SIZE, 1024);
-        retryCount = options.getInteger(RETRY_COUNT, 3);
+        retryCount = options.getInteger(RETRY_COUNT, 10);
         retryPeriodMillis = options.getInteger(RETRY_PERIOD_MILLIS, 1000);
     }
 
