@@ -39,8 +39,10 @@ pipeline {
         }
     }
     post {
-        node(params.slaveNode) {
-            step([$class: 'ClaimPublisher'])
+        always {
+            node('xld') {
+                step([$class: 'ClaimPublisher'])
+            }
         }
     }
 }
