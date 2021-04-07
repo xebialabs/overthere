@@ -35,7 +35,7 @@ pipeline {
             agent { label params.slaveNode }
             steps {
                 withEnv(Globals.javaEnv(this)) {
-                    sh "./gradlew clean itest -Paws.endpoint=https://ec2.eu-west-1.amazonaws.com -Paws.accessKey=${AWS_ACCESS_KEY_ID} -Paws.secretKey=${AWS_SECRET_ACCESS_KEY}"
+                    sh "./gradlew clean itest"
                 }
             }
             post {
