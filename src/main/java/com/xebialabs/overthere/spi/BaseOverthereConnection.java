@@ -365,6 +365,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
      * @deprecated use {@link BaseOverthereConnection#execute(com.xebialabs.overthere.OverthereExecutionOutputHandler, com.xebialabs.overthere.OverthereExecutionOutputHandler, com.xebialabs.overthere.CmdLine)}
      */
     @Override
+    @Deprecated
     public final int execute(final OverthereProcessOutputHandler handler, final CmdLine commandLine) {
         return execute(wrapStdout(handler), wrapStderr(handler), commandLine);
     }
