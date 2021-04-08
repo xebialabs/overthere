@@ -24,7 +24,7 @@ pipeline {
         stage('Run test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.javaEnv(this)) {
+                withEnv(Globals.java11Env(this, params.jdkVersion)) {
                     sh "./gradlew clean test"
                 }
             }
@@ -32,7 +32,7 @@ pipeline {
         stage('Run integration test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.javaEnv(this)) {
+                withEnv(Globals.java11Env(this, params.jdkVersion)) {
                     sh "./gradlew clean itest"
                 }
             }
