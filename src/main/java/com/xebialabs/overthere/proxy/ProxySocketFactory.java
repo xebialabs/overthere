@@ -22,8 +22,6 @@
  */
 package com.xebialabs.overthere.proxy;
 
-import com.hierynomus.sshj.backport.JavaVersion;
-import com.hierynomus.sshj.backport.Jdk7HttpProxySocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,17 +61,9 @@ public class ProxySocketFactory extends SocketFactory {
     }
 
     @Override
-    public Socket createSocket() throws IOException {
-        Socket socket;
-        // Special case, pre-java8 HTTP proxies were not supported by Socket
-        if (JavaVersion.isJava7OrEarlier() && proxy.type() == Proxy.Type.HTTP) {
-            logger.trace("Using {} proxy {} (Java 7 mode)", proxy.type(), proxy.address());
-            socket = new Jdk7HttpProxySocket(proxy);
-        } else {
-            logger.trace("Using {} proxy {}", proxy.type(), proxy.address());
-            socket = new Socket(proxy);
-        }
-        return socket;
+    public Socket createSocket() {
+        logger.trace("Using {} proxy {}", proxy.type(), proxy.address());
+        return new Socket(proxy);
     }
 
     @Override

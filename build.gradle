@@ -49,8 +49,8 @@ repositories {
   mavenLocal()
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 configurations {
   compile {
@@ -191,11 +191,11 @@ task itest(type: Test) {
 
 task sourcesJar(type: Jar) {
   from sourceSets.main.allSource
-  classifier = 'sources'
+  archiveClassifier = 'sources'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
+  archiveClassifier = 'javadoc'
   from javadoc.destinationDir
 }
 
@@ -282,8 +282,10 @@ def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
   }
 }
 
-task dumpVersion << {
-  file(buildDir).mkdirs()
-  def out = file("$buildDir/version.dump")
-  out.write("version=$project.version")
+task dumpVersion {
+  doLast {
+    file(buildDir).mkdirs()
+    def out = file("$buildDir/version.dump")
+    out.write("version=$project.version")
+  }
 }
