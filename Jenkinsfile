@@ -2,9 +2,7 @@
 
 @Library('jenkins-pipeline-libs@master')
 
-import com.xebialabs.pipeline.utils.Branches
 import com.xebialabs.pipeline.globals.Globals
-import com.xebialabs.pipeline.utils.Touch
 
 pipeline {
 
@@ -12,7 +10,7 @@ pipeline {
 
     parameters {
         string( name: 'jdkVersion',
-                defaultValue: 'JDK 8u191',
+                defaultValue: 'OpenJDK 11.0.10',
                 description: 'Configuration to run server on an environment with designated jdk version')
         string(name: 'slaveNode', defaultValue: 'xlr||xld', description: 'Node label where steps would be executed.')
     }
@@ -26,7 +24,7 @@ pipeline {
         stage('Run test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.javaEnv(this)) {
+                withEnv(Globals.java11Env(this, params.jdkVersion)) {
                     sh "./gradlew clean test"
                 }
             }
@@ -34,7 +32,7 @@ pipeline {
         stage('Run integration test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.javaEnv(this)) {
+                withEnv(Globals.java11Env(this, params.jdkVersion)) {
                     sh "./gradlew clean itest"
                 }
             }

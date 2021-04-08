@@ -95,6 +95,7 @@ public interface OverthereConnection extends Closeable {
      * @return the exit value of the executed command. Usually 0 on successful execution.
      * @deprecated use {@link #execute(OverthereExecutionOutputHandler, OverthereExecutionOutputHandler, CmdLine)}
      */
+    @Deprecated
     int execute(OverthereProcessOutputHandler handler, CmdLine commandLine);
 
     /**

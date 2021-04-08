@@ -25,10 +25,12 @@ package com.xebialabs.overthere.winrm;
 import com.google.common.io.Resources;
 import org.dom4j.*;
 import org.dom4j.io.SAXReader;
-import org.jdom2.JDOMException;
 import org.testng.annotations.Test;
+import org.xml.sax.SAXException;
 
-import java.io.IOException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.net.URL;
 import java.util.List;
 
@@ -39,14 +41,14 @@ public class ResponseExtractorTest {
 
 
     @Test
-    public void checkReturnExitCodeWinRmV1() throws DocumentException {
+    public void checkReturnExitCodeWinRmV1() throws DocumentException, ParserConfigurationException, SAXException {
         Document doc = getRequestDocument("winrm/winrm-exitcode-test_10.xml");
         String exitCode = getFirstElement(doc, ResponseExtractor.EXIT_CODE.getXPath());
         assertThat(exitCode, equalTo("12"));
     }
 
     @Test
-    public void checkReturnExitCodeWinRmV2() throws DocumentException {
+    public void checkReturnExitCodeWinRmV2() throws DocumentException, ParserConfigurationException, SAXException {
         Document doc = getRequestDocument("winrm/winrm-exitcode-test_20.xml");
         String exitCode = getFirstElement(doc, ResponseExtractor.EXIT_CODE.getXPath());
         assertThat(exitCode, equalTo("16"));
@@ -61,10 +63,21 @@ public class ResponseExtractorTest {
         return next.getText();
     }
 
-    private Document getRequestDocument(String path) throws DocumentException {
+    private Document getRequestDocument(String path) throws DocumentException, ParserConfigurationException, SAXException {
         URL resource = Resources.getResource(path);
-        SAXReader reader = new SAXReader();
+        SAXReader reader = getSAXReader();
         Document responseDocument = reader.read(resource);
         return responseDocument;
+    }
+
+    private static SAXReader getSAXReader() throws ParserConfigurationException, SAXException {
+        SAXParserFactory spf = SAXParserFactory.newDefaultInstance();
+        SAXParser sp = spf.newSAXParser();
+        SAXReader reader = new SAXReader();
+        reader.setXMLReader(sp.getXMLReader());
+        reader.setFeature("http://xml.org/sax/features/namespaces", true);
+        reader.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
+        reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        return reader;
     }
 }
