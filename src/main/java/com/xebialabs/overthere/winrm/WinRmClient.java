@@ -73,6 +73,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Iterator;
 import java.util.List;
@@ -544,7 +545,7 @@ class WinRmClient {
 
         final InputStream is = entity.getContent();
         final Writer writer = new StringWriter();
-        final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        final Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         try {
             int n;
             final char[] buffer = new char[1024];

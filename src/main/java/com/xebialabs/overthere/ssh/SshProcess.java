@@ -22,21 +22,19 @@
  */
 package com.xebialabs.overthere.ssh;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xebialabs.overthere.CmdLine;
 import com.xebialabs.overthere.OperatingSystemFamily;
 import com.xebialabs.overthere.OverthereProcess;
 import com.xebialabs.overthere.RuntimeIOException;
-
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.connection.channel.direct.Signal;
 import net.schmizz.sshj.transport.TransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
 import static java.lang.String.format;
@@ -86,7 +84,7 @@ class SshProcess implements OverthereProcess {
         try {
             command.join();
             Integer exitStatus = command.getExitStatus();
-            logger.info("Command [{}] on {} returned exit code {}", new Object[]{obfuscatedCommandLine, connection, exitStatus});
+            logger.info("Command [{}] on {} returned exit code {}", obfuscatedCommandLine, connection, exitStatus);
             closeSession();
             if (exitStatus == null) {
                 logger.warn("Command [{}] on {} could not be started. Returning exit code -1", obfuscatedCommandLine, connection);

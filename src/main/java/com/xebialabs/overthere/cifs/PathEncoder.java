@@ -22,13 +22,13 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import com.xebialabs.overthere.RuntimeIOException;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.xebialabs.overthere.RuntimeIOException;
 
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CIFS_PORT_DEFAULT;
 import static java.lang.String.format;
@@ -87,10 +87,8 @@ class PathEncoder {
         // Java-style Windows paths.
         hostPath = hostPath.replace('/', WINDOWS_SEPARATOR);
 
-        if (hostPath.length() >= 3) {
-            if (hostPath.charAt(2) != WINDOWS_SEPARATOR) {
-                throw new IllegalArgumentException(format("Host path '%s' does not have a backslash (\\) as its third character", hostPath));
-            }
+        if (hostPath.length() >= 3 && hostPath.charAt(2) != WINDOWS_SEPARATOR) {
+            throw new IllegalArgumentException(format("Host path '%s' does not have a backslash (\\) as its third character", hostPath));
         }
 
         StringBuilder smbUrl = new StringBuilder(smbUrlPrefix);

@@ -23,6 +23,7 @@
 package com.xebialabs.overthere.winrm.soap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,10 +36,8 @@ public enum OptionSet {
     private final List<KeyValuePair> keyValuePairs;
 
     OptionSet(KeyValuePair... keyValuePairs) {
-        this.keyValuePairs = new ArrayList<KeyValuePair>();
-        for (KeyValuePair keyValuePair : keyValuePairs) {
-            this.keyValuePairs.add(keyValuePair);
-        }
+        this.keyValuePairs = new ArrayList<>();
+        this.keyValuePairs.addAll(Arrays.asList(keyValuePairs));
     }
 
     public List<KeyValuePair> getKeyValuePairs() {

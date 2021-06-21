@@ -38,11 +38,11 @@ import static java.util.Collections.unmodifiableList;
 @Deprecated
 public final class CapturingOverthereProcessOutputHandler implements OverthereProcessOutputHandler {
 
-    private final List<String> outputLines = new ArrayList<String>();
+    private final List<String> outputLines = new ArrayList<>();
 
-    private final List<String> errorLines = new ArrayList<String>();
+    private final List<String> errorLines = new ArrayList<>();
 
-    private final List<String> allLines = new ArrayList<String>();
+    private final List<String> allLines = new ArrayList<>();
 
     private CapturingOverthereProcessOutputHandler() {
     }

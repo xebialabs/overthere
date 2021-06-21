@@ -24,15 +24,10 @@ package com.xebialabs.overthere.util;
 
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Stack;
 
-import static com.xebialabs.overthere.util.OverthereFileDirectoryWalker.ROOT;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static com.xebialabs.overthere.util.OverthereUtils.write;
 
@@ -46,9 +41,6 @@ public final class OverthereFileCopier extends OverthereFileTransmitter {
 
     private static final String SOURCE = "Source";
     private static final String DESTINATION = "Destination";
-
-    private Stack<OverthereFile> dstDirStack = new Stack<OverthereFile>();
-    private OverthereFile srcDir;
 
     private OverthereFileCopier() {
     }

@@ -54,13 +54,13 @@ class WsmanSPNegoSchemeFactory extends SPNegoSchemeFactory {
 
     @Override
     public AuthScheme newInstance(final HttpParams params) {
-        logger.trace("WsmanSPNegoSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        logger.trace("WsmanSPNegoSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", spnServiceClass, spnHost, spnPort, isStripPort());
         return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort, useCanonicalHostname);
     }
 
     @Override
     public AuthScheme create(final HttpContext context) {
-        logger.trace("WsmanSPNegoSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        logger.trace("WsmanSPNegoSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", spnServiceClass, spnHost, spnPort, isStripPort());
         return new WsmanSPNegoScheme(isStripPort(), spnServiceClass, spnHost, spnPort, useCanonicalHostname);
     }
 

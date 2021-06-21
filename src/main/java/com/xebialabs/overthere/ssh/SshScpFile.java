@@ -134,9 +134,9 @@ class SshScpFile extends SshFile<SshScpConnection> {
             results.exists = false;
         }
 
-        logger.debug("Listed file {}: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", new Object[]{this, results.exists,
+        logger.debug("Listed file {}: exists={}, isDirectory={}, length={}, canRead={}, canWrite={}, canExecute={}", this, results.exists,
                 results.isDirectory, results.length
-                , results.canRead, results.canWrite, results.canExecute});
+                , results.canRead, results.canWrite, results.canExecute);
 
         return results;
     }
@@ -265,7 +265,7 @@ class SshScpFile extends SshFile<SshScpConnection> {
             throw new RuntimeIOException("Cannot list directory " + this + ": " + capturedStderr.getOutput() + " (errno=" + errno + ")");
         }
 
-        List<OverthereFile> files = new ArrayList<OverthereFile>();
+        List<OverthereFile> files = new ArrayList<>();
         for (String lsLine : capturedStdout.getOutputLines()) {
             // Filter out the '.' and '..'
             if (!(".".equals(lsLine) || "..".equals(lsLine))) {

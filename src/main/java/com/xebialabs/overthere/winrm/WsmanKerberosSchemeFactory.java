@@ -54,12 +54,12 @@ class WsmanKerberosSchemeFactory extends KerberosSchemeFactory {
 
     @Override
     public AuthScheme newInstance(final HttpParams params) {
-        logger.trace("WsmanKerberosSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        logger.trace("WsmanKerberosSchemeFactory.newInstance invoked for SPN {}/{} (spnPort = {}, stripPort = {})", spnServiceClass, spnHost, spnPort, isStripPort());
         return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort); }
 
     @Override
     public AuthScheme create(final HttpContext context) {
-        logger.trace("WsmanKerberosSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", new Object[] {spnServiceClass, spnHost, spnPort, isStripPort() });
+        logger.trace("WsmanKerberosSchemeFactory.create invoked for SPN {}/{} (spnPort = {}, stripPort = {})", spnServiceClass, spnHost, spnPort, isStripPort());
         return new WsmanKerberosScheme(isStripPort(), spnServiceClass, spnHost, spnPort);
     }
 

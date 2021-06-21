@@ -29,8 +29,7 @@ import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.mssmb2.SMB2CreateDisposition;
 import com.hierynomus.mssmb2.SMB2ShareAccess;
 import com.hierynomus.mssmb2.SMBApiException;
-import com.hierynomus.protocol.commons.EnumWithValue;
-import com.hierynomus.protocol.transport.TransportException;
+import com.hierynomus.protocol.commons.EnumWithValue.EnumUtils;
 import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
@@ -43,11 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 
@@ -114,7 +109,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
     private boolean checkAccess(Set<AccessMask> requestAccesSet, AccessMask searchAccessMask) {
         try {
             int accessFlags = getAccessMask(requestAccesSet);
-            return EnumWithValue.EnumUtils.isSet(accessFlags, searchAccessMask);
+            return EnumUtils.isSet(accessFlags, searchAccessMask);
         } catch(SMBApiException e) {
             logger.warn("Acces denied to {} : {}", getPath(), e.getMessage());
             if (e.getStatus() == NtStatus.STATUS_ACCESS_DENIED) {
@@ -269,7 +264,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
         String sharePath = getPathOnShare();
         logger.debug("Listing directory {}", sharePath);
         try {
-            List<OverthereFile> files = new ArrayList<OverthereFile>();
+            List<OverthereFile> files = new ArrayList<>();
             for (FileIdBothDirectoryInformation info : getShare().list(sharePath)) {
                 if (!info.getFileName().equals(".") && !info.getFileName().equals("..")) {
                     files.add(getFile(info.getFileName()));
@@ -387,7 +382,7 @@ public class SmbFile extends BaseOverthereFile<SmbConnection> {
 
     private boolean checkAttributes(FileAttributes mask) {
         long attrMask = getShare().getFileInformation(getPathOnShare()).getBasicInformation().getFileAttributes();
-        return FileAttributes.EnumUtils.isSet(attrMask, mask);
+        return EnumUtils.isSet(attrMask, mask);
     }
 
     private SmbFile getFileForAbsolutePath(String path) {

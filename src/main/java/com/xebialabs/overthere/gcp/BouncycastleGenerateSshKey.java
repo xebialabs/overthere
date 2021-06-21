@@ -39,10 +39,8 @@ class BouncycastleGenerateSshKey implements GenerateSshKey {
                     PrimeCertaintyCalculator.getDefaultCertainty(keySize)));
             AsymmetricCipherKeyPair asymmetricCipherKeyPair = rsaKeyPairGenerator.generateKeyPair();
             PrivateKeyInfo pkInfo = PrivateKeyInfoFactory.createPrivateKeyInfo(asymmetricCipherKeyPair.getPrivate());
-            String privateKey2 = new String(Base64.encode(pkInfo.getEncoded(ASN1Encoding.DER)));
 
             SubjectPublicKeyInfo info = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(asymmetricCipherKeyPair.getPublic());
-            String publicKey2 = new String(Base64.encode(info.getEncoded(ASN1Encoding.DER)));
 
             return new SshKeyPair(username, privateKey, publicKey, "");
         } catch (Exception e) {

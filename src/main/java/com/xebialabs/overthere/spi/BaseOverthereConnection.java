@@ -22,6 +22,11 @@
  */
 package com.xebialabs.overthere.spi;
 
+import com.xebialabs.overthere.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
@@ -30,26 +35,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereConnection;
-import com.xebialabs.overthere.OverthereExecutionOutputHandler;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.OverthereProcessOutputHandler;
-import com.xebialabs.overthere.RuntimeIOException;
-import org.slf4j.MDC;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.syserrHandler;
 import static com.xebialabs.overthere.util.ConsoleOverthereExecutionOutputHandler.sysoutHandler;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStderr;
 import static com.xebialabs.overthere.util.OverthereProcessOutputHandlerWrapper.wrapStdout;
+import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 
@@ -73,7 +65,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
     protected final boolean deleteTemporaryDirectoryOnDisconnect;
     protected final int temporaryFileCreationRetries;
     protected final String temporaryFileHolderDirectoryNamePrefix;
-    protected final List<OverthereFile> temporaryFileHolderDirectories = new ArrayList<OverthereFile>();
+    protected final List<OverthereFile> temporaryFileHolderDirectories = new ArrayList<>();
     protected final int streamBufferSize;
     protected int temporaryFileHolderDirectoryNameSuffix = 0;
     protected OverthereFile workingDirectory;

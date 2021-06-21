@@ -22,22 +22,20 @@
  */
 package com.xebialabs.overthere.cifs;
 
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.RuntimeIOException;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
+import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 import static java.lang.String.format;
 
@@ -184,14 +182,12 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
 
         try {
             upgradeToDirectorySmbFile();
-            List<OverthereFile> files = new ArrayList<OverthereFile>();
+            List<OverthereFile> files = new ArrayList<>();
             for (String name : smbFile.list()) {
                 files.add(getFile(name));
             }
             return files;
-        } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot list directory %s: %s", smbFile.getUncPath(), exc.toString()), exc);
-        } catch (SmbException exc) {
+        } catch (MalformedURLException | SmbException exc) {
             throw new RuntimeIOException(format("Cannot list directory %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
@@ -253,9 +249,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
             }
             smbFile.delete();
             refreshSmbFile();
-        } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s: %s", smbFile.getUncPath(), exc.toString()), exc);
-        } catch (SmbException exc) {
+        } catch (MalformedURLException | SmbException exc) {
             throw new RuntimeIOException(format("Cannot delete %s: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }
@@ -270,9 +264,7 @@ class CifsFile extends BaseOverthereFile<CifsConnection> {
             }
             smbFile.delete();
             refreshSmbFile();
-        } catch (MalformedURLException exc) {
-            throw new RuntimeIOException(format("Cannot delete %s recursively: %s", smbFile.getUncPath(), exc.toString()), exc);
-        } catch (SmbException exc) {
+        } catch (MalformedURLException | SmbException exc) {
             throw new RuntimeIOException(format("Cannot delete %s recursively: %s", smbFile.getUncPath(), exc.toString()), exc);
         }
     }

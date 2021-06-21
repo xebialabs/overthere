@@ -43,7 +43,7 @@ class KerberosJaasConfiguration extends Configuration {
 
     @Override
     public AppConfigurationEntry[] getAppConfigurationEntry(String s) {
-        final HashMap<String, String> options = new HashMap<String, String>();
+        final HashMap<String, String> options = new HashMap<>();
 
         if (debug) {
             options.put("debug", "true");

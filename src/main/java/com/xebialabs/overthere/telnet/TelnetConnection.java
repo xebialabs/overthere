@@ -24,8 +24,8 @@ package com.xebialabs.overthere.telnet;
 
 import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
-import com.xebialabs.overthere.spi.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.ProcessConnection;
 import org.apache.commons.net.telnet.InvalidTelnetOptionException;
 import org.apache.commons.net.telnet.TelnetClient;
 import org.apache.commons.net.telnet.WindowSizeOptionHandler;
@@ -38,9 +38,7 @@ import java.net.InetSocketAddress;
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotNewStyleWindowsDomain;
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.*;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 /**
@@ -241,9 +239,7 @@ public class TelnetConnection implements ProcessConnection {
                     }
                 }
             };
-        } catch (InvalidTelnetOptionException exc) {
-            throw new RuntimeIOException("Cannot execute command " + cmd + " at telnet://" + username + "@" + address, exc);
-        } catch (IOException exc) {
+        } catch (InvalidTelnetOptionException | IOException exc) {
             throw new RuntimeIOException("Cannot execute command " + cmd + " at telnet://" + username + "@" + address, exc);
         }
     }

@@ -12,7 +12,7 @@ public abstract class OverthereFileTransmitter extends OverthereFileDirectoryWal
     private static final String SOURCE = "Source";
     private static final String DESTINATION = "Destination";
 
-    private Stack<OverthereFile> dstDirStack = new Stack<OverthereFile>();
+    private Stack<OverthereFile> dstDirStack = new Stack<>();
     private OverthereFile srcDir;
 
     protected OverthereFileTransmitter() {

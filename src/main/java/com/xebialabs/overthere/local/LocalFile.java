@@ -61,10 +61,9 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     private static LocalConnection createConnection() {
         // Creating LocalConnection directly instead of through Overthere.getConnection() to prevent log messages from
         // appearing
-        LocalConnection localConnectionThatWillNeverBeDisconnected = new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
         // FIXME: Creating a LocalConnection on the fly does not honour the original TEMPORARY_DIRECTORY_PATH (tmp)
         // setting
-        return localConnectionThatWillNeverBeDisconnected;
+        return new LocalConnection(LOCAL_PROTOCOL, new ConnectionOptions());
     }
 
     public File getFile() {
@@ -171,7 +170,7 @@ public class LocalFile extends BaseOverthereFile<LocalConnection> implements Ser
     public List<OverthereFile> listFiles() {
         logger.debug("Listing directory {}", this);
 
-        List<OverthereFile> list = new ArrayList<OverthereFile>();
+        List<OverthereFile> list = new ArrayList<>();
         for (File each : file.listFiles()) {
             list.add(new LocalFile(connection, each));
         }

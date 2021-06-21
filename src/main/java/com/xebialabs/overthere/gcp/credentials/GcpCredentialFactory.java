@@ -1,8 +1,9 @@
 package com.xebialabs.overthere.gcp.credentials;
 
-import java.util.Collections;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
+
+import java.util.Collections;
 
 /**
  * Abstract factory that base for implementation of credential factory.
@@ -19,10 +20,10 @@ public abstract class GcpCredentialFactory {
     public ProjectCredentials withScope(ProjectCredentials projectCredentials) {
         Credentials credentials = projectCredentials.getCredentials();
         if (credentials instanceof GoogleCredentials) {
-            GoogleCredentials GcpCredentialFactory = (GoogleCredentials) credentials;
-            if (GcpCredentialFactory.createScopedRequired()) {
+            GoogleCredentials gcpCredentialFactory = (GoogleCredentials) credentials;
+            if (gcpCredentialFactory.createScopedRequired()) {
                 return new ProjectCredentials(
-                        GcpCredentialFactory.createScoped(Collections.singletonList("https://www.googleapis.com/auth/cloud-platform")),
+                        gcpCredentialFactory.createScoped(Collections.singletonList("https://www.googleapis.com/auth/cloud-platform")),
                         projectCredentials.getProjectId(),
                         projectCredentials.getClientEmail());
             }

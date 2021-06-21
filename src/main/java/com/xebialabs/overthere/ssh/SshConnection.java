@@ -32,11 +32,9 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.Factory;
 import net.schmizz.sshj.common.SSHException;
 import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.PTYMode;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import net.schmizz.sshj.userauth.UserAuthException;
 import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
@@ -116,12 +114,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         config.setFileKeyProviderFactories(current);
     }
 
-    protected Factory<SSHClient> sshClientFactory = new Factory<SSHClient>() {
-        @Override
-        public SSHClient create() {
-            return new SSHClient(config);
-        }
-    };
+    protected Factory<SSHClient> sshClientFactory = () -> new SSHClient(config);
 
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
         super(protocol, options, mapper, true);
@@ -332,12 +325,12 @@ abstract class SshConnection extends BaseOverthereConnection {
                 checkArgument(matcher.matches(), "Value for allocatePty [%s] does not match pattern \"" + PTY_PATTERN + "\"", allocatePty);
 
                 String term = matcher.group(1);
-                int cols = Integer.valueOf(matcher.group(2));
-                int rows = Integer.valueOf(matcher.group(3));
-                int width = Integer.valueOf(matcher.group(4));
-                int height = Integer.valueOf(matcher.group(5));
-                logger.debug("Allocating PTY {}:{}:{}:{}:{}", new Object[]{term, cols, rows, width, height});
-                session.allocatePTY(term, cols, rows, width, height, Collections.<PTYMode, Integer>emptyMap());
+                int cols = Integer.parseInt(matcher.group(2));
+                int rows = Integer.parseInt(matcher.group(3));
+                int width = Integer.parseInt(matcher.group(4));
+                int height = Integer.parseInt(matcher.group(5));
+                logger.debug("Allocating PTY {}:{}:{}:{}:{}", term, cols, rows, width, height);
+                session.allocatePTY(term, cols, rows, width, height, Collections.emptyMap());
             } else if (allocateDefaultPty) {
                 logger.debug("Allocating default PTY");
                 session.allocateDefaultPTY();
