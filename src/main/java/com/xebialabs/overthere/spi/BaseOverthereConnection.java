@@ -273,20 +273,17 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         Thread stdoutReaderThread = null;
         Thread stderrReaderThread = null;
         final CountDownLatch latch = new CountDownLatch(2);
-        final CountDownLatch latchToCheckThreadsFinished = new CountDownLatch(2);
         try {
             Map<String, String> mdcContext =  MDC.getCopyOfContextMap();
-            stdoutReaderThread = getThread("stdout", commandLine.toString(), stdoutHandler, process.getStdout(), latch, latchToCheckThreadsFinished,  mdcContext);
+            stdoutReaderThread = getThread("stdout", commandLine.toString(), stdoutHandler, process.getStdout(), latch, mdcContext);
             stdoutReaderThread.start();
 
-            stderrReaderThread = getThread("stderr", commandLine.toString(), stderrHandler, process.getStderr(), latch, latchToCheckThreadsFinished, mdcContext);
+            stderrReaderThread = getThread("stderr", commandLine.toString(), stderrHandler, process.getStderr(), latch, mdcContext);
             stderrReaderThread.start();
 
             try {
                 latch.await();
-                int threadsToWaitCount = process.waitFor();
-                latchToCheckThreadsFinished.await();
-                return threadsToWaitCount;
+                return process.waitFor();
             } catch (InterruptedException exc) {
                 Thread.currentThread().interrupt();
 
@@ -313,7 +310,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         }
     }
 
-    private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch, final CountDownLatch latchForThreadsFinished, final Map<String, String> mdcContext) {
+    private Thread getThread(final String streamName, final String commandLine, final OverthereExecutionOutputHandler outputHandler, final InputStream stream, final CountDownLatch latch, final Map<String, String> mdcContext) {
         Thread t = new Thread(format("%s reader", streamName)) {
             @Override
             public void run() {
@@ -321,7 +318,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 setMDCContext(mdcContext);
                 StringBuilder lineBuffer = new StringBuilder();
                 InputStreamReader stdoutReader = new InputStreamReader(stream);
-                latch.countDown();
                 try {
                     int cInt = stdoutReader.read();
                     while (cInt > -1) {
@@ -344,7 +340,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                         outputHandler.handleLine(lineBuffer.toString());
                     }
                     setMDCContext(previous);
-                    latchForThreadsFinished.countDown();
+                    latch.countDown();
                 }
             }
 
