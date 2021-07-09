@@ -318,7 +318,6 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                 setMDCContext(mdcContext);
                 StringBuilder lineBuffer = new StringBuilder();
                 InputStreamReader stdoutReader = new InputStreamReader(stream);
-                latch.countDown();
                 try {
                     int cInt = stdoutReader.read();
                     while (cInt > -1) {
@@ -341,6 +340,7 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
                         outputHandler.handleLine(lineBuffer.toString());
                     }
                     setMDCContext(previous);
+                    latch.countDown();
                 }
             }
 
