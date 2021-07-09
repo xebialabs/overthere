@@ -28,6 +28,8 @@ import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
 class ByteArrayConnection extends BaseOverthereConnection {
 
+    public static final String MESSAGE = "ByteArrayConnection has no functionality. Use only the created ByteArrayFile.";
+
     protected ByteArrayConnection(String protocol, ConnectionOptions options) {
         super(protocol, options, new DefaultAddressPortMapper(), false);
     }
@@ -39,17 +41,17 @@ class ByteArrayConnection extends BaseOverthereConnection {
 
     @Override
     public OverthereFile getFile(String hostPath) {
-        throw new UnsupportedOperationException("ByteArrayConnection has no functionality. Use only the created ByteArrayFile.");
+        throw new UnsupportedOperationException(MESSAGE);
     }
 
     @Override
     public OverthereFile getFile(OverthereFile parent, String child) {
-        throw new UnsupportedOperationException("ByteArrayConnection has no functionality. Use only the created ByteArrayFile.");
+        throw new UnsupportedOperationException(MESSAGE);
     }
 
     @Override
     protected OverthereFile getFileForTempFile(OverthereFile parent, String name) {
-        throw new UnsupportedOperationException("ByteArrayConnection has no functionality. Use only the created ByteArrayFile.");
+        throw new UnsupportedOperationException(MESSAGE);
     }
 
     @Override

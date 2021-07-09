@@ -121,7 +121,7 @@ class SshSftpFile extends SshFile<SshSftpConnection> {
             List<RemoteResourceInfo> ls = connection.getSharedSftpClient().ls(getSftpPath());
 
             // copy files to list, skipping . and ..
-            List<OverthereFile> files = new ArrayList<OverthereFile>();
+            List<OverthereFile> files = new ArrayList<>();
             for (RemoteResourceInfo l : ls) {
                 String filename = l.getName();
                 if (filename.equals(".") || filename.equals("..")) {

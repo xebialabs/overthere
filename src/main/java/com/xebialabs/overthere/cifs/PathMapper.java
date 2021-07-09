@@ -40,13 +40,8 @@ public class PathMapper {
 
     public PathMapper(final Map<String, String> mappings) {
         // longest first, so reverse lexicographical order
-        SortedMap<String, String> sharesForPath = new TreeMap<String, String>(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o2.compareTo(o1);
-            }
-        });
-        Map<String, String> pathsForShare = new HashMap<String, String>();
+        SortedMap<String, String> sharesForPath = new TreeMap<>((o1, o2) -> o2.compareTo(o1));
+        Map<String, String> pathsForShare = new HashMap<>();
 
         for (Entry<String, String> mapping : mappings.entrySet()) {
             String pathPrefixToMatch = mapping.getKey();

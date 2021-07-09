@@ -26,8 +26,8 @@ import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
-import com.xebialabs.overthere.spi.ProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+import com.xebialabs.overthere.spi.ProcessConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +40,7 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.*;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkIsWindowsHost;
 import static com.xebialabs.overthere.cifs.ConnectionValidator.checkNotOldStyleWindowsDomain;
-import static com.xebialabs.overthere.util.OverthereUtils.checkArgument;
-import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
-import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
+import static com.xebialabs.overthere.util.OverthereUtils.*;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
 
@@ -114,7 +112,7 @@ public class WinRmConnection implements ProcessConnection {
             winRmClient.createShell();
             final String commandId = winRmClient.executeCommand(cmdString);
 
-            final Exception inputReaderTheaException[] = new Exception[1];
+            final Exception[] inputReaderTheaException = new Exception[1];
             final Thread inputReaderThead = new Thread(format("WinRM input reader for command [%s]", commandId)) {
                 @Override
                 public void run() {
@@ -141,7 +139,7 @@ public class WinRmConnection implements ProcessConnection {
             inputReaderThead.setDaemon(true);
             inputReaderThead.start();
 
-            final Exception outputReaderThreadException[] = new Exception[1];
+            final Exception[] outputReaderThreadException = new Exception[1];
             final Thread outputReaderThread = new Thread(format("WinRM output reader for command [%s]", commandId)) {
                 @Override
                 public void run() {

@@ -22,9 +22,8 @@
  */
 package com.xebialabs.overthere.util;
 
-import org.slf4j.Logger;
-
 import com.xebialabs.overthere.OverthereExecutionOutputHandler;
+import org.slf4j.Logger;
 
 /**
  * Implementation of the {@link com.xebialabs.overthere.OverthereExecutionOutputHandler} interface that sends the output to the specified logger.
@@ -35,7 +34,7 @@ public class LoggingOverthereExecutionOutputHandler implements OverthereExecutio
     /**
      * Enum that controls to which level the message gets sent.
      */
-    private static enum LogLevel {
+    private enum LogLevel {
         INFO {
             void log(Logger logger, String message) {
                 logger.info(message);

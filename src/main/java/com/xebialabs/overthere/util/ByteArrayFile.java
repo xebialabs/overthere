@@ -22,16 +22,16 @@
  */
 package com.xebialabs.overthere.util;
 
+import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.OperatingSystemFamily;
+import com.xebialabs.overthere.OverthereFile;
+import com.xebialabs.overthere.spi.BaseOverthereFile;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OperatingSystemFamily;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.spi.BaseOverthereFile;
 
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.ConnectionOptions.TEMPORARY_DIRECTORY_PATH;
@@ -152,7 +152,7 @@ public class ByteArrayFile extends BaseOverthereFile<ByteArrayConnection> {
 
     @Override
     public List<OverthereFile> listFiles() {
-        return new ArrayList<OverthereFile>();
+        return new ArrayList<>();
     }
 
     @Override

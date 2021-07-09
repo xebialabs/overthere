@@ -1,8 +1,5 @@
 package com.xebialabs.overthere.gcp;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.RuntimeIOException;
@@ -10,8 +7,9 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.Protocol;
 import com.xebialabs.overthere.ssh.GcpSshConnectionConfigurer;
 import com.xebialabs.overthere.ssh.SshConnectionBuilder;
-
 import net.schmizz.sshj.userauth.UserAuthException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 
@@ -150,7 +148,7 @@ public class GcpSshConnectionBuilder extends SshConnectionBuilder {
             try {
                 return tryToConnect();
             } catch (RuntimeIOException e) {
-                if (e.getCause() != null && e.getCause() instanceof UserAuthException) {
+                if (e.getCause() instanceof UserAuthException) {
                     try {
                         Thread.sleep(retryPeriodMillis);
                     } catch (InterruptedException interruptedException) {

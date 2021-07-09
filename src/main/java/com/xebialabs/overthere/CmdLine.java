@@ -27,13 +27,10 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.xebialabs.overthere.CmdLineArgument.*;
+import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.util.OverthereUtils.checkNotNull;
 import static com.xebialabs.overthere.util.OverthereUtils.checkState;
-import static com.xebialabs.overthere.CmdLineArgument.arg;
-import static com.xebialabs.overthere.CmdLineArgument.nested;
-import static com.xebialabs.overthere.CmdLineArgument.password;
-import static com.xebialabs.overthere.CmdLineArgument.raw;
-import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static java.util.Collections.unmodifiableList;
 
 /**
@@ -42,7 +39,7 @@ import static java.util.Collections.unmodifiableList;
 @SuppressWarnings("serial")
 public class CmdLine implements Serializable {
 
-    List<CmdLineArgument> arguments = new ArrayList<CmdLineArgument>();
+    List<CmdLineArgument> arguments = new ArrayList<>();
 
     /**
      * Adds {@link CmdLineArgument#arg(String) a regular argument} to the command line.

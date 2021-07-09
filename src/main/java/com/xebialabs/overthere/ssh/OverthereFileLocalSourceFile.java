@@ -74,7 +74,7 @@ class OverthereFileLocalSourceFile implements LocalSourceFile {
 
     @Override
     public Iterable<? extends LocalSourceFile> getChildren(LocalFileFilter filter) throws IOException {
-        List<LocalSourceFile> files = new ArrayList<LocalSourceFile>();
+        List<LocalSourceFile> files = new ArrayList<>();
         for (OverthereFile each : f.listFiles()) {
             files.add(new OverthereFileLocalSourceFile(each));
         }

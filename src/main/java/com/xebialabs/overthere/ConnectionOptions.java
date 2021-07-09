@@ -200,7 +200,7 @@ public class ConnectionOptions {
      * Creates an empty options object.
      */
     public ConnectionOptions() {
-        options = new HashMap<String, Object>();
+        options = new HashMap<>();
     }
 
     /**

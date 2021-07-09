@@ -23,8 +23,8 @@ import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 public class OverthereConnector {
     private static final Logger logger = LoggerFactory.getLogger(OverthereConnector.class);
 
-    final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>>(
-            new HashMap<String, Class<? extends OverthereConnectionBuilder>>());
+    final AtomicReference<Map<String, Class<? extends OverthereConnectionBuilder>>> protocols = new AtomicReference<>(
+            new HashMap<>());
 
 
     public void registerProtocol(Class<? extends OverthereConnectionBuilder> builderClass) {

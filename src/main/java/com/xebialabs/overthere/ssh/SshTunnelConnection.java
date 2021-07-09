@@ -22,6 +22,17 @@
  */
 package com.xebialabs.overthere.ssh;
 
+import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.spi.AddressPortMapper;
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.transport.TransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.SocketFactory;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -35,28 +46,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.xebialabs.overthere.CmdLine;
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.OverthereExecutionOutputHandler;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.OverthereProcess;
-import com.xebialabs.overthere.RuntimeIOException;
-import com.xebialabs.overthere.spi.AddressPortMapper;
-
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.transport.TransportException;
-
-import javax.net.SocketFactory;
-
-import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.PORT_ALLOCATION_RANGE_START_DEFAULT;
+import static com.xebialabs.overthere.util.OverthereUtils.checkState;
 import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 import static java.lang.String.format;
 import static java.net.InetSocketAddress.createUnresolved;
@@ -66,13 +58,13 @@ import static java.net.InetSocketAddress.createUnresolved;
  */
 public class SshTunnelConnection extends SshConnection implements AddressPortMapper {
 
-    private static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<TunnelPortManager>(new TunnelPortManager());
+    private static final AtomicReference<TunnelPortManager> PORT_MANAGER = new AtomicReference<>(new TunnelPortManager());
 
     private static final int MAX_PORT = 65535;
 
-    private Map<InetSocketAddress, InetSocketAddress> localPortForwards = new HashMap<InetSocketAddress, InetSocketAddress>();
+    private Map<InetSocketAddress, InetSocketAddress> localPortForwards = new HashMap<>();
 
-    private List<PortForwarder> portForwarders = new ArrayList<PortForwarder>();
+    private List<PortForwarder> portForwarders = new ArrayList<>();
 
     private int startPortRange;
 

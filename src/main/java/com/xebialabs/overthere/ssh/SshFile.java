@@ -134,7 +134,7 @@ abstract class SshFile<C extends SshConnection> extends BaseOverthereFile<C> {
 
     static List<String> splitPath(String path, OperatingSystemFamily os) {
         Pattern s = os == WINDOWS ? WINDOWS_PATH_SPLITTER : UNIX_PATH_SPLITTER;
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         for (String p : s.split(path)) {
             if (p.isEmpty()) continue;
             l.add(p);
