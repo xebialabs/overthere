@@ -1,0 +1,35 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+dependencies {
+  compile rootProject
+
+  compile 'com.jcraft:jsch:0.1.55'
+  compile 'com.google.cloud:google-cloud-os-login:1.2.2'
+  compile 'com.google.apis:google-api-services-compute:v1-rev20210310-1.31.0'
+
+
+  // Test dependencies
+  testCompile rootProject
+  testCompile('com.xebialabs.cloud:overcast:2.5.1') {
+    exclude group: 'com.xebialabs.overthere', module: 'overthere'
+    exclude group: 'net.schmizz', module: 'sshj'
+  }
+  testCompile 'org.hamcrest:hamcrest-core:1.3'
+  testCompile 'org.hamcrest:hamcrest-library:1.3'
+  testImplementation 'org.mockito:mockito-core:3.9.0'
+
+  testCompile('org.testng:testng:5.14.10') {
+    exclude group: "junit", module: "junit"
+  }
+}
+
+test {
+  useTestNG()
+
+  excludes = ['**/*Itest.*']
+
+  maxHeapSize = "512m"
+}

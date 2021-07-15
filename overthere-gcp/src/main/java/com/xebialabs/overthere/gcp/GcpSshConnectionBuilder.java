@@ -189,8 +189,8 @@ public class GcpSshConnectionBuilder extends SshConnectionBuilder {
     }
 
     private static ConnectionOptions additionalConnectionOptions(final ConnectionOptions options) {
-        if (!options.containsKey(USERNAME)) {
-            options.set(USERNAME, USERNAME); // temporary dummy username, real is set in the GcpSshConnectionConfigurer
+        if (!options.containsKey(ConnectionOptions.USERNAME)) {
+            options.set(ConnectionOptions.USERNAME, ConnectionOptions.USERNAME); // temporary dummy username, real is set in the GcpSshConnectionConfigurer
         }
         return options;
     }

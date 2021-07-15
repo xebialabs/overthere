@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Utils;
+import com.xebialabs.overthere.gcp.Utils;
 
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.CLIENT_EMAIL;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.CLIENT_ID;
