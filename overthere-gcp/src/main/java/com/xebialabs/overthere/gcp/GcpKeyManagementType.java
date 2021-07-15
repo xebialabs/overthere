@@ -25,7 +25,7 @@ public enum GcpKeyManagementType {
         GcpKeyManager createGcpKeyManager(final ConnectionOptions options, final GcpCredentialFactory gcpCredentialFactory) {
             String zoneName = options.get(ZONE_NAME);
             String instanceId = options.getOptional(INSTANCE_ID);
-            String username = options.get(ConnectionOptions.USERNAME);
+            String username = options.get(USERNAME);
             String applicationName = options.getOptional(APPLICATION_NAME);
             return new GcpMetadataKeyManager(
                     GENERATE_SSH_KEY,
