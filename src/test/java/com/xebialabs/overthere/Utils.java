@@ -26,6 +26,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Paths;
+import com.google.common.io.Resources;
 
 public class Utils {
 
@@ -51,5 +53,9 @@ public class Utils {
             file = new File(url.getPath());
         }
         return file.getPath();
+    }
+
+    public static String getClasspathFile(String name) throws Exception {
+        return Paths.get(Resources.getResource(name).toURI()).toFile().getAbsolutePath();
     }
 }

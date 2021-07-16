@@ -6,6 +6,7 @@ import org.testng.annotations.Test;
 import com.google.api.services.compute.model.Metadata;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Utils;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialsType;
 

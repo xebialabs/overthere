@@ -1169,8 +1169,6 @@ There are 2 options to manage internally SSH keys via GCP keys, that are selecte
 </tr>
 </table>
 
-	NOTE: to enable Overthere GCP features you need to include additional library overthere-gcp, that is submodule of the overthere.
-
 <a name="gcp_oslogin"></a>
 ### GCP OsLogin: Using GCP's service account with OsLogin
 SSH connection to the GCP hosts can be implemented by managing ssh keys with OsLogin API.
@@ -1378,8 +1376,6 @@ For `ServiceAccountPkcs8` following options are required:
 
 <a name="release_history"></a>
 # Release History
-* Overthere 5.3.3 (15-Jul-2021)
-	* Split Overthere GCP implementation so the separate module.
 * Overthere 5.3.2 (30-Mar-2021)
     * SSH connection to GCP hosts by using project or instance metadata.
     * Fix SSH connection resource leak on connection failure.

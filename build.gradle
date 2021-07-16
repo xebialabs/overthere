@@ -25,6 +25,7 @@ plugins {
 }
 defaultTasks 'build'
 
+group = 'com.xebialabs.overthere'
 
 apply plugin: 'idea'
 apply plugin: 'java'
@@ -34,22 +35,18 @@ apply plugin: 'signing'
 apply plugin: 'license'
 apply plugin: 'io.codearte.nexus-staging'
 
-allprojects {
-  group = 'com.xebialabs.overthere'
-
-  repositories {
-    mavenCentral()
-    maven {
-      url 'http://download.java.net/maven/2/'
-    }
-    maven {
-      url 'https://oss.sonatype.org/content/repositories/releases'
-    }
-    maven {
-      url 'http://www.libvirt.org/maven2/'
-    }
-    mavenLocal()
+repositories {
+  mavenCentral()
+  maven {
+    url 'http://download.java.net/maven/2/'
   }
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/releases'
+  }
+  maven {
+    url 'http://www.libvirt.org/maven2/'
+  }
+  mavenLocal()
 }
 
 sourceCompatibility = '11'
@@ -125,6 +122,11 @@ dependencies {
   }
   compile 'org.apache.httpcomponents:httpcore:4.4.1'
   compile 'commons-codec:commons-codec:1.10'
+
+  // GCP
+  compile 'com.jcraft:jsch:0.1.55'
+  compile 'com.google.cloud:google-cloud-os-login:1.2.2'
+  compile 'com.google.apis:google-api-services-compute:v1-rev20210310-1.31.0'
 
   // Test dependencies
   testCompile('com.xebialabs.cloud:overcast:2.5.1') {

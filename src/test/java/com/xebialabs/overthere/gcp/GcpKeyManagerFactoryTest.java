@@ -4,6 +4,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Utils;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialsType;
 
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.CREDENTIALS_FILE;

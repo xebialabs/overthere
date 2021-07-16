@@ -6,13 +6,14 @@ import com.google.cloud.oslogin.common.OsLoginProto;
 import com.google.cloud.oslogin.v1.LoginProfile;
 
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.Utils;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialsType;
 
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.CREDENTIALS_FILE;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GcpOsLoginKeyManagerTest {
