@@ -21,6 +21,7 @@ import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.PROJECT_ID;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.SCOPES;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.SERVICE_ACCOUNT_USER;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.TOKEN_SERVER_URI;
+import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.API_TOKEN;
 
 /**
  * Enums that are used under option `gcpCredentialsType`.
@@ -39,6 +40,19 @@ public enum GcpCredentialsType {
         @Override
         public String createKey(final ConnectionOptions options) {
             return composeKey(options.<String>get(CLIENT_EMAIL), options);
+        }
+    },
+    ServiceAccountToken(Sets.newHashSet(PROJECT_ID, API_TOKEN)) {
+        @Override
+        protected GcpCredentialFactory doCreate(final ConnectionOptions options) {
+            return new ServiceAccountTokenGcpCredentialFactory(
+                    options.<String>get(PROJECT_ID),
+                    options.<String>get(API_TOKEN)
+            );
+        }
+        @Override
+        public String createKey(final ConnectionOptions options) {
+            return composeKey(options.<String>get(API_TOKEN), options);
         }
     },
     ServiceAccountJsonFile(Sets.newHashSet(CREDENTIALS_FILE)) {
