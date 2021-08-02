@@ -5,8 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.compute.ComputeScopes;
-import com.google.auth.oauth2.GoogleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -75,9 +75,7 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
 
     @Override
     public GcpKeyManager init() {
-        System.out.print("CAME 333");
         projectCredentials = gcpCredentialFactory.create();
-        System.out.print("CAME 10101010");
         computeService = createComputeService();
         return this;
     }
@@ -215,16 +213,11 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     }
 
     private Compute createComputeService() {
-        System.out.print("CAME 11 11 11 11 11");
-        if(projectCredentials.getGoogleCredentials() != null) {
-//            GoogleCredential.Builder credentialBuilderNew = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory).setClientSecrets("client_id", "client_secret");
-//            this.credential = credentialBuilderNew.build().createScoped(SCOPES);
-//            credential.setAccessToken(accessToken);
-            System.out.print("CAME 12 12 12 12 12 12 12");
+        if(projectCredentials.getCredential() instanceof Credential) {
             return new Compute.Builder(
                     httpTransport, jsonFactory, null)
                     .setApplicationName(applicationName)
-                    .setHttpRequestInitializer(projectCredentials.getGoogleCredentials())
+                    .setHttpRequestInitializer(projectCredentials.getCredential())
                     .build();
         } else {
             return new Compute.Builder(

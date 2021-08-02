@@ -1,11 +1,10 @@
 package com.xebialabs.overthere.gcp.credentials;
 
 import com.google.auth.Credentials;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-
+import com.google.api.client.auth.oauth2.Credential;
 public final class ProjectCredentials {
     private Credentials credentials;
-    private GoogleCredential googleCredential;
+    private Credential credential;
     private final String projectId;
     private final String clientEmail;
 
@@ -15,8 +14,8 @@ public final class ProjectCredentials {
         this.clientEmail = clientEmail;
     }
 
-    ProjectCredentials(final GoogleCredential credentials, final String projectId, final String clientEmail) {
-        this.googleCredential = credentials;
+    ProjectCredentials(final Credential credential, final String projectId, final String clientEmail) {
+        this.credential = credential;
         this.projectId = projectId;
         this.clientEmail = clientEmail;
     }
@@ -25,8 +24,8 @@ public final class ProjectCredentials {
         return credentials;
     }
 
-    public GoogleCredential getGoogleCredentials() {
-        return googleCredential;
+    public Credential getCredential() {
+        return credential;
     }
 
     public String getProjectId() {
