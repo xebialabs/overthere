@@ -18,15 +18,10 @@ public abstract class GcpCredentialFactory {
      * @return credentials with additional scopes.
      */
     public ProjectCredentials withScope(ProjectCredentials projectCredentials) {
-        System.out.print("CAME 555");
         Object credentials = projectCredentials.getCredentials();
-        System.out.print("CAME 666");
         if (credentials instanceof GoogleCredentials) {
-            System.out.print("CAME 7777");
             GoogleCredentials gcpCredentialFactory = (GoogleCredentials) credentials;
-            System.out.print("CAME 8888");
             if (gcpCredentialFactory.createScopedRequired()) {
-                System.out.print("CAME 9999");
                 return new ProjectCredentials(
                         gcpCredentialFactory.createScoped(Collections.singletonList("https://www.googleapis.com/auth/cloud-platform")),
                         projectCredentials.getProjectId(),
@@ -42,7 +37,6 @@ public abstract class GcpCredentialFactory {
      * @return new project credentials.
      */
     public ProjectCredentials create() {
-        System.out.print("CAME 444");
         ProjectCredentials credentials = doCreate();
         return withScope(credentials);
     }
