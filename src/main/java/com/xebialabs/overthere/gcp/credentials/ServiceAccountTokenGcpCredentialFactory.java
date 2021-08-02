@@ -43,7 +43,7 @@ class ServiceAccountTokenGcpCredentialFactory extends GcpCredentialFactory {
             GoogleCredential.Builder credentialBuilderNew = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(JSON_FACTORY).setClientSecrets("client_id", "client_secret");
             this.credential = credentialBuilderNew.build().createScoped(SCOPES);
             credential.setAccessToken(apiToken);
-            return new ProjectCredentials(credential, credential.getServiceAccountProjectId(), credential.getServiceAccountUser());
+            return new ProjectCredentials(credential, projectId, credential.getServiceAccountUser());
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalArgumentException("Cannot use credentials from " + "Token", e);
         }

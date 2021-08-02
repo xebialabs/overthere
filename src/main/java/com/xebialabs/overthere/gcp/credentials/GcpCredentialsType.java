@@ -45,6 +45,7 @@ public enum GcpCredentialsType {
     ServiceAccountToken(Sets.newHashSet(PROJECT_ID, API_TOKEN)) {
         @Override
         protected GcpCredentialFactory doCreate(final ConnectionOptions options) {
+            System.out.print("CAME 111");
             return new ServiceAccountTokenGcpCredentialFactory(
                     options.<String>get(PROJECT_ID),
                     options.<String>get(API_TOKEN)
@@ -52,6 +53,7 @@ public enum GcpCredentialsType {
         }
         @Override
         public String createKey(final ConnectionOptions options) {
+            System.out.print("CAME 222");
             return composeKey(options.<String>get(API_TOKEN), options);
         }
     },

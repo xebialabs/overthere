@@ -3,10 +3,10 @@ package com.xebialabs.overthere.gcp;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
+
+import com.google.api.services.compute.ComputeScopes;
+import com.google.auth.oauth2.GoogleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -20,7 +20,7 @@ import com.google.api.services.compute.model.Metadata;
 import com.google.api.services.compute.model.Operation;
 import com.google.api.services.compute.model.Project;
 import com.google.auth.http.HttpCredentialsAdapter;
-
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
@@ -50,6 +50,8 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     private ProjectCredentials projectCredentials;
     private GcpSshKey gcpSshKey;
     private Compute computeService;
+    private static final List<String> SCOPES = Arrays.asList(ComputeScopes.CLOUD_PLATFORM);
+    private GoogleCredential credential;
 
     private final String zoneName;
     private final String instanceId;
@@ -73,7 +75,9 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
 
     @Override
     public GcpKeyManager init() {
+        System.out.print("CAME 333");
         projectCredentials = gcpCredentialFactory.create();
+        System.out.print("CAME 10101010");
         computeService = createComputeService();
         return this;
     }
@@ -211,11 +215,24 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     }
 
     private Compute createComputeService() {
-        return new Compute.Builder(
-                httpTransport,
-                jsonFactory,
-                new HttpCredentialsAdapter(projectCredentials.getCredentials())
-        ).setApplicationName(applicationName).build();
+        System.out.print("CAME 11 11 11 11 11");
+        if(projectCredentials.getGoogleCredentials() != null) {
+//            GoogleCredential.Builder credentialBuilderNew = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory).setClientSecrets("client_id", "client_secret");
+//            this.credential = credentialBuilderNew.build().createScoped(SCOPES);
+//            credential.setAccessToken(accessToken);
+            System.out.print("CAME 12 12 12 12 12 12 12");
+            return new Compute.Builder(
+                    httpTransport, jsonFactory, null)
+                    .setApplicationName(applicationName)
+                    .setHttpRequestInitializer(projectCredentials.getGoogleCredentials())
+                    .build();
+        } else {
+            return new Compute.Builder(
+                    httpTransport,
+                    jsonFactory,
+                    new HttpCredentialsAdapter(projectCredentials.getCredentials())
+            ).setApplicationName(applicationName).build();
+        }
     }
 
     private static String getISO8601StringForDate(long date) {
