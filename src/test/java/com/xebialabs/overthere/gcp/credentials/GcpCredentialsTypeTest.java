@@ -56,9 +56,9 @@ public class GcpCredentialsTypeTest {
         String key = resolved.createKey(options);
         GcpCredentialFactory gcpCredentialFactory = resolved.createGcpCredentialFactory(options);
 
-        assertThat(resolved, equalTo(GcpCredentialsType.Default));
-        assertThat(key, startsWith(GcpCredentialsType.Default.name()));
-        assertThat(gcpCredentialFactory instanceof DefaultCredentialsGcpCredentialFactory, equalTo(true));
+        assertThat(resolved, equalTo(GcpCredentialsType.ServiceAccountToken));
+        assertThat(key, startsWith(GcpCredentialsType.ServiceAccountToken.name()));
+        assertThat(gcpCredentialFactory instanceof ServiceAccountTokenGcpCredentialFactory, equalTo(true));
     }
 
     @Test
