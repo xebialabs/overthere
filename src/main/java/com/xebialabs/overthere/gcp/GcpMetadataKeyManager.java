@@ -3,7 +3,11 @@ package com.xebialabs.overthere.gcp;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Arrays;
+import java.util.ListIterator;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.compute.ComputeScopes;
@@ -20,7 +24,6 @@ import com.google.api.services.compute.model.Metadata;
 import com.google.api.services.compute.model.Operation;
 import com.google.api.services.compute.model.Project;
 import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
@@ -51,7 +54,6 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     private GcpSshKey gcpSshKey;
     private Compute computeService;
     private static final List<String> SCOPES = Arrays.asList(ComputeScopes.CLOUD_PLATFORM);
-    private GoogleCredential credential;
 
     private final String zoneName;
     private final String instanceId;
