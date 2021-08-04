@@ -4,7 +4,7 @@ import com.google.auth.Credentials;
 import com.google.api.client.auth.oauth2.Credential;
 public final class ProjectCredentials {
     private Credentials credentials;
-    private Credential credential;
+    private Credential oauth2Credential;
     private final String projectId;
     private final String clientEmail;
 
@@ -15,7 +15,7 @@ public final class ProjectCredentials {
     }
 
     ProjectCredentials(final Credential credential, final String projectId, final String clientEmail) {
-        this.credential = credential;
+        this.oauth2Credential = credential;
         this.projectId = projectId;
         this.clientEmail = clientEmail;
     }
@@ -24,8 +24,8 @@ public final class ProjectCredentials {
         return credentials;
     }
 
-    public Credential getCredential() {
-        return credential;
+    public Credential getOauth2Credential() {
+        return oauth2Credential;
     }
 
     public String getProjectId() {

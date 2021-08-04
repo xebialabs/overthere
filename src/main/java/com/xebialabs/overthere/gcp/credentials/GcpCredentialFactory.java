@@ -18,7 +18,7 @@ public abstract class GcpCredentialFactory {
      * @return credentials with additional scopes.
      */
     public ProjectCredentials withScope(ProjectCredentials projectCredentials) {
-        Object credentials = projectCredentials.getCredentials();
+        Credentials credentials = projectCredentials.getCredentials();
         if (credentials instanceof GoogleCredentials) {
             GoogleCredentials gcpCredentialFactory = (GoogleCredentials) credentials;
             if (gcpCredentialFactory.createScopedRequired()) {

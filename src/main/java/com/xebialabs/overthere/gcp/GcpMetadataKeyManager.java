@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Arrays;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.services.compute.ComputeScopes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -53,7 +50,6 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     private ProjectCredentials projectCredentials;
     private GcpSshKey gcpSshKey;
     private Compute computeService;
-    private static final List<String> SCOPES = Arrays.asList(ComputeScopes.CLOUD_PLATFORM);
 
     private final String zoneName;
     private final String instanceId;
@@ -215,11 +211,11 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     }
 
     private Compute createComputeService() {
-        if(projectCredentials.getCredential() instanceof Credential) {
+        if(projectCredentials.getOauth2Credential() != null) {
             return new Compute.Builder(
                     httpTransport, jsonFactory, null)
                     .setApplicationName(applicationName)
-                    .setHttpRequestInitializer(projectCredentials.getCredential())
+                    .setHttpRequestInitializer(projectCredentials.getOauth2Credential())
                     .build();
         } else {
             return new Compute.Builder(
