@@ -443,19 +443,24 @@ class WinRmClient {
         }
     }
 
-    private HttpClientConnectionManager getHttpClientConnectionManager() throws NoSuchAlgorithmException, KeyStoreException {
+    private HttpClientConnectionManager getHttpClientConnectionManager() {
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
-        final Lookup<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
-            @Override
-            public Socket createSocket(HttpContext context) throws IOException {
-                return socketFactory.createSocket();
-            }
-        }).register("https", new SSLConnectionSocketFactory(SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
-            @Override
-            public Socket createSocket(HttpContext context) throws IOException {
-                return socketFactory.createSocket();
-            }
-        }).build();
+        final Lookup<ConnectionSocketFactory> socketFactoryRegistry = null;
+        try {
+            socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
+                @Override
+                public Socket createSocket(HttpContext context) throws IOException {
+                    return socketFactory.createSocket();
+                }
+            }).register("https", new SSLConnectionSocketFactory(SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
+                @Override
+                public Socket createSocket(HttpContext context) throws IOException {
+                    return socketFactory.createSocket();
+                }
+            }).build();
+        } catch (Exception e) {
+
+        }
         return new BasicHttpClientConnectionManager(socketFactoryRegistry);
     }
 
