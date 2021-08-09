@@ -14,7 +14,6 @@ pipeline {
                 description: 'Configuration to run server on an environment with designated jdk version')
         string(name: 'slaveNode', defaultValue: 'xlr||xld', description: 'Node label where steps would be executed.')
     }
-
     environment {
         REPOSITORY_NAME = 'overthere'
         GRADLE_OPTS = "-XX:MaxPermSize=256m -Xmx1024m  -Djsse.enableSNIExtension=true"
