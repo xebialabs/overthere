@@ -451,7 +451,7 @@ class WinRmClient {
                 public Socket createSocket(HttpContext context) throws IOException {
                     return socketFactory.createSocket();
                 }
-            }).register("https", new SSLConnectionSocketFactory(SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
+            }).register("https", new SSLConnectionSocketFactory(SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.2").build(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
                 @Override
                 public Socket createSocket(HttpContext context) throws IOException {
                     return socketFactory.createSocket();
@@ -493,7 +493,7 @@ class WinRmClient {
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
         //SSLContext sslContext = SSLContext.getInstance("Tls12");
-        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build();
+        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.2").build();
         //sslContext.init(null, null, null);
         final HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
         final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
