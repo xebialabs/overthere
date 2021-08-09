@@ -445,9 +445,8 @@ class WinRmClient {
 
     private HttpClientConnectionManager getHttpClientConnectionManager() {
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
-        final Lookup<ConnectionSocketFactory> socketFactoryRegistry = null;
         try {
-            socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
+            final Lookup<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
                 @Override
                 public Socket createSocket(HttpContext context) throws IOException {
                     return socketFactory.createSocket();
@@ -458,10 +457,10 @@ class WinRmClient {
                     return socketFactory.createSocket();
                 }
             }).build();
+            return new BasicHttpClientConnectionManager(socketFactoryRegistry);
         } catch (Exception e) {
-
+            return null;
         }
-        return new BasicHttpClientConnectionManager(socketFactoryRegistry);
     }
 
     private void configureHttpClient(final HttpClientBuilder httpclient) throws GeneralSecurityException {
