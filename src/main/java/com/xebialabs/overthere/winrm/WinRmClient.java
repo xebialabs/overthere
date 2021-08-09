@@ -391,13 +391,13 @@ class WinRmClient {
     /**
      * Internal sendRequest, performs the HTTP request and returns the result document.
      */
-    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        final HttpClientBuilder client = HttpClientBuilder.create();
-        final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
-        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.2").build();
-        client.setSslcontext(sslContext);
+    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) {
         HttpClientConnectionManager connectionManager = getHttpClientConnectionManager();
         try {
+            final HttpClientBuilder client = HttpClientBuilder.create();
+            final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
+            SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.2").build();
+            client.setSSLContext(sslContext);
             configureHttpClient(client);
             try(CloseableHttpClient httpClient = client.build()) {
                 final HttpContext context = new BasicHttpContext();
