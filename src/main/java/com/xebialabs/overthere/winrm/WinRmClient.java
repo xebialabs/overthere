@@ -398,6 +398,8 @@ class WinRmClient {
             configureHttpClient(client);
             try(CloseableHttpClient httpClient = client.build()) {
                 final HttpContext context = new BasicHttpContext();
+                //specify to use TLS 1.2 as default connection
+               // System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 final HttpPost request = new HttpPost(targetURL.toURI());
 
                 if (soapAction != null) {
@@ -441,13 +443,14 @@ class WinRmClient {
         }
     }
 
-    private HttpClientConnectionManager getHttpClientConnectionManager() {
+    private HttpClientConnectionManager getHttpClientConnectionManager() throws NoSuchAlgorithmException, KeyStoreException {
+        final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
         final Lookup<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create().register("http", new PlainConnectionSocketFactory() {
             @Override
             public Socket createSocket(HttpContext context) throws IOException {
                 return socketFactory.createSocket();
             }
-        }).register("https", new SSLConnectionSocketFactory(SSLContexts.createDefault(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
+        }).register("https", new SSLConnectionSocketFactory(SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build(), SSLConnectionSocketFactory.getDefaultHostnameVerifier()) {
             @Override
             public Socket createSocket(HttpContext context) throws IOException {
                 return socketFactory.createSocket();
