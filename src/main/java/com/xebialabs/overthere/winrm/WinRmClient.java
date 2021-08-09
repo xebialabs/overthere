@@ -391,21 +391,20 @@ class WinRmClient {
     /**
      * Internal sendRequest, performs the HTTP request and returns the result document.
      */
-    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) {
+    private Document doSendRequest(final Document requestDocument, final SoapAction soapAction) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         final HttpClientBuilder client = HttpClientBuilder.create();
+        final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
+        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.2").build();
+        client.setSslcontext(sslContext);
         HttpClientConnectionManager connectionManager = getHttpClientConnectionManager();
         try {
             configureHttpClient(client);
             try(CloseableHttpClient httpClient = client.build()) {
                 final HttpContext context = new BasicHttpContext();
-                //specify to use TLS 1.2 as default connection
-               // System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 final HttpPost request = new HttpPost(targetURL.toURI());
-
                 if (soapAction != null) {
                     request.setHeader("SOAPAction", soapAction.getValue());
                 }
-
                 final String requestBody = toString(requestDocument);
                 logger.trace("Request:\nPOST {}\n{}", targetURL, requestBody);
 
