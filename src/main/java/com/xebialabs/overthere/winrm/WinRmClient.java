@@ -485,9 +485,9 @@ class WinRmClient {
         }
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
-        SSLContext sslContext = SSLContext.getInstance("Tls12");
-        //SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).build();
-        sslContext.init(null, null, null);
+        //SSLContext sslContext = SSLContext.getInstance("Tls12");
+        SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).setProtocol("TLSv1.1").build();
+        //sslContext.init(null, null, null);
         final HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
         final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
         httpclientBuilder.setSSLSocketFactory(socketFactory);
