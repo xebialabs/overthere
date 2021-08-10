@@ -7,7 +7,6 @@ import com.xebialabs.pipeline.globals.Globals
 pipeline {
 
     agent none
-
     parameters {
         string( name: 'jdkVersion',
                 defaultValue: 'OpenJDK 11.0.12',
