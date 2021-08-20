@@ -49,6 +49,11 @@ public class GcpSshConnectionBuilder extends SshConnectionBuilder {
     public static final String PROJECT_ID = "projectId";
 
     /**
+     * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#gcp_apiToken">the online documentation</a>
+     */
+    public static final String API_TOKEN = "apiToken";
+
+    /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#gcp_zoneName">the online documentation</a>
      */
     public static final String ZONE_NAME = "zoneName";

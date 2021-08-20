@@ -20,7 +20,6 @@ import com.google.api.services.compute.model.Metadata;
 import com.google.api.services.compute.model.Operation;
 import com.google.api.services.compute.model.Project;
 import com.google.auth.http.HttpCredentialsAdapter;
-
 import com.xebialabs.overthere.gcp.credentials.GcpCredentialFactory;
 import com.xebialabs.overthere.gcp.credentials.ProjectCredentials;
 
@@ -211,11 +210,19 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     }
 
     private Compute createComputeService() {
-        return new Compute.Builder(
-                httpTransport,
-                jsonFactory,
-                new HttpCredentialsAdapter(projectCredentials.getCredentials())
-        ).setApplicationName(applicationName).build();
+        if(projectCredentials.getOauth2Credential() != null) {
+            return new Compute.Builder(
+                    httpTransport, jsonFactory, null)
+                    .setApplicationName(applicationName)
+                    .setHttpRequestInitializer(projectCredentials.getOauth2Credential())
+                    .build();
+        } else {
+            return new Compute.Builder(
+                    httpTransport,
+                    jsonFactory,
+                    new HttpCredentialsAdapter(projectCredentials.getCredentials())
+            ).setApplicationName(applicationName).build();
+        }
     }
 
     private static String getISO8601StringForDate(long date) {

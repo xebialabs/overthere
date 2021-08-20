@@ -22,6 +22,7 @@ import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.PROJECT_ID;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.SCOPES;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.SERVICE_ACCOUNT_USER;
 import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.TOKEN_SERVER_URI;
+import static com.xebialabs.overthere.gcp.GcpSshConnectionBuilder.API_TOKEN;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,6 +44,21 @@ public class GcpCredentialsTypeTest {
         assertThat(resolved, equalTo(GcpCredentialsType.Default));
         assertThat(key, startsWith(GcpCredentialsType.Default.name()));
         assertThat(gcpCredentialFactory instanceof DefaultCredentialsGcpCredentialFactory, equalTo(true));
+    }
+
+    @Test
+    public void canSetupServiceAccountTokenGcpCredentialsType() {
+        options.set(GCP_CREDENTIALS_TYPE, GcpCredentialsType.ServiceAccountToken.name());
+        options.set(PROJECT_ID, "project_id");
+        options.set(API_TOKEN, "ya29.c.Kp8BCQjd8meb5Z2MuKkzVUzqPbIveWIgI7NVuQVxZBpeSGmVbS4gaUY4Cbq6UUVzi8zr-hTTEwHANedcbT5godVD6-740kLc9C7JeB2_HilgaYqv7kR-oi_mz8Apgbh-HJhugFRRp8zMh07sMA98_shojHg3ljORcStFCTcEKNNJ5cIbiuSDVClhZc48KE4OBumf_9rag5OhAyAczdW_uXG9");
+
+        GcpCredentialsType resolved = GcpCredentialsType.resolve(options);
+        String key = resolved.createKey(options);
+        GcpCredentialFactory gcpCredentialFactory = resolved.createGcpCredentialFactory(options);
+
+        assertThat(resolved, equalTo(GcpCredentialsType.ServiceAccountToken));
+        assertThat(key, startsWith(GcpCredentialsType.ServiceAccountToken.name()));
+        assertThat(gcpCredentialFactory instanceof ServiceAccountTokenGcpCredentialFactory, equalTo(true));
     }
 
     @Test
