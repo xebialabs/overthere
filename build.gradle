@@ -88,6 +88,11 @@ release {
 dependencies {
     // General dependencies
     compile 'nl.javadude.scannit:scannit:1.4.1'
+    constraints {
+        compile('org.apache.commons:commons-compress:1.21') {
+            because 'earlier versions of this transitive dependency of scannit have a vulnerability issue'
+        }
+    }
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 
@@ -121,9 +126,8 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     compile 'org.apache.httpcomponents:httpcore:4.4.14'
-    compile 'org.apache.commons:commons-compress:1.21'
     compile 'commons-codec:commons-codec:1.10'
-    
+
     // GCP
     compile 'com.jcraft:jsch:0.1.55'
     compile 'com.google.cloud:google-cloud-os-login:1.2.2'
