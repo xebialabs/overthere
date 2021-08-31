@@ -27,6 +27,7 @@ import com.xebialabs.overthere.spi.AddressPortMapper;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.connection.ConnectionException;
 import net.schmizz.sshj.connection.channel.direct.LocalPortForwarder;
+import net.schmizz.sshj.connection.channel.direct.Parameters;
 import net.schmizz.sshj.connection.channel.direct.Session;
 import net.schmizz.sshj.transport.TransportException;
 import org.slf4j.Logger;
@@ -182,7 +183,7 @@ public class SshTunnelConnection extends SshConnection implements AddressPortMap
 
         @Override
         public void run() {
-            LocalPortForwarder.Parameters params = new LocalPortForwarder.Parameters("localhost", localSocket.getLocalPort(),
+            Parameters params = new Parameters("localhost", localSocket.getLocalPort(),
                     remoteAddress.getHostName(), remoteAddress.getPort());
             forwarder = sshClient.newLocalPortForwarder(params, localSocket);
             try {
