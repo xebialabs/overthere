@@ -73,7 +73,7 @@ class SshElevatedPasswordHandlingStream extends FilterInputStream {
     }
 
     private void handleChar(char c) {
-//        if (!sentPassword) {
+        if (!sentPassword) {
             logger.trace("Received: {}", c);
             if (c == '\n') {
                 receivedOutputBuffer.setLength(0);
@@ -95,7 +95,7 @@ class SshElevatedPasswordHandlingStream extends FilterInputStream {
                     }
                 }
             }
-//        }
+        }
     }
 
     private static Logger logger = LoggerFactory.getLogger(SshElevatedPasswordHandlingStream.class);
