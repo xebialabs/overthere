@@ -83,7 +83,7 @@ abstract class SshElevatedUserConnection extends SshScpConnection {
             return new SshProcess(this, os, session, commandLine) {
                 @Override
                 public InputStream getStdout() {
-                    return new ReplacingInputStream(new SshElevatedPasswordHandlingStream(super.getStdout(), getStdin(), elevatedPassword, elevatedPasswordPromptRegex), elevatedPassword, "*****");
+                    return new ReplacingInputStream(new SshElevatedPasswordHandlingStream(super.getStdout(), getStdin(), elevatedPassword, elevatedPasswordPromptRegex), elevatedPassword, "");
                 }
             };
         }
