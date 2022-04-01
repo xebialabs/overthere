@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import com.google.api.client.json.gson.GsonFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Strings;
 import com.google.api.services.compute.Compute;
 import com.google.api.services.compute.model.Instance;
@@ -34,7 +35,7 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     private static final String SSH_KEYS_USERNAME = "google-ssh";
 
     private static HttpTransport httpTransport;
-    private static final JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+    private static final JsonFactory gsonFactory = GsonFactory.getDefaultInstance();
 
     static {
         try {
@@ -212,14 +213,14 @@ public class GcpMetadataKeyManager implements GcpKeyManager {
     private Compute createComputeService() {
         if(projectCredentials.getOauth2Credential() != null) {
             return new Compute.Builder(
-                    httpTransport, jsonFactory, null)
+                    httpTransport, gsonFactory, null)
                     .setApplicationName(applicationName)
                     .setHttpRequestInitializer(projectCredentials.getOauth2Credential())
                     .build();
         } else {
             return new Compute.Builder(
                     httpTransport,
-                    jsonFactory,
+                    gsonFactory,
                     new HttpCredentialsAdapter(projectCredentials.getCredentials())
             ).setApplicationName(applicationName).build();
         }
