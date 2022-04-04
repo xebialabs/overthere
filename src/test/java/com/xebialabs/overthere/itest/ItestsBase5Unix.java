@@ -50,8 +50,7 @@ import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandl
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 public abstract class ItestsBase5Unix extends ItestsBase4Size {
 
@@ -224,7 +223,7 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
             // When using ssh_interactive_sudo, the output may be proceeded by the password prompt and possibly even the
             // sudo warning message.
             for(int i=0; captured.getOutputLines().size()>i; i++) {
-                assertThat(captured.getOutputLines().get(i), containsString(options.get(PASSWORD)));
+                assertThat(captured.getOutputLines().get(i), not(containsString(options.get(PASSWORD))));
             }
         }
     }
