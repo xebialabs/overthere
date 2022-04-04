@@ -41,7 +41,7 @@ public class ReplacingInputStream extends FilterInputStream {
      * @param replacement the replacement or null
      */
     public ReplacingInputStream(InputStream in, String pattern, String replacement) {
-        this(in, pattern.getBytes(UTF_8), replacement==null ? null : replacement.getBytes(UTF_8));
+        this(in, pattern==null ? null : pattern.getBytes(UTF_8), replacement==null ? null : replacement.getBytes(UTF_8));
     }
 
     /**

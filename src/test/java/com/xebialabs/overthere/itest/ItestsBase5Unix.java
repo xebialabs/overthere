@@ -40,6 +40,7 @@ import com.xebialabs.overthere.util.OverthereUtils;
 
 import nl.javadude.assumeng.Assumption;
 
+import static com.xebialabs.overthere.ConnectionOptions.PASSWORD;
 import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_USERNAME;
 import static com.xebialabs.overthere.util.CapturingOverthereExecutionOutputHandler.capturingHandler;
@@ -49,7 +50,8 @@ import static com.xebialabs.overthere.util.MultipleOverthereExecutionOutputHandl
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 
 public abstract class ItestsBase5Unix extends ItestsBase4Size {
 
@@ -222,7 +224,7 @@ public abstract class ItestsBase5Unix extends ItestsBase4Size {
             // When using ssh_interactive_sudo, the output may be proceeded by the password prompt and possibly even the
             // sudo warning message.
             for(int i=0; captured.getOutputLines().size()>i; i++) {
-                assertThat(captured.getOutputLines().get(i), not(containsString("assword")));
+                assertThat(captured.getOutputLines().get(i), containsString(options.get(PASSWORD)));
             }
         }
     }
