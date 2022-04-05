@@ -91,7 +91,7 @@ public class SshElevatedPasswordHandlingStreamTest {
         String elevatedStreamResult = new String(elevatedStream.readAllBytes());
         assertThat(elevatedStreamResult, containsString(password));
 
-        ReplacingInputStream foo = new ReplacingInputStream(elevatedStream, "dd", "");
+        ReplacingInputStream foo = new ReplacingInputStream(elevatedStream, password, "");
         String replaceStreamResult = new String(foo.readAllBytes());
         assertThat(replaceStreamResult, not(containsString(password)));
     }
