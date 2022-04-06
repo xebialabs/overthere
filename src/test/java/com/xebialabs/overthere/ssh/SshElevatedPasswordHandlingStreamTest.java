@@ -32,6 +32,9 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.SUDO_PASSWORD_PROMPT_REGEX_DEFAULT;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -75,6 +78,22 @@ public class SshElevatedPasswordHandlingStreamTest {
         SshElevatedPasswordHandlingStream foo = new SshElevatedPasswordHandlingStream(is, os, "foo", ".*[Pp]assword.*>");
         readStream(foo);
         verifyZeroInteractions(os);
+    }
+
+    @Test
+    public void shouldNotDisplayActualPasswordOnInteractiveSudo() throws IOException {
+        String password = "SudoPassword";
+        InputStream is = new ByteArrayInputStream(("Executing command line : echo Password:\r\n" +
+                "[sudo] password for user bar:\r\n" +
+                "Password:\r\n" +
+                password).getBytes());
+        SshElevatedPasswordHandlingStream elevatedStream = new SshElevatedPasswordHandlingStream(is, os, password, SUDO_PASSWORD_PROMPT_REGEX_DEFAULT);
+        String elevatedStreamResult = new String(elevatedStream.readAllBytes());
+        assertThat(elevatedStreamResult, containsString(password));
+
+        ReplacingInputStream foo = new ReplacingInputStream(elevatedStream, password, "");
+        String replaceStreamResult = new String(foo.readAllBytes());
+        assertThat(replaceStreamResult, not(containsString(password)));
     }
 
     private static void readStream(SshElevatedPasswordHandlingStream foo) throws IOException {
