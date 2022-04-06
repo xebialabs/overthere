@@ -57,4 +57,16 @@ public class ReplacingInputStreamTest {
         String replaceStreamResult = new String(foo.readAllBytes());
         assertThat(replaceStreamResult, not(containsString("ReplacePassword")));
     }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void shouldThrowExceptionOnPatternNull() {
+        InputStream is = new ByteArrayInputStream(("echo UserName:").getBytes());
+        new ReplacingInputStream(is, null, "ReplacePassword");
+    }
+
+    @Test(expectedExceptions = NullPointerException.class)
+    public void shouldThrowExceptionOnInputStreamNull() throws IOException {
+        ReplacingInputStream foo = new ReplacingInputStream(null, "SudoPassword", "ReplacePassword");
+        String replaceStreamResult = new String(foo.readAllBytes());
+    }
 }
