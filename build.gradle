@@ -150,7 +150,7 @@ dependencies {
     }
     testCompile 'com.google.guava:guava:30.1.1-jre'
 
-    testRuntime 'ch.qos.logback:logback-classic:1.0.6'
+    testRuntime 'ch.qos.logback:logback-classic:1.2.11'
 }
 
 tasks.withType(Test) {
