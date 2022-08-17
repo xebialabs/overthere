@@ -97,7 +97,7 @@ dependencies {
     compile 'org.slf4j:jcl-over-slf4j:1.7.12'
 
     // SSH
-    compile 'com.hierynomus:sshj:0.27.0'
+    compile 'com.hierynomus:sshj:0.33.0'
     runtime 'com.jcraft:jzlib:1.0.7'
 
     // CIFS
