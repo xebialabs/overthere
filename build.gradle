@@ -130,8 +130,10 @@ dependencies {
 
     // GCP
     compile 'com.jcraft:jsch:0.1.55'
-    compile 'com.google.cloud:google-cloud-os-login:2.0.13'
-    compile 'com.google.apis:google-api-services-compute:v1-rev20220322-1.32.1'
+    compile 'com.google.apis:google-api-services-compute:v1-rev235-1.25.0'
+    compile 'com.google.auth:google-auth-library-oauth2-http:1.13.0'
+    compile 'com.google.cloud:google-cloud-os-login:2.5.0'
+    compile 'com.google.http-client:google-http-client-gson:1.42.3'
 
     // Test dependencies
     testCompile('com.xebialabs.cloud:overcast:2.5.1') {
