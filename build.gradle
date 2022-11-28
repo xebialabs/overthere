@@ -110,7 +110,7 @@ dependencies {
     compile "org.bouncycastle:bcpkix-jdk15on:1.69"
 
     // Telnet
-    compile 'commons-net:commons-net:3.3'
+    compile 'commons-net:commons-net:3.8.0'
 
     // WinRM
     compile('org.dom4j:dom4j:2.1.3') {
