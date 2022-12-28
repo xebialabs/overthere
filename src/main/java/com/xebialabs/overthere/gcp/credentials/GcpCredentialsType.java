@@ -42,12 +42,13 @@ public enum GcpCredentialsType {
             return composeKey(options.<String>get(CLIENT_EMAIL), options);
         }
     },
-    ServiceAccountToken(Sets.newHashSet(PROJECT_ID, API_TOKEN)) {
+    ServiceAccountToken(Sets.newHashSet(PROJECT_ID, API_TOKEN, CLIENT_EMAIL)) {
         @Override
         protected GcpCredentialFactory doCreate(final ConnectionOptions options) {
             return new ServiceAccountTokenGcpCredentialFactory(
                     options.<String>get(PROJECT_ID),
-                    options.<String>get(API_TOKEN)
+                    options.<String>get(API_TOKEN),
+                    options.<String>get(CLIENT_EMAIL)
             );
         }
         @Override
