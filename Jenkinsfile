@@ -1,6 +1,6 @@
 #!groovy
 
-@Library('jenkins-pipeline-libs@S-83937')
+@Library('jenkins-pipeline-libs@master')
 
 import com.xebialabs.pipeline.globals.Globals
 
@@ -10,7 +10,7 @@ pipeline {
 
     parameters {
         string( name: 'jdkVersion',
-                defaultValue: 'OpenJDK 11.0.12',
+                defaultValue: Globals.jdk17Version,
                 description: 'Configuration to run server on an environment with designated jdk version')
         string(name: 'slaveNode', defaultValue: 'xlr||java-17', description: 'Node label where steps would be executed.')
     }
@@ -44,7 +44,7 @@ pipeline {
     }
     post {
         always {
-            node('xld') {
+            node('java-17') {
                 step([$class: 'ClaimPublisher'])
             }
         }
