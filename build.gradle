@@ -36,7 +36,7 @@ defaultTasks 'build'
 group = 'com.xebialabs.overthere'
 
 apply plugin: 'idea'
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
@@ -239,71 +239,85 @@ nexusStaging {
     packageGroup = "com.xebialabs"
 }
 
+project.tasks.register("uploadArchives") {
+    group "upload"
+    if (project.hasProperty("sonatypeUsername")) {
+        dependsOn publish
+    }
+}
 
-if (project.hasProperty("sonatypeUsername")) {
-    publishing {
+project.tasks.register("uploadArchivesToMavenLocal") {
+    group "upload"
+    dependsOn "publishToMavenLocal"
+}
+
+if (project.hasProperty('sonatypeUsername')) {
+    project.publishing {
         publications {
-            register("deployment", MavenPublication::class) {
-                from(components["java"])
-
+            create('deployment', MavenPublication) {
                 groupId = "com.xebialabs"
-                artifactId = "Overthere"
-                version = releasedVersion
-
+                artifactId = "overthere"
                 pom {
-                    name 'Overthere'
-                    description 'Remote file manipulation and process execution framework for Java'
-                    packaging 'jar'
-                    url 'https://github.com/xebialabs/overthere'
-                    inceptionYear '2011'
+                    project.gradle.projectsEvaluated {
+                        name = 'Overthere'
+                        description = 'Remote file manipulation and process execution framework for Java'
+                        packaging 'jar'
+                        url = 'https://github.com/xebialabs/overthere'
+                        inceptionYear = '2011'
+                    }
                     scm {
-                        url 'https://github.com/xebialabs/overthere'
+                        url = 'https://github.com/xebialabs/overthere'
                     }
                     licenses {
                         license {
-                            name 'GPLv2 with XebiaLabs FLOSS License Exception'
-                            url 'https://github.com/xebialabs/overthere/blob/master/LICENSE'
-                            distribution 'repo'
+                            name = 'GPLv2 with XebiaLabs FLOSS License Exception'
+                            url = 'https://github.com/xebialabs/overthere/blob/master/LICENSE'
+                            distribution = 'repo'
                         }
                     }
                     developers {
                         developer {
-                            id 'vpartington'
-                            name 'Vincent Partington'
-                            url 'http://www.xebialabs.com/'
-                            email 'vpartington@xebialabs.com'
-                            roles {
-                                role 'Developer'
-                            }
+                            id = 'vpartington'
+                            name = 'Vincent Partington'
+                            url = 'http://www.xebialabs.com/'
+                            email = 'vpartington@xebialabs.com'
+                            roles = ['Developer']
                         }
                         developer {
-                            id 'hierynomus'
-                            name 'Jeroen van Erp'
-                            url 'http://www.xebialabs.com/'
-                            email 'jvanerp@xebialabs.com'
-                            roles {
-                                role 'Developer'
-                            }
+                            id = 'hierynomus'
+                            name = 'Jeroen van Erp'
+                            url = 'http://www.xebialabs.com/'
+                            email = 'jvanerp@xebialabs.com'
+                            roles = ['Developer']
                         }
                     }
                 }
                 versionMapping {
-                    usage("java-api") {
-                        fromResolutionOf("runtimeClasspath")
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
                     }
-                    usage("java-runtime") {
+                    usage('java-runtime') {
                         fromResolutionResult()
                     }
                 }
+                from project.components.java
             }
         }
-        repositories {
-            configuration = configurations.archives
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+    }
+
+    repositories {
+        maven {
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username project.property("sonatypeUsername").toString()
+                password project.property("sonatypePassword").toString()
             }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+        maven {
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username project.property("sonatypeUsername").toString()
+                password project.property("sonatypePassword").toString()
             }
         }
     }
@@ -311,7 +325,18 @@ if (project.hasProperty("sonatypeUsername")) {
     signing {
         sign(publishing.publications["deployment"])
     }
+} else {
+    publishing {
+        publications {
+            create("deployment", MavenPublication) {
+                from(components["java"])
+            }
+        }
+    }
 }
+
+
+
 
 def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
     if (project.hasProperty(name)) {
