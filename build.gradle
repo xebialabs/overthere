@@ -241,9 +241,8 @@ nexusStaging {
 
 project.tasks.register("uploadArchives") {
     group "upload"
-    if (project.hasProperty("sonatypeUsername")) {
-        dependsOn publish
-    }
+    dependsOn publish
+
 }
 
 project.tasks.register("uploadArchivesToMavenLocal") {
