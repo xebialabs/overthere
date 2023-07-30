@@ -61,11 +61,8 @@ repositories {
 sourceCompatibility = '11'
 targetCompatibility = '11'
 
-configurations {
-    compile {
-        transitive = false
-        exclude group: 'org.bouncycastle', module: 'bcprov-jdk16'
-    }
+configurations.all {
+    exclude(group: "org.bouncycastle", module: "bcprov-jdk16")
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -101,52 +98,52 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
 
 dependencies {
     // General dependencies
-    implementation 'nl.javadude.scannit:scannit:1.4.1'
+    api 'nl.javadude.scannit:scannit:1.4.1'
     constraints {
-        implementation('org.apache.commons:commons-compress:1.23.0') {
+        api('org.apache.commons:commons-compress:1.23.0') {
             because 'earlier versions of this transitive dependency of scannit have a vulnerability issue'
         }
     }
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    implementation 'org.slf4j:jcl-over-slf4j:1.7.36'
+    api 'org.slf4j:slf4j-api:1.7.36'
+    api 'org.slf4j:jcl-over-slf4j:1.7.36'
 
     // SSH
-    implementation 'com.hierynomus:sshj:0.33.0'
+    api 'com.hierynomus:sshj:0.33.0'
     implementation 'com.jcraft:jzlib:1.0.7'
 
     // CIFS
-    implementation 'jcifs:jcifs:1.3.17'
+    api 'jcifs:jcifs:1.3.17'
 
     // SMB2/3
-    implementation 'com.hierynomus:smbj:0.12.1'
-    implementation 'net.engio:mbassador:1.3.2'
-    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
-    implementation "org.bouncycastle:bcpkix-jdk15on:1.70"
+    api 'com.hierynomus:smbj:0.12.1'
+    api 'net.engio:mbassador:1.3.2'
+    api "org.bouncycastle:bcprov-jdk15on:1.70"
+    api "org.bouncycastle:bcpkix-jdk15on:1.70"
 
     // Telnet
-    implementation 'commons-net:commons-net:3.9.0'
+    api 'commons-net:commons-net:3.9.0'
 
     // WinRM
-    implementation('org.dom4j:dom4j:2.1.4') {
+    api('org.dom4j:dom4j:2.1.4') {
         exclude group: 'xml-apis', module: 'xml-apis'
     }
-    implementation('jaxen:jaxen:2.0.0') {
+    api('jaxen:jaxen:2.0.0') {
         exclude group: 'xml-apis', module: 'xml-apis'
         exclude group: 'xalan', module: 'xalan'
         exclude group: 'xerces', module: 'xmlParserAPIs'
         exclude group: 'xerces', module: 'xercesImpl'
     }
-    implementation('org.apache.httpcomponents:httpclient:4.5.13') {
+    api('org.apache.httpcomponents:httpclient:4.5.13') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    implementation 'org.apache.httpcomponents:httpcore:4.4.14'
-    implementation 'commons-codec:commons-codec:1.16.0'
+    api 'org.apache.httpcomponents:httpcore:4.4.14'
+    api 'commons-codec:commons-codec:1.16.0'
 
     // GCP
-    implementation 'com.jcraft:jsch:0.1.55'
-    implementation 'com.google.apis:google-api-services-compute:v1-rev20221026-2.0.0'
-    implementation 'com.google.auth:google-auth-library-oauth2-http:1.13.0'
-    implementation 'com.google.cloud:google-cloud-os-login:2.5.0'
+    api 'com.jcraft:jsch:0.1.55'
+    api 'com.google.apis:google-api-services-compute:v1-rev20221026-2.0.0'
+    api 'com.google.auth:google-auth-library-oauth2-http:1.13.0'
+    api 'com.google.cloud:google-cloud-os-login:2.5.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
@@ -250,86 +247,78 @@ project.tasks.register("uploadArchivesToMavenLocal") {
     dependsOn "publishToMavenLocal"
 }
 
-if (project.hasProperty('sonatypeUsername')) {
-    project.publishing {
-        publications {
-            create('deployment', MavenPublication) {
-                groupId = "com.xebialabs"
-                artifactId = "overthere"
-                pom {
-                    project.gradle.projectsEvaluated {
-                        name = 'Overthere'
-                        description = 'Remote file manipulation and process execution framework for Java'
-                        packaging 'jar'
-                        url = 'https://github.com/xebialabs/overthere'
-                        inceptionYear = '2011'
-                    }
-                    scm {
-                        url = 'https://github.com/xebialabs/overthere'
-                    }
-                    licenses {
-                        license {
-                            name = 'GPLv2 with XebiaLabs FLOSS License Exception'
-                            url = 'https://github.com/xebialabs/overthere/blob/master/LICENSE'
-                            distribution = 'repo'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'vpartington'
-                            name = 'Vincent Partington'
-                            url = 'http://www.xebialabs.com/'
-                            email = 'vpartington@xebialabs.com'
-                            roles = ['Developer']
-                        }
-                        developer {
-                            id = 'hierynomus'
-                            name = 'Jeroen van Erp'
-                            url = 'http://www.xebialabs.com/'
-                            email = 'jvanerp@xebialabs.com'
-                            roles = ['Developer']
-                        }
+project.publishing {
+    publications {
+        create('deployment', MavenPublication) {
+            groupId = "com.xebialabs"
+            artifactId = "overthere"
+            pom {
+                project.gradle.projectsEvaluated {
+                    name = 'Overthere'
+                    description = 'Remote file manipulation and process execution framework for Java'
+                    packaging 'jar'
+                    url = 'https://github.com/xebialabs/overthere'
+                    inceptionYear = '2011'
+                }
+                scm {
+                    url = 'https://github.com/xebialabs/overthere'
+                }
+                licenses {
+                    license {
+                        name = 'GPLv2 with XebiaLabs FLOSS License Exception'
+                        url = 'https://github.com/xebialabs/overthere/blob/master/LICENSE'
+                        distribution = 'repo'
                     }
                 }
-                versionMapping {
-                    usage('java-api') {
-                        fromResolutionOf('runtimeClasspath')
+                developers {
+                    developer {
+                        id = 'vpartington'
+                        name = 'Vincent Partington'
+                        url = 'http://www.xebialabs.com/'
+                        email = 'vpartington@xebialabs.com'
+                        roles = ['Developer']
                     }
-                    usage('java-runtime') {
-                        fromResolutionResult()
+                    developer {
+                        id = 'hierynomus'
+                        name = 'Jeroen van Erp'
+                        url = 'http://www.xebialabs.com/'
+                        email = 'jvanerp@xebialabs.com'
+                        roles = ['Developer']
                     }
                 }
-                from project.components.java
             }
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            from(components["java"])
         }
     }
 
-    repositories {
-        maven {
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-            credentials {
-                username project.property("sonatypeUsername").toString()
-                password project.property("sonatypePassword").toString()
+    if (project.hasProperty('sonatypeUsername')) {
+        repositories {
+            maven {
+                url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                credentials {
+                    username project.property("sonatypeUsername").toString()
+                    password project.property("sonatypePassword").toString()
+                }
+            }
+            maven {
+                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username project.property("sonatypeUsername").toString()
+                    password project.property("sonatypePassword").toString()
+                }
             }
         }
-        maven {
-            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-            credentials {
-                username project.property("sonatypeUsername").toString()
-                password project.property("sonatypePassword").toString()
-            }
-        }
-    }
 
-    signing {
-        sign(publishing.publications["deployment"])
-    }
-} else {
-    publishing {
-        publications {
-            create("deployment", MavenPublication) {
-                from(components["java"])
-            }
+        signing {
+            sign(publishing.publications["deployment"])
         }
     }
 }
