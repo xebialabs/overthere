@@ -58,8 +58,8 @@ repositories {
     mavenLocal()
 }
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 configurations.all {
     exclude(group: "org.bouncycastle", module: "bcprov-jdk16")
