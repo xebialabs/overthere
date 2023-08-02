@@ -10,9 +10,9 @@ pipeline {
 
     parameters {
         string( name: 'jdkVersion',
-                defaultValue: 'OpenJDK 11.0.12',
+                defaultValue: Globals.jdk17Version,
                 description: 'Configuration to run server on an environment with designated jdk version')
-        string(name: 'slaveNode', defaultValue: 'xlr||xld', description: 'Node label where steps would be executed.')
+        string(name: 'slaveNode', defaultValue: 'xlr||java-17', description: 'Node label where steps would be executed.')
     }
     environment {
         REPOSITORY_NAME = 'overthere'
@@ -23,7 +23,7 @@ pipeline {
         stage('Run test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.java11Env(this, params.jdkVersion)) {
+                withEnv(Globals.java17Env(this, Globals.jdk17Version)) {
                     sh "./gradlew clean test"
                 }
             }
@@ -31,7 +31,7 @@ pipeline {
         stage('Run integration test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.java11Env(this, params.jdkVersion)) {
+                withEnv(Globals.java17Env(this, Globals.jdk17Version)) {
                     sh "./gradlew clean itest"
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
     }
     post {
         always {
-            node('xld') {
+            node('java-17') {
                 step([$class: 'ClaimPublisher'])
             }
         }
