@@ -12,7 +12,7 @@ pipeline {
         string( name: 'jdkVersion',
                 defaultValue: Globals.jdk17Version,
                 description: 'Configuration to run server on an environment with designated jdk version')
-        string(name: 'slaveNode', defaultValue: 'xlr||java-17', description: 'Node label where steps would be executed.')
+        string(name: 'slaveNode', defaultValue: 'java-17', description: 'Node label where steps would be executed.')
     }
     environment {
         REPOSITORY_NAME = 'overthere'
