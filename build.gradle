@@ -238,7 +238,7 @@ nexusStaging {
 
 project.tasks.register("uploadArchives") {
     group "upload"
-    dependsOn publish
+    dependsOn "publish"
 
 }
 
@@ -250,7 +250,6 @@ project.tasks.register("uploadArchivesToMavenLocal") {
 project.publishing {
     publications {
         create('deployment', MavenPublication) {
-            groupId = "com.xebialabs"
             artifactId = "overthere"
             pom {
                 project.gradle.projectsEvaluated {
