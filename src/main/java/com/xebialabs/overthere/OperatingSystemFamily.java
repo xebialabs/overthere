@@ -160,7 +160,9 @@ public enum OperatingSystemFamily {
     }
 
     /**
-     * Returns the string used by the operating system family to separate commands in a command line, e.g. <tt>&&</tt>
+     * Returns the string used by the operating system family to separate commands in a command line, e.g. <tt>
+     *
+     * </tt>
      * or <tt>;<tt>.
      *
      * @return the command separator.
