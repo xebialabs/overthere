@@ -6,7 +6,7 @@ import com.xebialabs.pipeline.globals.Globals
 
 pipeline {
 
-    agent none
+    agent { label 'java-17' }
 
     parameters {
         string( name: 'jdkVersion',
