@@ -6,7 +6,7 @@ import com.xebialabs.pipeline.globals.Globals
 
 pipeline {
 
-    agent { label 'java-17' }
+    agent none
 
     parameters {
         string( name: 'jdkVersion',
@@ -16,7 +16,7 @@ pipeline {
     }
     environment {
         REPOSITORY_NAME = 'overthere'
-        GRADLE_OPTS = "-XX:MaxPermSize=256m -Xmx1024m  -Djsse.enableSNIExtension=true"
+        GRADLE_OPTS = "-XX:MaxMetaspaceSize=256m -Xmx1024m  -Djsse.enableSNIExtension=true"
     }
 
     stages {
