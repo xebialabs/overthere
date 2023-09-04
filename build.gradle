@@ -246,11 +246,8 @@ project.tasks.register("uploadArchivesToMavenLocal") {
     dependsOn "publishToMavenLocal"
 }
 
-tasks.publishToMavenLocal {
-    dependsOn project.tasks.withType(Sign)
-}
-tasks.publish {
-    dependsOn project.tasks.withType(Sign)
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn(tasks.withType(Sign))
 }
 
 project.publishing {
