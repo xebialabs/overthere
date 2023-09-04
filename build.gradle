@@ -20,7 +20,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
         classpath "com.netflix.nebula:nebula-release-plugin:15.3.1"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
 
