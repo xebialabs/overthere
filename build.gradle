@@ -239,12 +239,18 @@ nexusStaging {
 project.tasks.register("uploadArchives") {
     group "upload"
     dependsOn "publish"
-
 }
 
 project.tasks.register("uploadArchivesToMavenLocal") {
     group "upload"
     dependsOn "publishToMavenLocal"
+}
+
+tasks.publishToMavenLocal {
+    dependsOn project.tasks.withType(Sign)
+}
+tasks.publish {
+    dependsOn project.tasks.withType(Sign)
 }
 
 project.publishing {
