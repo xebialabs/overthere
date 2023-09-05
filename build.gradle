@@ -23,7 +23,6 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         classpath "com.netflix.nebula:nebula-release-plugin:15.3.1"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
-
     }
 }
 
@@ -303,18 +302,21 @@ project.publishing {
 
     if (project.hasProperty('sonatypeUsername')) {
         repositories {
-            maven {
-                url = "https://oss.sonatype.org/content/repositories/snapshots/"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
+            if(project.version.toString().endsWith('-SNAPSHOT')) {
+                maven {
+                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    credentials {
+                        username project.property("sonatypeUsername").toString()
+                        password project.property("sonatypePassword").toString()
+                    }
                 }
-            }
-            maven {
-                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
+            } else {
+                maven {
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    credentials {
+                        username project.property("sonatypeUsername").toString()
+                        password project.property("sonatypePassword").toString()
+                    }
                 }
             }
         }
