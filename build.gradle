@@ -233,6 +233,10 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
+    if (project.hasProperty('sonatypeUsername')) {
+        username = project.property("sonatypeUsername").toString()
+        password = project.property("sonatypePassword").toString()
+    }
 }
 
 project.tasks.register("uploadArchives") {
