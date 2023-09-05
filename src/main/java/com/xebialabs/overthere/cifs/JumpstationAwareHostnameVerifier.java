@@ -3,11 +3,14 @@ package com.xebialabs.overthere.cifs;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
-public class WinrmHttpsViaJumpstationHostnameVerifier implements HostnameVerifier {
+/**
+ * Use this verifier when establishing secured connection via jumpstation.
+ */
+public class JumpstationAwareHostnameVerifier implements HostnameVerifier {
     String remoteHost;
     HostnameVerifier hostnameVerifier;
 
-    public WinrmHttpsViaJumpstationHostnameVerifier(String remoteHost, HostnameVerifier hostnameVerifier) {
+    public JumpstationAwareHostnameVerifier(String remoteHost, HostnameVerifier hostnameVerifier) {
         this.remoteHost = remoteHost;
         this.hostnameVerifier = hostnameVerifier;
     }

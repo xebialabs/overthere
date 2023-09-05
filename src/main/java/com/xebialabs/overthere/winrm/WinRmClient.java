@@ -22,7 +22,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
-import com.xebialabs.overthere.cifs.WinrmHttpsViaJumpstationHostnameVerifier;
+import com.xebialabs.overthere.cifs.JumpstationAwareHostnameVerifier;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.winrm.soap.*;
@@ -43,7 +43,6 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.DefaultHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
@@ -497,8 +496,8 @@ class WinRmClient {
 
     private HostnameVerifier getHostNameVerifier() {
         HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
-        if (isUseJumpstation() && hostnameVerifier instanceof DefaultHostnameVerifier) {
-            hostnameVerifier = new WinrmHttpsViaJumpstationHostnameVerifier(unmappedAddress, hostnameVerifier);
+        if (isUseJumpstation()) {
+            hostnameVerifier = new JumpstationAwareHostnameVerifier(unmappedAddress, hostnameVerifier);
         }
         return hostnameVerifier;
     }
