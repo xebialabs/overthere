@@ -51,8 +51,14 @@ import static java.lang.String.format;
 class SshSftpCygwinConnection extends SshSftpConnection {
 
     public SshSftpCygwinConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+        super(type, fixOptions(options), mapper);
         checkArgument(os == WINDOWS, "Cannot create a %s connection to a host that is not running Windows", protocolAndConnectionType);
+    }
+
+    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
+        ConnectionOptions fixedOptions = new ConnectionOptions(options);
+        fixedOptions.set(FILE_COPY_COMMAND_FOR_WINDOWS, "cmd /c " + fixedOptions.get(FILE_COPY_COMMAND_FOR_WINDOWS, FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT));
+        return fixedOptions;
     }
 
     @Override
