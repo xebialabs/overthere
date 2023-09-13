@@ -265,7 +265,7 @@ public class WinRmConnection implements ProcessConnection {
         client.setConnectionTimeout(connectionTimeoutMillis);
         client.setSoTimeout(socketTimeoutMillis);
         client.setUseCanonicalHostname(options.getBoolean(WINRM_USE_CANONICAL_HOSTNAME, WINRM_USE_CANONICAL_HOSTNAME_DEFAULT));
-        client.setUseJumpstation(options.get(JUMPSTATION) != null);
+        client.setUseJumpstation(options.get(JUMPSTATION, null) != null);
         return client;
     }
 
