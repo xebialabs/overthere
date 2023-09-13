@@ -147,7 +147,7 @@ public class ConnectionOptions {
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#fileCopyCommandForWindows">the online documentation</a>
      */
-    public static final String FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT = "copy {0} {1} /y";
+    public static final String FILE_COPY_COMMAND_FOR_WINDOWS_DEFAULT = "cmd /c copy {0} {1} /y";
 
     /**
      * See <a href="https://github.com/xebialabs/overthere/blob/master/README.md#directoryCopyCommandForWindows">the online documentation</a>
