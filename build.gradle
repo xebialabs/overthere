@@ -216,10 +216,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-artifacts {
-    archives sourcesJar, javadocJar
-}
-
 license {
     header project.file('HEADER')
     ignoreFailures true
@@ -302,6 +298,8 @@ project.publishing {
                 }
             }
             from(components["java"])
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 
