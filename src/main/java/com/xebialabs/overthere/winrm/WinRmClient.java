@@ -22,6 +22,7 @@
  */
 package com.xebialabs.overthere.winrm;
 
+import com.xebialabs.overthere.cifs.JumpstationAwareHostnameVerifier;
 import com.xebialabs.overthere.cifs.WinrmHttpsCertificateTrustStrategy;
 import com.xebialabs.overthere.cifs.WinrmHttpsHostnameVerificationStrategy;
 import com.xebialabs.overthere.winrm.soap.*;
@@ -113,6 +114,8 @@ class WinRmClient {
     private String commandId;
     private int exitValue = -1;
     private int chunk = 0;
+
+    private boolean useJumpstation;
 
     public WinRmClient(final String username, final String password, final URL targetURL, final String unmappedAddress, final int unmappedPort, final SocketFactory socketFactory) {
         int posOfAtSign = username.indexOf('@');
@@ -486,9 +489,17 @@ class WinRmClient {
 
         final TrustStrategy trustStrategy = httpsCertTrustStrategy.getStrategy();
         SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(trustStrategy).build();
-        final HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
+        final HostnameVerifier hostnameVerifier = getHostNameVerifier();
         final SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, hostnameVerifier);
         httpclientBuilder.setSSLSocketFactory(socketFactory);
+    }
+
+    private HostnameVerifier getHostNameVerifier() {
+        HostnameVerifier hostnameVerifier = httpsHostnameVerifyStrategy.getVerifier();
+        if (isUseJumpstation()) {
+            hostnameVerifier = new JumpstationAwareHostnameVerifier(unmappedAddress, hostnameVerifier);
+        }
+        return hostnameVerifier;
     }
 
     private void configureAuthentication(CredentialsProvider provider, final String scheme, final Principal principal) {
@@ -643,6 +654,14 @@ class WinRmClient {
 
     public void setUseCanonicalHostname(boolean useCanonicalHostname) {
         this.useCanonicalHostname = useCanonicalHostname;
+    }
+
+    public boolean isUseJumpstation() {
+        return useJumpstation;
+    }
+
+    public void setUseJumpstation(boolean useJumpstation) {
+        this.useJumpstation = useJumpstation;
     }
 
     private static Logger logger = LoggerFactory.getLogger(WinRmClient.class);
