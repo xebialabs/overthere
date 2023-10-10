@@ -15,6 +15,14 @@ import nebula.plugin.release.git.opinion.Strategies
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Tag
 
+sourceSets {
+    all {
+      configurations.all { conf ->
+        attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+      }
+    }
+}
+
 buildscript {
     repositories {
         mavenCentral()
