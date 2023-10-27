@@ -355,7 +355,23 @@ abstract class SshConnection extends BaseOverthereConnection {
             processedCmd = new CmdLine();
             processedCmd.addArgument("cd");
             processedCmd.addArgument(workingDirectory.getPath());
-            processedCmd.addRaw(os.getCommandSeparator());
+            if(os == OperatingSystemFamily.WINDOWS) {
+                Session session = null;
+                try {
+                    logger.debug("Creating a temporary session to check default windows terminal.");
+                    session = getSshClient().startSession();
+                    Session.Command command = session.exec("(dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell");
+                    String defaultTerminal = new String(command.getInputStream().readAllBytes()).trim();
+                    processedCmd.addRaw(defaultTerminal.equals("PowerShell") ? ";" : os.getCommandSeparator());
+                } catch (Exception e) {
+                    logger.warn("Command to find windows default terminal failed: " + e.getMessage());
+                    processedCmd.addRaw(os.getCommandSeparator());
+                } finally {
+                    closeQuietly(session);
+                }
+            } else {
+                processedCmd.addRaw(os.getCommandSeparator());
+            }
             for (CmdLineArgument a : cmd.getArguments()) {
                 processedCmd.add(a);
             }

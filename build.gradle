@@ -142,7 +142,7 @@ dependencies {
     api 'com.jcraft:jsch:0.1.55'
     api 'com.google.apis:google-api-services-compute:v1-rev20221026-2.0.0'
     api 'com.google.auth:google-auth-library-oauth2-http:1.13.0'
-    api 'com.google.cloud:google-cloud-os-login:2.5.0'
+    api 'com.google.cloud:google-cloud-os-login:2.27.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
