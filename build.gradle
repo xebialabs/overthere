@@ -252,7 +252,6 @@ tasks.withType(PublishToMavenRepository).configureEach {
 project.publishing {
     publications {
         create('deployment', MavenPublication) {
-            groupId = "com.xebialabs"
             artifactId = "overthere"
             pom {
                 project.gradle.projectsEvaluated {
