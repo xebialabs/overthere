@@ -99,7 +99,7 @@ dependencies {
     // General dependencies
     api 'nl.javadude.scannit:scannit:1.4.1'
     constraints {
-        api('org.apache.commons:commons-compress:1.23.0') {
+        api('org.apache.commons:commons-compress:1.24.0') {
             because 'earlier versions of this transitive dependency of scannit have a vulnerability issue'
         }
     }
@@ -108,19 +108,19 @@ dependencies {
 
     // SSH
     api 'com.hierynomus:sshj:0.33.0'
-    implementation 'com.jcraft:jzlib:1.0.7'
+    implementation 'com.jcraft:jzlib:1.1.3'
 
     // CIFS
     api 'jcifs:jcifs:1.3.17'
 
     // SMB2/3
-    api 'com.hierynomus:smbj:0.12.1'
+    api 'com.hierynomus:smbj:0.12.2'
     api 'net.engio:mbassador:1.3.2'
-    api "org.bouncycastle:bcprov-jdk15on:1.70"
-    api "org.bouncycastle:bcpkix-jdk15on:1.70"
+    api "org.bouncycastle:bcprov-jdk18on:1.76"
+    api "org.bouncycastle:bcpkix-jdk18on:1.76"
 
     // Telnet
-    api 'commons-net:commons-net:3.9.0'
+    api 'commons-net:commons-net:3.10.0'
 
     // WinRM
     api('org.dom4j:dom4j:2.1.4') {
@@ -132,17 +132,17 @@ dependencies {
         exclude group: 'xerces', module: 'xmlParserAPIs'
         exclude group: 'xerces', module: 'xercesImpl'
     }
-    api('org.apache.httpcomponents:httpclient:4.5.13') {
+    api('org.apache.httpcomponents:httpclient:4.5.14') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
-    api 'org.apache.httpcomponents:httpcore:4.4.14'
+    api 'org.apache.httpcomponents:httpcore:4.4.16'
     api 'commons-codec:commons-codec:1.16.0'
 
     // GCP
     api 'com.jcraft:jsch:0.1.55'
-    api 'com.google.apis:google-api-services-compute:v1-rev20221026-2.0.0'
-    api 'com.google.auth:google-auth-library-oauth2-http:1.13.0'
-    api 'com.google.cloud:google-cloud-os-login:2.27.0'
+    api 'com.google.apis:google-api-services-compute:v1-rev20231031-2.0.0'
+    api 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
+    api 'com.google.cloud:google-cloud-os-login:2.29.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
