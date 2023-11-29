@@ -99,7 +99,7 @@ public class ReplacingInputStreamTest {
         assertThat(replaceStreamResult, equalTo("echo SudoPassword:"));
     }
 
-    @Test(expectedExceptions = TimeoutException.class)
+    @Test
     public void shouldExitFineWhenPatternNotFoundInInputStream() throws IOException, TimeoutException {
         Process process = new ProcessBuilder("sleep", "100").start();
         InputStream is = process.getInputStream();
