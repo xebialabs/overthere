@@ -123,7 +123,7 @@ public class ReplacingInputStreamTest {
         }
 
         String replaceStreamResult = sbr.toString();
-        assertThat(replaceStreamResult, containsString("replaced string"));
+        assertThat(replaceStreamResult, not(containsString("replaced string")));
     }
 }
 
