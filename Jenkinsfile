@@ -12,7 +12,7 @@ pipeline {
         string( name: 'jdkVersion',
                 defaultValue: Globals.jdk17Version,
                 description: 'Configuration to run server on an environment with designated jdk version')
-        string(name: 'slaveNode', defaultValue: 'xld', description: 'Node label where steps would be executed.')
+        string(name: 'slaveNode', defaultValue: 'xld-ubuntu', description: 'Node label where steps would be executed.')
     }
     environment {
         REPOSITORY_NAME = 'overthere'
@@ -44,7 +44,7 @@ pipeline {
     }
     post {
         always {
-            node('xld') {
+            node('xld-ubuntu') {
                 step([$class: 'ClaimPublisher'])
             }
         }
