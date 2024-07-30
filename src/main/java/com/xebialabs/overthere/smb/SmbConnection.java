@@ -71,8 +71,19 @@ public class SmbConnection extends BaseOverthereConnection {
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
 
+    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
+        CifsConnectionType type = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        if (type.equals(CifsConnectionType.WINRM_NATIVE)) {
+            ConnectionOptions fixedOptions = new ConnectionOptions(options);
+            fixedOptions.set(FILE_COPY_COMMAND_FOR_WINDOWS, "copy {0} {1}");
+            return fixedOptions;
+        }
+        return options;
+
+    }
+
     protected SmbConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
-        super(protocol, options, mapper, canStartProcess);
+        super(protocol, fixOptions(options), mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         if (mapper instanceof ProxyConnection) {
             throw new IllegalArgumentException("Cannot open a smb:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
