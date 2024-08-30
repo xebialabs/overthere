@@ -38,6 +38,7 @@ import com.hierynomus.smbj.transport.TransportLayerFactory;
 import com.hierynomus.smbj.transport.tcp.direct.DirectTcpTransportFactory;
 import com.hierynomus.smbj.transport.tcp.tunnel.TunnelTransportFactory;
 import com.xebialabs.overthere.ConnectionOptions;
+import com.xebialabs.overthere.ConnectionOptionsUtil;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
@@ -71,34 +72,8 @@ public class SmbConnection extends BaseOverthereConnection {
     protected CifsConnectionType cifsConnectionType;
     protected final String username;
 
-    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
-        CifsConnectionType type = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
-        if (type.equals(CifsConnectionType.WINRM_NATIVE) || type.equals(CifsConnectionType.WINRM_INTERNAL)) {
-            Process process = null;
-            ConnectionOptions fixedOptions = new ConnectionOptions(options);
-            try {
-                process = Runtime.getRuntime().exec("winrs /c \"(dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell\"");
-                process.waitFor();
-                String defaultTerminal = new String(process.getInputStream().readAllBytes()).trim();
-
-                if ("PowerShell".equals(defaultTerminal)) {
-                    logger.debug("Default terminal is PowerShell");
-                    fixedOptions.set(FILE_COPY_COMMAND_FOR_WINDOWS, "echo F|xcopy {0} {1} /y");
-                }
-            } catch (Exception e) {
-                logger.warn("Command to find windows default terminal failed: " + e.getMessage());
-            } finally {
-                if (process != null) {
-                    process.destroy();
-                }
-            }
-            return fixedOptions;
-        }
-        return options;
-    }
-
     protected SmbConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
-        super(protocol, options, mapper, canStartProcess);
+        super(protocol, ConnectionOptionsUtil.fixOptions(options), mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         if (mapper instanceof ProxyConnection) {
             throw new IllegalArgumentException("Cannot open a smb:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");

@@ -25,14 +25,11 @@ package com.xebialabs.overthere.cifs;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
+import com.xebialabs.overthere.*;
 import com.xebialabs.overthere.proxy.ProxyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.Overthere;
-import com.xebialabs.overthere.OverthereFile;
-import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.spi.AddressPortMapper;
 import com.xebialabs.overthere.spi.BaseOverthereConnection;
 
@@ -82,38 +79,12 @@ public abstract class CifsConnection extends BaseOverthereConnection {
 
     protected NtlmPasswordAuthentication authentication;
 
-    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
-        CifsConnectionType type = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
-        if (type.equals(CifsConnectionType.WINRM_NATIVE) || type.equals(CifsConnectionType.WINRM_INTERNAL)) {
-            Process process = null;
-            ConnectionOptions fixedOptions = new ConnectionOptions(options);
-            try {
-                process = Runtime.getRuntime().exec("winrs /c \"(dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell\"");
-                process.waitFor();
-                String defaultTerminal = new String(process.getInputStream().readAllBytes()).trim();
-
-                if ("PowerShell".equals(defaultTerminal)) {
-                    logger.debug("Default terminal is PowerShell");
-                    fixedOptions.set(ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS, "echo F|xcopy {0} {1} /y");
-                }
-            } catch (Exception e) {
-                logger.warn("Command to find windows default terminal failed: " + e.getMessage());
-            } finally {
-                if (process != null) {
-                    process.destroy();
-                }
-            }
-            return fixedOptions;
-        }
-        return options;
-    }
-
     /**
      * Creates a {@link CifsConnection}. Don't invoke directly. Use
      * {@link Overthere#getConnection(String, ConnectionOptions)} instead.
      */
     public CifsConnection(String protocol, ConnectionOptions options, AddressPortMapper mapper, boolean canStartProcess) {
-        super(protocol, fixOptions(options), mapper, canStartProcess);
+        super(protocol, ConnectionOptionsUtil.fixOptions(options), mapper, canStartProcess);
         this.cifsConnectionType = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
         if(mapper instanceof ProxyConnection) {
             throw new IllegalArgumentException("Cannot open a cifs:" + cifsConnectionType.toString().toLowerCase() + ": connection through an HTTP proxy");
