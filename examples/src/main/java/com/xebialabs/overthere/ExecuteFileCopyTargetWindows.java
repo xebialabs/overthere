@@ -13,7 +13,7 @@ import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnection;
 
-public class ExecuteOnWindows {
+public class ExecuteFileCopyTargetWindows {
 
 	public static void main(String[] args) {
 
@@ -33,7 +33,7 @@ public class ExecuteOnWindows {
 
 		try {
 			//	connection.execute(CmdLine.build("type", "\\windows\\system32\\drivers\\etc\\hosts"));
-		//	connection.execute(CmdLine.build("ipconfig", "/all"));
+			//	connection.execute(CmdLine.build("ipconfig", "/all"));
 			OverthereFile from = connection.getFile("C:\\foltest\\arulshare\\makeLocalCpy.log");
 			OverthereFile to = connection.getFile("C:\\foltest\\arulshare\\makeLocalCpy2.log");
 			from.copyTo(to);
