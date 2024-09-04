@@ -18,10 +18,6 @@ import org.ajoberstar.grgit.Tag
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            name 'ajoberstar-backup'
-            url 'https://ajoberstar.org/bintray-backup/'
-        }
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
