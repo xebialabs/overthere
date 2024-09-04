@@ -38,7 +38,6 @@ import com.hierynomus.smbj.transport.TransportLayerFactory;
 import com.hierynomus.smbj.transport.tcp.direct.DirectTcpTransportFactory;
 import com.hierynomus.smbj.transport.tcp.tunnel.TunnelTransportFactory;
 import com.xebialabs.overthere.ConnectionOptions;
-import com.xebialabs.overthere.ConnectionOptionsUtil;
 import com.xebialabs.overthere.OverthereFile;
 import com.xebialabs.overthere.RuntimeIOException;
 import com.xebialabs.overthere.cifs.CifsConnectionType;
