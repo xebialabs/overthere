@@ -8,10 +8,10 @@
 	</appender>
 
 
-	<logger name="com.xebialabs" level="info" />
+	<logger name="com.xebialabs" level="debug" />
 	<logger name="net.schmizz.sshj" level="debug" />
 
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="STDOUT" />
 	</root>
 
