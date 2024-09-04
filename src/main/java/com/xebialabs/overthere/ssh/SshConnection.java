@@ -116,31 +116,8 @@ abstract class SshConnection extends BaseOverthereConnection {
 
     protected Factory<SSHClient> sshClientFactory = () -> new SSHClient(config);
 
-    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
-        if (options.get(OPERATING_SYSTEM) == OperatingSystemFamily.WINDOWS) {
-            Process process = null;
-            try {
-                process = Runtime.getRuntime().exec("cmd /c \"(dir 2>&1 *`|echo CMD);&<# rem #>echo PowerShell\"");
-                process.waitFor();
-                String defaultTerminal = new String(process.getInputStream().readAllBytes()).trim();
-
-                if ("PowerShell".equals(defaultTerminal)) {
-                    logger.debug("Default terminal is PowerShell");
-                    options.set(FILE_COPY_COMMAND_FOR_WINDOWS, "echo F|xcopy {0} {1} /y");
-                }
-            } catch (Exception e) {
-                logger.warn("Command to find windows default terminal failed: " + e.getMessage());
-            } finally {
-                if (process != null) {
-                    process.destroy();
-                }
-            }
-        }
-        return options;
-    }
-
     public SshConnection(final String protocol, final ConnectionOptions options, final AddressPortMapper mapper) {
-        super(protocol, fixOptions(options), mapper, true);
+        super(protocol, options, mapper, true);
         SshConnectionType connectionType = options.getOptionalEnum(CONNECTION_TYPE, SshConnectionType.class);
         if(connectionType != null) {
             protocolAndConnectionType = protocol + ":" + connectionType.toString().toLowerCase();

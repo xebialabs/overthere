@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS;
 import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.util.OverthereUtils.closeQuietly;
 
 /**
  * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
@@ -64,6 +65,4 @@ public class CifsWinrsConnection  extends CifsProcessConnection {
     public OverthereProcess startProcess(final CmdLine cmd) {
         return super.startProcess(cmd);
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(CifsWinrsConnection.class);
 }
