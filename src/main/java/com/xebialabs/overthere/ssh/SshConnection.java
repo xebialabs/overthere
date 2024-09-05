@@ -37,17 +37,19 @@ import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
+import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
 import net.schmizz.sshj.userauth.password.Resource;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -108,9 +110,10 @@ abstract class SshConnection extends BaseOverthereConnection {
     private static final Config config = new DefaultConfig();
     {
         // PKCS5 is missing from 0.19.0 SSHJ config.
+        Security.addProvider(new BouncyCastleProvider());
         List<Factory.Named<FileKeyProvider>> current = config.getFileKeyProviderFactories();
         current = new ArrayList<>(current);
-        current.add(new PKCS5KeyFile.Factory());
+        current.add(new PKCS8KeyFile.Factory());
         config.setFileKeyProviderFactories(current);
     }
 
