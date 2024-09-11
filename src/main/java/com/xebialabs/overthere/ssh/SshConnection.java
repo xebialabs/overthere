@@ -37,7 +37,7 @@ import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.keyprovider.FileKeyProvider;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
-import net.schmizz.sshj.userauth.keyprovider.PKCS5KeyFile;
+import net.schmizz.sshj.userauth.keyprovider.PKCS8KeyFile;
 import net.schmizz.sshj.userauth.method.AuthKeyboardInteractive;
 import net.schmizz.sshj.userauth.method.AuthPassword;
 import net.schmizz.sshj.userauth.password.PasswordFinder;
@@ -110,7 +110,7 @@ abstract class SshConnection extends BaseOverthereConnection {
         // PKCS5 is missing from 0.19.0 SSHJ config.
         List<Factory.Named<FileKeyProvider>> current = config.getFileKeyProviderFactories();
         current = new ArrayList<>(current);
-        current.add(new PKCS5KeyFile.Factory());
+        current.add(new PKCS8KeyFile.Factory());
         config.setFileKeyProviderFactories(current);
     }
 
