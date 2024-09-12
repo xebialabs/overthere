@@ -23,16 +23,29 @@
 package com.xebialabs.overthere.cifs.winrs;
 
 import com.xebialabs.overthere.*;
+import com.xebialabs.overthere.cifs.CifsConnectionType;
 import com.xebialabs.overthere.cifs.CifsProcessConnection;
 import com.xebialabs.overthere.spi.AddressPortMapper;
+
+import static com.xebialabs.overthere.ConnectionOptions.FILE_COPY_COMMAND_FOR_WINDOWS;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
 
 /**
  * A connection to a Windows host using CIFS and the Windows native implementation of WinRM, i.e. the <tt>winrs</tt> command.
  */
 public class CifsWinrsConnection  extends CifsProcessConnection {
+    private static ConnectionOptions fixOptions(final ConnectionOptions options) {
+        CifsConnectionType type = options.getEnum(CONNECTION_TYPE, CifsConnectionType.class);
+        if (type.equals(CifsConnectionType.WINRM_NATIVE)) {
+            ConnectionOptions fixedOptions = new ConnectionOptions(options);
+            fixedOptions.set(FILE_COPY_COMMAND_FOR_WINDOWS, "copy {0} {1}");
+            return fixedOptions;
+        }
+        return options;
+    }
 
     public CifsWinrsConnection(String type, ConnectionOptions options, AddressPortMapper mapper) {
-        super(type, options, mapper);
+        super(type, fixOptions(options), mapper);
     }
 
     @Override
