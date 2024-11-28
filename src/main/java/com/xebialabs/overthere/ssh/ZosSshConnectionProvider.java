@@ -1,6 +1,8 @@
 package com.xebialabs.overthere.ssh;
 
 import java.io.IOException;
+import java.util.Objects;
+
 import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.ConnectionOptions.OPERATING_SYSTEM;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
@@ -19,7 +21,6 @@ public class ZosSshConnectionProvider {
         options.set(USERNAME, "ubuntu");
         options.set(PASSWORD, "devopsqe@123");
         options.set(OPERATING_SYSTEM, UNIX);
-        options.set(CONNECTION_TYPE, SFTP);
 
         ZosConnection zosConnection = new ZosConnection(options);
         System.out.println(zosConnection.getOverthereForScp());
@@ -61,9 +62,9 @@ class ZosConnection {
     }
 
     public SshConnection getOverthere(SshConnectionType connectionType) {
-        if (connectionType == SFTP) {
+        if (connectionType.equals(SFTP)) {
             return overthereSshSftp;
-        } else if (connectionType == SCP) {
+        } else if (connectionType.equals(SCP)) {
             return overthereSshScp;
         } else {
             throw new IllegalArgumentException("Unsupported connection type: " + connectionType);
@@ -71,13 +72,13 @@ class ZosConnection {
     }
 
     public void checkConnection(SshConnectionType connectionType){
-        if (connectionType == SFTP) {
-            if (overthereSshSftp == null) {
+        if (connectionType.equals(SFTP)) {
+            if (Objects.isNull(overthereSshSftp)) {
                 throw new IllegalArgumentException("No SFTP connection available");
             }
             echoTmpDirContents(overthereSshSftp);
-        } else if (connectionType == SCP) {
-            if (overthereSshScp == null) {
+        } else if (connectionType.equals(SCP)) {
+            if (Objects.isNull(overthereSshScp)) {
                 throw new IllegalArgumentException("No SCP connection available");
             }
             echoTmpDirContents(overthereSshScp);
@@ -87,18 +88,18 @@ class ZosConnection {
     }
 
     public void checkConnection(){
-        if (overthereSshSftp != null) echoTmpDirContents(overthereSshSftp);
-        if (overthereSshScp != null) echoTmpDirContents(overthereSshScp);
-        if (overthereSshSftp == null && overthereSshScp == null) {
+        if (Objects.nonNull(overthereSshSftp)) echoTmpDirContents(overthereSshSftp);
+        if (Objects.nonNull(overthereSshScp)) echoTmpDirContents(overthereSshScp);
+        if (Objects.isNull(overthereSshSftp) && Objects.isNull(overthereSshScp)) {
             throw new IllegalArgumentException("No connection available");
         }
     }
 
     public void close() throws IOException {
-        if (overthereSshSftp != null) {
+        if (Objects.nonNull(overthereSshSftp)) {
             overthereSshSftp.close();
         }
-        if (overthereSshScp != null) {
+        if (Objects.nonNull(overthereSshScp)) {
             overthereSshScp.close();
         }
     }
@@ -106,20 +107,15 @@ class ZosConnection {
     private void echoTmpDirContents(SshConnection connection) {
         System.out.println("Listing the contents of the temporary directory using "+ connection.protocolAndConnectionType +" connection on host " + connection.host);
         CmdLine cmdLine = new CmdLine();
-        if (connection.getHostOperatingSystem() == OperatingSystemFamily.WINDOWS) {
-            cmdLine.addArgument("cmd");
-            cmdLine.addArgument("/c");
-            cmdLine.addArgument("dir");
-        } else {
-            cmdLine.addArgument("ls");
-        }
-
+        cmdLine.addArgument("ls");
         String tempDir = connection.getHostOperatingSystem().getDefaultTemporaryDirectoryPath();
         cmdLine.addArgument(tempDir);
-        int i = connection.execute(cmdLine);
-        System.out.println("Successfully executed commands on " + connection.host + ".");
-        if (i != 0) {
-            System.out.println("Failed to execute command for connection type "+ connection.protocolAndConnectionType +" on host" + connection.host +". Return code was ["+ i +"]. Please check the logs.");
+        int returnCode = connection.execute(cmdLine);
+        if (returnCode != 0) {
+            System.out.println("Failed to execute command for connection type "+ connection.protocolAndConnectionType +" on host" + connection.host +". Return code was ["+ returnCode +"]. Please check the logs.");
+        }
+        else {
+            System.out.println("Successfully executed commands on " + connection.host + ".");
         }
     }
 }
