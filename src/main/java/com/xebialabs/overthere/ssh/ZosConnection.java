@@ -6,10 +6,17 @@ import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
 
 import com.xebialabs.overthere.ConnectionOptions;
 import com.xebialabs.overthere.Overthere;
+import com.xebialabs.overthere.OverthereConnection;
+import com.xebialabs.overthere.OverthereConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZosConnection {
-    private SshConnection overthereSshScp;
-    private SshConnection overthereSshSftp;
+    private static final Logger logger = LoggerFactory.getLogger(OverthereConnector.class);
+
+    private SshConnection sshScpZosConnection;
+    private SshConnection sshSftpZosConnection;
+
 
     public ZosConnection(ConnectionOptions options) {
         initializeConnections(options);
@@ -17,33 +24,33 @@ public class ZosConnection {
 
     private void initializeConnections(ConnectionOptions targetOptions) {
         try {
-            ConnectionOptions scpOptions = new ConnectionOptions(targetOptions);
-            scpOptions.set(CONNECTION_TYPE, SCP);
-            this.overthereSshScp = (SshConnection) Overthere.getConnection("ssh", scpOptions);
+            targetOptions.set(CONNECTION_TYPE, SCP);
+            this.sshScpZosConnection = (SshConnection) Overthere.getConnection("ssh", targetOptions);
         } catch (Exception e) {
-            this.overthereSshScp = null;
+            logger.warn("OverThere:zosConnection:SCP Failed", e);
+            this.sshScpZosConnection = null;
         }
 
         try {
-            ConnectionOptions sftpOptions = new ConnectionOptions(targetOptions);
-            sftpOptions.set(CONNECTION_TYPE, SFTP);
-            this.overthereSshSftp = (SshConnection) Overthere.getConnection("ssh", sftpOptions);
+            targetOptions.set(CONNECTION_TYPE, SFTP);
+            this.sshSftpZosConnection = (SshConnection) Overthere.getConnection("ssh", targetOptions);
         } catch (Exception e) {
-            this.overthereSshSftp = null;
+            logger.warn("OverThere:zosConnection:SFTP Failed", e);
+            this.sshSftpZosConnection = null;
         }
     }
 
-    public SshConnection getConnectionForScp() { return overthereSshScp; }
+    public OverthereConnection getConnectionForScp() { return sshScpZosConnection; }
 
-    public SshConnection getConnectionForSftp() {
-        return overthereSshSftp;
+    public OverthereConnection getConnectionForSftp() {
+        return sshSftpZosConnection;
     }
 
-    public SshConnection getConnection(SshConnectionType connectionType) {
+    public OverthereConnection getConnection(SshConnectionType connectionType) {
         if (connectionType.equals(SFTP)) {
-            return overthereSshSftp;
+            return sshSftpZosConnection;
         } else if (connectionType.equals(SCP)) {
-            return overthereSshScp;
+            return sshScpZosConnection;
         } else {
             throw new IllegalArgumentException("Unsupported connection type: " + connectionType);
         }
