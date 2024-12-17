@@ -531,6 +531,9 @@ public class SshConnectionBuilder implements OverthereConnectionBuilder {
             case INTERACTIVE_SUDO:
                 connection = new SshInteractiveSudoConnection(type, options, mapper);
                 break;
+            case ZOS_UNIX_SSH:
+                connection = new SshZOSConnectionBuilder(type, options, mapper).getSshConnection();
+                break;
             default:
                 throw new IllegalArgumentException("Unknown SSH connection type " + sshConnectionType);
         }

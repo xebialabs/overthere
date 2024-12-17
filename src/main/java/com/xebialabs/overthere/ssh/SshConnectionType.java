@@ -69,4 +69,8 @@ public enum SshConnectionType {
      */
     INTERACTIVE_SUDO,
 
+    /**
+     * ZOS SSH connection which is a composite class that has both SCP and SFTP connection to transfer files, to a ZOS host
+     */
+    ZOS_UNIX_SSH,
 }
