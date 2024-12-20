@@ -5,16 +5,23 @@ import com.xebialabs.overthere.Overthere;
 import com.xebialabs.overthere.OverthereConnection;
 import com.xebialabs.overthere.OverthereFile;
 
+import com.xebialabs.overthere.itest.OverthereConnectionItestBase;
+import com.xebialabs.overthere.local.LocalConnection;
 import com.xebialabs.overthere.local.LocalFile;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import static com.xebialabs.overthere.local.LocalConnection.LOCAL_PROTOCOL;
 import static org.testng.AssertJUnit.assertEquals;
 
-public class OverthereFileTranscoderTest {
+public class OverthereFileTranscoderTest extends OverthereConnectionItestBase {
+
+    private File srcFile;
+    private File dstFile;
 
     @Test
     public void testTransmitFileUtf8ToCp1047() throws IOException {
@@ -22,20 +29,20 @@ public class OverthereFileTranscoderTest {
         String specialChars = "This is a Sample Encoding";
 
         // Create source file with UTF-8 encoding
-        File srcFile = File.createTempFile("source", ".txt");
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(srcFile), Charset.forName("UTF-8"))) {
+        srcFile = File.createTempFile("source", ".txt");
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(srcFile), StandardCharsets.UTF_8)) {
             writer.write(specialChars);
         }
 
         // Create destination file
-        File dstFile = File.createTempFile("destination", ".txt");
+        dstFile = File.createTempFile("destination", ".txt");
 
         // Create OverthereFile instances
         OverthereFile srcOverthereFile = LocalFile.from(srcFile);
         OverthereFile dstOverthereFile = LocalFile.from(dstFile);
 
         // Transcode file from UTF-8 to CP1047
-        OverthereFileTranscoder transcoder = new OverthereFileTranscoder(Charset.forName("UTF-8"), Charset.forName("CP1047"));
+        OverthereFileTranscoder transcoder = new OverthereFileTranscoder(StandardCharsets.UTF_8, Charset.forName("CP1047"));
         transcoder.transmitFile(srcOverthereFile, dstOverthereFile);
 
         // Read and assert the content of the destination file
@@ -50,20 +57,20 @@ public class OverthereFileTranscoderTest {
     @Test
     public void testfileTransmitFromLinuxToLinuxSftp() {
         OverthereFileTranscoder oft = new OverthereFileTranscoder(StandardCharsets.UTF_8, Charset.forName("CP1047"));
-        ConnectionOptions fromConnection = new ConnectionOptions();
+        ConnectionOptions fromConnection = getOptions();
         /*fromConnection.set(ADDRESS, "qe-ubuntu-2.xebialabs.com");
         fromConnection.set(USERNAME, "root");
         fromConnection.set(PASSWORD, "devopsqe@123");
         fromConnection.set(OPERATING_SYSTEM, UNIX);
-        fromConnection.set(CONNECTION_TYPE, SshConnectionType.SFTP);*/
+        fromConnection.set(CONNECTION_TYPE, SshConnectionType.SFTP);
 
         ConnectionOptions toConnection = new ConnectionOptions();
-        /*toConnection.set("address", "qe-ubuntu-2.xebialabs.com");
+        toConnection.set("address", "qe-ubuntu-2.xebialabs.com");
         toConnection.set("username", "root");
         toConnection.set("password", "devopsqe@123");
         toConnection.set("os", "UNIX");
         toConnection.set("connectionType", "SFTP");*/
-        OverthereConnection fromConn = Overthere.getConnection("local", fromConnection);
+        OverthereConnection fromConn = Overthere.getConnection(getProtocol(), fromConnection);
         //OverthereConnection toConn = Overthere.getConnection("local", toConnection);
         try {
             OverthereFile from = fromConn.getFile("src/test/resources/test.txt");
@@ -109,5 +116,35 @@ public class OverthereFileTranscoderTest {
             fromConn.close();
             //toConn.close();
         }
+    }
+
+    @AfterMethod
+    public void teardown(){
+        if(srcFile != null && srcFile.exists()){
+            srcFile.delete();
+        }
+        if(dstFile != null && dstFile.exists()){
+            dstFile.delete();
+        }
+        File transcodedFile = new File("src/test/resources/test-transcoded.txt");
+        if (transcodedFile.exists()) {
+            transcodedFile.delete();
+        }
+    }
+
+    @Override
+    protected String getProtocol() {
+        return LOCAL_PROTOCOL;
+    }
+
+    @Override
+    protected ConnectionOptions getOptions() {
+        ConnectionOptions options = new ConnectionOptions();
+        return options;
+    }
+
+    @Override
+    protected String getExpectedConnectionClassName() {
+        return LocalConnection.class.getName();
     }
 }
