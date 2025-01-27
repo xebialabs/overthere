@@ -24,15 +24,14 @@ package com.xebialabs.overthere;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class TemporaryFolder {
 
     private File tempRoot;
 
     public void create() throws IOException {
-        tempRoot = File.createTempFile("testng", ".tmp");
-        tempRoot.delete();
-        tempRoot.mkdir();
+        tempRoot = Files.createTempDirectory("testng" + ".tmp").toFile();
     }
 
     public void delete() {
