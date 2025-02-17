@@ -67,10 +67,5 @@ public enum SshConnectionType {
      * An SSH connection that uses SCP to transfer files, to a Unix host. Uses SUDO, <em>not</em> been configured with
      * NOPASSWD for all commands, to execute commands.
      */
-    INTERACTIVE_SUDO,
-
-    /**
-     * ZOS SSH connection which is a composite class that has both SCP and SFTP connection to transfer files, to a ZOS host
-     */
-    ZOS_UNIX_SSH,
+    INTERACTIVE_SUDO
 }

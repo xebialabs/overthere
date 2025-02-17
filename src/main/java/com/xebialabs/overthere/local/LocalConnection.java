@@ -174,21 +174,10 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     private CmdLine getCmdForWindows(final CmdLine cmd) {
         String command = cmd.toCommandLine(WINDOWS, false);
         CmdLine c = CmdLine.build("cmd", "/s", "/c");
-        if (command.startsWith("powershell")) {
-            for(CmdLineArgument arg : cmd.getArguments()) {
-                if(containsAnySpecialChars(arg.toString(WINDOWS, false)))
-                    c.addArgument("\"" + arg.toString(WINDOWS, false) + "\"");
-                else
-                    c.add(arg);
-            }
-            return c;
+        if (containsAnySpecialChars(command)) {
+            return c.addArgument("\"" + command + "\"");
         }
-        else {
-            if (containsAnySpecialChars(command)) {
-                return c.addArgument("\"" + command + "\"");
-            }
-            return c.add(cmd.getArguments());
-        }
+        return c.add(cmd.getArguments());
     }
 
     private static final Logger logger = LoggerFactory.getLogger(LocalConnection.class);
