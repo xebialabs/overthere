@@ -10,18 +10,13 @@
  * prerequisites: Published PGP key installed and configured, authorised sonatype username and password configured
  */
 
-import com.github.zafarkhaja.semver.Version
-import nebula.plugin.release.git.opinion.Strategies
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.Tag
-
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
-        classpath "com.netflix.nebula:nebula-release-plugin:17.1.0"
+        classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
     }
 }
@@ -57,8 +52,8 @@ repositories {
     mavenLocal()
 }
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 configurations.all {
     exclude(group: "org.bouncycastle", module: "bcprov-jdk16")
@@ -68,29 +63,6 @@ if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
         tasks.withType(Javadoc) {
             options.addStringOption('Xdoclint:none', '-quiet')
-        }
-    }
-}
-
-if (!project.gradle.startParameter.taskNames.contains("final")) {
-    release {
-        grgit = Grgit.open(dir: project.projectDir)
-        defaultVersionStrategy = Strategies.SNAPSHOT
-        tagStrategy {
-            toTagString = { vs -> "${project.name}-$vs" }
-            parseTag = { Tag tag ->
-                if (tag.name.startsWith(project.name)) {
-                    try {
-                        Version tagversion =
-                                Version.valueOf(tag.name[project.name.size() + 1..-1])
-                        tagversion.getMajorVersion() > 2000 ? null : tagversion
-                    } catch (e) {
-                        null
-                    }
-                } else {
-                    null
-                }
-            }
         }
     }
 }
