@@ -1,3 +1,8 @@
+import com.github.zafarkhaja.semver.Version
+import nebula.plugin.release.git.opinion.Strategies
+import org.ajoberstar.grgit.Grgit
+
+
 /*
  * Release and publish instructions:
  *
@@ -10,6 +15,7 @@
  * prerequisites: Published PGP key installed and configured, authorised sonatype username and password configured
  */
 
+
 buildscript {
     repositories {
         mavenCentral()
@@ -18,6 +24,7 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
+        classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
     }
 }
 
@@ -37,6 +44,7 @@ apply plugin: 'signing'
 apply plugin: 'license'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'nebula.release'
+apply plugin: 'org.ajoberstar.grgit'
 
 repositories {
     mavenCentral()
@@ -66,6 +74,50 @@ if (JavaVersion.current().isJava8Compatible()) {
         }
     }
 }
+
+nebulaRelease {
+    addReleaseBranchPattern(/main/)
+}
+
+if (!project.gradle.startParameter.taskNames.contains("final")) {
+    def grgit = Grgit.open(dir: project.projectDir)
+
+    // Custom tag parsing logic
+    def parseTag = { tag ->
+        if (tag.name.startsWith(project.name)) {
+            try {
+                def versionString = tag.name.substring(project.name.length() + 1)
+                Version tagVersion = Version.valueOf(versionString)
+                def major = tagVersion.getMajorVersion()
+                def minor = tagVersion.getMinorVersion()
+                def patch = 0
+                return "${major}.${minor}.${patch}"
+            } catch (Exception e) {
+                return null
+            }
+        } else {
+            return null
+        }
+    }
+    // Collect valid versions from tags
+    def validVersions = grgit.tag.list()
+            .collect { parseTag(it) }
+            .findAll { it != null }
+            .sort { a, b -> a.compareTo(b) }
+
+    // Determine the latest version or fallback to snapshot
+    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()+"-SNAPSHOT"
+    project.version = latestVersion
+
+    // Configure Nebula Release Plugin
+    release {
+        defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
+        tagStrategy {
+            toTagString = { vs -> "${project.name}-$vs" } // Custom tag format
+        }
+    }
+}
+
 
 dependencies {
     // General dependencies
