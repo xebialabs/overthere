@@ -75,10 +75,6 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-nebulaRelease {
-    addReleaseBranchPattern(/main/)
-}
-
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
@@ -107,7 +103,7 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
 
     // Determine the latest version or fallback to snapshot
     def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()+"-SNAPSHOT"
-    project.version = latestVersion
+    ext.set("release.version", latestVersion)
 
     // Configure Nebula Release Plugin
     release {
