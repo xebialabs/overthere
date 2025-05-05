@@ -102,7 +102,7 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
             .sort { a, b -> a.compareTo(b) }
 
     // Determine the latest version or fallback to snapshot
-    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()+"-SNAPSHOT"
+    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()
     ext.set("release.version", latestVersion)
 
     // Configure Nebula Release Plugin
