@@ -106,12 +106,12 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
     ext.set("release.version", latestVersion)
 
     // Configure Nebula Release Plugin
-    release {
+   /* release {
         //defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
         tagStrategy {
-            toTagString = { vs -> "${project.name}-$vs" } // Custom tag format
+            toTagString = { vs -> "${project.name}" } // Custom tag format
         }
-    }
+    }*/
 }
 
 
