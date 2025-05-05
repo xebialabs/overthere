@@ -74,7 +74,7 @@ if (JavaVersion.current().isJava8Compatible()) {
         }
     }
 }
-/*
+
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
@@ -107,12 +107,12 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
 
     // Configure Nebula Release Plugin
     release {
-        defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
+        //defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
         tagStrategy {
             toTagString = { vs -> "${project.name}-$vs" } // Custom tag format
         }
     }
-}*/
+}
 
 
 dependencies {
