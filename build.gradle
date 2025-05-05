@@ -85,7 +85,7 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
                 def versionString = tag.name.substring(project.name.length() + 1)
                 Version tagVersion = Version.valueOf(versionString)
                 def major = tagVersion.getMajorVersion()
-                def minor = tagVersion.getMinorVersion()
+                def minor = tagVersion.getMinorVersion()+1
                 def patch = 0
                 return "${major}.${minor}.${patch}"
             } catch (Exception e) {
