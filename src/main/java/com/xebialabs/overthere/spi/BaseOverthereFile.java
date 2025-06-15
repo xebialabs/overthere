@@ -22,12 +22,10 @@
  */
 package com.xebialabs.overthere.spi;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Map;
 
+import com.xebialabs.overthere.OperatingSystemFamily;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,20 +83,22 @@ public abstract class BaseOverthereFile<C extends BaseOverthereConnection> imple
     @Override
     public void deleteRecursively() throws RuntimeIOException {
         if (isDirectory()) {
-            RuntimeIOException accumulator = new RuntimeIOException("Cannot delete " + this + ", not all children are deleted.");
-            for (OverthereFile each : listFiles()) {
-                try {
-                    each.deleteRecursively();
-                } catch (RuntimeIOException rio) {
-                    logger.warn("Unable to delete child {}. Continue...", each);
-                    accumulator.addSuppressed(rio);
+            try {
+                var hostOS = connection.getHostOperatingSystem();
+                String command = hostOS.equals(OperatingSystemFamily.WINDOWS)
+                        ? "powershell -Command \"Remove-Item -Path '" + getPath() + "' -Recurse -Force\"" // Windows PowerShell command
+                        : "rm -rf " + getPath(); // Unix/Linux command
+
+                ProcessBuilder processBuilder = new ProcessBuilder(command.split(" "));
+                Process process = processBuilder.start();
+
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    throw new IOException("Failed to delete directory: " + getPath());
                 }
-            }
-            Throwable[] suppressed = accumulator.getSuppressed();
-            if (suppressed == null || suppressed.length == 0) {
-                delete();
-            } else {
-                throw accumulator;
+            } catch (IOException | InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupted status
+                throw new RuntimeIOException("Failed to delete directory " + this, e);
             }
         } else {
             delete();
