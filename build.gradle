@@ -1,5 +1,4 @@
 import com.github.zafarkhaja.semver.Version
-import nebula.plugin.release.git.opinion.Strategies
 import org.ajoberstar.grgit.Grgit
 
 
@@ -49,27 +48,30 @@ apply plugin: 'org.ajoberstar.grgit'
 repositories {
     mavenCentral()
     maven {
-        url 'https://download.java.net/maven/2/'
+        url = 'https://download.java.net/maven/2/'
     }
     maven {
-        url 'https://oss.sonatype.org/content/repositories/releases'
+        url = 'https://oss.sonatype.org/content/repositories/releases'
     }
     maven {
-        url 'https://www.libvirt.org/maven2/'
+        url = 'https://www.libvirt.org/maven2/'
     }
     mavenLocal()
 }
 
-sourceCompatibility = '21'
-targetCompatibility = '21'
+// Set Java compatibility using the Java plugin extension (modern approach)
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
-configurations.all {
+configurations.configureEach {
     exclude(group: "org.bouncycastle", module: "bcprov-jdk16")
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
     allprojects {
-        tasks.withType(Javadoc) {
+        tasks.withType(Javadoc).configureEach {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
@@ -88,7 +90,7 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
                 def minor = tagVersion.getMinorVersion()+1
                 def patch = 0
                 return "${major}.${minor}.${patch}"
-            } catch (Exception e) {
+            } catch (Exception _) {
                 return null
             }
         } else {
@@ -187,7 +189,7 @@ dependencies {
     testImplementation 'ch.qos.logback:logback-classic:1.4.8'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     afterSuite { descriptor, result ->
         if (descriptor.className != null) {
             def indicator = "\u001B[32m✓\u001b[0m"
@@ -207,16 +209,13 @@ test {
     maxHeapSize = "512m"
 }
 
-task itest(type: Test) {
+tasks.register('itest', Test) {
     useTestNG()
-
     includes = ['**/*Itest.*', '**/LocalConnectionTest.*']
-    reports.junitXml.outputLocation = file("${buildDir}/itest-results")
-    reports.html.outputLocation = file("${buildDir}/reports/itests")
-
+    reports.junitXml.outputLocation = layout.buildDirectory.dir("itest-results")
+    reports.html.outputLocation = layout.buildDirectory.dir("reports/itests")
     maxHeapSize = "512m"
     copyProjectPropertyToSystemProperty(project, systemProperties, 'itests')
-
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.password')
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.passphrase')
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.linux.regular.privatekey')
@@ -226,28 +225,30 @@ task itest(type: Test) {
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.regular.password')
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.administrative.password')
     copyProjectPropertyToSystemProperty(project, systemProperties, 'test.overthere.windows.domain.password')
-
 }
 
-task sourcesJar(type: Jar) {
+tasks.register('sourcesJar', Jar) {
     from sourceSets.main.allSource
     archiveClassifier.set('sources')
 }
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
     archiveClassifier.set('javadoc')
     from javadoc.destinationDir
 }
 
 license {
-    header project.file('HEADER')
-    ignoreFailures true
+    header = project.file('HEADER')
+    ignoreFailures = true
     exclude "**/ProxySocketFactory.java"
 }
 
 signing {
-    required { gradle.taskGraph.hasTask('uploadArchives') }
+    required = { gradle.taskGraph.hasTask('uploadArchives') }
     sign configurations.archives
+    if (project.hasProperty('sonatypeUsername')) {
+        sign(publishing.publications.named("deployment"))
+    }
 }
 
 nexusStaging {
@@ -280,7 +281,7 @@ project.publishing {
                 project.gradle.projectsEvaluated {
                     name = 'Overthere'
                     description = 'Remote file manipulation and process execution framework for Java'
-                    packaging 'jar'
+                    packaging = 'jar'
                     url = 'https://github.com/xebialabs/overthere'
                     inceptionYear = '2011'
                 }
@@ -361,10 +362,10 @@ def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
     }
 }
 
-task dumpVersion {
+tasks.register('dumpVersion') {
     doLast {
-        file(buildDir).mkdirs()
-        def out = file("$buildDir/version.dump")
+        layout.buildDirectory.get().asFile.mkdirs()
+        def out = layout.buildDirectory.file("version.dump").get().asFile
         out.write("version=$project.version")
     }
 }
