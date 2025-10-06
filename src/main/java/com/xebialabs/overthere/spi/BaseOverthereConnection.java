@@ -406,4 +406,18 @@ public abstract class BaseOverthereConnection implements OverthereConnection {
         result = 31 * result + options.hashCode();
         return result;
     }
+
+    /**
+     * Make sure that the connection is cleaned up. This will log error messages if the connection is collected before it is cleaned up.
+     *
+     * @throws Throwable
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        if (isConnected) {
+            logger.error(String.format("Connection [%s] was not closed, closing automatically.", this), openStack);
+            closeQuietly(this);
+        }
+        super.finalize();
+    }
 }

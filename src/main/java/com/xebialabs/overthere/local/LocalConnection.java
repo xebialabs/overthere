@@ -151,6 +151,16 @@ public class LocalConnection extends BaseOverthereConnection implements Overther
     }
 
     /**
+     * Override this from {@link com.xebialabs.overthere.spi.BaseOverthereConnection#finalize()}, because the LocalConnection needn't be closed, so it should not log messages.
+     * @throws Throwable
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        closeQuietly(this);
+        super.finalize();
+    }
+
+    /**
      * Creates a connection to the local host.
      */
     public static OverthereConnection getLocalConnection() {
