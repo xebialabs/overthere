@@ -97,6 +97,10 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
 
 dependencies {
     // General dependencies
+    configurations.all {
+        exclude group: 'io.grpc', module: 'grpc-netty-shaded'
+    }
+    implementation 'io.grpc:grpc-netty-shaded:1.75.0'
     api ('nl.javadude.scannit:scannit:1.4.1'){
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
     }
