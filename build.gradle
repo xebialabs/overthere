@@ -145,7 +145,7 @@ dependencies {
     api 'com.jcraft:jsch:0.1.55'
     api 'com.google.apis:google-api-services-compute:v1-rev20231031-2.0.0'
     api 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
-    api 'com.google.cloud:google-cloud-os-login:2.51.0' {
+    api('com.google.cloud:google-cloud-os-login:2.51.0') {
         exclude group: 'io.grpc', module: 'grpc-netty-shaded'
     }
     implementation 'io.grpc:grpc-netty-shaded:1.75.0'
