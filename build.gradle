@@ -75,6 +75,10 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
+if (project.hasProperty('release.explicit')) {
+    version = project.property('release.explicit')
+}
+
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
