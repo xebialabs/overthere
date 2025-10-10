@@ -252,6 +252,7 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
+    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
     if (project.hasProperty('sonatypeUsername')) {
         username = project.property("sonatypeUsername").toString()
         password = project.property("sonatypePassword").toString()
@@ -329,7 +330,7 @@ project.publishing {
         repositories {
             if(project.version.toString().endsWith('-SNAPSHOT')) {
                 maven {
-                    url = "https://oss.sonatype.org/content/repositories/snapshots/"
+                    url = "https://central.sonatype.com/repository/maven-snapshots/"
                     credentials {
                         username project.property("sonatypeUsername").toString()
                         password project.property("sonatypePassword").toString()
@@ -337,7 +338,8 @@ project.publishing {
                 }
             } else {
                 maven {
-                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    name = 'ossrh-staging-api'
+                    url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
                     credentials {
                         username project.property("sonatypeUsername").toString()
                         password project.property("sonatypePassword").toString()
