@@ -85,43 +85,13 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-if (!project.gradle.startParameter.taskNames.contains("final")) {
-    def grgit = Grgit.open(dir: project.projectDir)
-
-    // Custom tag parsing logic
-    def parseTag = { tag ->
-        if (tag.name.startsWith(project.name)) {
-            try {
-                def versionString = tag.name.substring(project.name.length() + 1)
-                Version tagVersion = Version.valueOf(versionString)
-                def major = tagVersion.getMajorVersion()
-                def minor = tagVersion.getMinorVersion()+1
-                def patch = 0
-                return "${major}.${minor}.${patch}"
-            } catch (Exception e) {
-                return null
-            }
-        } else {
-            return null
-        }
+// Configure nebula release plugin properly
+// Use -Prelease.version=x.y.z parameter to specify version for releases
+release {
+    defaultVersionStrategy = Strategies.SNAPSHOT
+    tagStrategy {
+        toTagString = { version -> "${project.name}-${version}" }
     }
-    // Collect valid versions from tags
-    def validVersions = grgit.tag.list()
-            .collect { parseTag(it) }
-            .findAll { it != null }
-            .sort { a, b -> a.compareTo(b) }
-
-    // Determine the latest version or fallback to snapshot
-    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()
-    ext.set("release.version", latestVersion)
-
-    // Configure Nebula Release Plugin
-   /* release {
-        //defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
-        tagStrategy {
-            toTagString = { vs -> "${project.name}" } // Custom tag format
-        }
-    }*/
 }
 
 
