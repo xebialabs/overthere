@@ -82,16 +82,12 @@ if (project.hasProperty('release.explicit')) {
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
-    // Custom tag parsing logic
+    // Custom tag parsing logic for 5.6.x series
     def parseTag = { tag ->
-        if (tag.name.startsWith(project.name)) {
+        if (tag.name.startsWith(project.name) && tag.name.matches(".*-5\\.6\\.[0-9]+\$")) {
             try {
                 def versionString = tag.name.substring(project.name.length() + 1)
-                Version tagVersion = Version.valueOf(versionString)
-                def major = tagVersion.getMajorVersion()
-                def minor = tagVersion.getMinorVersion()+1
-                def patch = 0
-                return "${major}.${minor}.${patch}"
+                return versionString
             } catch (Exception e) {
                 return null
             }
@@ -99,14 +95,27 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
             return null
         }
     }
-    // Collect valid versions from tags
+    // Collect valid 5.6.x versions from tags
     def validVersions = grgit.tag.list()
             .collect { parseTag(it) }
             .findAll { it != null }
-            .sort { a, b -> a.compareTo(b) }
+            .sort { a, b -> 
+                def aParts = a.split('\\.').collect { Integer.parseInt(it) }
+                def bParts = b.split('\\.').collect { Integer.parseInt(it) }
+                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+                    int result = aParts[i] <=> bParts[i]
+                    if (result != 0) return result
+                }
+                return aParts.size() <=> bParts.size()
+            }
 
-    // Determine the latest version or fallback to snapshot
-    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()
+    // Determine the next patch version in 5.6.x series
+    def latestVersion = validVersions.isEmpty() ? '5.6.0-SNAPSHOT' : {
+        def latest = validVersions.last()
+        def parts = latest.split('\\.')
+        def nextPatch = Integer.parseInt(parts[2]) + 1
+        return "${parts[0]}.${parts[1]}.${nextPatch}"
+    }()
     ext.set("release.version", latestVersion)
 
     // Configure Nebula Release Plugin
