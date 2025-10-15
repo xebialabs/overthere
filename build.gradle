@@ -12,7 +12,17 @@ import org.ajoberstar.grgit.Grgit
  * For example:
  * gradle clean build signArchives uploadArchives closeAndPromoteRepository
  *
- * prerequisites: Published PGP key installed and configured, authorised sonatype username and password configured
+ * IMPORTANT AUTHENTICATION UPDATE (2024+):
+ * - Legacy OSSRH credentials will result in 401 errors
+ * - You must use Central Publisher Portal User Tokens instead
+ * - Generate tokens at: https://central.sonatype.com/ -> View Account -> Generate User Token
+ * - Set sonatypeUsername and sonatypePassword to the generated token values
+ * - The nexus-staging plugin handles the complete promotion workflow
+ *
+ * Prerequisites: 
+ * - Published PGP key installed and configured
+ * - Central Publisher Portal User Token configured (not legacy OSSRH credentials)
+ * - Namespace verified and owned in Central Publisher Portal
  */
 
 
@@ -268,7 +278,7 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
+    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
     if (project.hasProperty('sonatypeUsername')) {
         username = project.property("sonatypeUsername").toString()
         password = project.property("sonatypePassword").toString()
@@ -344,22 +354,12 @@ project.publishing {
 
     if (project.hasProperty('sonatypeUsername')) {
         repositories {
-            if(project.version.toString().endsWith('-SNAPSHOT')) {
-                maven {
-                    name = 'ossrh-staging-api'
-                    url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2"
-                    credentials {
-                        username project.property("sonatypeUsername").toString()
-                        password project.property("sonatypePassword").toString()
-                    }
-                }
-            } else {
-                maven {
-                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                    credentials {
-                        username project.property("sonatypeUsername").toString()
-                        password project.property("sonatypePassword").toString()
-                    }
+            maven {
+                name = 'ossrh-staging-api'
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+                credentials {
+                    username project.property("sonatypeUsername").toString()
+                    password project.property("sonatypePassword").toString()
                 }
             }
         }
