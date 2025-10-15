@@ -35,7 +35,7 @@ plugins {
 defaultTasks 'build'
 
 group = 'com.xebialabs.overthere'
-
+version = "5.6.18"
 apply plugin: 'idea'
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
