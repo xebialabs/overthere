@@ -110,6 +110,7 @@ public class SmbConnection extends BaseOverthereConnection {
                 .withSigningRequired(requireSigning)
                 .withTransportLayerFactory(transportLayerFactory)
                 .withSecurityProvider(new BCSecurityProvider())
+                .withEncryptData(true)
                 .build();
         client = new SMBClient(config);
     }
