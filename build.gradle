@@ -33,8 +33,8 @@ buildscript {
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
-        classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
-        classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
+        classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
+        classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
     }
 }
 
@@ -102,28 +102,28 @@ dependencies {
     }
 
     constraints {
-        api('org.apache.commons:commons-compress:1.24.0') {
+        api('org.apache.commons:commons-compress:1.28.0') {
             because 'earlier versions of this transitive dependency of scannit have a vulnerability issue'
         }
     }
-    api 'org.slf4j:slf4j-api:1.7.36'
-    api 'org.slf4j:jcl-over-slf4j:1.7.36'
+    api 'org.slf4j:slf4j-api:2.0.17'
+    api 'org.slf4j:jcl-over-slf4j:2.0.17'
 
     // SSH
-    api 'com.hierynomus:sshj:0.38.0'
+    api 'com.hierynomus:sshj:0.40.0'
     implementation 'com.jcraft:jzlib:1.1.3'
 
     // CIFS
     api 'jcifs:jcifs:1.3.17'
 
     // SMB2/3
-    api 'com.hierynomus:smbj:0.12.2'
+    api 'com.hierynomus:smbj:0.14.0'
     api 'net.engio:mbassador:1.3.2'
-    api "org.bouncycastle:bcprov-jdk18on:1.76"
-    api "org.bouncycastle:bcpkix-jdk18on:1.76"
+    api "org.bouncycastle:bcprov-jdk18on:1.83"
+    api "org.bouncycastle:bcpkix-jdk18on:1.83"
 
     // Telnet
-    api 'commons-net:commons-net:3.10.0'
+    api 'commons-net:commons-net:3.12.0'
 
     // WinRM
     api('org.dom4j:dom4j:2.1.4') {
@@ -139,16 +139,16 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     api 'org.apache.httpcomponents:httpcore:4.4.16'
-    api 'commons-codec:commons-codec:1.16.0'
+    api 'commons-codec:commons-codec:1.19.0'
 
     // GCP
     api 'com.jcraft:jsch:0.1.55'
-    api 'com.google.apis:google-api-services-compute:v1-rev20231031-2.0.0'
-    api 'com.google.auth:google-auth-library-oauth2-http:1.20.0'
-    api('com.google.cloud:google-cloud-os-login:2.51.0') {
+    api 'com.google.apis:google-api-services-compute:v1-rev20251110-2.0.0'
+    api 'com.google.auth:google-auth-library-oauth2-http:1.41.0'
+    api('com.google.cloud:google-cloud-os-login:2.79.0') {
         exclude group: 'io.grpc', module: 'grpc-netty-shaded'
     }
-    implementation 'io.grpc:grpc-netty-shaded:1.75.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.76.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
@@ -157,17 +157,17 @@ dependencies {
     }
     testImplementation 'org.hamcrest:hamcrest-core:2.2'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.mockito:mockito-core:5.20.0'
 
-    testImplementation('org.testng:testng:7.8.0') {
+    testImplementation('org.testng:testng:7.11.0') {
         exclude group: "junit", module: "junit"
     }
     testImplementation('nl.javadude.assumeng:assumeng:1.2.4') {
         exclude group: "junit", module: "junit"
     }
-    testImplementation 'com.google.guava:guava:30.1.1-jre'
+    testImplementation 'com.google.guava:guava:33.5.0-jre'
 
-    testImplementation 'ch.qos.logback:logback-classic:1.4.8'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.21'
 }
 
 tasks.withType(Test) {
