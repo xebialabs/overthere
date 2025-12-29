@@ -19,7 +19,7 @@ import org.ajoberstar.grgit.Grgit
  * - Set sonatypeUsername and sonatypePassword to the generated token values
  * - The nexus-staging plugin handles the complete promotion workflow
  *
- * Prerequisites: 
+ * Prerequisites:
  * - Published PGP key installed and configured
  * - Central Publisher Portal User Token configured (not legacy OSSRH credentials)
  * - Namespace verified and owned in Central Publisher Portal
@@ -145,10 +145,10 @@ dependencies {
     api 'com.jcraft:jsch:0.1.55'
     api 'com.google.apis:google-api-services-compute:v1-rev20251110-2.0.0'
     api 'com.google.auth:google-auth-library-oauth2-http:1.41.0'
-    api('com.google.cloud:google-cloud-os-login:2.79.0') {
+    api('com.google.cloud:google-cloud-os-login:2.80.0') {
         exclude group: 'io.grpc', module: 'grpc-netty-shaded'
     }
-    implementation 'io.grpc:grpc-netty-shaded:1.76.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.78.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
@@ -157,7 +157,7 @@ dependencies {
     }
     testImplementation 'org.hamcrest:hamcrest-core:2.2'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
-    testImplementation 'org.mockito:mockito-core:5.20.0'
+    testImplementation 'org.mockito:mockito-core:5.21.0'
 
     testImplementation('org.testng:testng:7.11.0') {
         exclude group: "junit", module: "junit"
@@ -167,7 +167,7 @@ dependencies {
     }
     testImplementation 'com.google.guava:guava:33.5.0-jre'
 
-    testImplementation 'ch.qos.logback:logback-classic:1.5.21'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.23'
 }
 
 tasks.withType(Test) {
