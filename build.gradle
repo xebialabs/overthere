@@ -1,4 +1,5 @@
 import com.github.zafarkhaja.semver.Version
+import nebula.plugin.release.git.opinion.Strategies
 import org.ajoberstar.grgit.Grgit
 
 
@@ -356,11 +357,8 @@ project.publishing {
             sign(publishing.publications["deployment"])
         }
     }
+  }
 }
-
-
-
-
 def copyProjectPropertyToSystemProperty(project, systemProperties, name) {
     if (project.hasProperty(name)) {
         systemProperties[name] = project.getProperty(name)
