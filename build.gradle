@@ -31,7 +31,7 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
+        classpath "com.netflix.nebula:nebula-release-plugin:21.0.0"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
         classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
     }
@@ -158,7 +158,7 @@ dependencies {
     api 'commons-net:commons-net:3.10.0'
 
     // WinRM
-    api('org.dom4j:dom4j:2.1.4') {
+    api('org.dom4j:dom4j:2.2.0') {
         exclude group: 'xml-apis', module: 'xml-apis'
     }
     api('jaxen:jaxen:2.0.0') {
@@ -171,7 +171,7 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     api 'org.apache.httpcomponents:httpcore:4.4.16'
-    api 'commons-codec:commons-codec:1.16.0'
+    api 'commons-codec:commons-codec:1.20.0'
 
     // GCP
     api 'com.jcraft:jsch:0.1.55'
@@ -187,8 +187,7 @@ dependencies {
         exclude group: 'com.xebialabs.overthere', module: 'overthere'
         exclude group: 'net.schmizz', module: 'sshj'
     }
-    testImplementation 'org.hamcrest:hamcrest-core:2.2'
-    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'org.hamcrest:hamcrest:3.0'
     testImplementation 'org.mockito:mockito-core:3.12.4'
 
     testImplementation('org.testng:testng:7.8.0') {
