@@ -34,7 +34,7 @@ import net.schmizz.sshj.transport.Transport;
 import net.schmizz.sshj.transport.TransportException;
 import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 import net.schmizz.sshj.userauth.method.AuthMethod;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
@@ -46,10 +46,10 @@ import static com.xebialabs.overthere.ConnectionOptions.*;
 import static com.xebialabs.overthere.OperatingSystemFamily.UNIX;
 import static com.xebialabs.overthere.ssh.SshConnectionBuilder.*;
 import static com.xebialabs.overthere.ssh.SshConnectionType.SFTP;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
 /**
@@ -102,7 +102,7 @@ public class SshConnectionTest {
         SshConnection connection = newConnectionWithClient(client);
         connection.connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        verify(client).authPublickey(eq("some-user"), ArgumentMatchers.<KeyProvider>any());
         connection.close();
 
     }
@@ -115,7 +115,7 @@ public class SshConnectionTest {
         SshConnection connection = newConnectionWithClient(client);
         connection.connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
+        verify(client).authPublickey(eq("some-user"), ArgumentMatchers.<KeyProvider>any());
         verify(client, never()).authPassword(anyString(), anyString());
         connection.close();
     }
@@ -128,8 +128,8 @@ public class SshConnectionTest {
         SshConnection connection = newConnectionWithClient(client);
         connection.connect();
 
-        verify(client).authPublickey(eq("some-user"), Matchers.<KeyProvider>anyVararg());
-        verify(client, never()).authPublickey(Matchers.eq(keyFile), anyString());
+        verify(client).authPublickey(eq("some-user"), ArgumentMatchers.<KeyProvider>any());
+        verify(client, never()).authPublickey(ArgumentMatchers.eq(keyFile), anyString());
         connection.close();
     }
 
