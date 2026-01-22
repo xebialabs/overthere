@@ -36,7 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 public class SshElevatedPasswordHandlingStreamTest {
 
@@ -77,7 +77,7 @@ public class SshElevatedPasswordHandlingStreamTest {
         InputStream is = new ByteArrayInputStream("Password:".getBytes());
         SshElevatedPasswordHandlingStream foo = new SshElevatedPasswordHandlingStream(is, os, "foo", ".*[Pp]assword.*>");
         readStream(foo);
-        verifyZeroInteractions(os);
+        verifyNoInteractions(os);
     }
 
     @Test
