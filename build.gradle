@@ -188,19 +188,19 @@ dependencies {
         exclude group: 'com.xebialabs.overthere', module: 'overthere'
         exclude group: 'net.schmizz', module: 'sshj'
     }
-    testImplementation 'org.hamcrest:hamcrest-core:2.2'
-    testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'org.hamcrest:hamcrest-core:3.0'
+    testImplementation 'org.hamcrest:hamcrest-library:3.0'
     testImplementation 'org.mockito:mockito-core:5.21.0'
 
-    testImplementation('org.testng:testng:7.11.0') {
+    testImplementation('org.testng:testng:7.10.2') {
         exclude group: "junit", module: "junit"
     }
     testImplementation('nl.javadude.assumeng:assumeng:1.2.4') {
         exclude group: "junit", module: "junit"
     }
-    testImplementation 'com.google.guava:guava:33.5.0-jre'
+    testImplementation 'com.google.guava:guava:33.4.6-jre'
 
-    testImplementation 'ch.qos.logback:logback-classic:1.5.23'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.24'
 }
 
 tasks.withType(Test).configureEach {
