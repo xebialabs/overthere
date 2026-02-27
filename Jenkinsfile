@@ -23,7 +23,7 @@ pipeline {
         stage('Run test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.java21Env(this, Globals.jdk21Version)) {
+                withEnv(Globals.java21Env(this, Globals.jdk21Version) + ["GRADLE_OPTS=-Dhttps.protocols=TLSv1.2,TLSv1.3"]) {
                     sh "./gradlew clean test"
                 }
             }
@@ -31,7 +31,7 @@ pipeline {
         stage('Run integration test') {
             agent { label params.slaveNode }
             steps {
-                withEnv(Globals.java21Env(this, Globals.jdk21Version)) {
+                withEnv(Globals.java21Env(this, Globals.jdk21Version) + ["GRADLE_OPTS=-Dhttps.protocols=TLSv1.2,TLSv1.3"]) {
                     sh "./gradlew clean itest"
                 }
             }
