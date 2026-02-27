@@ -260,9 +260,6 @@ license {
 signing {
     required = { gradle.taskGraph.hasTask('uploadArchives') }
     sign configurations.archives
-    if (project.hasProperty('sonatypeUsername')) {
-        sign(publishing.publications.named("deployment"))
-    }
 }
 
 nexusStaging {
