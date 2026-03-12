@@ -56,6 +56,12 @@ public class SmbConnectionBuilder extends BaseCifsConnectionBuilder implements O
      */
     public static final String SMB_REQUIRE_SIGNING = "smbRequireSigning";
 
+    /**
+     * Whether SMB Connections require the server to encrypt the data.
+     */
+    public static final boolean SMB_ENCRYPT_DATA_DEFAULT = false;
+    public static final String SMB_ENCRYPT_DATA = "smbEncryptData";
+
     private final SmbConnection connection;
 
     public SmbConnectionBuilder(String type, ConnectionOptions options, AddressPortMapper mapper) {

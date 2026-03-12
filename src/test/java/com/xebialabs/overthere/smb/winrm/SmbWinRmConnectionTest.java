@@ -74,4 +74,27 @@ public class SmbWinRmConnectionTest {
         new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldSupportEncryptDataEnabled() {
+        options.set(USERNAME, "user");
+        options.set(SMB_ENCRYPT_DATA, true);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldSupportEncryptDataDisabled() {
+        options.set(USERNAME, "user");
+        options.set(SMB_ENCRYPT_DATA, false);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldDefaultEncryptDataToFalse() {
+        options.set(USERNAME, "user");
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
 }

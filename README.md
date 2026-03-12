@@ -1083,6 +1083,10 @@ The SMB 2.x and CIFS protocol implementation of Overthere defines a number of ad
 	<th align="left" valign="top"><a name="smb_smbRequireSigning"></a>smbRequireSigning</th>
 	<td>Whether to require the server to sign the responses. The default value is <code>false</code>.</td>
 </tr>
+<tr>
+	<th align="left" valign="top"><a name="smb_smbEncryptData"></a>smbEncryptData</th>
+	<td>Whether to encrypt the SMB transport data. Set to <code>true</code> or <code>false</code> for SMB 3.x servers. Must be <code>false</code> for SMB 2.x servers, as SMB 2.x does not support encryption and the connection will fail otherwise. The default value is <code>false</code>.</td>
+</tr>
 </table>
 
 <a name="cifs_connection_options"></a>
