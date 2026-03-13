@@ -12,17 +12,7 @@ import org.ajoberstar.grgit.Grgit
  * For example:
  * gradle clean build signArchives uploadArchives closeAndPromoteRepository
  *
- * IMPORTANT AUTHENTICATION UPDATE (2024+):
- * - Legacy OSSRH credentials will result in 401 errors
- * - You must use Central Publisher Portal User Tokens instead
- * - Generate tokens at: https://central.sonatype.com/ -> View Account -> Generate User Token
- * - Set sonatypeUsername and sonatypePassword to the generated token values
- * - The nexus-staging plugin handles the complete promotion workflow
- *
- * Prerequisites: 
- * - Published PGP key installed and configured
- * - Central Publisher Portal User Token configured (not legacy OSSRH credentials)
- * - Namespace verified and owned in Central Publisher Portal
+ * prerequisites: Published PGP key installed and configured, authorised sonatype username and password configured
  */
 
 
@@ -31,7 +21,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
         classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
@@ -85,13 +75,56 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-// Configure nebula release plugin properly
-// Use -Prelease.version=x.y.z parameter to specify version for releases
-release {
-    defaultVersionStrategy = Strategies.SNAPSHOT
-    tagStrategy {
-        toTagString = { version -> "${project.name}-${version}" }
+if (project.hasProperty('release.explicit')) {
+    version = project.property('release.explicit')
+}
+
+if (!project.gradle.startParameter.taskNames.contains("final")) {
+    def grgit = Grgit.open(dir: project.projectDir)
+
+    // Custom tag parsing logic for 5.6.x series
+    def parseTag = { tag ->
+        if (tag.name.startsWith(project.name) && tag.name.matches(".*-5\\.6\\.[0-9]+\$")) {
+            try {
+                def versionString = tag.name.substring(project.name.length() + 1)
+                return versionString
+            } catch (Exception e) {
+                return null
+            }
+        } else {
+            return null
+        }
     }
+    // Collect valid 5.6.x versions from tags
+    def validVersions = grgit.tag.list()
+            .collect { parseTag(it) }
+            .findAll { it != null }
+            .sort { a, b -> 
+                def aParts = a.split('\\.').collect { Integer.parseInt(it) }
+                def bParts = b.split('\\.').collect { Integer.parseInt(it) }
+                for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
+                    int result = aParts[i] <=> bParts[i]
+                    if (result != 0) return result
+                }
+                return aParts.size() <=> bParts.size()
+            }
+
+    // Determine the next patch version in 5.6.x series
+    def latestVersion = validVersions.isEmpty() ? '5.6.0-SNAPSHOT' : {
+        def latest = validVersions.last()
+        def parts = latest.split('\\.')
+        def nextPatch = Integer.parseInt(parts[2]) + 1
+        return "${parts[0]}.${parts[1]}.${nextPatch}"
+    }()
+    ext.set("release.version", latestVersion)
+
+    // Configure Nebula Release Plugin
+   /* release {
+        //defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
+        tagStrategy {
+            toTagString = { vs -> "${project.name}" } // Custom tag format
+        }
+    }*/
 }
 
 
@@ -235,7 +268,7 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
+    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
     if (project.hasProperty('sonatypeUsername')) {
         username = project.property("sonatypeUsername").toString()
         password = project.property("sonatypePassword").toString()
@@ -311,12 +344,22 @@ project.publishing {
 
     if (project.hasProperty('sonatypeUsername')) {
         repositories {
-            maven {
-                name = 'ossrh-staging-api'
-                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
+            if(project.version.toString().endsWith('-SNAPSHOT')) {
+                maven {
+                    name = 'ossrh-staging-api'
+                    url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2"
+                    credentials {
+                        username project.property("sonatypeUsername").toString()
+                        password project.property("sonatypePassword").toString()
+                    }
+                }
+            } else {
+                maven {
+                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    credentials {
+                        username project.property("sonatypeUsername").toString()
+                        password project.property("sonatypePassword").toString()
+                    }
                 }
             }
         }
