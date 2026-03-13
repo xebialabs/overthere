@@ -36,6 +36,8 @@ import static com.xebialabs.overthere.ConnectionOptions.USERNAME;
 import static com.xebialabs.overthere.OperatingSystemFamily.WINDOWS;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static com.xebialabs.overthere.util.DefaultAddressPortMapper.INSTANCE;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.PORT_DEFAULT_WINRM_HTTP;
 import static com.xebialabs.overthere.cifs.CifsConnectionType.WINRM_INTERNAL;
 
 public class SmbWinRmConnectionTest {
@@ -74,4 +76,26 @@ public class SmbWinRmConnectionTest {
         new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
     }
 
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldSupportEncryptDataEnabled() {
+        options.set(USERNAME, "user");
+        options.set(SMB_ENCRYPT_DATA, true);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldSupportEncryptDataDisabled() {
+        options.set(USERNAME, "user");
+        options.set(SMB_ENCRYPT_DATA, false);
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
+
+    @Test
+    @SuppressWarnings("resource")
+    public void shouldDefaultEncryptDataToFalse() {
+        options.set(USERNAME, "user");
+        new SmbProcessConnection(SMB_PROTOCOL, options, INSTANCE);
+    }
 }
