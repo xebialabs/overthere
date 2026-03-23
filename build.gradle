@@ -225,6 +225,8 @@ test {
 
 tasks.register('itest', Test) {
     useTestNG()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     includes = ['**/*Itest.*', '**/LocalConnectionTest.*']
     reports.junitXml.outputLocation = layout.buildDirectory.dir("itest-results")
     reports.html.outputLocation = layout.buildDirectory.dir("reports/itests")
