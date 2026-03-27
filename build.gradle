@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
+        classpath "com.netflix.nebula:nebula-release-plugin:21.0.0"
         classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
     }
@@ -156,10 +156,10 @@ dependencies {
     api "org.bouncycastle:bcpkix-jdk18on:1.83"
 
     // Telnet
-    api 'commons-net:commons-net:3.12.0'
+    api 'commons-net:commons-net:3.13.0'
 
     // WinRM
-    api('org.dom4j:dom4j:2.1.4') {
+    api('org.dom4j:dom4j:2.2.0') {
         exclude group: 'xml-apis', module: 'xml-apis'
     }
     api('jaxen:jaxen:2.0.0') {
@@ -172,16 +172,16 @@ dependencies {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
     api 'org.apache.httpcomponents:httpcore:4.4.16'
-    api 'commons-codec:commons-codec:1.19.0'
+    api 'commons-codec:commons-codec:1.21.0'
 
     // GCP
     api 'com.jcraft:jsch:0.1.55'
     api 'com.google.apis:google-api-services-compute:v1-rev20251110-2.0.0'
-    api 'com.google.auth:google-auth-library-oauth2-http:1.41.0'
-    api('com.google.cloud:google-cloud-os-login:2.80.0') {
+    api 'com.google.auth:google-auth-library-oauth2-http:1.43.0'
+    api('com.google.cloud:google-cloud-os-login:2.87.0') {
         exclude group: 'io.grpc', module: 'grpc-netty-shaded'
     }
-    implementation 'io.grpc:grpc-netty-shaded:1.78.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.80.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
@@ -190,17 +190,17 @@ dependencies {
     }
     testImplementation 'org.hamcrest:hamcrest-core:3.0'
     testImplementation 'org.hamcrest:hamcrest-library:3.0'
-    testImplementation 'org.mockito:mockito-core:5.21.0'
+    testImplementation 'org.mockito:mockito-core:5.23.0'
 
-    testImplementation('org.testng:testng:7.10.2') {
+    testImplementation('org.testng:testng:7.12.0') {
         exclude group: "junit", module: "junit"
     }
     testImplementation('nl.javadude.assumeng:assumeng:1.2.4') {
         exclude group: "junit", module: "junit"
     }
-    testImplementation 'com.google.guava:guava:33.4.6-jre'
+    testImplementation 'com.google.guava:guava:33.5.0-jre'
 
-    testImplementation 'ch.qos.logback:logback-classic:1.5.24'
+    testImplementation 'ch.qos.logback:logback-classic:1.5.32'
 }
 
 tasks.withType(Test).configureEach {
