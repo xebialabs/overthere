@@ -32,7 +32,7 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
+        classpath "com.netflix.nebula:nebula-release-plugin:21.0.0"
         classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
     }
@@ -156,10 +156,10 @@ dependencies {
     api "org.bouncycastle:bcpkix-jdk18on:1.83"
 
     // Telnet
-    api 'commons-net:commons-net:3.12.0'
+    api 'commons-net:commons-net:3.13.0'
 
     // WinRM
-    api('org.dom4j:dom4j:2.1.4') {
+    api('org.dom4j:dom4j:2.2.0') {
         exclude group: 'xml-apis', module: 'xml-apis'
     }
     api('jaxen:jaxen:2.0.0') {
@@ -176,12 +176,12 @@ dependencies {
 
     // GCP
     api 'com.jcraft:jsch:0.1.55'
-    api 'com.google.apis:google-api-services-compute:v1-rev235-1.25.0'
+    api 'com.google.apis:google-api-services-compute:v1-rev20251110-2.0.0'
     api 'com.google.auth:google-auth-library-oauth2-http:1.43.0'
-    api('com.google.cloud:google-cloud-os-login:2.85.0') {
+    api('com.google.cloud:google-cloud-os-login:2.87.0') {
         exclude group: 'io.grpc', module: 'grpc-netty-shaded'
     }
-    implementation 'io.grpc:grpc-netty-shaded:1.79.0'
+    implementation 'io.grpc:grpc-netty-shaded:1.80.0'
 
     // Test dependencies
     testImplementation('com.xebialabs.cloud:overcast:2.5.1') {
