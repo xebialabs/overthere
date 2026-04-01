@@ -52,7 +52,9 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 import static com.xebialabs.overthere.ConnectionOptions.*;
-import static com.xebialabs.overthere.cifs.CifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.CONNECTION_TYPE;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.PATH_SHARE_MAPPINGS;
+import static com.xebialabs.overthere.cifs.BaseCifsConnectionBuilder.PATH_SHARE_MAPPINGS_DEFAULT;
 import static com.xebialabs.overthere.smb.SmbConnectionBuilder.*;
 import static java.net.InetSocketAddress.createUnresolved;
 
@@ -104,12 +106,14 @@ public class SmbConnection extends BaseOverthereConnection {
         if (!realSmbHost.equals(hostname)) {
             transportLayerFactory = new TunnelTransportFactory<>(transportLayerFactory, hostname, smbPort);
         }
+        boolean encryptData = options.getBoolean(SMB_ENCRYPT_DATA, SMB_ENCRYPT_DATA_DEFAULT);
         username = options.get(USERNAME);
         password = options.get(PASSWORD);
         SmbConfig config = SmbConfig.builder()
                 .withSigningRequired(requireSigning)
                 .withTransportLayerFactory(transportLayerFactory)
                 .withSecurityProvider(new BCSecurityProvider())
+                .withEncryptData(encryptData)
                 .build();
         client = new SMBClient(config);
     }
