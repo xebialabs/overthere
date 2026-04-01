@@ -62,9 +62,6 @@ repositories {
         url = 'https://download.java.net/maven/2/'
     }
     maven {
-        url = 'https://oss.sonatype.org/content/repositories/releases'
-    }
-    maven {
         url = 'https://www.libvirt.org/maven2/'
     }
     mavenLocal()
