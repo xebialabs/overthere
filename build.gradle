@@ -6,11 +6,11 @@ import org.ajoberstar.grgit.Grgit
 /*
  * Release and publish instructions:
  *
- * Overthere can be published to Maven Central via the Sonatype Central Portal staging API.
- * Use the publishToSonatype and closeAndReleaseSonatypeStagingRepository tasks:
+ * Overthere can be published to Maven Central via the Sonatype Central Portal.
+ * Use the publishToSonatypeCentralPortal and closeAndReleaseSonatypeCentralPortalStagingRepository tasks:
  *
  * For example:
- * gradle clean build publishToSonatype closeAndReleaseSonatypeStagingRepository
+ * gradle clean build publishToSonatypeCentralPortal closeAndReleaseSonatypeCentralPortalStagingRepository
  *
  * prerequisites: Published PGP key installed and configured, authorised Sonatype Central Portal
  *   user token (sonatypeUsername / sonatypePassword) configured in ~/.gradle/gradle.properties
@@ -262,9 +262,7 @@ signing {
 
 nexusPublishing {
     repositories {
-        sonatype {
-            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
-            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        sonatypeCentralPortal {
             if (project.hasProperty('sonatypeUsername')) {
                 username = project.property("sonatypeUsername").toString()
                 password = project.property("sonatypePassword").toString()
