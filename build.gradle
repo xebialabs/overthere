@@ -285,6 +285,40 @@ nexusStaging {
     }
 }
 
+tasks.register('dropStagingRepository') {
+    group 'publishing'
+    description 'Drops any open staging repository to clean up stale artifacts before a new release'
+    doLast {
+        if (!project.hasProperty('sonatypeUsername')) {
+            logger.warn('Skipping dropStagingRepository: sonatypeUsername not configured')
+            return
+        }
+        def username = project.property('sonatypeUsername').toString()
+        def password = project.property('sonatypePassword').toString()
+        def baseUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local'
+        def auth = Base64.getEncoder().encodeToString("${username}:${password}".getBytes('UTF-8'))
+
+        try {
+            def dropUrl = new URL("${baseUrl}/staging/bulk/drop")
+            def conn = dropUrl.openConnection()
+            conn.setRequestMethod('POST')
+            conn.setRequestProperty('Content-Type', 'application/json')
+            conn.setRequestProperty('Authorization', "Basic ${auth}")
+            conn.setDoOutput(true)
+            def body = '{"data":{"stagedRepositoryIds":["com.xebialabs--default-repository"],"description":"Cleanup stale staging before release"}}'
+            conn.outputStream.withWriter('UTF-8') { it.write(body) }
+            def responseCode = conn.getResponseCode()
+            if (responseCode >= 200 && responseCode < 300) {
+                logger.lifecycle('Successfully dropped stale staging repository')
+            } else {
+                logger.warn("Drop staging returned HTTP ${responseCode} - no stale repository to drop (this is OK)")
+            }
+        } catch (Exception e) {
+            logger.warn("Could not drop staging repository: ${e.message} - continuing with build")
+        }
+    }
+}
+
 project.tasks.register("uploadArchives") {
     group "upload"
     dependsOn "publish"
