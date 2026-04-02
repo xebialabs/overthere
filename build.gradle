@@ -262,7 +262,7 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
+    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
     if (project.hasProperty('sonatypeUsername')) {
         username = project.property("sonatypeUsername").toString()
         password = project.property("sonatypePassword").toString()
