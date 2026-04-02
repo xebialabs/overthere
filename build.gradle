@@ -6,23 +6,14 @@ import org.ajoberstar.grgit.Grgit
 /*
  * Release and publish instructions:
  *
- * Overthere can be automatically "closed" and "promoted" on maven central by calling gradle tasks
- * closeRepository, promoteRepository or closeAndPromoteRepository. Archives need to be uploaded manually.
+ * Overthere can be published to Maven Central via the Sonatype Central Portal.
+ * Use the publishToSonatypeCentralPortal and closeAndReleaseSonatypeCentralPortalStagingRepository tasks:
  *
  * For example:
- * gradle clean build signArchives uploadArchives closeAndPromoteRepository
+ * gradle clean build publishToSonatypeCentralPortal closeAndReleaseSonatypeCentralPortalStagingRepository
  *
- * IMPORTANT AUTHENTICATION UPDATE (2024+):
- * - Legacy OSSRH credentials will result in 401 errors
- * - You must use Central Publisher Portal User Tokens instead
- * - Generate tokens at: https://central.sonatype.com/ -> View Account -> Generate User Token
- * - Set sonatypeUsername and sonatypePassword to the generated token values
- * - The nexus-staging plugin handles the complete promotion workflow
- *
- * Prerequisites:
- * - Published PGP key installed and configured
- * - Central Publisher Portal User Token configured (not legacy OSSRH credentials)
- * - Namespace verified and owned in Central Publisher Portal
+ * prerequisites: Published PGP key installed and configured, authorised Sonatype Central Portal
+ *   user token (sonatypeUsername / sonatypePassword) configured in ~/.gradle/gradle.properties
  */
 
 
@@ -31,7 +22,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath "io.github.gradle-nexus:publish-plugin:2.0.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
@@ -52,7 +43,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'license'
-apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'nebula.release'
 apply plugin: 'org.ajoberstar.grgit'
 
@@ -88,16 +79,12 @@ if (JavaVersion.current().isJava8Compatible()) {
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
-    // Custom tag parsing logic
+    // Custom tag parsing logic — extract Version from tag name
     def parseTag = { tag ->
-        if (tag.name.startsWith(project.name)) {
+        if (tag.name.startsWith(project.name + "-")) {
             try {
                 def versionString = tag.name.substring(project.name.length() + 1)
-                Version tagVersion = Version.valueOf(versionString)
-                def major = tagVersion.getMajorVersion()
-                def minor = tagVersion.getMinorVersion()+1
-                def patch = 0
-                return "${major}.${minor}.${patch}"
+                return Version.valueOf(versionString)
             } catch (Exception _) {
                 return null
             }
@@ -105,14 +92,32 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
             return null
         }
     }
-    // Collect valid versions from tags
-    def validVersions = grgit.tag.list()
+    // Collect valid versions from tags, sort using semantic version comparison
+    def existingVersions = grgit.tag.list()
             .collect { parseTag(it) }
             .findAll { it != null }
             .sort { a, b -> a.compareTo(b) }
 
-    // Determine the latest version or fallback to snapshot
-    def latestVersion = validVersions.isEmpty() ? '0.1.0-SNAPSHOT' : validVersions.last().toString()
+    // Determine the next version based on release.scope (patch/minor/major)
+    def releaseScope = project.hasProperty('release.scope') ? project.property('release.scope').toString().trim() : 'minor'
+    def latestVersion
+    if (existingVersions.isEmpty()) {
+        latestVersion = '0.1.0-SNAPSHOT'
+    } else {
+        def highest = existingVersions.last()
+        switch (releaseScope) {
+            case 'major':
+                latestVersion = "${highest.getMajorVersion() + 1}.0.0"
+                break
+            case 'patch':
+                latestVersion = "${highest.getMajorVersion()}.${highest.getMinorVersion()}.${highest.getPatchVersion() + 1}"
+                break
+            case 'minor':
+            default:
+                latestVersion = "${highest.getMajorVersion()}.${highest.getMinorVersion() + 1}.0"
+                break
+        }
+    }
     ext.set("release.version", latestVersion)
 
 // Configure nebula release plugin properly
@@ -259,12 +264,16 @@ signing {
     sign configurations.archives
 }
 
-nexusStaging {
-    packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
-    if (project.hasProperty('sonatypeUsername')) {
-        username = project.property("sonatypeUsername").toString()
-        password = project.property("sonatypePassword").toString()
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
+            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            if (project.hasProperty('sonatypeUsername')) {
+                username = project.property("sonatypeUsername").toString()
+                password = project.property("sonatypePassword").toString()
+            }
+        }
     }
 }
 
@@ -336,17 +345,6 @@ project.publishing {
     }
 
     if (project.hasProperty('sonatypeUsername')) {
-        repositories {
-            maven {
-                name = 'ossrh-staging-api'
-                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
-                }
-            }
-        }
-
         signing {
             sign(publishing.publications["deployment"])
         }
