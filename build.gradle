@@ -21,7 +21,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0"
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:2.2.2"
         classpath "org.ajoberstar.grgit:grgit-gradle:4.1.1"
@@ -72,10 +72,6 @@ if (JavaVersion.current().isJava8Compatible()) {
     }
 }
 
-if (project.hasProperty('release.explicit')) {
-    version = project.property('release.explicit')
-}
-
 if (!project.gradle.startParameter.taskNames.contains("final")) {
     def grgit = Grgit.open(dir: project.projectDir)
 
@@ -115,13 +111,13 @@ if (!project.gradle.startParameter.taskNames.contains("final")) {
     }()
     ext.set("release.version", latestVersion)
 
-    // Configure Nebula Release Plugin
-   /* release {
-        //defaultVersionStrategy = Strategies.SNAPSHOT // Use snapshot strategy
-        tagStrategy {
-            toTagString = { vs -> "${project.name}" } // Custom tag format
-        }
-    }*/
+// Configure nebula release plugin properly
+// Use -Prelease.version=x.y.z parameter to specify version for releases
+release {
+    defaultVersionStrategy = Strategies.SNAPSHOT
+    tagStrategy {
+        toTagString = { version -> "${project.name}-${version}" }
+    }
 }
 
 
@@ -265,7 +261,7 @@ signing {
 
 nexusStaging {
     packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
+    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
     if (project.hasProperty('sonatypeUsername')) {
         username = project.property("sonatypeUsername").toString()
         password = project.property("sonatypePassword").toString()
@@ -341,22 +337,12 @@ project.publishing {
 
     if (project.hasProperty('sonatypeUsername')) {
         repositories {
-            if(project.version.toString().endsWith('-SNAPSHOT')) {
-                maven {
-                    name = 'ossrh-staging-api'
-                    url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2"
-                    credentials {
-                        username project.property("sonatypeUsername").toString()
-                        password project.property("sonatypePassword").toString()
-                    }
-                }
-            } else {
-                maven {
-                    url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                    credentials {
-                        username project.property("sonatypeUsername").toString()
-                        password project.property("sonatypePassword").toString()
-                    }
+            maven {
+                name = 'ossrh-staging-api'
+                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
+                credentials {
+                    username project.property("sonatypeUsername").toString()
+                    password project.property("sonatypePassword").toString()
                 }
             }
         }
