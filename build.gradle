@@ -6,23 +6,14 @@ import org.ajoberstar.grgit.Grgit
 /*
  * Release and publish instructions:
  *
- * Overthere can be automatically "closed" and "promoted" on maven central by calling gradle tasks
- * closeRepository, promoteRepository or closeAndPromoteRepository. Archives need to be uploaded manually.
+ * Overthere can be published to Maven Central via the Sonatype Central Portal.
+ * Use the publishToSonatypeCentralPortal and closeAndReleaseSonatypeCentralPortalStagingRepository tasks:
  *
  * For example:
- * gradle clean build signArchives uploadArchives closeAndPromoteRepository
+ * gradle clean build publishToSonatypeCentralPortal closeAndReleaseSonatypeCentralPortalStagingRepository
  *
- * IMPORTANT AUTHENTICATION UPDATE (2024+):
- * - Legacy OSSRH credentials will result in 401 errors
- * - You must use Central Publisher Portal User Tokens instead
- * - Generate tokens at: https://central.sonatype.com/ -> View Account -> Generate User Token
- * - Set sonatypeUsername and sonatypePassword to the generated token values
- * - The nexus-staging plugin handles the complete promotion workflow
- *
- * Prerequisites:
- * - Published PGP key installed and configured
- * - Central Publisher Portal User Token configured (not legacy OSSRH credentials)
- * - Namespace verified and owned in Central Publisher Portal
+ * prerequisites: Published PGP key installed and configured, authorised Sonatype Central Portal
+ *   user token (sonatypeUsername / sonatypePassword) configured in ~/.gradle/gradle.properties
  */
 
 
@@ -31,7 +22,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath "io.github.gradle-nexus:publish-plugin:2.0.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
@@ -52,7 +43,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'license'
-apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'nebula.release'
 apply plugin: 'org.ajoberstar.grgit'
 
@@ -60,9 +51,6 @@ repositories {
     mavenCentral()
     maven {
         url = 'https://download.java.net/maven/2/'
-    }
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/releases'
     }
     maven {
         url = 'https://www.libvirt.org/maven2/'
@@ -276,45 +264,13 @@ signing {
     sign configurations.archives
 }
 
-nexusStaging {
-    packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/service/local/"
-    if (project.hasProperty('sonatypeUsername')) {
-        username = project.property("sonatypeUsername").toString()
-        password = project.property("sonatypePassword").toString()
-    }
-}
-
-tasks.register('dropStagingRepository') {
-    group 'publishing'
-    description 'Drops any open staging repository to clean up stale artifacts before a new release'
-    doLast {
-        if (!project.hasProperty('sonatypeUsername')) {
-            logger.warn('Skipping dropStagingRepository: sonatypeUsername not configured')
-            return
-        }
-        def username = project.property('sonatypeUsername').toString()
-        def password = project.property('sonatypePassword').toString()
-        def baseUrl = 'https://ossrh-staging-api.central.sonatype.com/service/local'
-        def auth = Base64.getEncoder().encodeToString("${username}:${password}".getBytes('UTF-8'))
-
-        try {
-            def dropUrl = new URL("${baseUrl}/staging/bulk/drop")
-            def conn = dropUrl.openConnection()
-            conn.setRequestMethod('POST')
-            conn.setRequestProperty('Content-Type', 'application/json')
-            conn.setRequestProperty('Authorization', "Basic ${auth}")
-            conn.setDoOutput(true)
-            def body = '{"data":{"stagedRepositoryIds":["com.xebialabs--default-repository"],"description":"Cleanup stale staging before release"}}'
-            conn.outputStream.withWriter('UTF-8') { it.write(body) }
-            def responseCode = conn.getResponseCode()
-            if (responseCode >= 200 && responseCode < 300) {
-                logger.lifecycle('Successfully dropped stale staging repository')
-            } else {
-                logger.warn("Drop staging returned HTTP ${responseCode} - no stale repository to drop (this is OK)")
+nexusPublishing {
+    repositories {
+        sonatypeCentralPortal {
+            if (project.hasProperty('sonatypeUsername')) {
+                username = project.property("sonatypeUsername").toString()
+                password = project.property("sonatypePassword").toString()
             }
-        } catch (Exception e) {
-            logger.warn("Could not drop staging repository: ${e.message} - continuing with build")
         }
     }
 }
@@ -387,17 +343,6 @@ project.publishing {
     }
 
     if (project.hasProperty('sonatypeUsername')) {
-        repositories {
-            maven {
-                name = 'ossrh-staging-api'
-                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
-                }
-            }
-        }
-
         signing {
             sign(publishing.publications["deployment"])
         }
