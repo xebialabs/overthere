@@ -22,7 +22,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath "io.github.gradle-nexus:publish-plugin:2.0.0"
         classpath "com.netflix.nebula:nebula-release-plugin:20.2.0"
         classpath "ru.vyarus:gradle-pom-plugin:3.0.0"
         classpath "org.ajoberstar.grgit:grgit-gradle:5.3.3"
@@ -43,7 +43,7 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'license'
-apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 apply plugin: 'nebula.release'
 apply plugin: 'org.ajoberstar.grgit'
 
@@ -260,12 +260,16 @@ signing {
     sign configurations.archives
 }
 
-nexusStaging {
-    packageGroup = "com.xebialabs"
-    serverUrl = "https://ossrh-staging-api.central.sonatype.com/"
-    if (project.hasProperty('sonatypeUsername')) {
-        username = project.property("sonatypeUsername").toString()
-        password = project.property("sonatypePassword").toString()
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
+            snapshotRepositoryUrl = uri("https://central.sonatype.com/repository/maven-snapshots/")
+            if (project.hasProperty('sonatypeUsername')) {
+                username = project.property("sonatypeUsername").toString()
+                password = project.property("sonatypePassword").toString()
+            }
+        }
     }
 }
 
@@ -337,17 +341,6 @@ project.publishing {
     }
 
     if (project.hasProperty('sonatypeUsername')) {
-        repositories {
-            maven {
-                name = 'ossrh-staging-api'
-                url = "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/"
-                credentials {
-                    username project.property("sonatypeUsername").toString()
-                    password project.property("sonatypePassword").toString()
-                }
-            }
-        }
-
         signing {
             sign(publishing.publications["deployment"])
         }
