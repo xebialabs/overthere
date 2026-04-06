@@ -29,6 +29,12 @@
 		* [GCP Credentials](#gcp-credentials)
 * [Release History](#release-history)
 
+<a name="Versions"></a>
+# Versions
+
+JDK 17 Supported Latest Version: 5.6.19 
+
+JDK 21 Supported Latest Version: 5.9.2
 
 <a name="introduction"></a>
 # Introduction
