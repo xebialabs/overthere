@@ -1,6 +1,7 @@
 <a name="toc"></a>
 # Table of Contents
 
+* [Versions](#versions)
 * [Introduction](#introduction)
 * [Getting Overthere](#getting-overthere)
 	* [Depending on Overthere](#depending-on-overthere)
@@ -29,12 +30,12 @@
 		* [GCP Credentials](#gcp-credentials)
 * [Release History](#release-history)
 
-<a name="Versions"></a>
+<a name="versions"></a>
 # Versions
 
-JDK 17 Supported Latest Version: 5.6.19 
+JDK 17 Supported Latest Version: **5.6.19** - use **25.1.x-maintenance** branch
 
-JDK 21 Supported Latest Version: 5.9.2
+JDK 21 Supported Latest Version: **5.9.2** - use **master** branch
 
 <a name="introduction"></a>
 # Introduction
