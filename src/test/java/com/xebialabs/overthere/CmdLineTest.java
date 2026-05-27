@@ -131,15 +131,49 @@ public class CmdLineTest {
         assertThat(nestedCommandLine.toCommandLine(UNIX, false), equalTo("rm a\\ file"));
 
         CmdLine commandLine = new CmdLine().addArgument("sudo").addNested(nestedCommandLine);
-        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo rm\\ a\\\\\\ file"));
+        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo 'rm a\\ file'"));
     }
 
     @Test
     public void shouldEncodeNestedPassword() {
         CmdLine nestedCommandLine = new CmdLine().addArgument("login").addPassword("secret");
         CmdLine commandLine = new CmdLine().addArgument("wrap").addNested(nestedCommandLine);
-        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("wrap login\\ secret"));
-        assertThat(commandLine.toCommandLine(UNIX, true), equalTo("wrap login\\ \\*\\*\\*\\*\\*\\*\\*\\*"));
+        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("wrap 'login secret'"));
+        assertThat(commandLine.toCommandLine(UNIX, true), equalTo("wrap 'login ********'"));
+    }
+
+    @Test
+    public void shouldSingleQuoteWrapNestedCommandForUnix() {
+        // Reproduces the double-shell scenario: SSH outer shell + su/sudo inner shell.
+        // The inner command contains a path with a backslash (\liquibase) and a URL
+        // with a ? — both must survive two shell passes unmodified.
+        //
+        // With single-quote wrapping:
+        //   SSH shell:  single quotes pass content verbatim to su -c
+        //   su inner sh: interprets the one-level backslash-escaping correctly:
+        //                  \\liquibase -> \liquibase  (correct binary path)
+        //                  \?          -> ?           (correct JDBC URL)
+        CmdLine inner = new CmdLine()
+                .addArgument("/opt/liquibase/\\liquibase")
+                .addArgument("--url=jdbc:postgresql://db:5432/schema?currentSchema=pa")
+                .addArgument("listlocks");
+
+        CmdLine outer = new CmdLine()
+                .addArgument("sudo").addArgument("su").addArgument("-")
+                .addArgument("vvuser").addArgument("-c")
+                .addNested(inner);
+
+        assertThat(outer.toCommandLine(UNIX, false),
+                equalTo("sudo su - vvuser -c '/opt/liquibase/\\\\liquibase --url=jdbc:postgresql://db:5432/schema\\?currentSchema=pa listlocks'"));
+    }
+
+    @Test
+    public void shouldEscapeEmbeddedSingleQuoteInNestedCommand() {
+        // A single quote inside the nested command must be escaped using the POSIX '\'' idiom.
+        CmdLine inner = new CmdLine().addArgument("echo").addArgument("it's");
+        CmdLine outer = new CmdLine().addArgument("sudo").addArgument("-c").addNested(inner);
+
+        assertThat(outer.toCommandLine(UNIX, false), equalTo("sudo -c 'echo it\\'\\''s'"));
     }
 
     @Test
@@ -156,7 +190,7 @@ public class CmdLineTest {
         assertThat(nestedCommandLine.toCommandLine(UNIX, false), equalTo("rm *"));
 
         CmdLine commandLine = new CmdLine().addArgument("sudo").addNested(nestedCommandLine);
-        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo rm\\ \\*"));
+        assertThat(commandLine.toCommandLine(UNIX, false), equalTo("sudo 'rm *'"));
     }
 
 }

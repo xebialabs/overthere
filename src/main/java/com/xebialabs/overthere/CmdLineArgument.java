@@ -243,13 +243,29 @@ public abstract class CmdLineArgument implements Serializable {
 
         public String toString(OperatingSystemFamily os, boolean forLogging) {
             StringBuilder builder = new StringBuilder();
-            encodeString(line.toCommandLine(os, forLogging), os, builder);
+            buildString(os, forLogging, builder);
             return builder.toString();
         }
 
         @Override
         public void buildString(OperatingSystemFamily os, boolean forLogging, StringBuilder builder) {
-            encodeString(line.toCommandLine(os, forLogging), os, builder);
+            String inner = line.toCommandLine(os, forLogging);
+            switch (os) {
+                case UNIX:
+                case ZOS:
+                    // Single-quote wrap so the inner command survives two shell passes
+                    // (SSH shell + su/sudo inner shell) unmodified. The inner command
+                    // string already contains one level of backslash-escaping from
+                    // toCommandLine(), which the su/sudo inner shell will interpret
+                    // correctly. Embedded single quotes are escaped using the POSIX
+                    // '\'' idiom (end quote, escaped quote, reopen quote).
+                    builder.append('\'');
+                    builder.append(inner.replace("'", "'\\''"));
+                    builder.append('\'');
+                    break;
+                default:
+                    encodeString(inner, os, builder);
+            }
         }
 
         @Override
