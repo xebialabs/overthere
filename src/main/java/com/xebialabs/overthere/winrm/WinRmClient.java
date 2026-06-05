@@ -342,7 +342,7 @@ class WinRmClient {
 
     private Document sendRequest(final Document requestDocument, final SoapAction soapAction) {
         if (enableKerberos) {
-            return runPrivileged(requestDocument, soapAction);
+            return runPrivileged(new PrivilegedSendMessage(requestDocument, soapAction));
         } else {
             return doSendRequest(requestDocument, soapAction);
         }
@@ -351,19 +351,44 @@ class WinRmClient {
     /**
      * Performs the JAAS login and run the sendRequest method within a privileged scope.
      */
-    private Document runPrivileged(final Document requestDocument, final SoapAction soapAction) {
+    private Document runPrivileged(final PrivilegedSendMessage privilegedSendMessage) {
         final CallbackHandler handler = new ProvidedAuthCallback(username, password);
         Document result;
         try {
             final LoginContext lc = new LoginContext("", null, handler, new KerberosJaasConfiguration(kerberosDebug, kerberosTicketCache));
             lc.login();
 
-            result = Subject.callAs(lc.getSubject(), () -> doSendRequest(requestDocument, soapAction));
+            result = Subject.doAs(lc.getSubject(), privilegedSendMessage);
         } catch (LoginException e) {
             throw new WinRmRuntimeIOException("Login failure sending message on " + targetURL + " error: " + e.getMessage(),
-                    requestDocument, null, e);
+                    privilegedSendMessage.getRequestDocument(), null, e);
+        } catch (PrivilegedActionException e) {
+            throw new WinRmRuntimeIOException("Failure sending message on " + targetURL + " error: " + e.getMessage(),
+                    privilegedSendMessage.getRequestDocument(), null, e.getException());
         }
         return result;
+    }
+
+    /**
+     * PrivilegedExceptionAction that wraps the internal sendRequest
+     */
+    private class PrivilegedSendMessage implements PrivilegedExceptionAction<Document> {
+        private Document requestDocument;
+        private SoapAction soapAction;
+
+        private PrivilegedSendMessage(final Document requestDocument, final SoapAction soapAction) {
+            this.requestDocument = requestDocument;
+            this.soapAction = soapAction;
+        }
+
+        @Override
+        public Document run() throws Exception {
+            return WinRmClient.this.doSendRequest(requestDocument, soapAction);
+        }
+
+        public Document getRequestDocument() {
+            return requestDocument;
+        }
     }
 
     /**
